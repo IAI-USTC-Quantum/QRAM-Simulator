@@ -1,0 +1,6 @@
+
+add_executable(ExecutabilityTest ExecutabilityTest.cpp)
+target_link_libraries(ExecutabilityTest SparQ)
+
+add_executable(CorrectnessTest CorrectnessTest.cpp)
+target_link_libraries(CorrectnessTest SparQ)

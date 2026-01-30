@@ -1,0 +1,536 @@
+#include "quantum_arithmetic.h"
+
+namespace qram_simulator
+{
+
+	void FlipBools::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg = s.get(id);
+			reg.value = ~reg.value;
+		}
+	}
+
+	void Swap_Bool_Bool::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg1 = s.get(lhs);
+			auto& reg2 = s.get(rhs);
+			bool v1 = get_digit(reg1.value, digit1);
+			bool v2 = get_digit(reg2.value, digit2);
+			if (v1 && (!v2))
+			{
+				reg1.value -= pow2(digit1);
+				reg2.value += pow2(digit2);
+			}
+			if (v2 && (!v1))
+			{
+				reg1.value += pow2(digit1);
+				reg2.value -= pow2(digit2);
+			}
+		}
+	}
+
+	void ShiftLeft::operator()(std::vector<System>& state) const
+	{
+		size_t size = System::size_of(register_1);
+		//change >= to >
+		if (digit > size)
+			throw_invalid_input();
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t value = s.GetAs(register_1, uint64_t);
+			/* [digit, size-digit]*/
+
+			uint64_t high = value >> (size - digit);
+			uint64_t low = value - (high << (size - digit));
+			s.get(register_1).value = (low << digit) + high;
+			//Debug_CheckOverflow(register_1);
+		}
+	}
+
+	// high(size-d)-low(d)
+	// low-high
+
+	void ShiftRight::operator()(std::vector<System>& state) const
+	{
+		size_t size = System::size_of(register_1);
+		//change >= to >
+		if (digit > size)
+			throw_invalid_input();
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t value = s.GetAs(register_1, uint64_t);
+			/* [digit, size-digit]*/
+
+			uint64_t high = value >> digit; // high
+			uint64_t low = value - (high << (digit)); // low
+			s.get(register_1).value = (low << (size - digit)) + high;
+		}
+	}
+
+	void Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg_out = s.get(res);
+			reg_out.value ^= (s.GetAs(lhs, uint64_t) * mult_int);
+		}
+	}
+
+	void Add_Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			//Debug_CheckOverflow(res);
+			//Debug_CheckOverflow(lhs);
+			s.get(res).value += (mult_int * s.GetAs(lhs, uint64_t));
+			//Debug_CheckOverflow(res);
+		}
+		}
+
+
+	void Add_Mult_UInt_ConstUInt::dag(std::vector<System>& state) const
+	{
+		auto dim = System::size_of(res);
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			s.get(res).value += (pow2(dim) - mult_int * s.GetAs(lhs, uint64_t));
+			s.get(res).value %= pow2(dim);
+		}
+	}
+
+
+	void Add_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			s.get(res).value ^= (s.GetAs(lhs, uint64_t) + s.GetAs(rhs, uint64_t));
+		}
+	}
+
+	void Add_UInt_UInt_InPlace::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			s.get(rhs).value += s.GetAs(lhs, uint64_t);
+		}
+	}
+
+	void Add_UInt_UInt_InPlace::dag(std::vector<System>& state) const
+	{
+		auto dim = System::size_of(rhs);
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			s.get(rhs).value += (pow2(dim) - s.GetAs(lhs, uint64_t));
+			s.get(rhs).value = s.get(rhs).value % pow2(dim);
+		}
+	}
+
+	void Add_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg_out = s.get(res);
+			reg_out.value ^= (s.GetAs(lhs, uint64_t) + add_int);
+			//Debug_CheckOverflow(res);
+		}
+	}
+
+	void Add_ConstUInt::operator()(std::vector<System>& state) const
+	{
+		auto dim = System::size_of(reg_in);
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg_ = s.get(reg_in);
+			reg_.value += add_int;
+			reg_.value = reg_.value % pow2(dim);
+		}
+	}
+
+	void Add_ConstUInt::dag(std::vector<System>& state) const
+	{
+		auto dim = System::size_of(reg_in);
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg_ = s.get(reg_in);
+			reg_.value += (pow2(dim) - add_int);
+			reg_.value = reg_.value % pow2(dim);
+		}
+	}
+
+	void Div_Sqrt_Arccos_Int_Int::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t regl_v = s.GetAs(register_lhs, uint64_t);
+			uint64_t regr_v = s.GetAs(register_rhs, uint64_t);
+			double out = std::acos(std::sqrt(1.0 * regl_v / regr_v)) / pi / 2;
+			auto& regout = s.get(register_out);
+			regout.value ^= get_rational(out, System::size_of(register_out));
+		}
+	}
+
+	void Sqrt_Div_Arccos_Int_Int::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			int64_t lvalue = s.GetAs(register_lhs, int64_t);
+			uint64_t rvalue = s.GetAs(register_rhs, uint64_t);
+
+			double out = std::acos(lvalue / std::sqrt(rvalue)) / pi / 2;
+			auto& regout = s.get(register_out);
+			regout.value ^= get_rational(out, System::size_of(register_out));
+		}
+	}
+
+	void GetRotateAngle_Int_Int::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& regl = s.get(register_lhs);
+			auto& regr = s.get(register_rhs);
+			auto l_complement = s.GetAs(register_lhs, uint64_t);
+			auto r_complement = s.GetAs(register_rhs, uint64_t);
+			auto l = get_complement(l_complement, System::size_of(register_lhs));
+			auto r = get_complement(r_complement, System::size_of(register_rhs));
+			double out;
+			if (l == 0 && r >= 0) { out = 0.25; }
+			else if (l == 0 && r < 0) { out = 0.75; }
+			else {
+				out = std::atan2(r, l) / pi / 2;
+				if (out < 0) out += 1;
+			}
+			auto& regout = s.get(register_out);
+			regout.value ^= get_rational(out, System::size_of(register_out));
+		}
+	}
+
+	void AddAssign_AnyInt_AnyInt::_operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
+	{
+		lhs += rhs;
+		lhs %= pow2(l_size);
+	}
+
+	void AddAssign_AnyInt_AnyInt::_operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
+	{
+		lhs -= rhs;
+		lhs %= pow2(l_size);
+	}
+
+	void AddAssign_AnyInt_AnyInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			_operate_uint_uint(
+				s.get(lhs_id).value, lhs_size,
+				s.get(rhs_id).as<uint64_t>(rhs_size), rhs_size);
+		}
+	}
+
+	void AddAssign_AnyInt_AnyInt::dag(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			_operate_uint_uint_dag(
+				s.get(lhs_id).value, lhs_size,
+				s.get(rhs_id).as<uint64_t>(rhs_size), rhs_size);
+		}
+	}
+
+	void Assign::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& reg1 = s.get(register_1);
+			auto& reg2 = s.get(register_2);
+			reg2.value ^= reg1.value;
+
+		}
+	}
+
+	void Compare_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t l = s.GetAs(left_id, uint64_t);
+			uint64_t r = s.GetAs(right_id, uint64_t);
+
+			if (l == r)
+			{
+				s.get(compare_equal_id).value ^= 1;
+			}
+			else
+			{
+				s.get(compare_less_id).value ^= (l < r);
+			}
+		}
+	}
+
+
+	void Less_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t l = s.GetAs(left_id, uint64_t);
+			uint64_t r = s.GetAs(right_id, uint64_t);
+
+			s.get(compare_less_id).value ^= (l < r);
+		}
+	}
+
+	void Swap_General_General::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+			//Debug_CheckOverflow(id1);
+			//Debug_CheckOverflow(id2);
+			std::swap(s.get(id1).value, s.get(id2).value);
+		}
+	}
+
+	void GetMid_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t l = s.GetAs(left_id, uint64_t);
+			uint64_t r = s.GetAs(right_id, uint64_t);
+
+			s.get(mid_id).value ^= (l + r) / 2;
+		}
+	}
+}

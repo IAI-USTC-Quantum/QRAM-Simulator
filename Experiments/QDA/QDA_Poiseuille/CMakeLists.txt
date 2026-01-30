@@ -1,0 +1,7 @@
+project(Experiment_QDA_Poiseuille)
+
+add_executable(Experiment_PoiseuilleModuleTest PoiseuilleModuleTest.cpp)
+target_link_libraries(Experiment_PoiseuilleModuleTest SparQ)  
+
+add_executable(Experiment_PoiseuilleQDATest PoiseuilleQDATest.cpp)
+target_link_libraries(Experiment_PoiseuilleQDATest SparQ)  

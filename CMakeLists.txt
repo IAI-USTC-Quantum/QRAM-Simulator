@@ -1,0 +1,78 @@
+cmake_minimum_required(VERSION 3.18)
+
+project(SparQ)
+
+include_directories(${PROJECT_SOURCE_DIR}/Common/include
+                    ${PROJECT_SOURCE_DIR}/QRAM/include
+                    ${PROJECT_SOURCE_DIR}/SparQ_Algorithm/include
+                    ${PROJECT_SOURCE_DIR}/SparQ/include
+                    ${PROJECT_SOURCE_DIR}/ThirdParty
+                    ${PROJECT_SOURCE_DIR}/ThirdParty/argparse
+                    ${PROJECT_SOURCE_DIR}/ThirdParty/fmt/include
+                    ${PROJECT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
+                    ${PROJECT_SOURCE_DIR}/Thirdparty/pybind11
+                    )
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+include(CheckLanguage)
+check_language(CUDA)
+
+if(CACHED_REGISTER_SIZE)
+    add_compile_definitions(CACHED_REGISTER_SIZE=${CACHED_REGISTER_SIZE})
+endif()
+
+add_compile_definitions(FMT_UNICODE=0)
+
+if(CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+    message(STATUS "CUDA Toolkit found, version ${CMAKE_CUDA_COMPILER_VERSION}")
+    set(CUDA_FOUND TRUE)
+    # message(STATUS "${CUDA_FOUND}")
+
+    include_directories(${PROJECT_SOURCE_DIR}/Common/include/cuda
+                        ${CUDA_INCLUDE_DIRS})
+        
+else()
+    message(STATUS "CUDA not found - building without GPU support")
+endif()
+
+option(CMAKE_BUILD_TYPE "Release")
+
+message(STATUS "PROJECT_BINARY_DIR = ${PROJECT_BINARY_DIR}")
+message(STATUS "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+
+find_package(OpenMP REQUIRED)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(TBB)
+message(STATUS "Found TBB: ${TBB_FOUND}")
+
+if (UNIX)
+	add_compile_options(-fPIC)
+endif(UNIX)
+
+# if (MSVC)
+#   add_compile_options(/bigobj)
+#   add_compile_options(/FS)
+# endif()
+
+
+add_subdirectory(Common)
+add_subdirectory(QRAM)
+add_subdirectory(SparQ)
+add_subdirectory(SparQ_Algorithm)
+add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
+add_subdirectory(test)
+add_subdirectory(Experiments)
+add_subdirectory(PySparQ)

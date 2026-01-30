@@ -1,0 +1,9 @@
+[
+    {
+        "cmd": "OMP_NUM_THREADS=8 ./QasmTest.exe --input C:\\Users\\RGZN090201\\Documents\\GitHub\\Quantum-Sparse-State-Calculator\\test\\CPUTest\\QASMTest\\qasm_files\\bv_n19.qasm",
+        "stdout": "",
+        "stderr": "'OMP_NUM_THREADS' 不是内部或外部命令，也不是可运行的程序\n或批处理文件。\n",
+        "returncode": 1,
+        "elapsed": 600.0
+    }
+]

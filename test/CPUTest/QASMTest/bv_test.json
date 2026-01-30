@@ -1,0 +1,9 @@
+[
+    {
+        "cmd": "set OMP_NUM_THREADS=8\n C:\\Users\\RGZN090201\\Documents\\GitHub\\Quantum-Sparse-State-Calculator\\build\\x64-Release\\bin\\QasmTest.exe --input C:\\Users\\RGZN090201\\Documents\\GitHub\\Quantum-Sparse-State-Calculator\\test\\CPUTest\\QASMTest\\qasm_files\\bv_n19.qasm",
+        "stdout": "",
+        "stderr": "",
+        "returncode": 0,
+        "elapsed": null
+    }
+]
