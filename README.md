@@ -2,7 +2,7 @@
 
 This document gives a plain‑language map of the repository and a consolidated reference for QRAM‑related components.
 
-### Quick mental model (high-level summary)
+### Summary
 
 1. **Create a QRAM circuit** with an address size and data size, and fill its memory.
 2. **Create SparQ registers** for the address and data.
@@ -10,20 +10,20 @@ This document gives a plain‑language map of the repository and a consolidated 
 4. **Run additional algorithms** (state prep, block encoding, Grover, etc.) that internally call `QRAMLoad`.
 
 
-# Numerical simulation testing locations (for the paper reference)
+## Numerical simulation testing locations
 
 Below is where QRAM timing tests and error‑filtration tests live in this repo, with file‑level citations.
 
-## QRAM timing / performance testing locations
+### QRAM timing / performance testing locations
 
-### 1) QRAM fidelity tests that record profiler timing
+#### 1) QRAM fidelity tests that record profiler timing
 
 These tests wrap QRAM operations in profiler scopes and print profile summaries, which is where timing/perf for QRAM is captured:
 
 - **Experiment fidelity test**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`  
   *This experiment explicitly wraps the QRAM load in a profiler scope (`profiler _("**RECORD**")`) and prints profiling summaries afterward, which is another place QRAM timing is recorded.*
 
-### 2) QRAM simulator comparison (profiling per‑run)
+#### 2) QRAM simulator comparison (profiling per‑run)
 
 The "V2" QRAM simulator test sets up a per‑run `profiler` instance and also profiles the main test loop, which is useful for timing comparisons between "full" and "normal" QRAM executions:
 
@@ -32,7 +32,7 @@ The "V2" QRAM simulator test sets up a per‑run `profiler` instance and also pr
 
 If you specifically meant "wall‑clock benchmarks," the experiments above use the project’s `profiler` mechanism (not raw `std::chrono`) to capture timings.
 
-## Error‑filtration testing locations
+### Error‑filtration testing locations
 
 The error filtration work is concentrated here:
 
@@ -51,7 +51,7 @@ If you want to run them (high level):
 
 The classes and operators above are the "official" interface points that enable that flow.
 
-## 1) Repository structure (plain‑language map)
+#### 1) Repository structure
 
 The top‑level CMake configuration wires together the major modules below. If you are new to the codebase, this is the easiest map to start from:
 
@@ -63,7 +63,7 @@ The top‑level CMake configuration wires together the major modules below. If y
 - **ThirdParty/** — bundled third‑party dependencies.
 - **test/** and **Experiments/** — tests and experiment drivers.
 
-## 2) QRAM at a glance (what it does)
+#### 2) QRAM at a glance
 
 At a high level, the QRAM support in this repository provides:
 
@@ -74,11 +74,11 @@ At a high level, the QRAM support in this repository provides:
 
 The details are captured in the sections below.
 
-## 3) Core QRAM circuit types
+#### 3) Core QRAM circuit types
 
 There are two QRAM circuit implementations:
 
-### 3.1 Qutrit‑based QRAM (`qram_qutrit::QRAMCircuit`)
+##### 3.1 Qutrit‑based QRAM (`qram_qutrit::QRAMCircuit`)
 
 Key structure (from `QRAM/include/qram_circuit_qutrit.h`):
 
@@ -90,7 +90,7 @@ Key structure (from `QRAM/include/qram_circuit_qutrit.h`):
 - **Execution entry points**: `initialize_system()`, `run_normal()`, `run_full()`, `run_good_only()`, and `run(version)`.
 - **Sampling/normalization utilities**: `sample_output()` and `normalization()` plus damping‑aware variants.
 
-### 3.2 GPU‑accelerated QRAM (CUDA)
+##### 3.2 GPU‑accelerated QRAM (CUDA)
 
 For qutrit QRAM, there is a CUDA implementation:
 
@@ -100,11 +100,11 @@ For qutrit QRAM, there is a CUDA implementation:
 
 This provides GPU memory storage used by CUDA‑enabled QRAM operations.
 
-## 4) Internal QRAM data structures (qutrit model)
+#### 4) Internal QRAM data structures (qutrit model)
 
 The QRAM qutrit implementation uses several data structures to model internal state:
 
-### 4.1 QRAMNode
+##### 4.1 QRAMNode
 
 Each node holds **address** and **data** values with helper operations such as:
 
@@ -113,7 +113,7 @@ Each node holds **address** and **data** values with helper operations such as:
 - rotating among qutrit states (A1/A2 rotations),
 - checking a zero state.
 
-### 4.2 QRAMState
+##### 4.2 QRAMState
 
 `QRAMState` stores a **sparse map** of non‑zero elements, with helpers for:
 
@@ -130,11 +130,11 @@ The QRAM circuit evaluates a collection of branches:
 - **Branch** tracks a QRAM address, bus input, relative probabilities, and associated `SubBranch` instances.
 
 
-## 5) QRAM operators in SparQ
+#### 5) QRAM operators in SparQ
 
 SparQ exposes QRAM‑aware operators for the sparse‑state simulator:
 
-### 5.1 `QRAMLoad`
+##### 5.1 `QRAMLoad`
 
 `QRAMLoad` is a self‑adjoint operator that integrates a `qram_qutrit::QRAMCircuit` into a SparQ simulation. It stores the QRAM pointer and the address/data register IDs, and supports CUDA when enabled. 
 
@@ -143,15 +143,15 @@ The user‑facing behavior in the SparQ operator list describes the QRAM load as
 > \|a⟩\|z⟩ → \|a⟩\|z ⊕ d[a]⟩,  
 > where `d[a]` is the classical data stored in the QRAM circuit and the address/data register sizes must match the QRAM circuit sizes.
 
-### 5.2 `QRAMLoadFast`
+##### 5.2 `QRAMLoadFast`
 
 `QRAMLoadFast` is a related operator optimized for speed, also restricted to the qutrit QRAM circuit and with separate noise‑handling paths. It is defined in `SparQ/include/qram.h`.
 
-### 5.3 `QRAMInputGenerator`
+##### 5.3 `QRAMInputGenerator`
 
 `QRAMInputGenerator` is a helper for generating randomized or full input superpositions over address/data registers, enforcing size limits and normalization. This utility lives in `SparQ/include/qram.h`.
 
-## 6) Python API (PySparQ)
+#### 6) Python API (PySparQ)
 
 The Python bindings expose QRAM‑related classes:
 
@@ -160,12 +160,10 @@ The Python bindings expose QRAM‑related classes:
 
 These are defined in `PySparQ/pysparq/_core.pyi`.
 
-## 7) QRAM in higher‑level algorithms
+#### 7) QRAM in higher‑level algorithms
 
 QRAM is used directly in algorithm modules; for example:
 
 - **State preparation via QRAM** uses repeated `QRAMLoad` calls as part of its algorithm, loading "parent" and "child" data branches to compute rotations in a state‑preparation routine.
 
 This shows how QRAM primitives are composed into higher‑level algorithms.
-
----
