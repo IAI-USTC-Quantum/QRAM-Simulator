@@ -94,4 +94,4 @@ jobs:
       run: pip install .
 
     - name: Test Python Package
-      run: python -c "import pyqsparse; pyqsparse.test_import()"
+      run: python -c "import pysparq; pysparq.test_import()"
