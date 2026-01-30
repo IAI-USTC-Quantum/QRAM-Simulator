@@ -22,11 +22,11 @@ jobs:
         c_compiler: [gcc, cl]
         include:
           - os: Windows
-            runner: self-hosted
+            # runner: self-hosted
             c_compiler: cl
             cpp_compiler: cl
           - os: Linux
-            runner: self-hosted
+            # runner: self-hosted
             c_compiler: gcc
             cpp_compiler: g++
         exclude:
