@@ -9,7 +9,47 @@ This document gives a plain‑language map of the repository and a consolidated 
 3. **Use `QRAMLoad`** to load the QRAM’s memory value into the data register, conditioned on the address.
 4. **Run additional algorithms** (state prep, block encoding, Grover, etc.) that internally call `QRAMLoad`.
 
-The classes and operators above are the “official” interface points that enable that flow.
+
+# Numerical simulation testing locations (for the paper reference)
+
+Below is where QRAM timing tests and error‑filtration tests live in this repo, with file‑level citations.
+
+## QRAM timing / performance testing locations
+
+### 1) QRAM fidelity tests that record profiler timing
+
+These tests wrap QRAM operations in profiler scopes and print profile summaries, which is where timing/perf for QRAM is captured:
+
+- **Experiment fidelity test**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`  
+  *This experiment explicitly wraps the QRAM load in a profiler scope (`profiler _("**RECORD**")`) and prints profiling summaries afterward, which is another place QRAM timing is recorded.*
+
+### 2) QRAM simulator comparison (profiling per‑run)
+
+The "V2" QRAM simulator test sets up a per‑run `profiler` instance and also profiles the main test loop, which is useful for timing comparisons between "full" and "normal" QRAM executions:
+
+- `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`  
+  *This defines a profiler per QRAM run and uses `profiler _("MainLoop")` inside the comparison loop, so the time for QRAM execution versions is tracked here.*
+
+If you specifically meant "wall‑clock benchmarks," the experiments above use the project’s `profiler` mechanism (not raw `std::chrono`) to capture timings.
+
+## Error‑filtration testing locations
+
+The error filtration work is concentrated here:
+
+- **Multi‑EF QRAM experiment**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`  
+  *This file defines noise models (depolarizing + damping), prepares QRAM inputs, runs QRAM loads under noise, and computes fidelities for error‑filtration experiments.*
+
+Key indications in that file:
+
+- Noise model construction for error filtration tests (depolarizing + damping) and QRAM setup with noise.
+- No‑error‑filtration path (`main_no_ef`) that runs the QRAM load, followed by a noisefree load for fidelity comparison.
+
+If you want to run them (high level):
+
+- **Timing / profiling runs**: the QRAM fidelity tests and simulator comparison experiments under `Experiments/QRAM/` or `test/CPUTest/` are the intended entry points.
+- **Error filtration**: the `Experiments/ErrorFiltration/testMultiEFQRAM.cpp` experiment is the dedicated location.
+
+The classes and operators above are the "official" interface points that enable that flow.
 
 ## 1) Repository structure (plain‑language map)
 
@@ -105,11 +145,11 @@ The user‑facing behavior in the SparQ operator list describes the QRAM load as
 
 ### 5.2 `QRAMLoadFast`
 
-`QRAMLoadFast` is a related operator optimized for speed, also restricted to the qutrit QRAM circuit and with separate noise‑handling paths. It is defined in `SparQ/include/qram.h`.【F:SparQ/include/qram.h†L60-L80】
+`QRAMLoadFast` is a related operator optimized for speed, also restricted to the qutrit QRAM circuit and with separate noise‑handling paths. It is defined in `SparQ/include/qram.h`.
 
 ### 5.3 `QRAMInputGenerator`
 
-`QRAMInputGenerator` is a helper for generating randomized or full input superpositions over address/data registers, enforcing size limits and normalization. This utility lives in `SparQ/include/qram.h`.【F:SparQ/include/qram.h†L83-L190】
+`QRAMInputGenerator` is a helper for generating randomized or full input superpositions over address/data registers, enforcing size limits and normalization. This utility lives in `SparQ/include/qram.h`.
 
 ## 6) Python API (PySparQ)
 
@@ -118,13 +158,13 @@ The Python bindings expose QRAM‑related classes:
 - **`QRAMCircuit_qutrit`** — constructors accepting address size, data size, and optional memory arrays.
 - **`QRAMLoad`** and **`QRAMLoadFast`** — QRAM load operators with control helpers (`conditioned_by_*`) and access to the underlying QRAM circuit.
 
-These are defined in `PySparQ/pysparq/_core.pyi`.【F:PySparQ/pysparq/_core.pyi†L1790-L1947】
+These are defined in `PySparQ/pysparq/_core.pyi`.
 
 ## 7) QRAM in higher‑level algorithms
 
 QRAM is used directly in algorithm modules; for example:
 
-- **State preparation via QRAM** uses repeated `QRAMLoad` calls as part of its algorithm, loading “parent” and “child” data branches to compute rotations in a state‑preparation routine.【F:SparQ_Algorithm/include/state_preparation.h†L8-L118】
+- **State preparation via QRAM** uses repeated `QRAMLoad` calls as part of its algorithm, loading "parent" and "child" data branches to compute rotations in a state‑preparation routine.
 
 This shows how QRAM primitives are composed into higher‑level algorithms.
 
