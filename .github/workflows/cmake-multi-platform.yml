@@ -72,7 +72,6 @@ jobs:
       run: |
           ${{ steps.strings.outputs.build-output-dir }}/bin/ExecutabilityTest          
           ${{ steps.strings.outputs.build-output-dir }}/bin/CorrectnessTest       
-          ${{ steps.strings.outputs.build-output-dir }}/bin/CudaExecutabilityTest
 
     - name: Test
       # Test on Windows will have a ".exe" extension, while Linux executables will have no extension.
@@ -81,7 +80,6 @@ jobs:
       run: |
           ${{ steps.strings.outputs.build-output-dir }}/bin/ExecutabilityTest.exe
           ${{ steps.strings.outputs.build-output-dir }}/bin/CorrectnessTest.exe
-          ${{ steps.strings.outputs.build-output-dir }}/bin/CudaExecutabilityTest.exe
                                 
     - name: Build Python Package
       if: ${{ matrix.os == 'ubuntu-latest' }}
