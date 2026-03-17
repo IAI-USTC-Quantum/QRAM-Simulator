@@ -1,4 +1,4 @@
-# QRAM Simulator
+﻿# QRAM Simulator
 
 This document gives a plain‑language map of the repository and a consolidated reference for QRAM‑related components.
 
@@ -10,48 +10,63 @@ This document gives a plain‑language map of the repository and a consolidated 
 4. **Run additional algorithms** (state prep, block encoding, Grover, etc.) that internally call `QRAMLoad`.
 
 
-## Numerical simulation testing locations
+# Numerical simulation testing locations (for the paper reference)
 
-Below is where QRAM timing tests and error‑filtration tests live in this repo, with file‑level citations.
+This section collects the reproducibility materials for the paper's main numerical results:
 
-### QRAM timing / performance testing locations
+- Simulator source code used by the experiments.
+- Noise-model definitions and default noise settings.
+- Build and run commands to regenerate core result files.
 
-#### 1) QRAM fidelity tests that record profiler timing
+## What is included (with file-level pointers)
 
-These tests wrap QRAM operations in profiler scopes and print profile summaries, which is where timing/perf for QRAM is captured:
+- **QRAM fidelity experiment (main simulation + profiling)**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`
+- **QRAM simulator comparison (full vs normal + profiling)**: `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`
+- **Error-filtration experiment**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`
 
-- **Experiment fidelity test**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`  
-  *This experiment explicitly wraps the QRAM load in a profiler scope (`profiler _("**RECORD**")`) and prints profiling summaries afterward, which is another place QRAM timing is recorded.*
+All three programs are built by CMake targets:
 
-#### 2) QRAM simulator comparison (profiling per‑run)
+- `Experiment_QRAM_Fidelity`
+- `Experiment_QRAM_FidelityV2`
+- `Experiment_ErrorFiltration`
 
-The "V2" QRAM simulator test sets up a per‑run `profiler` instance and also profiles the main test loop, which is useful for timing comparisons between "full" and "normal" QRAM executions:
+## Noise model settings used by these experiments
 
-- `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`  
-  *This defines a profiler per QRAM run and uses `profiler _("MainLoop")` inside the comparison loop, so the time for QRAM execution versions is tracked here.*
+Noise is configured in-code via:
 
-If you specifically meant "wall‑clock benchmarks," the experiments above use the project’s `profiler` mechanism (not raw `std::chrono`) to capture timings.
+- `OperationType::Depolarizing`
+- `OperationType::Damping`
 
-### Error‑filtration testing locations
+Locations:
 
-The error filtration work is concentrated here:
+- `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp` 
+- `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp` 
+- `Experiments/ErrorFiltration/testMultiEFQRAM.cpp` 
 
-- **Multi‑EF QRAM experiment**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`  
-  *This file defines noise models (depolarizing + damping), prepares QRAM inputs, runs QRAM loads under noise, and computes fidelities for error‑filtration experiments.*
+Default values in source:
 
-Key indications in that file:
+- `QRAMFidelityTest.cpp`: `depolarizing = 0.0`, `damping = 0.0` (argument defaults); built-in demo run uses `1e-4`, `1e-5`.
+- `QRAMSimulatorTest.cpp`: `depolarizing = 0.0`, `damping = 0.0` (argument defaults); current compiled-in test run uses `1e-4`, `1e-4`.
+- `testMultiEFQRAM.cpp`: `depolarizing = 1e-5`, `damping = 1e-5` (defaults in `main`).
 
-- Noise model construction for error filtration tests (depolarizing + damping) and QRAM setup with noise.
-- No‑error‑filtration path (`main_no_ef`) that runs the QRAM load, followed by a noisefree load for fidelity comparison.
+## How to reproduce the main result files
 
-If you want to run them (high level):
+### 1) Build
+We use Visual Studio Code to build the executable files.
 
-- **Timing / profiling runs**: the QRAM fidelity tests and simulator comparison experiments under `Experiments/QRAM/` or `test/CPUTest/` are the intended entry points.
-- **Error filtration**: the `Experiments/ErrorFiltration/testMultiEFQRAM.cpp` experiment is the dedicated location.
+### 2) Run (example commands)
+For a single parameter setting (addrsize, datasize, shots, inputsize, depolarizing, damping, seed, version), we will have python script to automately generate the following command line.
 
-The classes and operators above are the "official" interface points that enable that flow.
+Windows (PowerShell):
 
-#### 1) Repository structure
+```powershell
+.\build\bin\Experiment_QRAM_Fidelity.exe --addrsize 15 --datasize 3 --shots 100 --inputsize 10 --depolarizing 1e-4 --damping 1e-5 --seed 123456 --version normal
+.\build\bin\Experiment_QRAM_FidelityV2.exe --addrsize 10 --datasize 3 --shots 100 --inputsize 500 --depolarizing 1e-4 --damping 1e-4 --seed 123456789 --architecture qutrit --experimentname qutrit_scheme
+.\build\bin\Experiment_ErrorFiltration.exe 5 1 10 1000 1e-5 1e-5 12345 normal
+```
+
+Note: this repository currently provides simulation executables and raw output artifacts. If the manuscript requires exact plotting/table scripts, add them as a small post-processing script layer that reads the files above.
+## 1) Repository structure (plain‑language map)
 
 The top‑level CMake configuration wires together the major modules below. If you are new to the codebase, this is the easiest map to start from:
 
