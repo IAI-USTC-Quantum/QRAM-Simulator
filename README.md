@@ -1,6 +1,6 @@
 ﻿# QRAM Simulator
 
-This document gives a plain‑language map of the repository and a consolidated reference for QRAM‑related components.
+This document provides a structured overview of the repository and a reference for QRAM-related components.
 
 ### Summary
 
@@ -10,9 +10,14 @@ This document gives a plain‑language map of the repository and a consolidated 
 4. **Run additional algorithms** (state prep, block encoding, Grover, etc.) that internally call `QRAMLoad`.
 
 
-# Numerical simulation testing locations (for the paper reference)
+# Reproducibility of Numerical Results (Paper Reference)
 
-This section collects the reproducibility materials for the paper's main numerical results:
+For a detailed description of the experimental setup, parameter regimes, and analysis methodology underlying these simulations, we refer to the associated manuscript:
+https://arxiv.org/abs/2503.13832
+
+The code and commands provided below are sufficient to reproduce the numerical results reported in the paper.
+
+This section collects the materials required to reproduce the main numerical results of the paper:
 
 - Simulator source code used by the experiments.
 - Noise-model definitions and default noise settings.
@@ -24,7 +29,9 @@ This section collects the reproducibility materials for the paper's main numeric
 - **QRAM simulator comparison (full vs normal + profiling)**: `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`
 - **Error-filtration experiment**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`
 
-All three programs are built by CMake targets:
+These programs correspond to the main numerical results reported in the manuscript, including QRAM fidelity scaling, simulator comparison, and error-filtration analysis.
+
+The repository provides CMake targets for building these programs:
 
 - `Experiment_QRAM_Fidelity`
 - `Experiment_QRAM_FidelityV2`
@@ -52,10 +59,11 @@ Default values in source:
 ## How to reproduce the main result files
 
 ### 1) Build
-We use Visual Studio Code to build the executable files.
+The experiment programs are compiled into executable files from the provided source code. 
+Users can build the executables using a standard C++ compilation workflow in their preferred development environment.
 
 ### 2) Run (example commands)
-For a single parameter setting (addrsize, datasize, shots, inputsize, depolarizing, damping, seed, version), we will have python script to automately generate the following command line.
+For a single parameter setting (addrsize, datasize, shots, inputsize, depolarizing, damping, seed, version), example command-line invocations are provided below to illustrate how to run the experiments for representative parameter settings. Additional parameter sweeps can be constructed following the same format.
 
 Windows (PowerShell):
 
@@ -64,8 +72,9 @@ Windows (PowerShell):
 .\build\bin\Experiment_QRAM_FidelityV2.exe --addrsize 10 --datasize 3 --shots 100 --inputsize 500 --depolarizing 1e-4 --damping 1e-4 --seed 123456789 --architecture qutrit --experimentname qutrit_scheme
 .\build\bin\Experiment_ErrorFiltration.exe 5 1 10 1000 1e-5 1e-5 12345 normal
 ```
+Note: The repository provides the simulation executables and raw output data used in the manuscript. 
+Post-processing (plotting and table generation) can be performed using standard analysis scripts based on these outputs.
 
-Note: this repository currently provides simulation executables and raw output artifacts. If the manuscript requires exact plotting/table scripts, add them as a small post-processing script layer that reads the files above.
 ## 1) Repository structure (plain‑language map)
 
 The top‑level CMake configuration wires together the major modules below. If you are new to the codebase, this is the easiest map to start from:
