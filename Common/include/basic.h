@@ -6,6 +6,7 @@
 #include "fmt/core.h"
 #include "logger.h"
 #include "iterable.h"
+#include <cassert>
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -22,22 +23,31 @@ namespace qram_simulator {
 		return std::real(c) * std::real(c) + std::imag(c) * std::imag(c);
 	}
 
-	HOST_DEVICE constexpr bool get_digit(uint64_t n, size_t digit) 
-	{ 
-		return (n >> digit) & 1; 
+	HOST_DEVICE constexpr bool get_digit(uint64_t n, size_t digit)
+	{
+		assert(digit < 64);
+		assert(digit < 64);
+		return (n >> digit) & 1;
 	}
 
 	HOST_DEVICE	constexpr bool get_digit_reverse(uint64_t n, size_t digit, size_t maxdigit)
 	{
+		assert(digit < 64);
+		assert(maxdigit < 64);
+		assert(digit < 64 && maxdigit < 64 && digit < maxdigit);
 		return (n >> (maxdigit - digit - 1)) & 1;
 	}
 
-	HOST_DEVICE	constexpr uint64_t pow2(size_t n) 
-	{ 
+	HOST_DEVICE	constexpr uint64_t pow2(size_t n)
+	{
+		assert(n < 64);
+		assert(n < 64);
 		return (static_cast<uint64_t>(1ull)) << (n);
 	}
 
 	constexpr size_t log2(uint64_t n) {
+		assert(n > 0);
+		assert(n > 0);
 		size_t ret = 0;
 		while (n > 1) {
 			ret++;
@@ -122,6 +132,7 @@ namespace qram_simulator {
 		// profiler _("Common");
 		if (data >= 1 || data < 0) return 0;
 		uint64_t ret = 0;
+		if (data_sz >= 64) data_sz = 63;
 		for (size_t i = 0; i < data_sz; ++i)
 		{
 			ret <<= 1;
@@ -180,20 +191,22 @@ namespace qram_simulator {
 	using _remove_cvref_t = typename _remove_cvref<T>::type;
 
 	template<typename Ty>
-	void* to_voidptr(Ty ptr)  {
-		using T_ptr_t = _remove_cvref_t<Ty>;
-		using T = _remove_cvref_t<std::remove_pointer_t<T_ptr_t>>;
-		using clear_pointer_type = T*;
-		return reinterpret_cast<void*>(const_cast<clear_pointer_type>(ptr));
+	const void* to_voidptr(const Ty* ptr) {
+		return static_cast<const void*>(ptr);
+	}
+
+	template<typename Ty>
+	void* to_voidptr(Ty* ptr) {
+		return static_cast<void*>(ptr);
 	}
 
 	template<typename KeyTy, typename ValTy>
-	void map2vec(std::vector<std::pair<void*, void*>>& vec, const std::map<KeyTy, ValTy>& map1) {
+	void map2vec(std::vector<std::pair<const void*, const void*>>& vec, const std::map<KeyTy, ValTy>& map1) {
 		vec.clear();
 		vec.reserve(map1.size());
 		for (const auto& item : map1) {
-			void* keyptr = to_voidptr(&(item.first));
-			void* valptr = to_voidptr(&(item.second));
+			const void* keyptr = to_voidptr(&(item.first));
+			const void* valptr = to_voidptr(&(item.second));
 			vec.push_back({ keyptr, valptr });
 		}
 	}

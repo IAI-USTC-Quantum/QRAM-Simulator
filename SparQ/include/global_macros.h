@@ -2,18 +2,17 @@
 // Comment this or uncomment this to select single-thread or openmp
 #define SINGLE_THREAD
 
-/*
-TODO:
-Check all ConditionSatisfied, ConditionSatisfiedAll, ConditionSatisfiedByBit
-
-Change them according these following meanings:
- - ConditionSatisfied: Satisfied when "any of the bit" is 1
- - ConditionSatisfiedAll: Satisfied when "all of the bit" is 1
- - ConditionSatisfiedByBit: Satisfied when "the bit" is 1
- - ConditionSatisfiedByValue: Satisfied when "the register" equals to "the value"
+/* Condition check macros — all require every specified condition to hold (logical AND):
+ - ConditionSatisfiedNonzeros: register value is nonzero
+ - ConditionSatisfiedAllOnes:   every bit in the register is 1
+ - ConditionSatisfiedByValue:   register value equals a given constant
+ - ConditionSatisfiedByBit:     a specific bit position in the register is 1
+ - ConditionSatisfied:          master check combining all of the above
 */
 
-// Utility macros
+// Utility macros — these remain as preprocessor macros rather than constexpr functions
+// because they capture outer-scope condition_variable_* members via text substitution,
+// enabling the ClassControllable pattern where each operator carries its own condition set.
 
 #define ConditionSatisfiedNonzeros(state_ref) \
 	std::all_of(std::begin(condition_variable_nonzeros), std::end(condition_variable_nonzeros),\
@@ -132,7 +131,6 @@ Change them according these following meanings:
 /********************************************
 *            conditioned_at
 *********************************************/
-// Todo : Elements of std::vector<std::pair<std::string, size_t>> can be same.
 #define ClassControllableByBit \
 	std::vector<std::pair<size_t, size_t>> condition_variable_by_bit;\
     inline void clear_control_by_bit()\

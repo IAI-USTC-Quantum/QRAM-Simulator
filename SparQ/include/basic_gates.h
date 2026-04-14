@@ -134,18 +134,9 @@ namespace qram_simulator
 	struct Ygate_Bool : SelfAdjointOperator, GateBase {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
+		using GateBase::GateBase;
 
 		ClassControllable
-		Ygate_Bool(std::string_view reg_, size_t digit_)
-			: GateBase(System::get(reg_), digit_)
-		{
-		}
-		Ygate_Bool(size_t id_, size_t digit_)
-			: GateBase(id_, digit_)
-		{
-		}
-		Ygate_Bool(std::string_view reg_) : Ygate_Bool(reg_, 0) {}
-		Ygate_Bool(size_t id_) : Ygate_Bool(id_, 0) {}
 		void operator()(std::vector<System>& state) const;
 		//void display() const override;
 		DenseMatrix<complex_t> extract_matrix();
@@ -155,11 +146,8 @@ namespace qram_simulator
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
+		using Phase_Bool::Phase_Bool;
 
-		Zgate_Bool(std::string_view reg_, size_t digit_) : Phase_Bool(reg_, digit_, pi) {}
-		Zgate_Bool(size_t id_, size_t digit_) : Phase_Bool(id_, digit_, pi) {}
-		Zgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi) {}
-		Zgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi) {}
 		//void display() const override;
 	};
 
@@ -167,11 +155,8 @@ namespace qram_simulator
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
+		using Phase_Bool::Phase_Bool;
 
-		Sgate_Bool(std::string_view reg_, size_t digit_) : Phase_Bool(reg_, digit_, pi / 2) {}
-		Sgate_Bool(size_t id_, size_t digit_) : Phase_Bool(id_, digit_, pi / 2) {}
-		Sgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 2) {}
-		Sgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 2) {}
 		//void display() const override;
 	};
 
@@ -179,11 +164,8 @@ namespace qram_simulator
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
+		using Phase_Bool::Phase_Bool;
 
-		Tgate_Bool(std::string_view reg_, size_t digit_) : Phase_Bool(reg_, digit_, pi / 4) {}
-		Tgate_Bool(size_t id_, size_t digit_) : Phase_Bool(id_, digit_, pi / 4) {}
-		Tgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 4) {}
-		Tgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 4) {}
 		//void display() const override;
 	};
 

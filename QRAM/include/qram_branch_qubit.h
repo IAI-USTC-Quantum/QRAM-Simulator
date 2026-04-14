@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "time_step.h"
+#include <memory>
 
 namespace qram_simulator {
 	namespace qram_qubit {
@@ -9,6 +10,7 @@ namespace qram_simulator {
 		constexpr size_t Data = 1;
 		constexpr bool ZeroState = false;
 		constexpr bool OneState = true;
+		constexpr size_t MAX_BUS_SIZE = 30; // Maximum bus size to prevent exponential memory explosion
 
 		struct State
 		{
@@ -104,7 +106,7 @@ namespace qram_simulator {
 			size_t bus_size = 1;
 			bus_t bus_input = 0;
 			double relative_multiplier = 1;
-			Branch* good_ref;
+			std::shared_ptr<Branch> good_ref;
 		private:
 			bool good = false;
 		public:
@@ -113,7 +115,7 @@ namespace qram_simulator {
 			size_t system_states_sz = 0;
 			inline size_t get_branchid() const { return (address << bus_size) + bus_input; }
 
-			inline void set_good(Branch* first_good_ptr)
+			inline void set_good(const std::shared_ptr<Branch>& first_good_ptr)
 			{
 				good = true;
 				good_ref = first_good_ptr;
@@ -163,7 +165,7 @@ namespace qram_simulator {
 				bus_size = bus_sz;
 				address = addr;
 				bus_input = bus;
-				if (bus_sz >= 30)
+				if (bus_sz >= MAX_BUS_SIZE)
 					throw_invalid_input();
 				system_states.resize(pow2(bus_sz + 1));
 				reset();
@@ -173,7 +175,7 @@ namespace qram_simulator {
 				bus_size = bus_sz;
 				address = branchid >> bus_sz;
 				bus_input = branchid - (address << bus_sz);
-				if (bus_sz >= 30)
+				if (bus_sz >= MAX_BUS_SIZE)
 					throw_invalid_input();
 				system_states.resize(pow2(bus_sz + 1));
 				reset();
@@ -240,7 +242,7 @@ namespace qram_simulator {
 			std::vector<double> state_probs;    // <ψi|ψi>
 
 			bool is_good = false;
-			BranchGroup* good_ref = nullptr;
+			std::shared_ptr<BranchGroup> good_ref;
 			double relative_multiplier = 1.0;
 
 			BranchGroup(size_t addr) : address(addr)
@@ -252,7 +254,7 @@ namespace qram_simulator {
 				is_good = false;
 			}
 
-			void set_good(BranchGroup* good_ref_)
+			void set_good(const std::shared_ptr<BranchGroup>& good_ref_)
 			{
 				is_good = true;
 				good_ref = good_ref_;
