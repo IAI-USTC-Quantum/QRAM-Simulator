@@ -1,5 +1,4 @@
 #include "basic.h"
-#include <cstring>
 #include "error_handler.h"
 
 namespace qram_simulator {
@@ -26,8 +25,7 @@ namespace qram_simulator {
 	{
 		// profiler _("IEEE");
 		if (data >= 1 || data < 0) return 0;
-		uint64_t idata;
-		std::memcpy(&idata, &data, sizeof(idata));
+		uint64_t idata = *reinterpret_cast<uint64_t*>(&data);
 		uint64_t bias = 1022 - (idata >> 52);
 		data_sz -= 1;
 		if (bias > data_sz) return 0;

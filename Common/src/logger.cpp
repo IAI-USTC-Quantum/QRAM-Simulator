@@ -47,22 +47,22 @@ namespace qram_simulator {
 		else {
 			ret += fmt::format("Item: {}\n", profiles.size());
 		}
-		vector<pair<const void*, const void*>> profvec;
+		vector<pair<void*, void*>> profvec;
 		map2vec(profvec, profiles);
 
-		auto get_time = [](const pair<const void*, const void*>& item) {
-			return (*static_cast<profile**>(const_cast<void*>(item.second)))->time;
+		auto get_time = [](const pair<void*, void*>& item) {
+			return (*static_cast<profile**>(item.second))->time;
 		};
-		auto get_name = [](const pair<const void*, const void*>& item) {
-			return (*static_cast<string*>(const_cast<void*>(item.first)));
+		auto get_name = [](const pair<void*, void*>& item) {
+			return (*static_cast<string*>(item.first));
 		};
-		auto get_profile = [](const pair<const void*, const void*>& item) {
-			return (*static_cast<profile**>(const_cast<void*>(item.second)));
+		auto get_profile = [](const pair<void*, void*>& item) {
+			return (*static_cast<profile**>(item.second));
 		};
 
 		sort(profvec.begin(), profvec.end(), [&get_time](
-			const pair<const void*, const void*>& item1,
-			const pair<const void*, const void*>& item2)
+			const pair<void*, void*>& item1,
+			const pair<void*, void*>& item2)
 			{
 				return get_time(item1) > get_time(item2);
 			}

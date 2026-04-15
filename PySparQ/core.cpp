@@ -9,19 +9,6 @@ PYBIND11_MODULE(_core, m)
 {
     m.doc() = "[Module sparq]";
 
-    // Register custom exception translator for std::exception
-    py::register_exception_translator([](std::exception_ptr p) {
-        try {
-            if (p) std::rethrow_exception(p);
-        } catch (const std::invalid_argument &e) {
-            PyErr_SetString(PyExc_ValueError, e.what());
-        } catch (const std::runtime_error &e) {
-            PyErr_SetString(PyExc_RuntimeError, e.what());
-        } catch (const std::exception &e) {
-            PyErr_SetString(PyExc_Exception, e.what());
-        }
-    });
-
     py::class_<DenseMatrix<complex_t>>(m, "DenseMatrix_complex")
         .def(py::init<>())
         .def(py::init<size_t>(), py::arg("size"));
@@ -118,7 +105,6 @@ PYBIND11_MODULE(_core, m)
         .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
                       {
 				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::gil_scoped_acquire acquire;
 					py::object result = py_func(x);
 					return result.cast<u22_t>();
 					};
@@ -127,7 +113,6 @@ PYBIND11_MODULE(_core, m)
         .def(py::init([](size_t reg_in, size_t reg_out, py::function py_func)
                       {
 				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::gil_scoped_acquire acquire;
 					py::object result = py_func(x);
 					return result.cast<u22_t>();
 					};
@@ -525,7 +510,6 @@ PYBIND11_MODULE(_core, m)
 
 				/* Cast function into GenericArithmetic type */
 				GenericArithmetic func_cpp = [func](const std::vector<size_t>& inputs) -> std::vector<size_t> {
-									py::gil_scoped_acquire acquire;
 					return func(inputs).cast<std::vector<size_t>>();
 				};
 

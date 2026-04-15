@@ -153,7 +153,7 @@ namespace qram_simulator {
 						else {
 							// this needs to gaurantee branches vector should
 							// never change size, reallocate or move.
-							branch_groups[i].set_good(std::shared_ptr<BranchGroup>(head + first_good_branch_group, [](BranchGroup*){}));
+							branch_groups[i].set_good(head + first_good_branch_group);
 
 							// good_number++;
 							good_branch_group_ids.push_back(i);
@@ -216,7 +216,7 @@ namespace qram_simulator {
 						else {
 							// this needs to gaurantee branches vector should
 							// never change size, reallocate or move.
-							branch_groups[i].set_good(std::shared_ptr<BranchGroup>(head + first_good_branch_group, [](BranchGroup*){}));
+							branch_groups[i].set_good(head + first_good_branch_group);
 
 							// good_number++;
 							good_branch_group_ids.push_back(i);
@@ -1019,7 +1019,7 @@ namespace qram_simulator {
 						else {
 							/*branches[i].good = true;
 							branches[i].system_states.front().bus = memory[branches[i].address];*/
-							branch_groups[i].set_good(std::shared_ptr<BranchGroup>(head + first_good_branch_group, [](BranchGroup*){}));
+							branch_groups[i].set_good(head + first_good_branch_group);
 						}
 					}
 				}

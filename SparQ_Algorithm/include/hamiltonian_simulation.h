@@ -279,20 +279,34 @@ namespace qram_simulator
 				size_t result_register);
 
 			template<typename Ty>
-			void qbs_search_forward(Ty& state,
-				size_t flag, size_t compare_less, size_t compare_equal,
-				size_t left_register, size_t right_register,
-				size_t mid_register, size_t midval_register) const
-			{
+			void impl(Ty& state) const {
+				profiler _("QBS");
+				auto flag = AddRegister("flag", Boolean, 1)(state);
+				Xgate_Bool(flag, 0)(state);
+
+				auto compare_less = AddRegister("compare_less", Boolean, 1)(state);
+				auto compare_equal = AddRegister("compare_equal", Boolean, 1)(state);
+				auto left_register = AddRegister("left_register", UnsignedInteger, qram->address_size + 1)(state);
+				auto right_register = AddRegister("right_register", UnsignedInteger, qram->address_size + 1)(state);
+				auto mid_register = AddRegister("mid_register", UnsignedInteger, qram->address_size + 1)(state);
+				auto midval_register = AddRegister("midval_register", UnsignedInteger, qram->address_size)(state);
+
+				// int flag_id = System::get("flag");
+
+				Assign(address_offset_id, left_register)(state);
+				Add_UInt_ConstUInt(left_register, total_length, right_register)(state);
+
 				for (size_t iteration_level = 0; iteration_level < max_step; ++iteration_level)
 				{
 					/* compute the mid */
 					GetMid_UInt_UInt(left_register, right_register, mid_register)
 						.conditioned_by_nonzeros(flag)(state);
+					//(StatePrint(StatePrintDisplay::Detail))(state);
 
 					/* load value */
 					QRAMLoad(qram, mid_register, midval_register)
 						.conditioned_by_nonzeros(flag)(state);
+					//(StatePrint(StatePrintDisplay::Detail))(state);
 
 					/* compare to decide the branch */
 					Compare_UInt_UInt(midval_register, target_id, compare_less, compare_equal)
@@ -321,14 +335,11 @@ namespace qram_simulator
 						Push(compare_equal, fmt::format("{}-{}", "compare_equal", iteration_level))(state);
 					}
 				}
-			}
 
-			template<typename Ty>
-			void qbs_uncompute_reverse(Ty& state,
-				size_t flag, size_t compare_less, size_t compare_equal,
-				size_t left_register, size_t right_register,
-				size_t mid_register, size_t midval_register) const
-			{
+				// FlipBools(result_register).conditioned_by("flag")(state);
+
+				// todo: auto-uncompute
+				// uncompute all garbage variables
 				for (size_t iteration_level = max_step; iteration_level --> 0;)
 				{
 					if (iteration_level != max_step - 1)
@@ -357,29 +368,6 @@ namespace qram_simulator
 					GetMid_UInt_UInt(left_register, right_register, mid_register)
 						.conditioned_by_nonzeros(flag)(state);
 				}
-			}
-
-			template<typename Ty>
-			void impl(Ty& state) const {
-				profiler _("QBS");
-				auto flag = AddRegister("flag", Boolean, 1)(state);
-				Xgate_Bool(flag, 0)(state);
-
-				auto compare_less = AddRegister("compare_less", Boolean, 1)(state);
-				auto compare_equal = AddRegister("compare_equal", Boolean, 1)(state);
-				auto left_register = AddRegister("left_register", UnsignedInteger, qram->address_size + 1)(state);
-				auto right_register = AddRegister("right_register", UnsignedInteger, qram->address_size + 1)(state);
-				auto mid_register = AddRegister("mid_register", UnsignedInteger, qram->address_size + 1)(state);
-				auto midval_register = AddRegister("midval_register", UnsignedInteger, qram->address_size)(state);
-
-				Assign(address_offset_id, left_register)(state);
-				Add_UInt_ConstUInt(left_register, total_length, right_register)(state);
-
-				qbs_search_forward(state, flag, compare_less, compare_equal,
-					left_register, right_register, mid_register, midval_register);
-
-				qbs_uncompute_reverse(state, flag, compare_less, compare_equal,
-					left_register, right_register, mid_register, midval_register);
 
 				Add_UInt_ConstUInt(left_register, total_length, right_register)(state);
 				Assign(address_offset_id, left_register)(state);
