@@ -1,5 +1,7 @@
 ﻿# QRAM Simulator
 
+[![CI](https://github.com/Agony5757/QRAM-Simulator/workflows/CMake%20on%20multiple%20platforms/badge.svg)](https://github.com/Agony5757/QRAM-Simulator/actions)
+
 This document provides a structured overview of the repository and a reference for QRAM-related components.
 
 ### Summary
