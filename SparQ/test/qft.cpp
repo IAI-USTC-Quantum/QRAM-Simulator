@@ -15,11 +15,9 @@ class QFTTest : public ::testing::Test {
 protected:
     void SetUp() override {
         System::clear();
-        auto q = System::add_register("q", UnsignedInteger, 2);
     }
     void TearDown() override {
         System::clear();
-        auto q = System::add_register("q", UnsignedInteger, 2);
     }
 };
 
@@ -36,6 +34,7 @@ complex_t getAmplitude(const std::vector<System>& state, size_t reg_id, size_t v
 // Test QFT on |00> -> uniform superposition
 TEST_F(QFTTest, QFTOnZeroState)
 {
+    auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
     state.emplace_back();  // |00>
 
@@ -56,6 +55,7 @@ TEST_F(QFTTest, QFTOnZeroState)
 // Test QFT on |01>
 TEST_F(QFTTest, QFTOnOneState)
 {
+    auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
     state.emplace_back();  // |00>
     Init_Unsafe("q", 1)(state);  // Set to |01>
@@ -89,6 +89,7 @@ TEST_F(QFTTest, QFTOnOneState)
 // We verify the inverse QFT cancels QFT instead of checking exact phases.
 TEST_F(QFTTest, QFTOnTwoState)
 {
+    auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
     state.emplace_back();  // |00>
     Init_Unsafe("q", 2)(state);  // Set to |10>
@@ -122,6 +123,7 @@ TEST_F(QFTTest, QFTOnTwoState)
 // Note: We verify correctness via inverse QFT since exact phase conventions vary.
 TEST_F(QFTTest, QFTOnThreeState)
 {
+    auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
     state.emplace_back();  // |00>
     Init_Unsafe("q", 3)(state);  // Set to |11>
@@ -153,6 +155,7 @@ TEST_F(QFTTest, QFTOnThreeState)
 // Test inverse QFT returns to original state
 TEST_F(QFTTest, InverseQFTCancelsQFT)
 {
+    auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
     state.emplace_back();
     Init_Unsafe("q", 2)(state);  // Start with |10>
