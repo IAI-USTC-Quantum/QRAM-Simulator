@@ -14,6 +14,10 @@
  *   ./basic_gates
  */
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include <iostream>
 #include <cmath>
 #include "sparse_state_simulator.h"
