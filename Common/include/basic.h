@@ -26,7 +26,6 @@ namespace qram_simulator {
 	HOST_DEVICE constexpr bool get_digit(uint64_t n, size_t digit)
 	{
 		assert(digit < 64);
-		assert(digit < 64);
 		return (n >> digit) & 1;
 	}
 
@@ -34,19 +33,17 @@ namespace qram_simulator {
 	{
 		assert(digit < 64);
 		assert(maxdigit < 64);
-		assert(digit < 64 && maxdigit < 64 && digit < maxdigit);
+		assert(digit < maxdigit);
 		return (n >> (maxdigit - digit - 1)) & 1;
 	}
 
 	HOST_DEVICE	constexpr uint64_t pow2(size_t n)
 	{
 		assert(n < 64);
-		assert(n < 64);
 		return (static_cast<uint64_t>(1ull)) << (n);
 	}
 
 	constexpr size_t log2(uint64_t n) {
-		assert(n > 0);
 		assert(n > 0);
 		size_t ret = 0;
 		while (n > 1) {

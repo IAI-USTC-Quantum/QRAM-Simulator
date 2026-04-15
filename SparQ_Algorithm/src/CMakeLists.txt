@@ -16,7 +16,10 @@ if (CUDA_FOUND)
     sparq_setup_cuda_target(${PROJECT_NAME}_cuda)
 endif()
 
-target_compile_definitions(SparQ_Algorithm PRIVATE EIGEN_NO_CUDA)
+# Only define EIGEN_NO_CUDA for CPU-only builds to avoid Eigen CUDA overhead
+if(NOT CUDA_FOUND)
+    target_compile_definitions(SparQ_Algorithm PRIVATE EIGEN_NO_CUDA)
+endif()
 
 # Aggregation target: links all component libraries together
 add_library(SparQ INTERFACE)
