@@ -124,22 +124,6 @@ jobs:
         restore-keys: |
           pip-${{ runner.os }}-
 
-    # --- GTest ---
-    - name: Install GTest (Ubuntu)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get install -y libgtest-dev cmake
-        # Compile GTest from source (Ubuntu package only provides source)
-        cd /usr/src/gtest
-        sudo cmake .
-        sudo make
-        sudo make install
-
-    - name: Install GTest (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        vcpkg install gtest:x64-windows
-
     # --- Build ---
     - name: Configure CMake
       shell: bash
@@ -152,7 +136,6 @@ jobs:
         -DCMAKE_C_COMPILER=${{ runner.os == 'Linux' && 'gcc' || matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -DCACHED_REGISTER_SIZE=50
-        ${{ runner.os == 'Windows' && '-DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake' || '' }}
         -S .
 
     - name: Build

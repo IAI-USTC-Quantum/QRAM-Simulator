@@ -66,24 +66,17 @@ else()
     message(STATUS "TBB not found - using OpenMP for parallelization")
 endif()
 
-# Google Test (auto-detect: system package or FetchContent fallback)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(GTest CONFIG)
-if(NOT GTest_FOUND)
-    # Fallback: use FetchContent to download GTest automatically
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.14.0
-    )
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-    message(STATUS "GTest downloaded via FetchContent")
-else()
-    message(STATUS "Found system GTest: ${GTest_FOUND}")
-endif()
+# Google Test - Use FetchContent for consistent cross-platform builds
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.14.0
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+message(STATUS "GTest configured via FetchContent")
 
 if (UNIX)
 	add_compile_options(-fPIC)
