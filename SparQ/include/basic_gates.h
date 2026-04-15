@@ -1,4 +1,10 @@
 #pragma once
+
+// Windows MSVC requires _USE_MATH_DEFINES for M_PI
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include "sparse_state_simulator.h"
 #include "matrix.h"
 #include <Eigen/Eigen>
