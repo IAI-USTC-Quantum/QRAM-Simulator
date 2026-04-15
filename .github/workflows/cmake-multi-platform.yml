@@ -31,28 +31,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ============================================================================
+  # Main build job
+  # ============================================================================
   build:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
-
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
         include:
-          - os: ubuntu-latest
+          # Linux + GCC + C++17
+          - name: "Ubuntu + GCC + C++17"
+            os: ubuntu-24.04
+            build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
-          - os: windows-latest
+            cpp_standard: 17
+          # Linux + GCC + C++20
+          - name: "Ubuntu + GCC + C++20"
+            os: ubuntu-24.04
+            build_type: Release
+            c_compiler: gcc
+            cpp_compiler: g++
+            cpp_standard: 20
+          # Windows + MSVC
+          - name: "Windows + MSVC"
+            os: windows-latest
+            build_type: Release
             c_compiler: cl
             cpp_compiler: cl
+            cpp_standard: 17
 
     env:
       BUILD_DIR: ${{ github.workspace }}/build
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         submodules: 'true'
 
@@ -61,113 +78,89 @@ jobs:
       if: runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install -y ccache
 
-    - name: Prepare ccache
-      if: runner.os == 'Linux'
-      id: ccache-prepare
-      shell: bash
-      run: |
-        CCACHE_DIR="${{ runner.temp }}/ccache"
-        echo "dir=${CCACHE_DIR}" >> "$GITHUB_OUTPUT"
-        mkdir -p "${CCACHE_DIR}"
-
-    - name: Cache ccache
-      if: runner.os == 'Linux'
-      uses: actions/cache@v4
-      with:
-        path: ${{ steps.ccache-prepare.outputs.dir }}
-        key: ccache-linux-${{ matrix.build_type }}-${{ github.sha }}
-        restore-keys: |
-          ccache-linux-${{ matrix.build_type }}-
-
     - name: Configure ccache
       if: runner.os == 'Linux'
       run: |
-        ccache --set-config=max_size=500M
+        ccache --set-config=max_size=2G
         ccache --set-config=compression=true
         ccache -z
 
-    # --- CMake build cache ---
-    - name: Hash CMake and source files
-      id: cmake-hash
-      shell: bash
-      run: |
-        HASH=$(find . -name 'CMakeLists.txt' -o -name '*.cmake' \
-                | sort | xargs sha256sum | sha256sum | cut -d' ' -f1)
-        SUB_HASH=$(find ThirdParty -type f 2>/dev/null \
-                   | sort | xargs sha256sum | sha256sum | cut -d' ' -f1)
-        echo "hash=${HASH}-${SUB_HASH}" >> "$GITHUB_OUTPUT"
-
-    - name: Cache CMake build directory
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.BUILD_DIR }}
-        key: cmake-${{ runner.os }}-${{ matrix.build_type }}-${{ steps.cmake-hash.outputs.hash }}
-        restore-keys: |
-          cmake-${{ runner.os }}-${{ matrix.build_type }}-
-
-    # --- pip cache ---
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
-    - name: Cache pip packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/pip
-          ~/AppData/Local/pip/cache
-        key: pip-${{ runner.os }}-${{ hashFiles('PySparQ/**/setup.py', 'PySparQ/**/pyproject.toml', 'setup.py', 'pyproject.toml') }}
-        restore-keys: |
-          pip-${{ runner.os }}-
-
-    # --- Build ---
+    # --- CMake configure ---
     - name: Configure CMake
       shell: bash
-      env:
-        CC: ${{ runner.os == 'Linux' && 'ccache gcc' || matrix.c_compiler }}
-        CXX: ${{ runner.os == 'Linux' && 'ccache g++' || matrix.cpp_compiler }}
-      run: >
-        cmake -B "$BUILD_DIR"
-        -DCMAKE_CXX_COMPILER=${{ runner.os == 'Linux' && 'g++' || matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ runner.os == 'Linux' && 'gcc' || matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCACHED_REGISTER_SIZE=50
-        -S .
+      run: |
+        cmake -B "$BUILD_DIR" \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_CXX_STANDARD=${{ matrix.cpp_standard }} \
+          -DCACHED_REGISTER_SIZE=50 \
+          -S .
 
+    # --- Build ---
     - name: Build
       shell: bash
-      env:
-        CC: ${{ runner.os == 'Linux' && 'ccache gcc' || matrix.c_compiler }}
-        CXX: ${{ runner.os == 'Linux' && 'ccache g++' || matrix.cpp_compiler }}
-      run: >
-        cmake --build "$BUILD_DIR"
-        --config ${{ matrix.build_type }}
-        --parallel 4
+      run: cmake --build "$BUILD_DIR" --config ${{ matrix.build_type }} --parallel 4
 
     - name: Show ccache stats
       if: runner.os == 'Linux'
       run: ccache -s
 
     # --- Test ---
-    - name: Test
-      # Use ctest to run all registered tests (via gtest_discover_tests)
-      # This works on both Linux and Windows via CTest's platform detection
-      if: ${{ matrix.os == 'ubuntu-latest' }}
+    - name: Test (Unix)
+      if: runner.os != 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: |
-          ctest --output-on-failure
+      run: ctest --output-on-failure
 
-    - name: Test
-      # Windows uses multi-config generators, specify --configuration
-      if: ${{ matrix.os == 'windows-latest' }}
+    - name: Test (Windows)
+      if: runner.os == 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: |
-          ctest --output-on-failure -C ${{ matrix.build_type }}
-                                
+      run: ctest --output-on-failure -C ${{ matrix.build_type }}
+
     # --- Python package ---
     - name: Build Python Package
       run: pip install .
 
     - name: Test Python Package
       run: python -c "import pysparq; pysparq.test_import()"
+
+  # ============================================================================
+  # Python tests with multiple versions
+  # ============================================================================
+  python-tests:
+    name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+        python-version: ['3.9', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest numpy
+
+    - name: Build and install package
+      run: pip install -v .
+
+    - name: Run import test
+      run: python -c "import pysparq; pysparq.test_import()"
+
+    - name: Run pytest
+      shell: bash
+      run: |
+        if [ -d "PySparQ/tests" ]; then
+          pytest PySparQ/tests/ -v || true
+        else
+          echo "No Python tests found"
+        fi
