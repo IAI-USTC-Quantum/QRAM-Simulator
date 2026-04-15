@@ -19,7 +19,7 @@ function(sparq_setup_cuda_target target)
         --expt-relaxed-constexpr
     >)
 
-    target_compile_definitions(${target} PUBLIC USE_CUDA=1 EIGEN_NO_CUDA)
+    target_compile_definitions(${target} PRIVATE USE_CUDA=1)
 
     target_link_libraries(${target} PRIVATE
         cudart cudadevrt
