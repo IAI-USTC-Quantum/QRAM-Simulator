@@ -174,7 +174,7 @@ void example_qram_with_gates() {
     qram_qutrit::QRAMCircuit qram(addr_size, data_size);
     
     // Initialize memory: [1, 2, 3, 0]
-    std::vector<int> memory = {1, 2, 3, 0};
+    std::vector<size_t> memory = {1, 2, 3, 0};
     qram.set_memory(memory);
     
     std::cout << "QRAM memory:" << std::endl;

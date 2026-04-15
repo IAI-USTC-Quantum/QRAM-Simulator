@@ -57,7 +57,7 @@ size_t grover_search(
     qram_qutrit::QRAMCircuit qram(addr_size, data_size);
     
     // Create memory with target_value at a random position
-    std::vector<int> memory(1 << addr_size, 0);
+    std::vector<size_t> memory(1 << addr_size, 0);
     size_t target_address = 2;  // Fixed target address for reproducibility
     
     // Fill memory with random values, ensuring target is present
@@ -189,7 +189,7 @@ void grover_demonstration_simple() {
     
     // Setup QRAM
     qram_qutrit::QRAMCircuit qram(addr_size, data_size);
-    std::vector<int> memory = {0, 1, 2, 3, 0, 1, 2, 3};
+    std::vector<size_t> memory = {0, 1, 2, 3, 0, 1, 2, 3};
     // Only address 2 and 6 have value 2
     qram.set_memory(memory);
     
@@ -205,6 +205,7 @@ void grover_demonstration_simple() {
     SparseState state;
     size_t addr_reg = AddRegister("addr", UnsignedInteger, addr_size)(state);
     size_t data_reg = AddRegister("data", UnsignedInteger, data_size)(state);
+    size_t search_reg = AddRegister("search", UnsignedInteger, data_size)(state);
     
     // Initial superposition
     (Hadamard_Int_Full(addr_reg))(state.basis_states);
