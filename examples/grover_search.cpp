@@ -23,6 +23,10 @@
  * Reference: arXiv:2503.13832
  */
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -219,7 +223,8 @@ void grover_demonstration_simple() {
     std::cout << "\nOptimal iterations: " << optimal_iter << std::endl;
     
     // Run Grover iterations using the built-in operator
-    (grover::GroverAmplify(&qram, addr_reg, data_reg, data_size, optimal_iter))(state);
+    // Note: GroverAmplify takes (qram, addr_reg, search_reg, data_size, n_repeats)
+    (grover::GroverAmplify(&qram, addr_reg, search_reg, data_size, optimal_iter))(state);
     
     std::cout << "\nFinal state after " << optimal_iter << " iterations:" << std::endl;
     (StatePrint(Prob))(state);
