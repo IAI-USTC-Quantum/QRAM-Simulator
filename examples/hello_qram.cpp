@@ -46,7 +46,7 @@ int main() {
     // Address 1 -> Value 3 (binary: 011)
     // Address 2 -> Value 7 (binary: 111)
     // Address 3 -> Value 1 (binary: 001)
-    std::vector<int> memory = {5, 3, 7, 1};
+    std::vector<size_t> memory = {5, 3, 7, 1};
     qram.set_memory(memory);
     
     std::cout << "Memory initialized:" << std::endl;

@@ -117,10 +117,10 @@ size_t grover_search(
     // Step 3: Initialize address register in superposition
     // ============================================================
     // H^{\otimes n} |0> = uniform superposition of all addresses
-    (Hadamard_Int_Full(addr_reg))(state);
+    (Hadamard_Int_Full(addr_reg))(state.basis_states);
     
     std::cout << "Initial superposition created:" << std::endl;
-    (StatePrint(Prob))(state);
+    (StatePrint(Prob))(state.basis_states);
     std::cout << std::endl;
     
     // ============================================================
@@ -135,7 +135,7 @@ size_t grover_search(
     for (size_t iter = 0; iter < num_iterations; ++iter) {
         // ----- Oracle Step -----
         // Load data from QRAM
-        (QRAMLoad(&qram, addr_reg, data_reg))(state);
+        (QRAMLoad(&qram, addr_reg, data_reg))(state.basis_states);
         
         // Mark state where data == target_value
         // This is done by flipping the phase of the matching state
@@ -143,18 +143,18 @@ size_t grover_search(
         
         // For demonstration, we use the GroverOracle from SparQ_Algorithm
         // which internally handles the oracle construction
-        (grover::GroverOracle(&qram, addr_reg, data_reg, search_reg))(state);
+        (grover::GroverOracle(&qram, addr_reg, data_reg, search_reg))(state.basis_states);
         
         // Unload data (QRAMLoad is self-adjoint, so applying twice = identity)
-        (QRAMLoad(&qram, addr_reg, data_reg))(state);
+        (QRAMLoad(&qram, addr_reg, data_reg))(state.basis_states);
         
         // ----- Diffusion Step -----
         // Apply H^{\otimes n}, then phase flip on |0>, then H^{\otimes n}
         // This amplifies the amplitude of the marked state
-        (grover::HPH(addr_reg))(state);
+        (grover::HPH(addr_reg))(state.basis_states);
         
         std::cout << "After iteration " << (iter + 1) << ":" << std::endl;
-        (StatePrint(Prob))(state);
+        (StatePrint(Prob))(state.basis_states);
     }
     
     // ============================================================
@@ -164,7 +164,7 @@ size_t grover_search(
     // For simulation, we can examine the probabilities
     
     std::cout << "\nFinal state probabilities:" << std::endl;
-    (StatePrint(Prob))(state);
+    (StatePrint(Prob))(state.basis_states);
     
     // Find the address with highest probability
     // In a successful Grover search, this should be the target address
@@ -207,9 +207,9 @@ void grover_demonstration_simple() {
     size_t data_reg = AddRegister("data", UnsignedInteger, data_size)(state);
     
     // Initial superposition
-    (Hadamard_Int_Full(addr_reg))(state);
+    (Hadamard_Int_Full(addr_reg))(state.basis_states);
     std::cout << "\nInitial uniform superposition:" << std::endl;
-    (StatePrint(Prob))(state);
+    (StatePrint(Prob))(state.basis_states);
     
     QRAMLoad::version = "noisefree";
     
@@ -224,10 +224,11 @@ void grover_demonstration_simple() {
     
     // Run Grover iterations using the built-in operator
     // Note: GroverAmplify takes (qram, addr_reg, search_reg, data_size, n_repeats)
-    (grover::GroverAmplify(&qram, addr_reg, search_reg, data_size, optimal_iter))(state);
+    // and operates on state.basis_states (std::vector<System>&)
+    (grover::GroverAmplify(&qram, addr_reg, search_reg, data_size, optimal_iter))(state.basis_states);
     
     std::cout << "\nFinal state after " << optimal_iter << " iterations:" << std::endl;
-    (StatePrint(Prob))(state);
+    (StatePrint(Prob))(state.basis_states);
     
     System::clear();
 }
