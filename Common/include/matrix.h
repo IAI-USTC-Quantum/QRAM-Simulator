@@ -614,7 +614,7 @@ namespace qram_simulator
 			out << get(size - 1);
 		}
 
-		size_t max(const Ty& maxvalue) const {
+		size_t max(Ty& maxvalue) const {
 			size_t idx = 0;
 			maxvalue = get(0);
 			for (size_t i = 1; i < size; ++i) {
@@ -626,7 +626,7 @@ namespace qram_simulator
 			return idx;
 		}
 
-		size_t maxabs(const Ty& maxvalue) const {
+		size_t maxabs(Ty& maxvalue) const {
 			size_t idx = 0;
 			maxvalue = abs(get(0));
 			for (size_t i = 1; i < size; ++i) {

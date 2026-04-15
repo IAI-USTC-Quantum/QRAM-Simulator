@@ -55,8 +55,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(TBB)
-message(STATUS "Found TBB: ${TBB_FOUND}")
+# TBB is optional - used for parallel algorithms if available
+find_package(TBB QUIET)
+if(TBB_FOUND)
+    message(STATUS "Found TBB: ${TBB_VERSION}")
+else()
+    message(STATUS "TBB not found - using OpenMP for parallelization")
+endif()
 
 if (UNIX)
 	add_compile_options(-fPIC)
@@ -76,3 +81,41 @@ add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
 add_subdirectory(test)
 add_subdirectory(Experiments)
 add_subdirectory(PySparQ)
+
+# --- Install rules ---
+include(GNUInstallDirs)
+
+set(INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/QRAMSimulator")
+
+install(TARGETS SparQ SparQ_Common SparQ_QRAMSimulator SparQ_Algorithm SparQ_Simulator
+    EXPORT QRAMSimulatorTargets
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY
+    Common/include/
+    QRAM/include/
+    SparQ/include/
+    SparQ_Algorithm/include/
+    ThirdParty/eigen-3.4.0/
+    ThirdParty/fmt/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT QRAMSimulatorTargets
+    FILE QRAMSimulatorTargets.cmake
+    NAMESPACE QRAMSimulator::
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/QRAMSimulatorConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/QRAMSimulatorConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/QRAMSimulatorConfig.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
