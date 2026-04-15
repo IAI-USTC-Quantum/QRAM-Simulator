@@ -203,7 +203,7 @@ TEST(BasicGatesTest, TGateOnOne)
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
     // T|1> = exp(i*pi/4)|1>
-    complex_t expected(std::cos(M_PI / 4), std::sin(M_PI / 4));
+    complex_t expected(std::cos(pi / 4), std::sin(pi / 4));
     EXPECT_NEAR(std::abs(state[0].amplitude - expected), 0.0, 1e-9);
 }
 

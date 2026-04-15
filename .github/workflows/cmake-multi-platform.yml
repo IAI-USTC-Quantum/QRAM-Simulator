@@ -48,16 +48,13 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
 
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build
+
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'true'
-
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=$(pwd)/build" >> "$GITHUB_OUTPUT"
 
     # --- ccache (Linux only) ---
     - name: Install ccache
@@ -103,7 +100,7 @@ jobs:
     - name: Cache CMake build directory
       uses: actions/cache@v4
       with:
-        path: ${{ steps.strings.outputs.build-output-dir }}
+        path: ${{ env.BUILD_DIR }}
         key: cmake-${{ runner.os }}-${{ matrix.build_type }}-${{ steps.cmake-hash.outputs.hash }}
         restore-keys: |
           cmake-${{ runner.os }}-${{ matrix.build_type }}-
@@ -131,7 +128,7 @@ jobs:
         CC: ${{ runner.os == 'Linux' && 'ccache gcc' || matrix.c_compiler }}
         CXX: ${{ runner.os == 'Linux' && 'ccache g++' || matrix.cpp_compiler }}
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake -B "$BUILD_DIR"
         -DCMAKE_CXX_COMPILER=${{ runner.os == 'Linux' && 'g++' || matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ runner.os == 'Linux' && 'gcc' || matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
@@ -144,7 +141,7 @@ jobs:
         CC: ${{ runner.os == 'Linux' && 'ccache gcc' || matrix.c_compiler }}
         CXX: ${{ runner.os == 'Linux' && 'ccache g++' || matrix.cpp_compiler }}
       run: >
-        cmake --build ${{ steps.strings.outputs.build-output-dir }}
+        cmake --build "$BUILD_DIR"
         --config ${{ matrix.build_type }}
         --parallel 4
 
@@ -157,14 +154,14 @@ jobs:
       # Use ctest to run all registered tests (via gtest_discover_tests)
       # This works on both Linux and Windows via CTest's platform detection
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      working-directory: ${{ env.BUILD_DIR }}
       run: |
           ctest --output-on-failure
 
     - name: Test
       # Windows uses multi-config generators, specify --configuration
       if: ${{ matrix.os == 'windows-latest' }}
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      working-directory: ${{ env.BUILD_DIR }}
       run: |
           ctest --output-on-failure -C ${{ matrix.build_type }}
                                 

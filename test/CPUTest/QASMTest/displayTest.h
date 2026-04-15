@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <iostream>
-#include <cmath> // 用于 M_PI
-#define PI 3.1415926
+#include "typedefs.h"
 
 struct GateBase {
     int id;
@@ -30,9 +29,9 @@ struct Phase_Int : GateBase {
 };
 
 struct Zgate_Int : Phase_Int {
-    Zgate_Int(std::string reg_, size_t digit_) : Phase_Int(reg_, digit_, PI) {}
+    Zgate_Int(std::string reg_, size_t digit_) : Phase_Int(reg_, digit_, qram_simulator::pi) {}
 
-    Zgate_Int(int id_, size_t digit_) : Phase_Int(id_, digit_, PI) {}
+    Zgate_Int(int id_, size_t digit_) : Phase_Int(id_, digit_, qram_simulator::pi) {}
 
     // 重写 Phase_Int 的 display 函数
     void display() const override;
