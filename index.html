@@ -1,105 +1,204 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=11"/>
-<meta name="generator" content="Doxygen 1.9.8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>QRAM-Simulator: Main Page</title>
-<link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="dynsections.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript" src="navtreedata.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<link href="search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="search/searchdata.js"></script>
-<script type="text/javascript" src="search/search.js"></script>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRAM-Simulator &amp; PySparQ</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent), #d2a8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin: 0 auto 24px;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badges img {
+            height: 22px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 64px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            text-decoration: none;
+            color: var(--text);
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card .arrow {
+            display: inline-block;
+            margin-top: 16px;
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .card:hover .arrow { color: var(--accent-hover); }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 64px;
+        }
+
+        .feature {
+            padding: 20px;
+            border-left: 3px solid var(--accent);
+            background: var(--card);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .feature h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
-<div id="titlearea">
-<table cellspacing="0" cellpadding="0">
- <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
-   <div id="projectname">QRAM-Simulator<span id="projectnumber">&#160;1.0.0</span>
-   </div>
-   <div id="projectbrief">Quantum Random Access Memory (QRAM) Sparse State Simulator</div>
-  </td>
- </tr>
- </tbody>
-</table>
-</div>
-<!-- end header part -->
-<!-- Generated by Doxygen 1.9.8 -->
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-var searchBox = new SearchBox("searchBox", "search/",'.html');
-/* @license-end */
-</script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function() {
-  initMenu('',true,false,'search.php','Search');
-  $(document).ready(function() { init_search(); });
-});
-/* @license-end */
-</script>
-<div id="main-nav"></div>
-</div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-      <div id="nav-sync" class="sync"></div>
+    <div class="container">
+        <header>
+            <h1>QRAM-Simulator</h1>
+            <p>Sparse-state quantum circuit simulator with native QRAM support and Register Level Programming</p>
+            <div class="badges">
+                <img src="https://img.shields.io/badge/arXiv-2503.13832-b31b1b.svg" alt="arXiv">
+                <img src="https://img.shields.io/pypi/v/pysparq.svg" alt="PyPI">
+                <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+            </div>
+        </header>
+
+        <div class="grid">
+            <a class="card" href="api/index.html">
+                <h2>C++ API Documentation</h2>
+                <p>SparQ core, quantum gates, arithmetic operators, QRAM circuits, and system operations.</p>
+                <span class="arrow">Browse docs &rarr;</span>
+            </a>
+            <a class="card" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator">
+                <h2>GitHub Repository</h2>
+                <p>Source code, issues, CI pipelines, and contribution guidelines.</p>
+                <span class="arrow">View repo &rarr;</span>
+            </a>
+            <a class="card" href="https://pypi.org/project/pysparq/">
+                <h2>PySparQ on PyPI</h2>
+                <p>Python bindings via pybind11. Install with <code>pip install pysparq</code>.</p>
+                <span class="arrow">Get package &rarr;</span>
+            </a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>Register Level Programming</h3>
+                <p>Direct register operations with uint64_t storage instead of gate-by-gate circuit construction.</p>
+            </div>
+            <div class="feature">
+                <h3>Sparse State Simulation</h3>
+                <p>Only non-zero amplitudes are stored, enabling simulation of 64+ qubits for structured algorithms.</p>
+            </div>
+            <div class="feature">
+                <h3>Native QRAM</h3>
+                <p>Qutrit-based and qubit-based QRAM circuit implementations with noise model support.</p>
+            </div>
+            <div class="feature">
+                <h3>GPU Acceleration</h3>
+                <p>Optional CUDA backend for parallel sparse state operations.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Developed by <a href="https://github.com/IAI-USTC-Quantum">IAI-USTC-Quantum</a> &mdash; USTC Institute of Artificial Intelligence</p>
+        </footer>
     </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('index.html',''); initResizable(); });
-/* @license-end */
-</script>
-<div id="doc-content">
-<!-- window showing the filter options -->
-<div id="MSearchSelectWindow"
-     onmouseover="return searchBox.OnSearchSelectShow()"
-     onmouseout="return searchBox.OnSearchSelectHide()"
-     onkeydown="return searchBox.OnSearchSelectKey(event)">
-</div>
-
-<!-- iframe showing the search results (closed by default) -->
-<div id="MSearchResultsWindow">
-<div id="MSearchResults">
-<div class="SRPage">
-<div id="SRIndex">
-<div id="SRResults"></div>
-<div class="SRStatus" id="Loading">Loading...</div>
-<div class="SRStatus" id="Searching">Searching...</div>
-<div class="SRStatus" id="NoMatches">No Matches</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="header">
-  <div class="headertitle"><div class="title">QRAM-Simulator Documentation</div></div>
-</div><!--header-->
-<div class="contents">
-</div><!-- contents -->
-</div><!-- doc-content -->
-<!-- start footer part -->
-<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
-  <ul>
-    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
-  </ul>
-</div>
 </body>
 </html>
