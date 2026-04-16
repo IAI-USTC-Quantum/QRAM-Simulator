@@ -1,0 +1,2943 @@
+pysparq
+=======
+
+.. py:module:: pysparq
+
+.. autoapi-nested-parse::
+
+   PySparQ type stubs - re-exports all public API from _core module.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   pysparq.Binary
+   pysparq.Boolean
+   pysparq.Default
+   pysparq.Detail
+   pysparq.General
+   pysparq.Prob
+   pysparq.Rational
+   pysparq.SignedInteger
+   pysparq.UnsignedInteger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pysparq.AddAssign_AnyInt_AnyInt
+   pysparq.AddRegister
+   pysparq.AddRegisterWithHadamard
+   pysparq.Add_ConstUInt
+   pysparq.Add_Mult_UInt_ConstUInt
+   pysparq.Add_UInt_ConstUInt
+   pysparq.Add_UInt_UInt
+   pysparq.Add_UInt_UInt_InPlace
+   pysparq.Assign
+   pysparq.BaseOperator
+   pysparq.CheckDuplicateKey
+   pysparq.CheckNan
+   pysparq.CheckNormalization
+   pysparq.ClearZero
+   pysparq.CombineRegister
+   pysparq.Compare_UInt_UInt
+   pysparq.CondRot_Rational_Bool
+   pysparq.CustomArithmetic
+   pysparq.DenseMatrix_complex
+   pysparq.DenseMatrix_float64
+   pysparq.Div_Sqrt_Arccos_Int_Int
+   pysparq.FlipBools
+   pysparq.GetMid_UInt_UInt
+   pysparq.GetRotateAngle_Int_Int
+   pysparq.GlobalPhase_Int
+   pysparq.Hadamard_Bool
+   pysparq.Hadamard_Int
+   pysparq.Hadamard_Int_Full
+   pysparq.Hadamard_PartialQubit
+   pysparq.Init_Unsafe
+   pysparq.Less_UInt_UInt
+   pysparq.ModuleInheritance_Test
+   pysparq.ModuleInheritance_Test_SelfAdjoint
+   pysparq.MoveBackRegister
+   pysparq.Mult_UInt_ConstUInt
+   pysparq.Normalize
+   pysparq.PartialTrace
+   pysparq.PartialTraceSelect
+   pysparq.PartialTraceSelectRange
+   pysparq.Phase_Bool
+   pysparq.Pop
+   pysparq.Push
+   pysparq.QFT
+   pysparq.QRAMCircuit_qutrit
+   pysparq.QRAMLoad
+   pysparq.QRAMLoadFast
+   pysparq.RXgate_Bool
+   pysparq.RYgate_Bool
+   pysparq.RZgate_Bool
+   pysparq.Reflection_Bool
+   pysparq.RemoveRegister
+   pysparq.Rot_Bool
+   pysparq.Rot_GeneralStatePrep
+   pysparq.Rot_GeneralUnitary
+   pysparq.SXgate_Bool
+   pysparq.SelfAdjointOperator
+   pysparq.Sgate_Bool
+   pysparq.ShiftLeft
+   pysparq.ShiftRight
+   pysparq.SortByAmplitude
+   pysparq.SortByKey
+   pysparq.SortByKey2
+   pysparq.SortExceptBit
+   pysparq.SortExceptKey
+   pysparq.SortExceptKeyHadamard
+   pysparq.SortUnconditional
+   pysparq.SparseMatrix
+   pysparq.SparseState
+   pysparq.SplitRegister
+   pysparq.Sqrt_Div_Arccos_Int_Int
+   pysparq.StateEqualExceptKey
+   pysparq.StateEqualExceptQubits
+   pysparq.StateHashExceptKey
+   pysparq.StateHashExceptQubits
+   pysparq.StateLessExceptKey
+   pysparq.StateLessExceptQubits
+   pysparq.StatePrint
+   pysparq.StatePrintDisplay
+   pysparq.StateStorage
+   pysparq.StateStorageType
+   pysparq.Swap_Bool_Bool
+   pysparq.Swap_General_General
+   pysparq.System
+   pysparq.TestRemovable
+   pysparq.Tgate_Bool
+   pysparq.U2gate_Bool
+   pysparq.U3gate_Bool
+   pysparq.ViewNormalization
+   pysparq.Xgate_Bool
+   pysparq.Ygate_Bool
+   pysparq.ZeroConditionalPhaseFlip
+   pysparq.Zgate_Bool
+   pysparq.inverseQFT
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pysparq.combine_systems
+   pysparq.merge_system
+   pysparq.remove_system
+   pysparq.split_systems
+   pysparq.stateprep_unitary_build_schmidt
+   pysparq.test_import
+
+
+Package Contents
+----------------
+
+.. py:class:: AddAssign_AnyInt_AnyInt(input_reg: str, output_reg: str)
+              AddAssign_AnyInt_AnyInt(input_reg: int, output_reg: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_all_ones(conds: list[str]) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_all_ones(cond: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_all_ones(conds: list[int]) -> AddAssign_AnyInt_AnyInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_bit(cond: int, pos: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> AddAssign_AnyInt_AnyInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_nonzeros(conds: list[str]) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_nonzeros(cond: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_nonzeros(conds: list[int]) -> AddAssign_AnyInt_AnyInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_value(cond: int, pos: int) -> AddAssign_AnyInt_AnyInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> AddAssign_AnyInt_AnyInt
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: AddRegister(name: str, type: StateStorageType, size: int)
+
+.. py:class:: AddRegisterWithHadamard(name: str, type: StateStorageType, size: int)
+
+.. py:class:: Add_ConstUInt(input_reg: str, add: int)
+              Add_ConstUInt(input_reg: int, add: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Add_ConstUInt
+                  conditioned_by_all_ones(conds: list[str]) -> Add_ConstUInt
+                  conditioned_by_all_ones(cond: int) -> Add_ConstUInt
+                  conditioned_by_all_ones(conds: list[int]) -> Add_ConstUInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Add_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Add_ConstUInt
+                  conditioned_by_bit(cond: int, pos: int) -> Add_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Add_ConstUInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Add_ConstUInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Add_ConstUInt
+                  conditioned_by_nonzeros(cond: int) -> Add_ConstUInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Add_ConstUInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Add_ConstUInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Add_ConstUInt
+                  conditioned_by_value(cond: int, pos: int) -> Add_ConstUInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Add_ConstUInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Add_Mult_UInt_ConstUInt(input_reg: str, multiplier: int, output_reg: str)
+              Add_Mult_UInt_ConstUInt(input_reg: int, multiplier: int, output_reg: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[str]) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(cond: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[int]) -> Add_Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_bit(cond: int, pos: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Add_Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(cond: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Add_Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_value(cond: int, pos: int) -> Add_Mult_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Add_Mult_UInt_ConstUInt
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Add_UInt_ConstUInt(input_reg: str, add: int, output_reg: str)
+              Add_UInt_ConstUInt(input_reg: int, add: int, output_reg: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Add_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[str]) -> Add_UInt_ConstUInt
+                  conditioned_by_all_ones(cond: int) -> Add_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[int]) -> Add_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Add_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Add_UInt_ConstUInt
+                  conditioned_by_bit(cond: int, pos: int) -> Add_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Add_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Add_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Add_UInt_ConstUInt
+                  conditioned_by_nonzeros(cond: int) -> Add_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Add_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Add_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Add_UInt_ConstUInt
+                  conditioned_by_value(cond: int, pos: int) -> Add_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Add_UInt_ConstUInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Add_UInt_UInt(input_reg1: str, input_reg2: str, output_reg: str)
+              Add_UInt_UInt(input_id1: int, input_id2: int, output_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Add_UInt_UInt
+                  conditioned_by_all_ones(conds: list[str]) -> Add_UInt_UInt
+                  conditioned_by_all_ones(cond: int) -> Add_UInt_UInt
+                  conditioned_by_all_ones(conds: list[int]) -> Add_UInt_UInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Add_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Add_UInt_UInt
+                  conditioned_by_bit(cond: int, pos: int) -> Add_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Add_UInt_UInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Add_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Add_UInt_UInt
+                  conditioned_by_nonzeros(cond: int) -> Add_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Add_UInt_UInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Add_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Add_UInt_UInt
+                  conditioned_by_value(cond: int, pos: int) -> Add_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Add_UInt_UInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Add_UInt_UInt_InPlace(input_reg: str, output_reg: str)
+              Add_UInt_UInt_InPlace(input_reg: int, output_reg: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Add_UInt_UInt_InPlace
+                  conditioned_by_all_ones(conds: list[str]) -> Add_UInt_UInt_InPlace
+                  conditioned_by_all_ones(cond: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_all_ones(conds: list[int]) -> Add_UInt_UInt_InPlace
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Add_UInt_UInt_InPlace
+                  conditioned_by_bit(cond: int, pos: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Add_UInt_UInt_InPlace
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Add_UInt_UInt_InPlace
+                  conditioned_by_nonzeros(conds: list[str]) -> Add_UInt_UInt_InPlace
+                  conditioned_by_nonzeros(cond: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_nonzeros(conds: list[int]) -> Add_UInt_UInt_InPlace
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Add_UInt_UInt_InPlace
+                  conditioned_by_value(cond: int, pos: int) -> Add_UInt_UInt_InPlace
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Add_UInt_UInt_InPlace
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Assign(src: str, dst: str)
+              Assign(src_id: int, dst_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Assign
+                  conditioned_by_all_ones(conds: list[str]) -> Assign
+                  conditioned_by_all_ones(cond: int) -> Assign
+                  conditioned_by_all_ones(conds: list[int]) -> Assign
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Assign
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Assign
+                  conditioned_by_bit(cond: int, pos: int) -> Assign
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Assign
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Assign
+                  conditioned_by_nonzeros(conds: list[str]) -> Assign
+                  conditioned_by_nonzeros(cond: int) -> Assign
+                  conditioned_by_nonzeros(conds: list[int]) -> Assign
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Assign
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Assign
+                  conditioned_by_value(cond: int, pos: int) -> Assign
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Assign
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: BaseOperator
+
+   .. py:method:: dag(arg0: SparseState) -> None
+
+
+.. py:class:: CheckDuplicateKey
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: CheckNan
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: CheckNormalization
+              CheckNormalization(threshold: float)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: ClearZero
+              ClearZero(epsilon: float)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: CombineRegister(first: str, second: str)
+
+.. py:class:: Compare_UInt_UInt(left_reg: str, right_reg: str, less_flag_reg: str, equal_flag_reg: str)
+              Compare_UInt_UInt(left_id: int, right_id: int, less_flag_id: int, equal_flag_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Compare_UInt_UInt
+                  conditioned_by_all_ones(conds: list[str]) -> Compare_UInt_UInt
+                  conditioned_by_all_ones(cond: int) -> Compare_UInt_UInt
+                  conditioned_by_all_ones(conds: list[int]) -> Compare_UInt_UInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Compare_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Compare_UInt_UInt
+                  conditioned_by_bit(cond: int, pos: int) -> Compare_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Compare_UInt_UInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Compare_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Compare_UInt_UInt
+                  conditioned_by_nonzeros(cond: int) -> Compare_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Compare_UInt_UInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Compare_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Compare_UInt_UInt
+                  conditioned_by_value(cond: int, pos: int) -> Compare_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Compare_UInt_UInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: CondRot_Rational_Bool(arg0: str, arg1: str)
+              CondRot_Rational_Bool(arg0: int, arg1: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+.. py:class:: CustomArithmetic(input_registers: list, input_size: int, output_size: int, func: Callable)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: DenseMatrix_complex
+              DenseMatrix_complex(size: int)
+
+.. py:class:: DenseMatrix_float64
+              DenseMatrix_float64(size: int)
+
+.. py:class:: Div_Sqrt_Arccos_Int_Int(lhs_reg: str, rhs_reg: str, out_reg: str)
+              Div_Sqrt_Arccos_Int_Int(lhs_reg: int, rhs_reg: int, out_reg: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_all_ones(conds: list[str]) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_all_ones(cond: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_all_ones(conds: list[int]) -> Div_Sqrt_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_bit(cond: int, pos: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Div_Sqrt_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_nonzeros(conds: list[str]) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_nonzeros(cond: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_nonzeros(conds: list[int]) -> Div_Sqrt_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_value(cond: int, pos: int) -> Div_Sqrt_Arccos_Int_Int
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Div_Sqrt_Arccos_Int_Int
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: FlipBools(reg: str)
+              FlipBools(reg_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> FlipBools
+                  conditioned_by_all_ones(conds: list[str]) -> FlipBools
+                  conditioned_by_all_ones(cond: int) -> FlipBools
+                  conditioned_by_all_ones(conds: list[int]) -> FlipBools
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> FlipBools
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> FlipBools
+                  conditioned_by_bit(cond: int, pos: int) -> FlipBools
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> FlipBools
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> FlipBools
+                  conditioned_by_nonzeros(conds: list[str]) -> FlipBools
+                  conditioned_by_nonzeros(cond: int) -> FlipBools
+                  conditioned_by_nonzeros(conds: list[int]) -> FlipBools
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> FlipBools
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> FlipBools
+                  conditioned_by_value(cond: int, pos: int) -> FlipBools
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> FlipBools
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: GetMid_UInt_UInt(left_reg: str, right_reg: str, mid_reg: str)
+              GetMid_UInt_UInt(left_id: int, right_id: int, mid_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> GetMid_UInt_UInt
+                  conditioned_by_all_ones(conds: list[str]) -> GetMid_UInt_UInt
+                  conditioned_by_all_ones(cond: int) -> GetMid_UInt_UInt
+                  conditioned_by_all_ones(conds: list[int]) -> GetMid_UInt_UInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> GetMid_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> GetMid_UInt_UInt
+                  conditioned_by_bit(cond: int, pos: int) -> GetMid_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> GetMid_UInt_UInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> GetMid_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[str]) -> GetMid_UInt_UInt
+                  conditioned_by_nonzeros(cond: int) -> GetMid_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[int]) -> GetMid_UInt_UInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> GetMid_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> GetMid_UInt_UInt
+                  conditioned_by_value(cond: int, pos: int) -> GetMid_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> GetMid_UInt_UInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: GetRotateAngle_Int_Int(lhs_reg: str, rhs_reg: str, out_reg: str)
+              GetRotateAngle_Int_Int(lhs_reg: int, rhs_reg: int, out_reg: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> GetRotateAngle_Int_Int
+                  conditioned_by_all_ones(conds: list[str]) -> GetRotateAngle_Int_Int
+                  conditioned_by_all_ones(cond: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_all_ones(conds: list[int]) -> GetRotateAngle_Int_Int
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> GetRotateAngle_Int_Int
+                  conditioned_by_bit(cond: int, pos: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> GetRotateAngle_Int_Int
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> GetRotateAngle_Int_Int
+                  conditioned_by_nonzeros(conds: list[str]) -> GetRotateAngle_Int_Int
+                  conditioned_by_nonzeros(cond: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_nonzeros(conds: list[int]) -> GetRotateAngle_Int_Int
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> GetRotateAngle_Int_Int
+                  conditioned_by_value(cond: int, pos: int) -> GetRotateAngle_Int_Int
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> GetRotateAngle_Int_Int
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: GlobalPhase_Int(phase: complex)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> GlobalPhase_Int
+                  conditioned_by_all_ones(conds: list[str]) -> GlobalPhase_Int
+                  conditioned_by_all_ones(cond: int) -> GlobalPhase_Int
+                  conditioned_by_all_ones(conds: list[int]) -> GlobalPhase_Int
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> GlobalPhase_Int
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> GlobalPhase_Int
+                  conditioned_by_bit(cond: int, pos: int) -> GlobalPhase_Int
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> GlobalPhase_Int
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> GlobalPhase_Int
+                  conditioned_by_nonzeros(conds: list[str]) -> GlobalPhase_Int
+                  conditioned_by_nonzeros(cond: int) -> GlobalPhase_Int
+                  conditioned_by_nonzeros(conds: list[int]) -> GlobalPhase_Int
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> GlobalPhase_Int
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> GlobalPhase_Int
+                  conditioned_by_value(cond: int, pos: int) -> GlobalPhase_Int
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> GlobalPhase_Int
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Hadamard_Bool(reg_in: str)
+              Hadamard_Bool(reg_in: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Hadamard_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Hadamard_Bool
+                  conditioned_by_all_ones(cond: int) -> Hadamard_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Hadamard_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Hadamard_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Hadamard_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Hadamard_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Hadamard_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Hadamard_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Hadamard_Bool
+                  conditioned_by_nonzeros(cond: int) -> Hadamard_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Hadamard_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Hadamard_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Hadamard_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Hadamard_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Hadamard_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Hadamard_Int(reg_in: str, n_digits: int)
+              Hadamard_Int(reg_in: int, n_digits: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Hadamard_Int
+                  conditioned_by_all_ones(conds: list[str]) -> Hadamard_Int
+                  conditioned_by_all_ones(cond: int) -> Hadamard_Int
+                  conditioned_by_all_ones(conds: list[int]) -> Hadamard_Int
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Hadamard_Int
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Hadamard_Int
+                  conditioned_by_bit(cond: int, pos: int) -> Hadamard_Int
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Hadamard_Int
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Hadamard_Int
+                  conditioned_by_nonzeros(conds: list[str]) -> Hadamard_Int
+                  conditioned_by_nonzeros(cond: int) -> Hadamard_Int
+                  conditioned_by_nonzeros(conds: list[int]) -> Hadamard_Int
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Hadamard_Int
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Hadamard_Int
+                  conditioned_by_value(cond: int, pos: int) -> Hadamard_Int
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Hadamard_Int
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Hadamard_Int_Full(reg_in: str)
+              Hadamard_Int_Full(reg_in: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Hadamard_Int_Full
+                  conditioned_by_all_ones(conds: list[str]) -> Hadamard_Int_Full
+                  conditioned_by_all_ones(cond: int) -> Hadamard_Int_Full
+                  conditioned_by_all_ones(conds: list[int]) -> Hadamard_Int_Full
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Hadamard_Int_Full
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Hadamard_Int_Full
+                  conditioned_by_bit(cond: int, pos: int) -> Hadamard_Int_Full
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Hadamard_Int_Full
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Hadamard_Int_Full
+                  conditioned_by_nonzeros(conds: list[str]) -> Hadamard_Int_Full
+                  conditioned_by_nonzeros(cond: int) -> Hadamard_Int_Full
+                  conditioned_by_nonzeros(conds: list[int]) -> Hadamard_Int_Full
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Hadamard_Int_Full
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Hadamard_Int_Full
+                  conditioned_by_value(cond: int, pos: int) -> Hadamard_Int_Full
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Hadamard_Int_Full
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Hadamard_PartialQubit(reg_in: str, qubit_positions: set)
+              Hadamard_PartialQubit(reg_in: int, qubit_positions: set)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Hadamard_PartialQubit
+                  conditioned_by_all_ones(conds: list[str]) -> Hadamard_PartialQubit
+                  conditioned_by_all_ones(cond: int) -> Hadamard_PartialQubit
+                  conditioned_by_all_ones(conds: list[int]) -> Hadamard_PartialQubit
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Hadamard_PartialQubit
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Hadamard_PartialQubit
+                  conditioned_by_bit(cond: int, pos: int) -> Hadamard_PartialQubit
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Hadamard_PartialQubit
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Hadamard_PartialQubit
+                  conditioned_by_nonzeros(conds: list[str]) -> Hadamard_PartialQubit
+                  conditioned_by_nonzeros(cond: int) -> Hadamard_PartialQubit
+                  conditioned_by_nonzeros(conds: list[int]) -> Hadamard_PartialQubit
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Hadamard_PartialQubit
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Hadamard_PartialQubit
+                  conditioned_by_value(cond: int, pos: int) -> Hadamard_PartialQubit
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Hadamard_PartialQubit
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Init_Unsafe(reg: str, value: int)
+              Init_Unsafe(id: int, value: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: Less_UInt_UInt(left_reg: str, right_reg: str, less_flag_reg: str)
+              Less_UInt_UInt(left_id: int, right_id: int, less_flag_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Less_UInt_UInt
+                  conditioned_by_all_ones(conds: list[str]) -> Less_UInt_UInt
+                  conditioned_by_all_ones(cond: int) -> Less_UInt_UInt
+                  conditioned_by_all_ones(conds: list[int]) -> Less_UInt_UInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Less_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Less_UInt_UInt
+                  conditioned_by_bit(cond: int, pos: int) -> Less_UInt_UInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Less_UInt_UInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Less_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Less_UInt_UInt
+                  conditioned_by_nonzeros(cond: int) -> Less_UInt_UInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Less_UInt_UInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Less_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Less_UInt_UInt
+                  conditioned_by_value(cond: int, pos: int) -> Less_UInt_UInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Less_UInt_UInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: ModuleInheritance_Test
+
+   Bases: :py:obj:`BaseOperator`
+
+
+.. py:class:: ModuleInheritance_Test_SelfAdjoint
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: MoveBackRegister(reg: str)
+              MoveBackRegister(reg_id: int)
+
+.. py:class:: Mult_UInt_ConstUInt(input_reg: str, multiplier: int, output_reg: str)
+              Mult_UInt_ConstUInt(input_id: int, multiplier: int, output_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[str]) -> Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(cond: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_all_ones(conds: list[int]) -> Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Mult_UInt_ConstUInt
+                  conditioned_by_bit(cond: int, pos: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[str]) -> Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(cond: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_nonzeros(conds: list[int]) -> Mult_UInt_ConstUInt
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Mult_UInt_ConstUInt
+                  conditioned_by_value(cond: int, pos: int) -> Mult_UInt_ConstUInt
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Mult_UInt_ConstUInt
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Normalize
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: PartialTrace(partial_trace_register_names: list[str])
+              PartialTrace(partial_trace_register_ids: list[int])
+              PartialTrace(single_register_name: str)
+              PartialTrace(single_register_id: int)
+
+.. py:class:: PartialTraceSelect(name_value_map: dict[str, int])
+              PartialTraceSelect(id_value_map: dict[int, int])
+              PartialTraceSelect(reg_ids: list[int], select_values: list[int])
+
+.. py:class:: PartialTraceSelectRange(register_name: str, select_range: tuple[int, int])
+              PartialTraceSelectRange(register_id: int, select_range: tuple[int, int])
+
+.. py:class:: Phase_Bool(reg: str, digit: int, lambda_: float)
+              Phase_Bool(reg_id: int, digit: int, lambda_: float)
+              Phase_Bool(reg: str, lambda_: float)
+              Phase_Bool(reg_id: int, lambda_: float)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Phase_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Phase_Bool
+                  conditioned_by_all_ones(cond: int) -> Phase_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Phase_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Phase_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Phase_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Phase_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Phase_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Phase_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Phase_Bool
+                  conditioned_by_nonzeros(cond: int) -> Phase_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Phase_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Phase_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Phase_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Phase_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Phase_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Pop(reg: str)
+              Pop(reg_id: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+.. py:class:: Push(reg: str, garbage: str)
+              Push(reg_id: int, garbage: str)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+.. py:class:: QFT(reg_name: str)
+              QFT(reg_id: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> QFT
+                  conditioned_by_all_ones(conds: list[str]) -> QFT
+                  conditioned_by_all_ones(cond: int) -> QFT
+                  conditioned_by_all_ones(conds: list[int]) -> QFT
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> QFT
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> QFT
+                  conditioned_by_bit(cond: int, pos: int) -> QFT
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> QFT
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> QFT
+                  conditioned_by_nonzeros(conds: list[str]) -> QFT
+                  conditioned_by_nonzeros(cond: int) -> QFT
+                  conditioned_by_nonzeros(conds: list[int]) -> QFT
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> QFT
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> QFT
+                  conditioned_by_value(cond: int, pos: int) -> QFT
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> QFT
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: QRAMCircuit_qutrit(addr_size: int, data_size: int)
+              QRAMCircuit_qutrit(addr_size: int, data_size: int, memory: list[int])
+              QRAMCircuit_qutrit(addr_size: int, data_size: int, memory: list[int])
+
+.. py:class:: QRAMLoad(qram: QRAMCircuit_qutrit, addr_reg: str, data_reg: str)
+              QRAMLoad(qram: QRAMCircuit_qutrit, addr_reg_id: int, data_reg_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> QRAMLoad
+                  conditioned_by_all_ones(conds: list[str]) -> QRAMLoad
+                  conditioned_by_all_ones(cond: int) -> QRAMLoad
+                  conditioned_by_all_ones(conds: list[int]) -> QRAMLoad
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> QRAMLoad
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> QRAMLoad
+                  conditioned_by_bit(cond: int, pos: int) -> QRAMLoad
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> QRAMLoad
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> QRAMLoad
+                  conditioned_by_nonzeros(conds: list[str]) -> QRAMLoad
+                  conditioned_by_nonzeros(cond: int) -> QRAMLoad
+                  conditioned_by_nonzeros(conds: list[int]) -> QRAMLoad
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> QRAMLoad
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> QRAMLoad
+                  conditioned_by_value(cond: int, pos: int) -> QRAMLoad
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> QRAMLoad
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+   .. py:property:: qram_circuit
+      :type: QRAMCircuit_qutrit
+
+
+
+   .. py:attribute:: version
+      :type:  ClassVar[str]
+      :value: ''
+
+
+
+.. py:class:: QRAMLoadFast(qram: QRAMCircuit_qutrit, addr_reg: str, data_reg: str)
+              QRAMLoadFast(qram: QRAMCircuit_qutrit, addr_reg_id: int, data_reg_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> QRAMLoadFast
+                  conditioned_by_all_ones(conds: list[str]) -> QRAMLoadFast
+                  conditioned_by_all_ones(cond: int) -> QRAMLoadFast
+                  conditioned_by_all_ones(conds: list[int]) -> QRAMLoadFast
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> QRAMLoadFast
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> QRAMLoadFast
+                  conditioned_by_bit(cond: int, pos: int) -> QRAMLoadFast
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> QRAMLoadFast
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> QRAMLoadFast
+                  conditioned_by_nonzeros(conds: list[str]) -> QRAMLoadFast
+                  conditioned_by_nonzeros(cond: int) -> QRAMLoadFast
+                  conditioned_by_nonzeros(conds: list[int]) -> QRAMLoadFast
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> QRAMLoadFast
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> QRAMLoadFast
+                  conditioned_by_value(cond: int, pos: int) -> QRAMLoadFast
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> QRAMLoadFast
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: RXgate_Bool(reg: str, digit: int, theta: float)
+              RXgate_Bool(reg_id: int, digit: int, theta: float)
+              RXgate_Bool(reg: str, theta: float)
+              RXgate_Bool(reg_id: int, theta: float)
+
+   Bases: :py:obj:`Rot_Bool`
+
+
+.. py:class:: RYgate_Bool(reg: str, digit: int, theta: float)
+              RYgate_Bool(reg_id: int, digit: int, theta: float)
+              RYgate_Bool(reg: str, theta: float)
+              RYgate_Bool(reg_id: int, theta: float)
+
+   Bases: :py:obj:`Rot_Bool`
+
+
+.. py:class:: RZgate_Bool(reg: str, digit: int, theta: float)
+              RZgate_Bool(reg_id: int, digit: int, theta: float)
+              RZgate_Bool(reg: str, theta: float)
+              RZgate_Bool(reg_id: int, theta: float)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> RZgate_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> RZgate_Bool
+                  conditioned_by_all_ones(cond: int) -> RZgate_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> RZgate_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> RZgate_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> RZgate_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> RZgate_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> RZgate_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> RZgate_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> RZgate_Bool
+                  conditioned_by_nonzeros(cond: int) -> RZgate_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> RZgate_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> RZgate_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> RZgate_Bool
+                  conditioned_by_value(cond: int, pos: int) -> RZgate_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> RZgate_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Reflection_Bool(reg: str, inverse: bool = False)
+              Reflection_Bool(reg_id: int, inverse: bool = False)
+              Reflection_Bool(reg_ids: list[int], inverse: bool = False)
+              Reflection_Bool(regs: list[str], inverse: bool = False)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Reflection_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Reflection_Bool
+                  conditioned_by_all_ones(cond: int) -> Reflection_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Reflection_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Reflection_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Reflection_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Reflection_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Reflection_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Reflection_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Reflection_Bool
+                  conditioned_by_nonzeros(cond: int) -> Reflection_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Reflection_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Reflection_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Reflection_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Reflection_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Reflection_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: RemoveRegister(name: str)
+              RemoveRegister(reg_id: int)
+
+.. py:class:: Rot_Bool(reg: str, digit: int, matrix)
+              Rot_Bool(reg_id: int, digit: int, matrix)
+              Rot_Bool(reg: str, matrix)
+              Rot_Bool(reg_id: int, matrix)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Rot_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Rot_Bool
+                  conditioned_by_all_ones(cond: int) -> Rot_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Rot_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Rot_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Rot_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Rot_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Rot_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Rot_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Rot_Bool
+                  conditioned_by_nonzeros(cond: int) -> Rot_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Rot_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Rot_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Rot_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Rot_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Rot_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Rot_GeneralStatePrep(reg: str, state_vector: list[complex])
+              Rot_GeneralStatePrep(reg_id: int, state_vector: list[complex])
+
+   Bases: :py:obj:`BaseOperator`
+
+
+.. py:class:: Rot_GeneralUnitary(reg: str, unitary_matrix: DenseMatrix_complex)
+              Rot_GeneralUnitary(reg_id: int, unitary_matrix: DenseMatrix_complex)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Rot_GeneralUnitary
+                  conditioned_by_all_ones(conds: list[str]) -> Rot_GeneralUnitary
+                  conditioned_by_all_ones(cond: int) -> Rot_GeneralUnitary
+                  conditioned_by_all_ones(conds: list[int]) -> Rot_GeneralUnitary
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Rot_GeneralUnitary
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Rot_GeneralUnitary
+                  conditioned_by_bit(cond: int, pos: int) -> Rot_GeneralUnitary
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Rot_GeneralUnitary
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Rot_GeneralUnitary
+                  conditioned_by_nonzeros(conds: list[str]) -> Rot_GeneralUnitary
+                  conditioned_by_nonzeros(cond: int) -> Rot_GeneralUnitary
+                  conditioned_by_nonzeros(conds: list[int]) -> Rot_GeneralUnitary
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Rot_GeneralUnitary
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Rot_GeneralUnitary
+                  conditioned_by_value(cond: int, pos: int) -> Rot_GeneralUnitary
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Rot_GeneralUnitary
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: SXgate_Bool(reg: str, digit: int = 0)
+              SXgate_Bool(reg_id: int, digit: int = 0)
+
+   Bases: :py:obj:`Rot_Bool`
+
+
+.. py:class:: SelfAdjointOperator
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: dag(arg0: SparseState) -> None
+
+
+.. py:class:: Sgate_Bool(reg: str, digit: int = 0)
+              Sgate_Bool(reg_id: int, digit: int = 0)
+
+   Bases: :py:obj:`Phase_Bool`
+
+
+.. py:class:: ShiftLeft(reg: str, shift_bits: int)
+              ShiftLeft(reg_id: int, shift_bits: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> ShiftLeft
+                  conditioned_by_all_ones(conds: list[str]) -> ShiftLeft
+                  conditioned_by_all_ones(cond: int) -> ShiftLeft
+                  conditioned_by_all_ones(conds: list[int]) -> ShiftLeft
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> ShiftLeft
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> ShiftLeft
+                  conditioned_by_bit(cond: int, pos: int) -> ShiftLeft
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> ShiftLeft
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> ShiftLeft
+                  conditioned_by_nonzeros(conds: list[str]) -> ShiftLeft
+                  conditioned_by_nonzeros(cond: int) -> ShiftLeft
+                  conditioned_by_nonzeros(conds: list[int]) -> ShiftLeft
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> ShiftLeft
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> ShiftLeft
+                  conditioned_by_value(cond: int, pos: int) -> ShiftLeft
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> ShiftLeft
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: ShiftRight(reg: str, shift_bits: int)
+              ShiftRight(reg_id: int, shift_bits: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> ShiftRight
+                  conditioned_by_all_ones(conds: list[str]) -> ShiftRight
+                  conditioned_by_all_ones(cond: int) -> ShiftRight
+                  conditioned_by_all_ones(conds: list[int]) -> ShiftRight
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> ShiftRight
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> ShiftRight
+                  conditioned_by_bit(cond: int, pos: int) -> ShiftRight
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> ShiftRight
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> ShiftRight
+                  conditioned_by_nonzeros(conds: list[str]) -> ShiftRight
+                  conditioned_by_nonzeros(cond: int) -> ShiftRight
+                  conditioned_by_nonzeros(conds: list[int]) -> ShiftRight
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> ShiftRight
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> ShiftRight
+                  conditioned_by_value(cond: int, pos: int) -> ShiftRight
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> ShiftRight
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: SortByAmplitude
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortByKey(key: str)
+              SortByKey(key_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortByKey2(key1: str, key2: str)
+              SortByKey2(key1_id: int, key2_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortExceptBit(key: str, digit: int)
+              SortExceptBit(key_id: int, digit: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortExceptKey(key: str)
+              SortExceptKey(key_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortExceptKeyHadamard(key: str, qubit_ids: set[int])
+              SortExceptKeyHadamard(key_id: int, qubit_ids: set[int])
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SortUnconditional
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: SparseMatrix
+              SparseMatrix(arg0: list[float], arg1: list[int], arg2: int, arg3: int, arg4: int, arg5: bool)
+
+.. py:class:: SparseState
+
+   .. py:method:: empty() -> bool
+
+
+   .. py:method:: size() -> int
+
+
+   .. py:property:: basis_states
+      :type: list[System]
+
+
+
+.. py:class:: SplitRegister(first: str, second: str, size: int)
+
+.. py:class:: Sqrt_Div_Arccos_Int_Int(lhs_reg: str, rhs_reg: str, out_reg: str)
+              Sqrt_Div_Arccos_Int_Int(lhs_reg: int, rhs_reg: int, out_reg: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_all_ones(conds: list[str]) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_all_ones(cond: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_all_ones(conds: list[int]) -> Sqrt_Div_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_bit(cond: int, pos: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Sqrt_Div_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_nonzeros(conds: list[str]) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_nonzeros(cond: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_nonzeros(conds: list[int]) -> Sqrt_Div_Arccos_Int_Int
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_value(cond: int, pos: int) -> Sqrt_Div_Arccos_Int_Int
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Sqrt_Div_Arccos_Int_Int
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: StateEqualExceptKey(excluded_id: int)
+
+.. py:class:: StateEqualExceptQubits(target_id: int, excluded_qubits: set[int])
+
+.. py:class:: StateHashExceptKey(excluded_id: int)
+
+.. py:class:: StateHashExceptQubits(target_id: int, excluded_qubits: set[int])
+
+.. py:class:: StateLessExceptKey(excluded_id: int)
+
+.. py:class:: StateLessExceptQubits(target_id: int, excluded_qubits: set[int])
+
+.. py:class:: StatePrint(disp: int = 0)
+              StatePrint(disp: int, precision: int)
+              StatePrint(disp: StatePrintDisplay)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:attribute:: on
+      :type:  ClassVar[bool]
+      :value: True
+
+
+
+.. py:class:: StatePrintDisplay(value: int)
+
+   Members:
+
+     Default
+
+     Detail
+
+     Binary
+
+     Prob
+
+
+   .. py:attribute:: Binary
+      :type:  ClassVar[StatePrintDisplay]
+
+
+   .. py:attribute:: Default
+      :type:  ClassVar[StatePrintDisplay]
+
+
+   .. py:attribute:: Detail
+      :type:  ClassVar[StatePrintDisplay]
+
+
+   .. py:attribute:: Prob
+      :type:  ClassVar[StatePrintDisplay]
+
+
+   .. py:property:: name
+      :type: str
+
+
+
+   .. py:property:: value
+      :type: int
+
+
+
+.. py:class:: StateStorage
+
+   .. py:property:: value
+      :type: int
+
+
+
+.. py:class:: StateStorageType(value: int)
+
+   Members:
+
+     General
+
+     UnsignedInteger
+
+     SignedInteger
+
+     Boolean
+
+     Rational
+
+
+   .. py:attribute:: Boolean
+      :type:  ClassVar[StateStorageType]
+
+
+   .. py:attribute:: General
+      :type:  ClassVar[StateStorageType]
+
+
+   .. py:attribute:: Rational
+      :type:  ClassVar[StateStorageType]
+
+
+   .. py:attribute:: SignedInteger
+      :type:  ClassVar[StateStorageType]
+
+
+   .. py:attribute:: UnsignedInteger
+      :type:  ClassVar[StateStorageType]
+
+
+   .. py:property:: name
+      :type: str
+
+
+
+   .. py:property:: value
+      :type: int
+
+
+
+.. py:class:: Swap_Bool_Bool(reg1: str, digit1: int, reg2: str, digit2: int)
+              Swap_Bool_Bool(reg1_id: int, digit1: int, reg2_id: int, digit2: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Swap_Bool_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Swap_Bool_Bool
+                  conditioned_by_all_ones(cond: int) -> Swap_Bool_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Swap_Bool_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Swap_Bool_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Swap_Bool_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Swap_Bool_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Swap_Bool_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Swap_Bool_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Swap_Bool_Bool
+                  conditioned_by_nonzeros(cond: int) -> Swap_Bool_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Swap_Bool_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Swap_Bool_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Swap_Bool_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Swap_Bool_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Swap_Bool_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Swap_General_General(reg1: str, reg2: str)
+              Swap_General_General(reg1_id: int, reg2_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Swap_General_General
+                  conditioned_by_all_ones(conds: list[str]) -> Swap_General_General
+                  conditioned_by_all_ones(cond: int) -> Swap_General_General
+                  conditioned_by_all_ones(conds: list[int]) -> Swap_General_General
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Swap_General_General
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Swap_General_General
+                  conditioned_by_bit(cond: int, pos: int) -> Swap_General_General
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Swap_General_General
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Swap_General_General
+                  conditioned_by_nonzeros(conds: list[str]) -> Swap_General_General
+                  conditioned_by_nonzeros(cond: int) -> Swap_General_General
+                  conditioned_by_nonzeros(conds: list[int]) -> Swap_General_General
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Swap_General_General
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Swap_General_General
+                  conditioned_by_value(cond: int, pos: int) -> Swap_General_General
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Swap_General_General
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: System
+
+   .. py:method:: add_register(arg0: str, arg1: StateStorageType, arg2: int) -> int
+      :staticmethod:
+
+
+
+   .. py:method:: add_register_synchronous(arg0: str, arg1: StateStorageType, arg2: int, arg3: SparseState) -> int
+                  add_register_synchronous(arg0: str, arg1: StateStorageType, arg2: int, arg3: list[System]) -> int
+      :staticmethod:
+
+
+
+   .. py:method:: clear() -> None
+      :staticmethod:
+
+
+
+   .. py:method:: get(arg0: int) -> StateStorage
+                  get(arg0: int) -> StateStorage
+
+
+   .. py:method:: get_activated_register_size() -> int
+      :staticmethod:
+
+
+
+   .. py:method:: get_id(arg0: str) -> int
+      :staticmethod:
+
+
+
+   .. py:method:: get_qubit_count() -> int
+      :staticmethod:
+
+
+
+   .. py:method:: get_register_info(arg0: str) -> tuple[str, StateStorageType, int, bool]
+      :staticmethod:
+
+
+
+   .. py:method:: last_register() -> StateStorage
+                  last_register() -> StateStorage
+
+
+   .. py:method:: name_of(arg0: int) -> str
+      :staticmethod:
+
+
+
+   .. py:method:: remove_register(arg0: int) -> None
+                  remove_register(arg0: str) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: remove_register_synchronous(arg0: int, arg1: list[System]) -> None
+                  remove_register_synchronous(arg0: str, arg1: list[System]) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: size_of(arg0: str) -> int
+                  size_of(arg0: int) -> int
+      :staticmethod:
+
+
+
+   .. py:method:: status_of(arg0: str) -> bool
+                  status_of(arg0: int) -> bool
+      :staticmethod:
+
+
+
+   .. py:method:: to_string() -> str
+                  to_string(arg0: int) -> str
+
+
+   .. py:method:: type_of(arg0: str) -> StateStorageType
+                  type_of(arg0: int) -> StateStorageType
+      :staticmethod:
+
+
+
+   .. py:method:: update_max_size(arg0: int) -> None
+      :staticmethod:
+
+
+
+   .. py:property:: amplitude
+      :type: complex
+
+
+
+   .. py:attribute:: max_register_count
+      :type:  ClassVar[int]
+      :value: 0
+
+
+
+   .. py:attribute:: max_register_map
+      :type:  ClassVar[int]
+      :value: 0
+
+
+
+   .. py:attribute:: max_system_size
+      :type:  ClassVar[int]
+      :value: 0
+
+
+
+   .. py:attribute:: name_register_map
+      :type:  ClassVar[list]
+      :value: []
+
+
+
+   .. py:property:: registers
+      :type: Annotated[list[StateStorage], pybind11_stubgen.typing_ext.FixedSize(40)]
+
+
+
+   .. py:attribute:: reusable_registers
+      :type:  ClassVar[list]
+      :value: []
+
+
+
+   .. py:attribute:: temporal_registers
+      :type:  ClassVar[list]
+      :value: []
+
+
+
+.. py:class:: TestRemovable(register_name: str)
+              TestRemovable(register_id: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: Tgate_Bool(reg: str, digit: int = 0)
+              Tgate_Bool(reg_id: int, digit: int = 0)
+
+   Bases: :py:obj:`Phase_Bool`
+
+
+.. py:class:: U2gate_Bool(reg: str, digit: int, phi: float, lambda_: float)
+              U2gate_Bool(reg_id: int, digit: int, phi: float, lambda_: float)
+              U2gate_Bool(reg: str, phi: float, lambda_: float)
+              U2gate_Bool(reg_id: int, phi: float, lambda_: float)
+
+   Bases: :py:obj:`Rot_Bool`
+
+
+.. py:class:: U3gate_Bool(reg: str, digit: int, theta: float, phi: float, lambda_: float)
+              U3gate_Bool(reg_id: int, digit: int, theta: float, phi: float, lambda_: float)
+              U3gate_Bool(reg: str, theta: float, phi: float, lambda_: float)
+              U3gate_Bool(reg_id: int, theta: float, phi: float, lambda_: float)
+
+   Bases: :py:obj:`Rot_Bool`
+
+
+.. py:class:: ViewNormalization
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+.. py:class:: Xgate_Bool(reg: str, digit: int)
+              Xgate_Bool(reg_id: int, digit: int)
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Xgate_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Xgate_Bool
+                  conditioned_by_all_ones(cond: int) -> Xgate_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Xgate_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Xgate_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Xgate_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Xgate_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Xgate_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Xgate_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Xgate_Bool
+                  conditioned_by_nonzeros(cond: int) -> Xgate_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Xgate_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Xgate_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Xgate_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Xgate_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Xgate_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Ygate_Bool(reg: str, digit: int = 0)
+              Ygate_Bool(reg_id: int, digit: int = 0)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> Ygate_Bool
+                  conditioned_by_all_ones(conds: list[str]) -> Ygate_Bool
+                  conditioned_by_all_ones(cond: int) -> Ygate_Bool
+                  conditioned_by_all_ones(conds: list[int]) -> Ygate_Bool
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> Ygate_Bool
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> Ygate_Bool
+                  conditioned_by_bit(cond: int, pos: int) -> Ygate_Bool
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> Ygate_Bool
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> Ygate_Bool
+                  conditioned_by_nonzeros(conds: list[str]) -> Ygate_Bool
+                  conditioned_by_nonzeros(cond: int) -> Ygate_Bool
+                  conditioned_by_nonzeros(conds: list[int]) -> Ygate_Bool
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> Ygate_Bool
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> Ygate_Bool
+                  conditioned_by_value(cond: int, pos: int) -> Ygate_Bool
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> Ygate_Bool
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: ZeroConditionalPhaseFlip(reg_ids: list[int])
+              ZeroConditionalPhaseFlip(regs: list[str])
+
+   Bases: :py:obj:`SelfAdjointOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> ZeroConditionalPhaseFlip
+                  conditioned_by_all_ones(conds: list[str]) -> ZeroConditionalPhaseFlip
+                  conditioned_by_all_ones(cond: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_all_ones(conds: list[int]) -> ZeroConditionalPhaseFlip
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> ZeroConditionalPhaseFlip
+                  conditioned_by_bit(cond: int, pos: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> ZeroConditionalPhaseFlip
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> ZeroConditionalPhaseFlip
+                  conditioned_by_nonzeros(conds: list[str]) -> ZeroConditionalPhaseFlip
+                  conditioned_by_nonzeros(cond: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_nonzeros(conds: list[int]) -> ZeroConditionalPhaseFlip
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> ZeroConditionalPhaseFlip
+                  conditioned_by_value(cond: int, pos: int) -> ZeroConditionalPhaseFlip
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> ZeroConditionalPhaseFlip
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:class:: Zgate_Bool(reg: str, digit: int = 0)
+              Zgate_Bool(reg_id: int, digit: int = 0)
+
+   Bases: :py:obj:`Phase_Bool`
+
+
+.. py:class:: inverseQFT(reg_name: str)
+              inverseQFT(reg_id: int)
+
+   Bases: :py:obj:`BaseOperator`
+
+
+   .. py:method:: clear_control_all_ones() -> None
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: clear_control_by_value() -> None
+
+
+   .. py:method:: clear_control_nonzeros() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> inverseQFT
+                  conditioned_by_all_ones(conds: list[str]) -> inverseQFT
+                  conditioned_by_all_ones(cond: int) -> inverseQFT
+                  conditioned_by_all_ones(conds: list[int]) -> inverseQFT
+
+
+   .. py:method:: conditioned_by_bit(cond: str, pos: int) -> inverseQFT
+                  conditioned_by_bit(conds: list[tuple[str, int]]) -> inverseQFT
+                  conditioned_by_bit(cond: int, pos: int) -> inverseQFT
+                  conditioned_by_bit(conds: list[tuple[int, int]]) -> inverseQFT
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str) -> inverseQFT
+                  conditioned_by_nonzeros(conds: list[str]) -> inverseQFT
+                  conditioned_by_nonzeros(cond: int) -> inverseQFT
+                  conditioned_by_nonzeros(conds: list[int]) -> inverseQFT
+
+
+   .. py:method:: conditioned_by_value(cond: str, pos: int) -> inverseQFT
+                  conditioned_by_value(conds: list[tuple[str, int]]) -> inverseQFT
+                  conditioned_by_value(cond: int, pos: int) -> inverseQFT
+                  conditioned_by_value(conds: list[tuple[int, int]]) -> inverseQFT
+
+
+   .. py:property:: condition_variable_all_ones
+      :type: list[int]
+
+
+
+   .. py:property:: condition_variable_by_bit
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_by_value
+      :type: list[tuple[int, int]]
+
+
+
+   .. py:property:: condition_variable_nonzeros
+      :type: list[int]
+
+
+
+.. py:function:: combine_systems(to: SparseState, from_: SparseState) -> None
+
+.. py:function:: merge_system(arg0: System, arg1: System) -> None
+
+.. py:function:: remove_system(arg0: System) -> bool
+
+.. py:function:: split_systems(state: SparseState, condition_variable_nonzeros: list[int], condition_variable_all_ones: list[int], condition_variable_by_bit: list[tuple[int, int]], condition_variable_by_value: list[tuple[int, int]]) -> SparseState
+
+.. py:function:: stateprep_unitary_build_schmidt(state_vector: list[complex]) -> DenseMatrix_complex
+
+   Build unitary for state preparation
+
+
+.. py:function:: test_import() -> None
+
+   Test that PySparQ imports are working correctly.
+
+
+.. py:data:: Binary
+   :type:  StatePrintDisplay
+
+.. py:data:: Boolean
+   :type:  StateStorageType
+
+.. py:data:: Default
+   :type:  StatePrintDisplay
+
+.. py:data:: Detail
+   :type:  StatePrintDisplay
+
+.. py:data:: General
+   :type:  StateStorageType
+
+.. py:data:: Prob
+   :type:  StatePrintDisplay
+
+.. py:data:: Rational
+   :type:  StateStorageType
+
+.. py:data:: SignedInteger
+   :type:  StateStorageType
+
+.. py:data:: UnsignedInteger
+   :type:  StateStorageType
+
