@@ -158,7 +158,18 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>双比特交换操作 </p>
-<p>交换两个寄存器中指定位置的比特 </p><dl class="section note"><dt>Note</dt><dd>数据类型：通用目的，输入位可能溢出 </dd></dl>
+<p>交换两个寄存器中指定位置的单个比特</p>
+<p>实现：使用临时变量交换两个寄存器指定位的值 这是一个自伴操作，应用两次等于恒等操作</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：自伴算子，Swap^2 = I </dd>
+<dd>
+数据类型：任意类型寄存器的布尔位</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>lhs和rhs寄存器必须是激活状态 </dd>
+<dd>
+digit1和digit2必须在各自寄存器的有效位范围内 [0, size)</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="comment">// reg1 = 0b1010, reg2 = 0b0101</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Swap__Bool__Bool.html">Swap_Bool_Bool</a>(<span class="stringliteral">&quot;reg1&quot;</span>, 0, <span class="stringliteral">&quot;reg2&quot;</span>, 1);  <span class="comment">// 交换reg1的第0位和reg2的第1位</span></div>
+<div class="ttc" id="astructqram__simulator_1_1Swap__Bool__Bool_html"><div class="ttname"><a href="structqram__simulator_1_1Swap__Bool__Bool.html">qram_simulator::Swap_Bool_Bool</a></div><div class="ttdoc">双比特交换操作</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:113</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a115f4b678bb470d282977e5418c4258a" name="a115f4b678bb470d282977e5418c4258a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a115f4b678bb470d282977e5418c4258a">&#9670;&#160;</a></span>Swap_Bool_Bool() <span class="overload">[1/2]</span></h2>
@@ -213,6 +224,12 @@ Public Attributes</h2></td></tr>
     <tr><td class="paramname">d1</td><td>第一个位索引 </td></tr>
     <tr><td class="paramname">reg2</td><td>第二个寄存器名称 </td></tr>
     <tr><td class="paramname">d2</td><td>第二个位索引 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当位索引超出寄存器大小时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -272,6 +289,12 @@ Public Attributes</h2></td></tr>
     <tr><td class="paramname">d1</td><td>第一个位索引 </td></tr>
     <tr><td class="paramname">id2</td><td>第二个寄存器 ID </td></tr>
     <tr><td class="paramname">d2</td><td>第二个位索引 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当位索引超出寄存器大小时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>

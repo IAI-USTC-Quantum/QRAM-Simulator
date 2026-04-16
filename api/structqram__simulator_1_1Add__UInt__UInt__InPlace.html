@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('structqram__simulator_1_1Add__UInt__UI
 </div><!--header-->
 <div class="contents">
 
-<p>原地无符号整数加法操作  
+<p>原地无符号整数加法操作（In-place）  
  <a href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="quantum__arithmetic_8h_source.html">quantum_arithmetic.h</a>&gt;</code></p>
@@ -147,8 +147,33 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a9d6215a7ec280cc75c7b0fe421d56cf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>原地无符号整数加法操作 </p>
-<p>y += x，结果存储在 rhs 中 </p>
+<div class="textblock"><p>原地无符号整数加法操作（In-place） </p>
+<p>实现 in-place 加法：rhs += lhs</p>
+<p>这是一个in-place操作，需要显式实现dagger来保证unitary。 dagger实现：rhs += (2^N - lhs) mod 2^N，其中N是rhs寄存器位数</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：通过模运算加法保证双射性 </dd>
+<dd>
+数据类型：lhs和rhs都应该是UnsignedInteger </dd>
+<dd>
+溢出行为：结果按rhs寄存器大小模2^N回绕</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>lhs和rhs寄存器应该是相同大小（推荐） </dd>
+<dd>
+lhs和rhs必须是激活状态</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>如果lhs和rhs大小不同，较小的值会被截断，可能导致非unitary行为</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code hl_variable" href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a81c3c67800bd37b81d0d14b352db2f73">lhs</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;lhs&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_variable" href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a9d6215a7ec280cc75c7b0fe421d56cf1">rhs</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;rhs&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_variable" href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a81c3c67800bd37b81d0d14b352db2f73">lhs</a>, 7);  <span class="comment">// lhs = 7</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_variable" href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a9d6215a7ec280cc75c7b0fe421d56cf1">rhs</a>, 3);  <span class="comment">// rhs = 3</span></div>
+<div class="line"><span class="comment">// rhs = 3 + 7 = 10</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html">Add_UInt_UInt_InPlace</a>(<span class="stringliteral">&quot;lhs&quot;</span>, <span class="stringliteral">&quot;rhs&quot;</span>);</div>
+<div class="line"><span class="comment">// dagger: rhs = 10 + (16 - 7) % 16 = 3 (恢复原值)</span></div>
+<div class="line"><a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">op</a>.dag(state);</div>
+<div class="ttc" id="anamespaceqram__simulator_html_a851129def8ccc68fbfd20eec0d0ee2be"><div class="ttname"><a href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">qram_simulator::_extract_block_encoding</a></div><div class="ttdeci">DenseMatrix&lt; complex_t &gt; _extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA, bool is_full=false, bool is_dag=false)</div><div class="ttdoc">提取块编码矩阵（内部实现）</div><div class="ttdef"><b>Definition</b> debugger.h:418</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Add__UInt__UInt__InPlace_html"><div class="ttname"><a href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html">qram_simulator::Add_UInt_UInt_InPlace</a></div><div class="ttdoc">原地无符号整数加法操作（In-place）</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:666</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Add__UInt__UInt__InPlace_html_a81c3c67800bd37b81d0d14b352db2f73"><div class="ttname"><a href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a81c3c67800bd37b81d0d14b352db2f73">qram_simulator::Add_UInt_UInt_InPlace::lhs</a></div><div class="ttdeci">size_t lhs</div><div class="ttdoc">左操作数寄存器 ID</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:671</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Add__UInt__UInt__InPlace_html_a9d6215a7ec280cc75c7b0fe421d56cf1"><div class="ttname"><a href="structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a9d6215a7ec280cc75c7b0fe421d56cf1">qram_simulator::Add_UInt_UInt_InPlace::rhs</a></div><div class="ttdeci">size_t rhs</div><div class="ttdoc">右操作数寄存器 ID</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:674</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Init__Unsafe_html"><div class="ttname"><a href="structqram__simulator_1_1Init__Unsafe.html">qram_simulator::Init_Unsafe</a></div><div class="ttdoc">非安全初始化操作</div><div class="ttdef"><b>Definition</b> dark_magic.h:46</div></div>
+<div class="ttc" id="astructqram__simulator_1_1System_html_ac82745049e671feba4774531498eb91a"><div class="ttname"><a href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">qram_simulator::System::add_register</a></div><div class="ttdeci">static size_t add_register(std::string_view name, StateStorageType type, size_t size)</div><div class="ttdoc">添加新寄存器</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af2c3901a9ade59f3df9f6a4cceac4734" name="af2c3901a9ade59f3df9f6a4cceac4734"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af2c3901a9ade59f3df9f6a4cceac4734">&#9670;&#160;</a></span>Add_UInt_UInt_InPlace() <span class="overload">[1/2]</span></h2>
@@ -187,8 +212,14 @@ Public Attributes</h2></td></tr>
 <p>构造函数（名称版本） </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">lhs_</td><td>左操作数寄存器名称 </td></tr>
-    <tr><td class="paramname">rhs_</td><td>右操作数寄存器名称 </td></tr>
+    <tr><td class="paramname">lhs_</td><td>左操作数寄存器名称（加数） </td></tr>
+    <tr><td class="paramname">rhs_</td><td>右操作数寄存器名称（被加数，结果存储于此） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -232,8 +263,14 @@ Public Attributes</h2></td></tr>
 <p>构造函数（ID 版本） </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">lhs_</td><td>左操作数寄存器 ID </td></tr>
-    <tr><td class="paramname">rhs_</td><td>右操作数寄存器 ID </td></tr>
+    <tr><td class="paramname">lhs_</td><td>左操作数寄存器 ID（加数） </td></tr>
+    <tr><td class="paramname">rhs_</td><td>右操作数寄存器 ID（被加数，结果存储于此） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>

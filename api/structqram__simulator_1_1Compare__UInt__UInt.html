@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('structqram__simulator_1_1Compare__UInt
 </div><!--header-->
 <div class="contents">
 
-<p>无符号整数比较操作  
+<p>无符号整数比较操作（Out-of-place）  
  <a href="structqram__simulator_1_1Compare__UInt__UInt.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="quantum__arithmetic_8h_source.html">quantum_arithmetic.h</a>&gt;</code></p>
@@ -170,8 +170,35 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a6f580619e34b283880ba9b5cdbae358e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>无符号整数比较操作 </p>
-<p>|l&gt;|r&gt;|0&gt;|0&gt; -&gt; |l&gt;|r&gt;|l &lt; r?&gt;|l == r?&gt; </p>
+<div class="textblock"><p>无符号整数比较操作（Out-of-place） </p>
+<p>比较两个无符号整数，输出小于和等于标志</p>
+<p>实现：</p><ul>
+<li>compare_less_id ^= (left &lt; right)</li>
+<li>compare_equal_id ^= (left == right)</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：自伴算子，通过XOR实现 </dd>
+<dd>
+数据类型：left_id和right_id必须是UnsignedInteger，compare_less_id和compare_equal_id必须是Boolean </dd>
+<dd>
+语义：输出标志是XOR到结果寄存器，如果初始为0则直接存储比较结果</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>left_id和right_id必须是UnsignedInteger类型 </dd>
+<dd>
+compare_less_id和compare_equal_id必须是Boolean类型（大小为1） </dd>
+<dd>
+所有寄存器必须是激活状态</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">left</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;left&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">right</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;right&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">less</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;less&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Boolean</a>, 1);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">equal</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;equal&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Boolean</a>, 1);</div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">left</a>, 3);</div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">right</a>, 5);</div>
+<div class="line"><span class="comment">// less = (3 &lt; 5) = 1, equal = (3 == 5) = 0</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Compare__UInt__UInt.html">Compare_UInt_UInt</a>(<span class="stringliteral">&quot;left&quot;</span>, <span class="stringliteral">&quot;right&quot;</span>, <span class="stringliteral">&quot;less&quot;</span>, <span class="stringliteral">&quot;equal&quot;</span>);</div>
+<div class="ttc" id="anamespaceqram__simulator_html_a851129def8ccc68fbfd20eec0d0ee2be"><div class="ttname"><a href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">qram_simulator::_extract_block_encoding</a></div><div class="ttdeci">DenseMatrix&lt; complex_t &gt; _extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA, bool is_full=false, bool is_dag=false)</div><div class="ttdoc">提取块编码矩阵（内部实现）</div><div class="ttdef"><b>Definition</b> debugger.h:418</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Compare__UInt__UInt_html"><div class="ttname"><a href="structqram__simulator_1_1Compare__UInt__UInt.html">qram_simulator::Compare_UInt_UInt</a></div><div class="ttdoc">无符号整数比较操作（Out-of-place）</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:1453</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Init__Unsafe_html"><div class="ttname"><a href="structqram__simulator_1_1Init__Unsafe.html">qram_simulator::Init_Unsafe</a></div><div class="ttdoc">非安全初始化操作</div><div class="ttdef"><b>Definition</b> dark_magic.h:46</div></div>
+<div class="ttc" id="astructqram__simulator_1_1System_html_ac82745049e671feba4774531498eb91a"><div class="ttname"><a href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">qram_simulator::System::add_register</a></div><div class="ttdeci">static size_t add_register(std::string_view name, StateStorageType type, size_t size)</div><div class="ttdoc">添加新寄存器</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a25d46e0d470ac8c2de66c5da8474b456" name="a25d46e0d470ac8c2de66c5da8474b456"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a25d46e0d470ac8c2de66c5da8474b456">&#9670;&#160;</a></span>Compare_UInt_UInt() <span class="overload">[1/2]</span></h2>

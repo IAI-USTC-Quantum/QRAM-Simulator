@@ -162,7 +162,17 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>布尔翻转操作 </p>
-<p>翻转通用寄存器中的所有位 </p><dl class="section note"><dt>Note</dt><dd>数据类型：通用目的，剩余高位也会被翻转 </dd></dl>
+<p>翻转寄存器中的所有位（按位取反），实现 y = ~y</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：自伴算子（SelfAdjointOperator），即 U^† = U </dd>
+<dd>
+数据类型：任意整数类型（UnsignedInteger/SignedInteger） </dd>
+<dd>
+溢出行为：只影响寄存器size范围内的位，高位被翻转但会被mask截断</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>输入寄存器必须是激活状态</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="comment">// 4位寄存器，初始值 0b1010 (10)</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1FlipBools.html">FlipBools</a>(<span class="stringliteral">&quot;reg&quot;</span>);  <span class="comment">// 结果: 0b0101 (5)</span></div>
+<div class="ttc" id="astructqram__simulator_1_1FlipBools_html"><div class="ttname"><a href="structqram__simulator_1_1FlipBools.html">qram_simulator::FlipBools</a></div><div class="ttdoc">布尔翻转操作</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:55</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abf8b5571f2344230e8692422df834f3c" name="abf8b5571f2344230e8692422df834f3c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf8b5571f2344230e8692422df834f3c">&#9670;&#160;</a></span>FlipBools() <span class="overload">[1/2]</span></h2>

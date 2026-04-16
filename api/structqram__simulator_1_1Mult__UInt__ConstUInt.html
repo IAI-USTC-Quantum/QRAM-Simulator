@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('structqram__simulator_1_1Mult__UInt__C
 </div><!--header-->
 <div class="contents">
 
-<p>无符号整数乘常量操作  
+<p>无符号整数乘常量操作（Out-of-place）  
  <a href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="quantum__arithmetic_8h_source.html">quantum_arithmetic.h</a>&gt;</code></p>
@@ -167,8 +167,29 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ad94db4add7112a388c1da5a1ff673103"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>无符号整数乘常量操作 </p>
-<p>z = x * mult，x 为寄存器值，mult 为常量 </p><dl class="section note"><dt>Note</dt><dd>数据类型：无符号整数，结果可能溢出 </dd></dl>
+<div class="textblock"><p>无符号整数乘常量操作（Out-of-place） </p>
+<p>实现 out-of-place 乘法：res ^= lhs * mult</p>
+<p>Unitary保证：通过XOR实现，res = res ⊕ (lhs * mult) 应用两次：res ⊕ (lhs * mult) ⊕ (lhs * mult) = res，即 U^2 = I</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作 </dd>
+<dd>
+数据类型：输入和输出都必须是UnsignedInteger </dd>
+<dd>
+溢出行为：乘法结果按输出寄存器大小截断</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>lhs和res寄存器必须是UnsignedInteger类型 </dd>
+<dd>
+所有寄存器必须是激活状态</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code hl_variable" href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#ab2dd9419c4ccc4fa5d9bb53807d9731a">lhs</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;lhs&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_variable" href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#ad94db4add7112a388c1da5a1ff673103">res</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;res&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_variable" href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#ab2dd9419c4ccc4fa5d9bb53807d9731a">lhs</a>, 3);  <span class="comment">// lhs = 3</span></div>
+<div class="line"><span class="comment">// res = 0 ⊕ (3 * 4) = 12</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Mult__UInt__ConstUInt.html">Mult_UInt_ConstUInt</a>(<span class="stringliteral">&quot;lhs&quot;</span>, 4, <span class="stringliteral">&quot;res&quot;</span>);</div>
+<div class="ttc" id="anamespaceqram__simulator_html_a851129def8ccc68fbfd20eec0d0ee2be"><div class="ttname"><a href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">qram_simulator::_extract_block_encoding</a></div><div class="ttdeci">DenseMatrix&lt; complex_t &gt; _extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA, bool is_full=false, bool is_dag=false)</div><div class="ttdoc">提取块编码矩阵（内部实现）</div><div class="ttdef"><b>Definition</b> debugger.h:418</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Init__Unsafe_html"><div class="ttname"><a href="structqram__simulator_1_1Init__Unsafe.html">qram_simulator::Init_Unsafe</a></div><div class="ttdoc">非安全初始化操作</div><div class="ttdef"><b>Definition</b> dark_magic.h:46</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Mult__UInt__ConstUInt_html"><div class="ttname"><a href="structqram__simulator_1_1Mult__UInt__ConstUInt.html">qram_simulator::Mult_UInt_ConstUInt</a></div><div class="ttdoc">无符号整数乘常量操作（Out-of-place）</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:377</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Mult__UInt__ConstUInt_html_ab2dd9419c4ccc4fa5d9bb53807d9731a"><div class="ttname"><a href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#ab2dd9419c4ccc4fa5d9bb53807d9731a">qram_simulator::Mult_UInt_ConstUInt::lhs</a></div><div class="ttdeci">size_t lhs</div><div class="ttdoc">左操作数寄存器 ID</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:385</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Mult__UInt__ConstUInt_html_ad94db4add7112a388c1da5a1ff673103"><div class="ttname"><a href="structqram__simulator_1_1Mult__UInt__ConstUInt.html#ad94db4add7112a388c1da5a1ff673103">qram_simulator::Mult_UInt_ConstUInt::res</a></div><div class="ttdeci">size_t res</div><div class="ttdoc">结果寄存器 ID</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:388</div></div>
+<div class="ttc" id="astructqram__simulator_1_1System_html_ac82745049e671feba4774531498eb91a"><div class="ttname"><a href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">qram_simulator::System::add_register</a></div><div class="ttdeci">static size_t add_register(std::string_view name, StateStorageType type, size_t size)</div><div class="ttdoc">添加新寄存器</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a74f48a0529eb5e605995bdfdc3d1eb0d" name="a74f48a0529eb5e605995bdfdc3d1eb0d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a74f48a0529eb5e605995bdfdc3d1eb0d">&#9670;&#160;</a></span>Mult_UInt_ConstUInt() <span class="overload">[1/2]</span></h2>

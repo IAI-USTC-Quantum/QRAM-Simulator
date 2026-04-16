@@ -1,6 +1,6 @@
 var indexSectionsWithContent =
 {
-  0: "_abcdefghilmnopqrstuvxyz~",
+  0: "_abcdefghilmnopqrstuvxyz~类",
   1: "abcdfghilmnopqrstuvxyz",
   2: "q",
   3: "bcdghpqrst",

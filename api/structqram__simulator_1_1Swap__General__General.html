@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('structqram__simulator_1_1Swap__General
 </div><!--header-->
 <div class="contents">
 
-<p>通用交换操作  
+<p>通用交换操作（In-place）  
  <a href="structqram__simulator_1_1Swap__General__General.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="quantum__arithmetic_8h_source.html">quantum_arithmetic.h</a>&gt;</code></p>
@@ -151,8 +151,28 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ac0fe5cd5cc570265d2db870028b639cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>通用交换操作 </p>
-<p>交换两个寄存器的值 </p>
+<div class="textblock"><p>通用交换操作（In-place） </p>
+<p>交换两个寄存器的完整值</p>
+<p>实现：使用std::swap交换两个寄存器的value字段。 这是一个自伴操作，应用两次等于恒等操作。</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：自伴算子，Swap^2 = I </dd>
+<dd>
+数据类型：任意类型，但两个寄存器大小必须相同 </dd>
+<dd>
+实现细节：直接交换寄存器值，不涉及XOR或算术运算</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>id1和id2大小必须相同 </dd>
+<dd>
+所有寄存器必须是激活状态</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">reg1</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;reg1&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><span class="keyword">auto</span> <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">reg2</a> = <a class="code hl_function" href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">System::add_register</a>(<span class="stringliteral">&quot;reg2&quot;</span>, <a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">UnsignedInteger</a>, 4);</div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">reg1</a>, 5);  <span class="comment">// reg1 = 5</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Init__Unsafe.html">Init_Unsafe</a>(<a class="code hl_function" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">reg2</a>, 10); <span class="comment">// reg2 = 10</span></div>
+<div class="line"><span class="comment">// 交换后: reg1 = 10, reg2 = 5</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1Swap__General__General.html">Swap_General_General</a>(<span class="stringliteral">&quot;reg1&quot;</span>, <span class="stringliteral">&quot;reg2&quot;</span>);</div>
+<div class="ttc" id="anamespaceqram__simulator_html_a851129def8ccc68fbfd20eec0d0ee2be"><div class="ttname"><a href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">qram_simulator::_extract_block_encoding</a></div><div class="ttdeci">DenseMatrix&lt; complex_t &gt; _extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA, bool is_full=false, bool is_dag=false)</div><div class="ttdoc">提取块编码矩阵（内部实现）</div><div class="ttdef"><b>Definition</b> debugger.h:418</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Init__Unsafe_html"><div class="ttname"><a href="structqram__simulator_1_1Init__Unsafe.html">qram_simulator::Init_Unsafe</a></div><div class="ttdoc">非安全初始化操作</div><div class="ttdef"><b>Definition</b> dark_magic.h:46</div></div>
+<div class="ttc" id="astructqram__simulator_1_1Swap__General__General_html"><div class="ttname"><a href="structqram__simulator_1_1Swap__General__General.html">qram_simulator::Swap_General_General</a></div><div class="ttdoc">通用交换操作（In-place）</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:1655</div></div>
+<div class="ttc" id="astructqram__simulator_1_1System_html_ac82745049e671feba4774531498eb91a"><div class="ttname"><a href="structqram__simulator_1_1System.html#ac82745049e671feba4774531498eb91a">qram_simulator::System::add_register</a></div><div class="ttdeci">static size_t add_register(std::string_view name, StateStorageType type, size_t size)</div><div class="ttdoc">添加新寄存器</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aeb47031b04540fdd5db9d774802409ed" name="aeb47031b04540fdd5db9d774802409ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeb47031b04540fdd5db9d774802409ed">&#9670;&#160;</a></span>Swap_General_General() <span class="overload">[1/2]</span></h2>

@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('structqram__simulator_1_1ShiftLeft.htm
 </div><!--header-->
 <div class="contents">
 
-<p>左移操作  
+<p>循环左移操作  
  <a href="structqram__simulator_1_1ShiftLeft.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="quantum__arithmetic_8h_source.html">quantum_arithmetic.h</a>&gt;</code></p>
@@ -144,8 +144,22 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ada221778b4eb99ee277c729f15ca9bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>左移操作 </p>
-<p>将寄存器值左移指定位数，最高位循环到最低位 </p><dl class="section note"><dt>Note</dt><dd>数据类型：建议使用无符号整数 </dd></dl>
+<div class="textblock"><p>循环左移操作 </p>
+<p>将寄存器值循环左移指定位数，溢出的高位循环到低位</p>
+<p>数学定义：y = (y &lt;&lt; digit) | (y &gt;&gt; (N - digit))，其中N是寄存器位数</p>
+<dl class="section note"><dt>Note</dt><dd>Unitary性质：循环移位是双射，保证unitary </dd>
+<dd>
+dagger操作：左移d位的dagger是右移d位（或左移N-d位） </dd>
+<dd>
+数据类型：建议UnsignedInteger，也可用于SignedInteger</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>register_1必须是激活状态 </dd>
+<dd>
+digit &lt;= 寄存器大小（digit == size时等于恒等操作）</dd></dl>
+<dl class="section user"><dt>示例</dt><dd><div class="fragment"><div class="line"><span class="comment">// 4位寄存器，初始值 0b1010</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1ShiftLeft.html">ShiftLeft</a>(<span class="stringliteral">&quot;reg&quot;</span>, 1);  <span class="comment">// 结果: 0b0101 (循环左移1位)</span></div>
+<div class="line"><a class="code hl_struct" href="structqram__simulator_1_1ShiftLeft.html">ShiftLeft</a>(<span class="stringliteral">&quot;reg&quot;</span>, 2);  <span class="comment">// 结果: 0b1010 (循环左移2位)</span></div>
+<div class="ttc" id="astructqram__simulator_1_1ShiftLeft_html"><div class="ttname"><a href="structqram__simulator_1_1ShiftLeft.html">qram_simulator::ShiftLeft</a></div><div class="ttdoc">循环左移操作</div><div class="ttdef"><b>Definition</b> quantum_arithmetic.h:204</div></div>
+</div><!-- fragment --> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aee277b083afa45233b3e2353c975befc" name="aee277b083afa45233b3e2353c975befc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aee277b083afa45233b3e2353c975befc">&#9670;&#160;</a></span>ShiftLeft() <span class="overload">[1/2]</span></h2>
@@ -186,6 +200,12 @@ Public Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">reg1</td><td>寄存器名称 </td></tr>
     <tr><td class="paramname">d</td><td>移位位数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当寄存器类型不是整数类型时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -231,6 +251,12 @@ Public Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">reg1</td><td>寄存器 ID </td></tr>
     <tr><td class="paramname">d</td><td>移位位数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">当寄存器类型不是整数类型时抛出异常</td><td></td></tr>
   </table>
   </dd>
 </dl>
