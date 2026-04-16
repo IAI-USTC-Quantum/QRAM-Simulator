@@ -269,17 +269,17 @@ auto result = measure(state);
 ### BibTeX
 
 ```bibtex
-@article{qram_simulator_2025,
-  title={Efficient Simulation of Quantum Random Access Memory},
-  author={Chen, Zhaoyun and others},
-  journal={arXiv preprint arXiv:2503.13832},
+@article{sun2025sparqsim,
+  title={SparQSim: Simulating Scalable Quantum Algorithms via Sparse Quantum State Representations},
+  author={Sun, Tai-Ping and Chen, Zhao-Yun and Wang, Yun-Jie and Xue, Cheng and Liu, Huan-Yu and Zhuang, Xi-Ning and Xu, Xiao-Fan and Wu, Yu-Chun and Guo, Guo-Ping},
+  journal={arXiv preprint arXiv:2503.15118},
   year={2025}
 }
 
-@article{sparq_2025,
-  title={SparQ: A Sparse Quantum Circuit Simulator with Register-Level Abstraction},
-  author={Chen, Zhaoyun and others},
-  journal={arXiv preprint arXiv:2503.15118},
+@article{wang2025refined,
+  title={Refined Criteria for QRAM Error Suppression via Efficient Large-Scale QRAM Simulator},
+  author={Wang, Yun-Jie and Sun, Tai-Ping and Zhuang, Xi-Ning and Xu, Xiao-Fan and Liu, Huan-Yu and Xue, Cheng and Wu, Yu-Chun and Chen, Zhao-Yun and Guo, Guo-Ping},
+  journal={arXiv preprint arXiv:2503.13832},
   year={2025}
 }
 ```
