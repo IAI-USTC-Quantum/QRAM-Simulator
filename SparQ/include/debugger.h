@@ -1,3 +1,10 @@
+/**
+ * @file debugger.h
+ * @brief 调试工具定义
+ * @details 提供量子态的调试、验证和检查工具，包括归一化检查、
+ *          NaN 检查、状态打印、块编码提取等功能
+ */
+
 #pragma once
 #include "basic_components.h"
 #include "matrix.h"
@@ -6,138 +13,348 @@
 
 namespace qram_simulator
 {
+	/** @namespace qram_simulator
+	 * @brief QRAM 稀疏态模拟器命名空间
+	 */
+
+	/**
+	 * @brief 模块继承测试类
+	 * @details 用于测试 BaseOperator 的继承机制
+	 */
 	struct ModuleInheritance_Test : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
+		/**
+		 * @brief 应用测试操作
+		 * @param state 系统状态向量
+		 */
 		inline void operator()(std::vector<System>& state) const
 		{
 			fmt::print("ModuleInheritance_Test::operator()\n");
 		}
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用测试操作
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 自伴模块继承测试类
+	 * @details 用于测试 SelfAdjointOperator 的继承机制
+	 */
 	struct ModuleInheritance_Test_SelfAdjoint : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/**
+		 * @brief 应用测试操作
+		 * @param state 系统状态向量
+		 */
 		inline void operator()(std::vector<System>& state) const
 		{
 			fmt::print("ModuleInheritance_Test_SelfAdjoint::operator()\n");
 		}
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用测试操作
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 归一化检查类
+	 * @details 检查量子态是否归一化（总概率为1）
+	 */
 	struct CheckNormalization : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/** @brief 归一化检查阈值 */
 		double threshold = 1e-5;
+
+		/**
+		 * @brief 默认构造函数（使用默认阈值）
+		 */
 		CheckNormalization();
+
+		/**
+		 * @brief 构造函数（指定阈值）
+		 * @param threshold_ 检查阈值
+		 */
 		CheckNormalization(double threshold_) : threshold(threshold_) {}
+
+		/**
+		 * @brief 应用归一化检查
+		 * @param state 系统状态向量
+		 * @throws 当不归一化时抛出异常
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用归一化检查
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 归一化检查与重归一化类
+	 * @details 检查量子态归一化，如不归一则重新归一化
+	 */
 	struct CheckNormalization_Renormalize : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/** @brief 归一化检查阈值 */
 		double threshold = 1e-5;
+
+		/**
+		 * @brief 默认构造函数
+		 */
 		CheckNormalization_Renormalize() {}
+
+		/**
+		 * @brief 构造函数（指定阈值）
+		 * @param threshold_ 检查阈值
+		 */
 		CheckNormalization_Renormalize(double threshold_) : threshold(threshold_) {}
+
+		/**
+		 * @brief 应用检查与重归一化
+		 * @param state 系统状态向量
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用检查与重归一化
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief NaN 检查类
+	 * @details 检查量子态中是否存在 NaN 值
+	 */
 	struct CheckNan : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/**
+		 * @brief 默认构造函数
+		 */
 		CheckNan();
+
+		/**
+		 * @brief 应用 NaN 检查
+		 * @param state 系统状态向量
+		 * @throws 当发现 NaN 时抛出异常
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用 NaN 检查
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 归一化查看类
+	 * @details 打印量子态的归一化信息
+	 */
 	struct ViewNormalization : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/**
+		 * @brief 默认构造函数
+		 */
 		ViewNormalization();
+
+		/**
+		 * @brief 应用归一化查看
+		 * @param state 系统状态向量
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用归一化查看
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 状态打印显示模式枚举
+	 */
 	enum StatePrintDisplay : int32_t
 	{
-		Default = 0,
-		Detail = 1,
-		Binary = 2,
-		Prob = 4,
+		Default = 0,   ///< 默认显示模式
+		Detail = 1,    ///< 详细显示模式
+		Binary = 2,    ///< 二进制显示模式
+		Prob = 4,      ///< 概率显示模式
 	};
 
-
+	/**
+	 * @brief 状态打印类
+	 * @details 打印量子态信息到标准输出
+	 */
 	struct StatePrint : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/** @brief 打印开关 */
 		static bool on;
+
+		/** @brief 显示模式 */
 		int32_t display;
+
+		/** @brief 精度 */
 		int precision;
+
+		/**
+		 * @brief 构造函数（指定显示模式）
+		 * @param disp 显示模式
+		 */
 		StatePrint(int32_t disp = 0) : display(disp), precision(0) {}
+
+		/**
+		 * @brief 构造函数（指定显示模式和精度）
+		 * @param disp 显示模式
+		 * @param precision 精度
+		 */
 		StatePrint(int32_t disp, int precision) : display(disp), precision(precision) {}
+
+		/**
+		 * @brief 构造函数（枚举显示模式）
+		 * @param disp 显示模式枚举
+		 */
 		StatePrint(StatePrintDisplay disp) : display(static_cast<int32_t>(disp)), precision(0) {}
+
+		/**
+		 * @brief 将显示模式转换为字符串
+		 * @return 显示模式字符串
+		 */
 		std::string disp2str() const;
+
+		/**
+		 * @brief 应用状态打印
+		 * @param state 系统状态向量
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用状态打印
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 可移除性测试类
+	 * @details 测试指定寄存器是否可以安全移除
+	 */
 	struct TestRemovable : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/** @brief 寄存器 ID */
 		size_t register_id;
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param register_name 寄存器名称
+		 */
 		TestRemovable(std::string_view register_name);
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param register_name 寄存器 ID
+		 */
 		TestRemovable(size_t register_name);
+
+		/**
+		 * @brief 应用可移除性测试
+		 * @param state 系统状态向量
+		 */
 		void operator()(std::vector<System>& state) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用可移除性测试
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 重复键检查类
+	 * @details 检查量子态中是否存在重复的系统键
+	 */
 	struct CheckDuplicateKey : SelfAdjointOperator
 	{
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
+		/**
+		 * @brief 默认构造函数
+		 */
 		CheckDuplicateKey() {}
+
+		/**
+		 * @brief 检查是否存在重复键
+		 * @param system_states 系统状态向量
+		 * @return 是否存在重复键
+		 */
 		bool has_duplicate(std::vector<System>& system_states) const;
+
+		/**
+		 * @brief 应用重复键检查
+		 * @param system_states 系统状态向量
+		 * @throws 当发现重复键时抛出异常
+		 */
 		void operator()(std::vector<System>& system_states) const;
+
 #ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用重复键检查
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 #endif
 	};
 
+	/**
+	 * @brief 检查原地操作的幺正性
+	 * @details 验证 N+1 比特原地操作是否为幺正操作
+	 * @tparam OperationNq1q 操作类型
+	 * @param dagger 是否检查 dagger 版本
+	 * @return 真值表
+	 * @throws 当操作非幺正时抛出异常
+	 */
 	template<typename OperationNq1q>
 	std::vector<size_t> check_inplace_unitarity(bool dagger)
 	{
-		/* An inplace operation with two registers (N, 1) */
-		/* Check whether the operation is unitary */
-		/* Return the truth table of the operation */
 		System::clear();
 
 		size_t N = 2;
@@ -163,18 +380,16 @@ namespace qram_simulator
 				else
 					op(state);
 
-				/* Check whether state is still of size 1*/
 				if (state.size() != 1)
 				{
 					throw_bad_result("Bad check inplace unitarity: state size is not 1");
 				}
 
-				/* Get output state */
 				size_t out_i = state[0].get(reg1).value;
 				size_t out_j = state[0].get(reg2).value;
 				size_t out = (out_j << N) + out_i;
 				size_t in = (j << N) + i;
-				/* Check whether out exists in expected_output */
+
 				if (expected_output[out])
 				{
 					fmt::print("truth_table: {}", truth_table);
@@ -188,6 +403,17 @@ namespace qram_simulator
 		return truth_table;
 	}
 
+	/**
+	 * @brief 提取块编码矩阵（内部实现）
+	 * @tparam BlockEncoding 块编码类型
+	 * @tparam StateType 状态类型
+	 * @param encA 块编码对象
+	 * @param main_reg 主寄存器名称
+	 * @param anc_UA 辅助寄存器名称
+	 * @param is_full 是否完整提取
+	 * @param is_dag 是否为 dagger 版本
+	 * @return 块编码的稠密矩阵表示
+	 */
 	template<typename BlockEncoding, typename StateType = SparseState>
 	DenseMatrix<complex_t> _extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA,
 		bool is_full = false, bool is_dag = false)
@@ -268,7 +494,16 @@ namespace qram_simulator
 		}
 	}
 
-
+	/**
+	 * @brief 提取块编码矩阵
+	 * @tparam BlockEncoding 块编码类型
+	 * @param encA 块编码对象
+	 * @param main_reg 主寄存器名称
+	 * @param anc_UA 辅助寄存器名称
+	 * @param is_full 是否完整提取
+	 * @param is_dag 是否为 dagger 版本
+	 * @return 块编码的稠密矩阵表示
+	 */
 	template<typename BlockEncoding>
 	DenseMatrix<complex_t> extract_block_encoding(BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA,
 		bool is_full = false, bool is_dag = false)
@@ -276,6 +511,12 @@ namespace qram_simulator
 		return _extract_block_encoding<BlockEncoding, SparseState>(encA, main_reg, anc_UA, is_full, is_dag);
 	}
 
+	/**
+	 * @brief 检查两个状态是否相等
+	 * @param state1 第一个状态向量
+	 * @param state2 第二个状态向量
+	 * @throws 当状态不相等时抛出异常并打印差异
+	 */
 	inline void state_equal_check(std::vector<System> state1, std::vector<System> state2)
 	{	
 		SortUnconditional()(state1);
@@ -307,20 +548,44 @@ namespace qram_simulator
 
 namespace qram_simulator {
 
+	/**
+	 * @brief CUDA 并行操作测试类
+	 */
 	struct ParallelOperationTest : BaseOperator {
-		double real, imag;
+		/** @brief 实部 */
+		double real;
+
+		/** @brief 虚部 */
+		double imag;
+
+		/** @brief 值 */
 		uint64_t value;
 
+		/**
+		 * @brief 构造函数
+		 * @param real_ 实部
+		 * @param imag_ 虚部
+		 * @param value_ 值
+		 */
 		ParallelOperationTest(double real_, double imag_, uint64_t value_) :
 			real(real_), imag(imag_), value(value_) {
 		}
 
+		/**
+		 * @brief CPU 版本（抛出未实现异常）
+		 * @param state 系统状态向量
+		 * @throws 总是抛出未实现异常
+		 */
 		void operator()(std::vector<System>& state) const {
 			throw_not_implemented();
 		}
+
+		/**
+		 * @brief CUDA 应用测试操作
+		 * @param state CUDA 稀疏状态
+		 */
 		void operator()(CuSparseState& state) const;
 	};
-
 
 }
 

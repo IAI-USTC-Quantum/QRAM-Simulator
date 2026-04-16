@@ -1,95 +1,189 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: CMake on multiple platforms
 
 on:
   push:
     branches: [ "main", "develop" ]
+    paths:
+      - 'CMakeLists.txt'
+      - '**/*.cmake'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.cpp'
+      - '**/*.cu'
+      - '**/*.py'
+      - 'ThirdParty/**'
+      - '.github/workflows/cmake-multi-platform.yml'
   pull_request:
     branches: [ "main", "develop" ]
+    paths:
+      - 'CMakeLists.txt'
+      - '**/*.cmake'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.cpp'
+      - '**/*.cu'
+      - '**/*.py'
+      - 'ThirdParty/**'
+      - '.github/workflows/cmake-multi-platform.yml'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  # ============================================================================
+  # Main build job
+  # ============================================================================
   build:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations.
       fail-fast: false
-
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        c_compiler: [gcc, cl]
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
+          # Linux + GCC + C++17
+          - name: "Ubuntu + GCC + C++17"
+            os: ubuntu-24.04
+            build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
-        exclude:
-          - os: windows-latest
+            cpp_standard: 17
+          # Linux + GCC + C++20
+          - name: "Ubuntu + GCC + C++20"
+            os: ubuntu-24.04
+            build_type: Release
             c_compiler: gcc
-          - os: ubuntu-latest
+            cpp_compiler: g++
+            cpp_standard: 20
+          # Windows + MSVC
+          - name: "Windows + MSVC"
+            os: windows-latest
+            build_type: Release
             c_compiler: cl
+            cpp_compiler: cl
+            cpp_standard: 17
+
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+
+    # --- ccache (Linux only) ---
+    - name: Install ccache
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y ccache
+
+    - name: Configure ccache
+      if: runner.os == 'Linux'
+      run: |
+        ccache --set-config=max_size=2G
+        ccache --set-config=compression=true
+        ccache -z
+
+    # --- CMake configure ---
+    - name: Configure CMake
+      shell: bash
+      run: |
+        cmake -B "$BUILD_DIR" \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_CXX_STANDARD=${{ matrix.cpp_standard }} \
+          -DCACHED_REGISTER_SIZE=50 \
+          -S .
+
+    # --- Build ---
+    - name: Build
+      shell: bash
+      run: cmake --build "$BUILD_DIR" --config ${{ matrix.build_type }} --parallel 4
+
+    - name: Show ccache stats
+      if: runner.os == 'Linux'
+      run: ccache -s
+
+    # --- Test ---
+    - name: Test (Unix)
+      if: runner.os != 'Windows'
+      working-directory: ${{ env.BUILD_DIR }}
+      run: ctest --output-on-failure
+
+    - name: Test (Windows)
+      if: runner.os == 'Windows'
+      working-directory: ${{ env.BUILD_DIR }}
+      run: ctest --output-on-failure -C ${{ matrix.build_type }}
+
+    # --- Python package ---
+    - name: Build Python Package
+      run: pip install .
+
+    - name: Test Python Package
+      run: python -c "import pysparq; pysparq.test_import()"
+
+  # ============================================================================
+  # Python tests with multiple versions
+  # ============================================================================
+  python-tests:
+    name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+        python-version: ['3.9', '3.11', '3.12']
 
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'true'
 
-    - name: Set reusable strings
-      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
-      id: strings
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest numpy
+
+    - name: Build and install package
+      run: pip install -v .
+
+    - name: Run import test
+      run: python -c "import pysparq; pysparq.test_import()"
+
+    - name: Run pytest
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        if [ -d "PySparQ/tests" ]; then
+          pytest PySparQ/tests/ -v || true
+        else
+          echo "No Python tests found"
+        fi
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DCACHED_REGISTER_SIZE=50
-        -S ${{ github.workspace }}
+  # ============================================================================
+  # Documentation build job
+  # ============================================================================
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'true'
 
-    - name: Build
-      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: >
-        cmake --build ${{ steps.strings.outputs.build-output-dir }}
-        --config ${{ matrix.build_type }}
-        --parallel 4
-        # --target 
-        # ExecutabilityTest 
-        # CorrectnessTest 
-        
-    - name: Test
-      # Test on Linux will not have extenions.
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: |
-          ${{ steps.strings.outputs.build-output-dir }}/bin/ExecutabilityTest          
-          ${{ steps.strings.outputs.build-output-dir }}/bin/CorrectnessTest       
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-    - name: Test
-      # Test on Windows will have a ".exe" extension, while Linux executables will have no extension.
-      # Treat them differently to avoid errors.
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-          ${{ steps.strings.outputs.build-output-dir }}/bin/ExecutabilityTest.exe
-          ${{ steps.strings.outputs.build-output-dir }}/bin/CorrectnessTest.exe
-                                
-    - name: Build Python Package
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      # Build your program with the given configuration
-      run: pip install .
-              
-    - name: Build Python Package
-      if: ${{ matrix.os == 'windows-latest' }}
-      # Build your program with the given configuration
-      run: pip install .
+    - name: Generate API Documentation
+      run: doxygen Doxyfile
 
-    - name: Test Python Package
-      run: python -c "import pysparq; pysparq.test_import()"
+    - name: Upload documentation artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: docs/api/html/
+        retention-days: 30

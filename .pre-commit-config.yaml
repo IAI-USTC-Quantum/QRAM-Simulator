@@ -1,0 +1,147 @@
+# Pre-commit hooks configuration for QRAM-Simulator
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # ============================================================================
+  # General file checks
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      # Basic checks
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-vcs-permalinks
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: trailing-whitespace
+        exclude: 
+          ^ThirdParty/
+      - id: end-of-file-fixer
+        exclude:
+          ^ThirdParty/
+
+  # ============================================================================
+  # C/C++ formatting with clang-format
+  # ============================================================================
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.8
+    hooks:
+      - id: clang-format
+        name: clang-format (C/C++)
+        types_or: [c, c++, cuda]
+        exclude: 
+          ^ThirdParty/
+        args:
+          - --style=file
+          - -i
+
+  # ============================================================================
+  # CMake formatting
+  # ============================================================================
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        name: cmake-format
+        files: (CMakeLists\.txt|\.cmake)$
+        exclude:
+          ^ThirdParty/
+      - id: cmake-lint
+        name: cmake-lint
+        files: (CMakeLists\.txt|\.cmake)$
+        exclude:
+          ^ThirdParty/
+
+  # ============================================================================
+  # Python formatting and linting
+  # ============================================================================
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        name: black (Python formatter)
+        language_version: python3
+        exclude:
+          ^ThirdParty/
+        args:
+          - --line-length=100
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (Python import sorter)
+        exclude:
+          ^ThirdParty/
+        args:
+          - --profile=black
+          - --line-length=100
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        name: flake8 (Python linter)
+        exclude:
+          ^ThirdParty/
+        args:
+          - --max-line-length=100
+          - --extend-ignore=E203,W503
+
+  # ============================================================================
+  # GitHub Actions workflow validation
+  # ============================================================================
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.1
+    hooks:
+      - id: actionlint
+        name: actionlint (GitHub Actions linter)
+
+  # ============================================================================
+  # YAML formatting
+  # ============================================================================
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: yamllint (YAML linter)
+        args:
+          - --strict
+          - -d
+          - '{extends: relaxed, rules: {line-length: {max: 120}}}'
+
+  # ============================================================================
+  # Local hooks (optional - can be customized per project)
+  # ============================================================================
+  # Uncomment to enable custom local hooks
+  # - repo: local
+  #   hooks:
+  #     - id: custom-check
+  #       name: Custom project check
+  #       entry: ./scripts/check.sh
+  #       language: script
+  #       pass_filenames: false
+  #       always_run: true
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
