@@ -7,9 +7,85 @@
 
 #include <gtest/gtest.h>
 #include "sparse_state_simulator.h"
+#include "debugger.h"
 #include <cmath>
 
 using namespace qram_simulator;
+
+// Unitary verification helpers - use small state space to reduce CI load
+namespace {
+    constexpr size_t UNITARY_TEST_STATE_SIZE = 2;  // 4 values instead of 8
+
+    template<typename OpType, typename... Args>
+    bool verify_outofplace_unitarity(Args&&... args) {
+        System::clear();
+        auto reg1 = System::add_register("reg1", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        auto reg2 = System::add_register("reg2", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        auto res = System::add_register("res", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        OpType op(std::forward<Args>(args)...);
+
+        for (size_t v1 = 0; v1 < 4; ++v1) {
+            for (size_t v2 = 0; v2 < 4; ++v2) {
+                std::vector<System> state;
+                state.emplace_back();
+                state[0].get(reg1).value = v1;
+                state[0].get(reg2).value = v2;
+                state[0].get(res).value = 0;
+                op(state);
+                op(state);
+                if (state.size() != 1 || state[0].get(reg1).value != v1 ||
+                    state[0].get(reg2).value != v2 || state[0].get(res).value != 0)
+                    return false;
+            }
+        }
+        System::clear();
+        return true;
+    }
+
+    template<typename OpType, typename... Args>
+    bool verify_inplace_unitarity(Args&&... args) {
+        System::clear();
+        auto reg1 = System::add_register("reg1", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        auto reg2 = System::add_register("reg2", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        OpType op(std::forward<Args>(args)...);
+
+        for (size_t v1 = 0; v1 < 4; ++v1) {
+            for (size_t v2 = 0; v2 < 4; ++v2) {
+                std::vector<System> state;
+                state.emplace_back();
+                state[0].get(reg1).value = v1;
+                state[0].get(reg2).value = v2;
+                op(state);
+                op.dag(state);
+                if (state.size() != 1 || state[0].get(reg1).value != v1 || state[0].get(reg2).value != v2)
+                    return false;
+            }
+        }
+        System::clear();
+        return true;
+    }
+
+    // Separate function for single-register in-place operators like Add_ConstUInt
+    // (Cannot use template specialization because the primary template creates two registers)
+    template<typename OpType>
+    bool verify_single_reg_inplace_unitarity(std::string reg_name, size_t arg_val) {
+        System::clear();
+        auto reg = System::add_register(reg_name, UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        OpType op(reg_name, arg_val);
+
+        for (size_t v = 0; v < 4; ++v) {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(reg).value = v;
+            op(state);
+            op.dag(state);
+            if (state.size() != 1 || state[0].get(reg).value != v)
+                return false;
+        }
+        System::clear();
+        return true;
+    }
+}
 
 class QuantumArithmeticTest : public ::testing::Test {
 protected:
@@ -266,4 +342,159 @@ TEST(QuantumArithmeticTest, GetMid)
     ASSERT_EQ(state.size(), 1);
     uint64_t mid_val = getRegValue(state[0], mid, 4);
     EXPECT_EQ(mid_val, 5);  // (0 + 10) / 2 = 5
+}
+
+// ============ Unitarity Tests ============
+// These tests verify that operators satisfy the unitary condition: U^dagger * U = I
+
+// Test Add_UInt_UInt unitarity (out-of-place, self-adjoint)
+TEST(QuantumArithmeticTest, AddUIntUIntUnitarity)
+{
+    EXPECT_TRUE((verify_outofplace_unitarity<Add_UInt_UInt>("reg1", "reg2", "res")));
+}
+
+// Test Add_UInt_UInt_InPlace unitarity (in-place with explicit dagger)
+TEST(QuantumArithmeticTest, AddUIntUIntInPlaceUnitarity)
+{
+    EXPECT_TRUE((verify_inplace_unitarity<Add_UInt_UInt_InPlace>("reg1", "reg2")));
+}
+
+// Test Add_ConstUInt unitarity with a few constant values
+TEST(QuantumArithmeticTest, AddConstUIntUnitarity)
+{
+    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt>("reg", 1)));
+    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt>("reg", 3)));
+}
+
+// Test Mult_UInt_ConstUInt unitarity (out-of-place, self-adjoint)
+TEST(QuantumArithmeticTest, MultUIntConstUIntUnitarity)
+{
+    EXPECT_TRUE((verify_outofplace_unitarity<Mult_UInt_ConstUInt>("reg1", 3, "res")));
+}
+
+// Test FlipBools unitarity (out-of-place, self-adjoint)
+TEST(QuantumArithmeticTest, FlipBoolsUnitarity)
+{
+    System::clear();
+    auto reg = System::add_register("reg", UnsignedInteger, 2);
+    FlipBools op("reg");
+
+    for (size_t v = 0; v < 4; ++v) {
+        std::vector<System> state;
+        state.emplace_back();
+        state[0].get(reg).value = v;
+        op(state);
+        op(state);
+        EXPECT_EQ(state[0].get(reg).value, v);
+    }
+    System::clear();
+}
+
+// Test Swap_General_General unitarity
+TEST(QuantumArithmeticTest, SwapGeneralGeneralUnitarity)
+{
+    System::clear();
+    auto reg1 = System::add_register("reg1", UnsignedInteger, 2);
+    auto reg2 = System::add_register("reg2", UnsignedInteger, 2);
+    Swap_General_General op("reg1", "reg2");
+
+    for (size_t v1 = 0; v1 < 4; ++v1) {
+        for (size_t v2 = 0; v2 < 4; ++v2) {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(reg1).value = v1;
+            state[0].get(reg2).value = v2;
+            op(state);
+            op(state);
+            EXPECT_EQ(state[0].get(reg1).value, v1);
+            EXPECT_EQ(state[0].get(reg2).value, v2);
+        }
+    }
+    System::clear();
+}
+
+// Test Assign unitarity (out-of-place, self-adjoint via XOR)
+TEST(QuantumArithmeticTest, AssignUnitarity)
+{
+    System::clear();
+    auto src = System::add_register("src", UnsignedInteger, 2);
+    auto dst = System::add_register("dst", UnsignedInteger, 2);
+    Assign op("src", "dst");
+
+    for (size_t v_src = 0; v_src < 4; ++v_src) {
+        for (size_t v_dst = 0; v_dst < 4; ++v_dst) {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(src).value = v_src;
+            state[0].get(dst).value = v_dst;
+            op(state);
+            op(state);
+            EXPECT_EQ(state[0].get(src).value, v_src);
+            EXPECT_EQ(state[0].get(dst).value, v_dst);
+        }
+    }
+    System::clear();
+}
+
+// Test ShiftLeft/ShiftRight round-trip (they are daggers of each other)
+TEST(QuantumArithmeticTest, ShiftLeftRightRoundTrip)
+{
+    System::clear();
+    auto reg = System::add_register("reg", UnsignedInteger, 3);  // Reduced from 4
+
+    // Reduced test: sample values instead of exhaustive
+    for (size_t v : {0, 1, 3, 7}) {
+        for (size_t shift = 1; shift <= 3; ++shift) {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(reg).value = v;
+            ShiftLeft left_op("reg", shift);
+            ShiftRight right_op("reg", shift);
+            left_op(state);
+            right_op(state);
+            EXPECT_EQ(state[0].get(reg).value, v);
+        }
+    }
+    System::clear();
+}
+
+// Test Add_Mult_UInt_ConstUInt unitarity (in-place with explicit dagger)
+TEST(QuantumArithmeticTest, AddMultUIntConstUIntUnitarity)
+{
+    EXPECT_TRUE((verify_inplace_unitarity<Add_Mult_UInt_ConstUInt>("reg1", 1, "reg2")));
+}
+
+// Test AddAssign_AnyInt_AnyInt unitarity (in-place with explicit dagger)
+TEST(QuantumArithmeticTest, AddAssignAnyIntAnyIntUnitarity)
+{
+    EXPECT_TRUE((verify_inplace_unitarity<AddAssign_AnyInt_AnyInt>("reg1", "reg2")));
+}
+
+// Test Compare_UInt_UInt unitarity (out-of-place, self-adjoint)
+TEST(QuantumArithmeticTest, CompareUIntUIntUnitarity)
+{
+    System::clear();
+    auto left = System::add_register("left", UnsignedInteger, 2);  // Reduced from 3
+    auto right = System::add_register("right", UnsignedInteger, 2);
+    auto less = System::add_register("less", Boolean, 1);
+    auto equal = System::add_register("equal", Boolean, 1);
+    Compare_UInt_UInt op("left", "right", "less", "equal");
+
+    for (size_t v_left = 0; v_left < 4; ++v_left) {
+        for (size_t v_right = 0; v_right < 4; ++v_right) {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(left).value = v_left;
+            state[0].get(right).value = v_right;
+            state[0].get(less).value = 0;
+            state[0].get(equal).value = 0;
+            op(state);
+            op(state);
+            EXPECT_EQ(state[0].get(left).value, v_left);
+            EXPECT_EQ(state[0].get(right).value, v_right);
+            EXPECT_EQ(state[0].get(less).value, 0);
+            EXPECT_EQ(state[0].get(equal).value, 0);
+        }
+    }
+    System::clear();
 }
