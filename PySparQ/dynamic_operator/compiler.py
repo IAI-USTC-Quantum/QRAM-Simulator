@@ -37,7 +37,7 @@ class CompilerConfig:
     """编译器配置"""
 
     # 默认代码框架模板
-    DEFAULT_TEMPLATE = """#include "SparQ/include/basic_components.h"
+    DEFAULT_TEMPLATE = """#include "basic_components.h"
 #include <vector>
 #include <complex>
 
@@ -55,6 +55,61 @@ extern "C" void destroy_operator(BaseOperator* op) {{
 
 extern "C" const char* get_operator_name() {{
     return "{CLASS_NAME}";
+}}
+"""
+
+    # Python 增强模板 - 包含支持 ctypes 调用的辅助函数
+    PYTHON_TEMPLATE = """#include "basic_components.h"
+#include <vector>
+#include <complex>
+
+using namespace qram_simulator;
+
+{USER_CPP_CODE}
+
+extern "C" BaseOperator* create_operator({CTOR_PARAMS}) {{
+    return new {CLASS_NAME}({CTOR_ARGS});
+}}
+
+extern "C" void destroy_operator(BaseOperator* op) {{
+    delete op;
+}}
+
+extern "C" const char* get_operator_name() {{
+    return "{CLASS_NAME}";
+}}
+
+// Python 调用辅助函数 - 应用算子到 SparseState
+extern "C" void apply_operator(BaseOperator* op, SparseState* state) {{
+    if (op && state) {{
+        (*op)(*state);
+    }}
+}}
+
+// Python 调用辅助函数 - 应用 dagger
+extern "C" void apply_operator_dag(BaseOperator* op, SparseState* state) {{
+    if (op && state) {{
+        op->dag(*state);
+    }}
+}}
+
+// Python 调用辅助函数 - 应用算子到 basis_states 向量
+extern "C" void apply_operator_vec(BaseOperator* op, std::vector<System>* state) {{
+    if (op && state) {{
+        (*op)(*state);
+    }}
+}}
+
+// Python 调用辅助函数 - 应用 dagger 到 basis_states 向量
+extern "C" void apply_operator_vec_dag(BaseOperator* op, std::vector<System>* state) {{
+    if (op && state) {{
+        op->dag(*state);
+    }}
+}}
+
+// 获取基类类型
+extern "C" const char* get_base_class() {{
+    return "{BASE_CLASS}";
 }}
 """
 
@@ -251,15 +306,28 @@ def compile_cpp_code(
 
     project_root_path = Path(project_root)
 
-    # 自动添加项目头文件路径
+    # 自动添加项目头文件路径（按优先级顺序）
     sparq_include = project_root_path / "SparQ" / "include"
     if sparq_include.exists() and str(sparq_include) not in cfg.include_paths:
         cfg.include_paths.insert(0, str(sparq_include))
+
+    qram_include = project_root_path / "QRAM" / "include"
+    if qram_include.exists() and str(qram_include) not in cfg.include_paths:
+        cfg.include_paths.insert(0, str(qram_include))
+
+    common_include = project_root_path / "Common" / "include"
+    if common_include.exists() and str(common_include) not in cfg.include_paths:
+        cfg.include_paths.insert(0, str(common_include))
 
     # 添加 Eigen 头文件路径
     eigen_include = project_root_path / "ThirdParty" / "eigen-3.4.0"
     if eigen_include.exists() and str(eigen_include) not in cfg.include_paths:
         cfg.include_paths.insert(0, str(eigen_include))
+
+    # 添加 fmt 头文件路径
+    fmt_include = project_root_path / "ThirdParty" / "fmt" / "include"
+    if fmt_include.exists() and str(fmt_include) not in cfg.include_paths:
+        cfg.include_paths.insert(0, str(fmt_include))
 
     # 计算哈希值
     code_hash = compute_code_hash(cpp_code, class_name, cfg)
