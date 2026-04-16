@@ -1,392 +1,300 @@
-# QRAM Simulator
+# QRAM-Simulator & PySparQ
 
 [![arXiv](https://img.shields.io/badge/arXiv-2503.13832-b31b1b.svg)](https://arxiv.org/abs/2503.13832)
+[![PyPI](https://img.shields.io/pypi/v/pysparq.svg)](https://pypi.org/project/pysparq/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A high-performance sparse-state quantum simulator with QRAM (Quantum Random Access Memory) support.
+> **稀疏态量子模拟器，支持 Register Level Programming**
 
-This repository provides:
-- **SparQ**: Sparse-state quantum simulator core
-- **QRAM**: Quantum Random Access Memory circuit implementation
-- **PySparQ**: Python bindings for easy prototyping
-- **Algorithms**: Grover search, state preparation, block encoding, and more
+## 双软件架构
 
-## Table of Contents
+本仓库包含两个紧密协作的软件组件，面向不同的用户群体和使用场景：
 
-- [Quick Start](#quick-start)
-- [Dependencies](#dependencies)
-- [Building](#building)
-- [Usage Examples](#usage-examples)
-- [Repository Structure](#repository-structure)
-- [Paper Reproducibility](#reproducibility-of-numerical-results-paper-reference)
+| 软件 | 定位 | 用户群体 | 核心优势 |
+|------|------|----------|----------|
+| **QRAM-Simulator** | C++ 稀疏态量子模拟器核心 | 研究人员、高性能计算开发者 | 极致性能、精细控制 |
+| **PySparQ** | Python 绑定与高层次 API | 量子算法开发者、教育工作者 | 快速原型、易于上手 |
 
-## Quick Start
+- **QRAM-Simulator**: 提供底层的稀疏态量子模拟能力，包括量子随机存取存储器 (QRAM) 模拟、量子算术运算、噪声模型等。适用于需要深度优化和高性能的场景。
+- **PySparQ**: 通过 pybind11 将 C++ 核心能力暴露给 Python，提供简洁的 API 用于快速开发和验证量子算法。
 
-### C++ Example
+## Register Level Programming（核心特性）
 
-```cpp
-#include "sparse_state_simulator.h"
-#include "qram.h"
+### 根本性差异
 
-using namespace qram_simulator;
+传统量子框架与 SparQ 的核心区别：
 
-int main() {
-    // Create QRAM with 2-bit address, 3-bit data
-    qram_qutrit::QRAMCircuit qram(2, 3);
-    qram.set_memory({5, 3, 7, 1});  // 4 memory locations
-    
-    // Create quantum state
-    SparseState state;
-    auto addr = AddRegister("addr", UnsignedInteger, 2)(state);
-    auto data = AddRegister("data", UnsignedInteger, 3)(state);
-    
-    // Create superposition and load from QRAM
-    (Hadamard_Int_Full(addr))(state);
-    (QRAMLoad(&qram, addr, data))(state);
-    
-    // Print result
-    (StatePrint(Detail))(state);
-    return 0;
-}
+| 维度 | 传统方式 | Register Level Programming |
+|------|----------|---------------------------|
+| **状态存储** | 量子比特数组/张量网络 | `uint64_t` 直接存储寄存器值 |
+| **算术运算** | 编译成量子门序列 | 直接对寄存器值进行算术操作 |
+| **开发模式** | 自底向上（从门电路构建） | 自顶向下（先写高层模块再细化） |
+| **QAdder 实现** | 分解为数百个量子门 | 直接调用加法器，自动门分解 |
+
+### 自顶向下开发流程
+
+```
+传统方式：                        SparQ 方式：
+┌──────────────┐                 ┌──────────────┐
+│ 量子门序列   │                 │ 高层算法模块 │ ← 先写这里
+│   ↓ ↓ ↓     │                 │   ↓ 细化    │
+│ 振幅计算    │                 │ 寄存器操作   │
+└──────────────┘                 │   ↓ 验证    │
+                                 │ 回归测试    │
+                                 └──────────────┘
 ```
 
-### Python Example
+### 代码示例对比
+
+**传统框架 (Qiskit)**：
+```python
+# 需要手动构建加法器门电路
+adder = DraperQFTAdder(num_state_qubits=4)
+circuit.append(adder, [0, 1, 2, 3, 4, 5, 6, 7])
+```
+
+**PySparQ**：
+```python
+import pysparq as ps
+
+# 直接创建寄存器并执行加法
+state = ps.SparseState()
+
+# 添加寄存器（返回寄存器 ID）
+a_id = ps.AddRegister("a", ps.StateStorageType.UnsignedInteger, 4)(state)
+b_id = ps.AddRegister("b", ps.StateStorageType.UnsignedInteger, 4)(state)
+
+# QAdder 直接操作寄存器值，无需编译成门序列
+# 将 a + b 存储到输出寄存器
+out_id = ps.AddRegister("out", ps.StateStorageType.UnsignedInteger, 5)(state)
+ps.Add_UInt_UInt("a", "b", "out")(state)
+```
+
+## 与主流量子框架对比
+
+| 特性 | QRAM-Simulator/PySparQ | Qiskit | Cirq | PennyLane |
+|------|------------------------|--------|------|-----------|
+| **状态表示** | 稀疏态（仅非零振幅） | 稠密态/张量网络 | 稠密态 | 混合态/自动微分 |
+| **编程模型** | Register Level | 门序列 | 门序列 | 可微分编程 |
+| **模拟规模** | 可达 64+ 量子比特（特定结构） | 通常 20-30 量子比特 | 类似 Qiskit | 类似 Qiskit |
+| **算术电路** | 原生寄存器操作 | 需分解为门 | 需分解为门 | 需分解为门 |
+| **QRAM 支持** | 原生支持 | 无原生支持 | 无原生支持 | 无原生支持 |
+| **GPU 加速** | CUDA 支持 | 有限支持 | 有限支持 | 有限支持 |
+
+### 何时使用 QRAM-Simulator？
+
+✅ **适合使用**：
+- 大规模量子算术电路（加法器、乘法器）
+- 需要 QRAM 的量子算法（Grover、量子机器学习）
+- 稀疏态结构的量子模拟
+- 噪声模型研究
+
+❌ **不适合使用**：
+- 通用量子电路（门种类复杂、态稠密）
+- 需要与真实量子硬件直接交互
+- 变分量子算法（需要自动微分）
+
+## PySparQ 快速开始
+
+### 安装
+
+```bash
+pip install pysparq
+```
+
+**要求**：
+- Python 3.9 – 3.13
+- NumPy
+
+**可选（推荐）**：
+- CUDA 12.0+ （用于 GPU 加速）
+
+### 5 分钟上手示例
 
 ```python
-from pysparq import *
+import pysparq as ps
+import numpy as np
 
-# Create quantum state
-state = SparseState()
+# 1. 创建稀疏态
+state = ps.SparseState()
 
-# Add registers
-addr_reg = System.add_register("addr", StateStorageType.UnsignedInteger, 2)
-data_reg = System.add_register("data", StateStorageType.UnsignedInteger, 3)
+# 2. 定义寄存器（Register Level Programming 的核心）
+# AddRegister 返回寄存器 ID，用于后续操作
+addr_id = ps.AddRegister("addr", ps.StateStorageType.UnsignedInteger, 4)(state)
+data_id = ps.AddRegister("data", ps.StateStorageType.UnsignedInteger, 8)(state)
 
-# Create QRAM and apply operations
-qram = QRAMCircuit_qutrit(2, 3, [5, 3, 7, 4])
-Hadamard_Int_Full("addr").apply(state)
-QRAMLoad(qram, "addr", "data").apply(state)
+# 3. 初始化叠加态（所有地址等概率）- Register Level 特性
+ps.Hadamard_Int("addr", 4)(state)  # 对 4-bit 寄存器应用 Hadamard
+print("After Hadamard:", ps.StatePrint(state))
 
-# Print state
-StatePrint(StatePrintDisplay.Detail).apply(state)
+# 4. 创建 QRAM 并加载数据
+memory = [i * 2 for i in range(16)]  # 16个地址，每个8-bit数据
+qram = ps.QRAMCircuit_qutrit(4, 8, memory)
+
+# 5. 执行 QRAM 加载：|addr⟩|0⟩ → |addr⟩|memory[addr]⟩
+ps.QRAMLoad(qram, "addr", "data")(state)
+print("After QRAM Load:", ps.StatePrint(state))
+
+# 6. 直接进行算术操作（无需编译成门！）
+# data = data + 5，使用寄存器级别加法
+ps.Add_ConstUInt("data", 5)(state)
+print("After Add:", ps.StatePrint(state))
+
+# 7. 测量 - 获取某个寄存器的概率分布
+prob_data = ps.Prob(state, data_id)
+print("Data register probabilities:", prob_data)
 ```
 
-## Dependencies
+### Register Level 特性的关键 API
 
-### Required
+```python
+# 量子算术 - 直接寄存器操作（Register Level Programming 核心）
+ps.Add_UInt_UInt(in1, in2, out)      # out = in1 + in2
+ps.Add_UInt_ConstUInt(reg, const)    # reg = reg + const
+ps.Add_ConstUInt(reg, const)         # reg = reg + const（简化版）
+ps.Mult_UInt_ConstUInt(in, c, out)   # out = in * c
+ps.ShiftLeft(reg, n)                 # 左移 n 位
+ps.ShiftRight(reg, n)                # 右移 n 位
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| CMake | >= 3.18 | Build system |
-| GCC or Clang | C++17 support | Compiler |
-| OpenMP | - | Parallelization |
+# 基础量子门
+ps.Hadamard_Int(reg, n_digits)       # 对整数寄存器应用 Hadamard
+ps.Xgate_Bool(reg, pos)              # X 门（特定比特位）
+ps.Zgate_Bool(reg, pos)              # Z 门
 
-### Optional
-
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| CUDA | >= 11.0 | GPU acceleration |
-| Python | >= 3.9 | Python bindings (PySparQ) |
-| NumPy | >= 1.20 | Python array support |
-| TBB | - | Intel Threading Building Blocks |
-
-### Installing Dependencies
-
-**Ubuntu/Debian:**
-```bash
-sudo apt-get update
-sudo apt-get install -y cmake build-essential libomp-dev
-
-# For Python bindings
-sudo apt-get install -y python3-dev python3-pip
-pip3 install numpy pybind11
-
-# Optional: CUDA (see NVIDIA documentation)
-# Optional: TBB
-sudo apt-get install -y libtbb-dev
+# QRAM 操作
+ps.QRAMLoad(qram, addr_reg, data_reg)      # QRAM 加载
+ps.QRAMLoadFast(qram, addr_reg, data_reg)  # 快速版本
 ```
 
-**macOS:**
-```bash
-brew install cmake llvm libomp
+## QRAM-Simulator C++ API
 
-# For Python bindings
-pip3 install numpy pybind11
-```
-
-**CentOS/RHEL:**
-```bash
-sudo yum install -y cmake gcc-c++
-
-# OpenMP is included with GCC
-# For Python bindings
-sudo yum install -y python3-devel
-pip3 install numpy pybind11
-```
-
-## Building
-
-### Clone the Repository
+### 构建指南
 
 ```bash
-git clone --recursive https://github.com/your-repo/QRAM-Simulator.git
+# 克隆仓库
+git clone https://github.com/Agony5757/QRAM-Simulator.git
 cd QRAM-Simulator
-```
 
-### Standard Build
-
-```bash
+# 创建构建目录
 mkdir build && cd build
-cmake ..
+
+# 配置（CPU 版本）
+cmake .. -DCMAKE_BUILD_TYPE=Release
+
+# 配置（CUDA 版本，可选）
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_CUDA=ON
+
+# 编译
 make -j$(nproc)
 ```
 
-### Build Options
+### 核心概念
+
+```cpp
+#include "SparQ/include/sparse_state_simulator.h"
+
+using namespace qram_simulator;
+
+// 1. 创建系统
+System sys;
+
+// 2. 声明寄存器
+auto addr_id = sys.create_register("addr", 4);  // 4-bit 地址
+auto data_id = sys.create_register("data", 8);  // 8-bit 数据
+
+// 3. 创建稀疏态
+std::vector<System> state;
+state.emplace_back(sys);
+
+// 4. 应用操作（Register Level!）
+Hadamard(addr_id)(state);           // 叠加态
+QAdder(data_id, addr_id)(state);    // 直接加法操作
+
+// 5. 测量
+auto result = measure(state);
+```
+
+### 核心组件
+
+- **SparseState**: 稀疏态存储与操作
+- **System**: 寄存器管理和系统配置
+- **Operators**: 量子操作（门、算术、QRAM）
+  - `basic_gates.h`: 基础量子门
+  - `quantum_arithmetic.h`: 量子算术（加减乘除、移位）
+  - `qram.h`: QRAM 加载操作
+  - `qft.h`: 快速傅里叶变换（优化实现）
+
+### 运行实验
 
 ```bash
-# Release build (optimized)
-cmake -DCMAKE_BUILD_TYPE=Release ..
-
-# Debug build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-
-# With GPU support (requires CUDA)
-cmake -DUSE_CUDA=ON ..
-
-# Build examples
-cmake -DBUILD_EXAMPLES=ON ..
-
-# Build Python bindings
-cmake -DBUILD_PYTHON=ON ..
-
-# Combine options
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_PYTHON=ON ..
+# QRAM 保真度实验
+./build/bin/Experiment_QRAM_Fidelity \
+    --addrsize 15 --datasize 3 \
+    --shots 100 --inputsize 10 \
+    --depolarizing 1e-4 --damping 1e-5 \
+    --seed 123456 --version normal
 ```
 
-### Python Bindings
+## 论文与引用
 
-```bash
-# Install from source
-pip install .
+### 相关论文
 
-# Or install in development mode
-pip install -e .
+1. **QRAM-Simulator**: [arXiv:2503.13832](https://arxiv.org/abs/2503.13832)
+2. **SparQ 稀疏态模拟器**: [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
 
-# Verify installation
-python -c "from pysparq import *; print('PySparQ installed successfully')"
+### BibTeX
+
+```bibtex
+@article{qram_simulator_2025,
+  title={Efficient Simulation of Quantum Random Access Memory},
+  author={Chen, Zhaoyun and others},
+  journal={arXiv preprint arXiv:2503.13832},
+  year={2025}
+}
 ```
 
-## Usage Examples
+### 复现论文结果
 
-See the `examples/` directory for complete examples:
+详细的实验复现指南见 [docs/paper/](docs/paper/) 目录：
 
-| Example | Description |
-|---------|-------------|
-| `hello_qram.cpp` | Basic QRAM circuit creation and memory loading |
-| `basic_gates.cpp` | Quantum gates (X, Y, Z, H, CNOT, rotations) |
-| `grover_search.cpp` | Grover's search algorithm with QRAM |
+- [docs/paper/README.md](docs/paper/README.md) - 论文关联文档
+- [docs/paper/reproduction.md](docs/paper/reproduction.md) - 实验运行详细指南
 
-### Running Examples
+## 项目结构
 
-```bash
-# After building with -DBUILD_EXAMPLES=ON
-cd build/bin
-./hello_qram
-./basic_gates
-./grover_search
+```
+QRAM-Simulator/
+├── SparQ/              # C++ 稀疏态模拟器核心
+│   ├── include/        # 头文件（运算符、系统操作）
+│   └── src/            # 源文件
+├── QRAM/               # QRAM 电路实现
+│   └── include/        # Qutrit-based QRAM
+├── PySparQ/            # Python 绑定
+│   └── pysparq/        # Python 包
+├── SparQ_Algorithm/    # 高层算法（状态准备、块编码等）
+├── Experiments/        # 论文实验代码
+│   └── QRAM/           # QRAM 相关实验
+├── test/               # 单元测试
+└── docs/               # 文档
+    └── paper/          # 论文复现文档
 ```
 
----
+## 贡献者
 
-[![CI](https://github.com/Agony5757/QRAM-Simulator/workflows/CMake%20on%20multiple%20platforms/badge.svg)](https://github.com/Agony5757/QRAM-Simulator/actions)
+本项目由 **USTC-IAI 量子计算团队** 开发。
 
-This document provides a structured overview of the repository and a reference for QRAM-related components.
+主要开发者：
+- Agony5757 (chenzhaoyun@iai.ustc.edu.cn)
+- RichardSun
+- Itachixc
+- YunJ1e
+- cilysad
+- TMYTiMidlY
 
-### Summary
+## 相关项目
 
-1. **Create a QRAM circuit** with an address size and data size, and fill its memory.
-2. **Create SparQ registers** for the address and data.
-3. **Use `QRAMLoad`** to load the QRAM's memory value into the data register, conditioned on the address.
-4. **Run additional algorithms** (state prep, block encoding, Grover, etc.) that internally call `QRAMLoad`.
+- [QPanda-lite](https://github.com/Agony5757/QPanda-lite) - NISQ 量子计算工具包
 
+## 许可证
 
-# Reproducibility of Numerical Results (Paper Reference)
-
-For a detailed description of the experimental setup, parameter regimes, and analysis methodology underlying these simulations, we refer to the associated manuscript:
-https://arxiv.org/abs/2503.13832
-
-The code and commands provided below are sufficient to reproduce the numerical results reported in the paper.
-
-This section collects the materials required to reproduce the main numerical results of the paper:
-
-- Simulator source code used by the experiments.
-- Noise-model definitions and default noise settings.
-- Build and run commands to regenerate core result files.
-
-## What is included (with file-level pointers)
-
-- **QRAM fidelity experiment (main simulation + profiling)**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`
-- **QRAM simulator comparison (full vs normal + profiling)**: `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`
-- **Error-filtration experiment**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`
-
-These programs correspond to the main numerical results reported in the manuscript, including QRAM fidelity scaling, simulator comparison, and error-filtration analysis.
-
-The repository provides CMake targets for building these programs:
-
-- `Experiment_QRAM_Fidelity`
-- `Experiment_QRAM_FidelityV2`
-- `Experiment_ErrorFiltration`
-
-## Noise model settings used by these experiments
-
-Noise is configured in-code via:
-
-- `OperationType::Depolarizing`
-- `OperationType::Damping`
-
-Locations:
-
-- `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp` 
-- `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp` 
-- `Experiments/ErrorFiltration/testMultiEFQRAM.cpp` 
-
-Default values in source:
-
-- `QRAMFidelityTest.cpp`: `depolarizing = 0.0`, `damping = 0.0` (argument defaults); built-in demo run uses `1e-4`, `1e-5`.
-- `QRAMSimulatorTest.cpp`: `depolarizing = 0.0`, `damping = 0.0` (argument defaults); current compiled-in test run uses `1e-4`, `1e-4`.
-- `testMultiEFQRAM.cpp`: `depolarizing = 1e-5`, `damping = 1e-5` (defaults in `main`).
-
-## How to reproduce the main result files
-
-### 1) Build
-The experiment programs are compiled into executable files from the provided source code. 
-Users can build the executables using a standard C++ compilation workflow in their preferred development environment.
-
-### 2) Run (example commands)
-For a single parameter setting (addrsize, datasize, shots, inputsize, depolarizing, damping, seed, version), example command-line invocations are provided below to illustrate how to run the experiments for representative parameter settings. Additional parameter sweeps can be constructed following the same format.
-
-Windows (PowerShell):
-
-```powershell
-.\build\bin\Experiment_QRAM_Fidelity.exe --addrsize 15 --datasize 3 --shots 100 --inputsize 10 --depolarizing 1e-4 --damping 1e-5 --seed 123456 --version normal
-.\build\bin\Experiment_QRAM_FidelityV2.exe --addrsize 10 --datasize 3 --shots 100 --inputsize 500 --depolarizing 1e-4 --damping 1e-4 --seed 123456789 --architecture qutrit --experimentname qutrit_scheme
-.\build\bin\Experiment_ErrorFiltration.exe 5 1 10 1000 1e-5 1e-5 12345 normal
-```
-Note: The repository provides the simulation executables and raw output data used in the manuscript. 
-Post-processing (plotting and table generation) can be performed using standard analysis scripts based on these outputs.
-
-## 1) Repository structure (plain‑language map)
-
-The top‑level CMake configuration wires together the major modules below. If you are new to the codebase, this is the easiest map to start from:
-
-- **Common/** — shared utilities that are reused across modules. It is included in the top‑level build. 
-- **QRAM/** — the QRAM simulator and data structures. This is the core module for QRAM logic.
-- **SparQ/** — the sparse‑state simulator core (operators and execution framework).
-- **SparQ_Algorithm/** — higher‑level algorithms built on top of SparQ and QRAM (e.g., state preparation, block‑encoding).
-- **PySparQ/** — Python bindings and API definitions.
-- **ThirdParty/** — bundled third‑party dependencies.
-- **test/** and **Experiments/** — tests and experiment drivers.
-
-#### 2) QRAM at a glance
-
-At a high level, the QRAM support in this repository provides:
-
-- **A QRAM circuit model** with an address size and data size.
-- **Memory storage** indexed by address.
-- **Operations to run the QRAM circuit** (including noise models).
-- **Operators that integrate QRAM into the SparQ sparse‑state simulator** (e.g., QRAM load operators).
-
-The details are captured in the sections below.
-
-#### 3) Core QRAM circuit types
-
-There are two QRAM circuit implementations:
-
-##### 3.1 Qutrit‑based QRAM (`qram_qutrit::QRAMCircuit`)
-
-Key structure (from `QRAM/include/qram_circuit_qutrit.h`):
-
-- **Address/data sizes**: `address_size`, `data_size`.
-- **Time‑step logic**: `time_step` used to generate QRAM operations.
-- **Memory**: `memory`, sized to `2^address_size`.
-- **Noise model support**: `noise_parameters`, plus helpers like `is_noise_free()` and `has_damping()`.
-- **Branching state**: `branches`, `branch_probs`, `valid_branch_view`, `first_good_branch`, and `good_branch_ids`.
-- **Execution entry points**: `initialize_system()`, `run_normal()`, `run_full()`, `run_good_only()`, and `run(version)`.
-- **Sampling/normalization utilities**: `sample_output()` and `normalization()` plus damping‑aware variants.
-
-##### 3.2 GPU‑accelerated QRAM (CUDA)
-
-For qutrit QRAM, there is a CUDA implementation:
-
-- **`qram_qutrit::CuQRAMCircuit`** extends `QRAMCircuit`.
-- **GPU memory mirror**: `memory_dev` (a `thrust::device_vector`).
-- **Memory setters** synchronize host and device memory.
-
-This provides GPU memory storage used by CUDA‑enabled QRAM operations.
-
-#### 4) Internal QRAM data structures (qutrit model)
-
-The QRAM qutrit implementation uses several data structures to model internal state:
-
-##### 4.1 QRAMNode
-
-Each node holds **address** and **data** values with helper operations such as:
-
-- flipping address/data bits,
-- internal swap,
-- rotating among qutrit states (A1/A2 rotations),
-- checking a zero state.
-
-##### 4.2 QRAMState
-
-`QRAMState` stores a **sparse map** of non‑zero elements, with helpers for:
-
-- tree navigation (`left_of`, `right_of`, `parent_of`),
-- bus input/output (`busin`, `busout`),
-- conditional swaps and rotations,
-- checking and setting internal states.
-
-### 4.3 SubBranch and Branch
-
-The QRAM circuit evaluates a collection of branches:
-
-- **SubBranch** contains a `QRAMState`, a data bus, and amplitude, and exposes operations like `run_acopy`, `run_busin`, `run_busout`, etc.
-- **Branch** tracks a QRAM address, bus input, relative probabilities, and associated `SubBranch` instances.
-
-
-#### 5) QRAM operators in SparQ
-
-SparQ exposes QRAM‑aware operators for the sparse‑state simulator:
-
-##### 5.1 `QRAMLoad`
-
-`QRAMLoad` is a self‑adjoint operator that integrates a `qram_qutrit::QRAMCircuit` into a SparQ simulation. It stores the QRAM pointer and the address/data register IDs, and supports CUDA when enabled. 
-
-The user‑facing behavior in the SparQ operator list describes the QRAM load as:
-
-> \|a⟩\|z⟩ → \|a⟩\|z ⊕ d[a]⟩,  
-> where `d[a]` is the classical data stored in the QRAM circuit and the address/data register sizes must match the QRAM circuit sizes.
-
-##### 5.2 `QRAMLoadFast`
-
-`QRAMLoadFast` is a related operator optimized for speed, also restricted to the qutrit QRAM circuit and with separate noise‑handling paths. It is defined in `SparQ/include/qram.h`.
-
-##### 5.3 `QRAMInputGenerator`
-
-`QRAMInputGenerator` is a helper for generating randomized or full input superpositions over address/data registers, enforcing size limits and normalization. This utility lives in `SparQ/include/qram.h`.
-
-#### 6) Python API (PySparQ)
-
-The Python bindings expose QRAM‑related classes:
-
-- **`QRAMCircuit_qutrit`** — constructors accepting address size, data size, and optional memory arrays.
-- **`QRAMLoad`** and **`QRAMLoadFast`** — QRAM load operators with control helpers (`conditioned_by_*`) and access to the underlying QRAM circuit.
-
-These are defined in `PySparQ/pysparq/_core.pyi`.
-
-#### 7) QRAM in higher‑level algorithms
-
-QRAM is used directly in algorithm modules; for example:
-
-- **State preparation via QRAM** uses repeated `QRAMLoad` calls as part of its algorithm, loading "parent" and "child" data branches to compute rotations in a state‑preparation routine.
-
-This shows how QRAM primitives are composed into higher‑level algorithms.
+Apache-2.0 License
