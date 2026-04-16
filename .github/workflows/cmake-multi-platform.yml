@@ -3,28 +3,8 @@ name: CMake on multiple platforms
 on:
   push:
     branches: [ "main", "develop" ]
-    paths:
-      - 'CMakeLists.txt'
-      - '**/*.cmake'
-      - '**/*.h'
-      - '**/*.hpp'
-      - '**/*.cpp'
-      - '**/*.cu'
-      - '**/*.py'
-      - 'ThirdParty/**'
-      - '.github/workflows/cmake-multi-platform.yml'
   pull_request:
     branches: [ "main", "develop" ]
-    paths:
-      - 'CMakeLists.txt'
-      - '**/*.cmake'
-      - '**/*.h'
-      - '**/*.hpp'
-      - '**/*.cpp'
-      - '**/*.cu'
-      - '**/*.py'
-      - 'ThirdParty/**'
-      - '.github/workflows/cmake-multi-platform.yml'
 
 concurrency:
   group: ci-${{ github.ref }}
