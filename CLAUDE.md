@@ -67,6 +67,13 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 - **CMake**: cmake-format + cmake-lint
 - ThirdParty code is excluded from all formatting/linting rules
 
+## Papers
+
+This repository is supported by two papers with distinct contributions:
+
+- **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, Register Level Programming paradigm, sparse state optimization, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`, `Experiments/ErrorFiltration/`
+- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim), PySparQ Python API, GPU acceleration. Code: `SparQ/`, `SparQ_Algorithm/`, `PySparQ/`
+
 ## GitHub Pages
 
 Doxygen documentation is auto-deployed on push to `main`:

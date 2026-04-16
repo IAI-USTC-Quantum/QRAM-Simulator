@@ -1,10 +1,41 @@
 # QRAM-Simulator & PySparQ
 
-[![arXiv](https://img.shields.io/badge/arXiv-2503.13832-b31b1b.svg)](https://arxiv.org/abs/2503.13832)
+[![arXiv:QRAM](https://img.shields.io/badge/arXiv-QRAM_Simulator-2503.13832-b31b1b.svg)](https://arxiv.org/abs/2503.13832)
+[![arXiv:SparQ](https://img.shields.io/badge/arXiv-SparQ-2503.15118-6f42c1.svg)](https://arxiv.org/abs/2503.15118)
 [![PyPI](https://img.shields.io/pypi/v/pysparq.svg)](https://pypi.org/project/pysparq/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > **稀疏态量子模拟器，支持 Register Level Programming**
+
+## 关联论文
+
+本仓库由两篇论文分别驱动，各自贡献了不同的核心能力：
+
+### Paper 1: QRAM-Simulator — [arXiv:2503.13832](https://arxiv.org/abs/2503.13832)
+
+> *Efficient Simulation of Quantum Random Access Memory*
+
+面向 QRAM 模拟的稀疏态量子模拟器，提出了 **Register Level Programming** 范式。主要贡献：
+
+- **QRAM 电路模拟**：Qutrit-based 与 Qubit-based 两种 QRAM 实现，支持退极化和振幅阻尼噪声模型
+- **Register Level Programming**：以 `uint64_t` 寄存器直接存储替代逐门构建，支持自顶向下的量子算法开发
+- **稀疏态优化**：仅存储非零振幅，可实现 64+ 量子比特的结构化算法模拟
+- **错误过滤**：针对含噪 QRAM 的错误过滤方案
+
+**对应代码**：`QRAM/`、`Experiments/QRAM/`、`Experiments/ErrorFiltration/`
+
+### Paper 2: SparQ — [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
+
+> *SparQ: A Sparse Quantum Circuit Simulator with Register-Level Abstraction*
+
+将 Register Level Programming 拓展为通用稀疏态量子模拟器，并提供 Python 接口。主要贡献：
+
+- **通用稀疏态模拟器**：支持 QFT、Grover、哈密顿量模拟、量子微分算法（QDA）、QCNN 等多种算法
+- **PySparQ**：通过 pybind11 提供完整 Python API，`pip install pysparq` 即可使用
+- **扩展算法库**：状态准备、块编码、量子游走、线性系统求解等高层算法
+- **GPU 加速**：CUDA 后端支持大规模并行稀疏态运算
+
+**对应代码**：`SparQ/`、`SparQ_Algorithm/`、`PySparQ/`、`Experiments/QFT/`、`Experiments/Grover/`、`Experiments/QDA/`、`Experiments/QCNN/`
 
 ## 双软件架构
 
@@ -237,11 +268,6 @@ auto result = measure(state);
 
 ## 论文与引用
 
-### 相关论文
-
-1. **QRAM-Simulator**: [arXiv:2503.13832](https://arxiv.org/abs/2503.13832)
-2. **SparQ 稀疏态模拟器**: [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
-
 ### BibTeX
 
 ```bibtex
@@ -251,6 +277,13 @@ auto result = measure(state);
   journal={arXiv preprint arXiv:2503.13832},
   year={2025}
 }
+
+@article{sparq_2025,
+  title={SparQ: A Sparse Quantum Circuit Simulator with Register-Level Abstraction},
+  author={Chen, Zhaoyun and others},
+  journal={arXiv preprint arXiv:2503.15118},
+  year={2025}
+}
 ```
 
 ### 复现论文结果
@@ -258,7 +291,7 @@ auto result = measure(state);
 详细的实验复现指南见 [docs/paper/](docs/paper/) 目录：
 
 - [docs/paper/README.md](docs/paper/README.md) - 论文关联文档
-- [docs/paper/reproduction.md](docs/paper/reproduction.md) - 实验运行详细指南
+- [docs/paper/reproduction.md](docs/paper/reproduction.md) - [QRAM-Simulator](https://arxiv.org/abs/2503.13832) 实验复现指南
 
 ## 项目结构
 
