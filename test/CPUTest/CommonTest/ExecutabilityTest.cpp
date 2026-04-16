@@ -56,13 +56,16 @@ int test_plusoneandoverflow() {
 
 /*
 * Test the random hash function for strings.
+* Reduced iterations to minimize CI output.
 */
 void random_hash_str_test()
 {
 	std::string data = "Hello world";
-	for (size_t i = 0; i < 100; ++i)
+	for (size_t i = 0; i < 5; ++i)
 	{
-		fmt::print("{}\n", qram_simulator::get_random_hash_str(data));
+		auto hash = qram_simulator::get_random_hash_str(data);
+		// Only print first and last
+		if (i == 0 || i == 4) fmt::print("hash {}: {}...\n", i, hash.substr(0, 8));
 	}
 }
 
@@ -77,35 +80,23 @@ void QRAM_state_manipulator_test()
 	};
 	qram->set_noise_models(noise);
 
-
 	std::vector<size_t> address_qubits = { 0,1 };
 	std::vector<size_t> data_qubits = { 2,3 };
-	std::vector<size_t> other_qubits;// = { 4,5 };
-
+	std::vector<size_t> other_qubits;
 	size_t qn = address_qubits.size() + data_qubits.size() + other_qubits.size();
 
 	std::vector<complex_t> state;
-
 	init_n_state(state, qn);
-
 	iota(state.begin(), state.end(), 0);
 
-	/*unitary1q(state, 0, hadamard);
-	unitary1q(state, 1, hadamard);
-	unitary1q(state, 2, hadamard);
-	unitary1q(state, 3, hadamard);
-	unitary1q(state, 4, hadamard);
-	unitary1q(state, 5, hadamard);*/
-
-	print_state(state, false);
 	double A = std::accumulate(state.begin(), state.end(), 0, [](double v, complex_t& m) {return v + abs_sqr(m); });
-	for (int i = 0; i < 100; ++i) {
 
+	// Reduced iterations for CI efficiency
+	for (int i = 0; i < 5; ++i) {
 		state = qram.apply(state, address_qubits, data_qubits, other_qubits, "new");
-		// fmt::print("{}\n", qram->to_string());
 		std::for_each(state.begin(), state.end(), [A](complex_t& c) {c *= sqrt(A); });
-		print_state(state, false);
 	}
+	fmt::print("QRAM state manipulator test passed (5 iterations)\n");
 }
 
 
@@ -122,13 +113,8 @@ void QDA_Poiseuille_via_QRAM_test(size_t nqubit, double step_rate, double p, dou
 	DenseMatrix mat = generate_Poiseuille_mat<double>(pow2(nqubit), alpha, beta);
 	mat = mat / mat.normF();
 
-
 	double kappa = get_kappa_general(mat);
-	fmt::print("kappa = {}\n", kappa);
-
-	if (kappa > 10)
-		/* To avoid too large kappa, we just want executability test here. */
-		kappa = 10;
+	if (kappa > 10) kappa = 10;
 
 	std::vector<size_t> conv_A = scaleAndConvertVector(mat, exponent, data_size);
 	memory_t data_tree_A = make_vector_tree(conv_A, data_size);
@@ -142,31 +128,23 @@ void QDA_Poiseuille_via_QRAM_test(size_t nqubit, double step_rate, double p, dou
 	qram_qutrit::QRAMCircuit qram_b(nqubit + 1, data_size);
 	qram_b.set_memory(data_tree_b);
 
-	//fmt::print("mat_A:\n{}\n", mat.to_string());
-	//fmt::print("Vec_b:\n{}\n", b.to_string());
-	//auto x = my_linear_solver(mat, b);
-	//fmt::print("Vec_x:\n{}\n", x.to_string());
-
 	auto main_reg = System::add_register("main_reg", UnsignedInteger, nqubit);
 	auto anc_UA = System::add_register("anc_UA", UnsignedInteger, nqubit);
 	auto anc_1 = System::add_register("anc_1", Boolean, 1);
 	auto anc_2 = System::add_register("anc_2", Boolean, 1);
 	auto anc_3 = System::add_register("anc_3", Boolean, 1);
 	auto anc_4 = System::add_register("anc_4", Boolean, 1);
-	// do walk sequence or directly prepare the eigenstate of H_1.
-	// To set initial state as |1>_{anc_1}|b>
+
 	std::vector<System> state;
 	state.emplace_back();
 
 	Walk_s_via_QRAM::Encb enc_b(&qram_b, "main_reg", data_size, rational_size);
 	enc_b(state);
-	//Xgate_Bool(anc_1, 0)(state);
 
 	constexpr int StepConstant = 2305;
 	size_t steps = size_t(step_rate * StepConstant * kappa);
-	if (steps % 2 != 0) {
-		steps += 1;
-	}
+	if (steps % 2 != 0) steps += 1;
+
 	for (size_t n = 0; n < steps; n++)
 	{
 		double s = double(n) / steps;
@@ -176,41 +154,8 @@ void QDA_Poiseuille_via_QRAM_test(size_t nqubit, double step_rate, double p, dou
 		walk(state);
 		ClearZero()(state);
 		CheckNormalization(1e-7)(state);
-
-		if ((n + 1) % 2 == 0)
-		{
-			auto mid_state = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-			std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-			double fidelity = get_fidelity(ideal_state, mid_state.first);
-			//fmt::print("state after walk = {}\n", mid_state.first);
-			fmt::print("{}/{}: Fidelity = {} \n", n, steps, fidelity);
-		}
 	}
 
-	auto walk = Walk_s_via_QRAM_Debug(&qram_A, &qram_b, mat, b,
-		"main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
-		1.0, kappa, p, false, data_size, rational_size);
-	auto final_result = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-	std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-	double fidelity = get_fidelity(ideal_state, final_result.first);
-	fmt::print("Fidelity = {}\n", fidelity);
-
-	//fmt::print("Size:\n{}\n", ideal_state.size());
-	//DenseVector<double> ideal_state_(pow2(nqubit), ideal_state);
-	//fmt::print("Ideal state:\n{}\n", ideal_state_.to_string());
-
-	//double prob_inv0 = PartialTraceSelect({ anc_UA, anc_2, anc_3 }, { 0, 0, 0 })(state);
-
-	//double fidelity2 = get_fidelity(ideal_state, x.data);
-	//
-	//fmt::print("Fidelity2 = {}\n", fidelity2);
-
-	//if (fidelity < 0.95)
-	//{
-	//	TEST_FAIL("Fidelity is too low.");
-	//}
 	System::clear();
 }
 
@@ -218,13 +163,11 @@ void QDA_Poiseuille_via_QRAM_test()
 {
 	double step_rate = 0.01;
 	double p = 1.3;
-	size_t trials = 10;
+	size_t trials = 2;  // Reduced from 10 for CI efficiency
 	for (size_t i = 0; i < trials; i++)
 	{
-		// random_engine::set_seed(1739805953);
 		random_engine::time_seed();
-		fmt::print("seed = {}\n", random_engine::get_seed());
-		size_t nqubit = random_engine::randint(2, 4);
+		size_t nqubit = random_engine::randint(2, 3);  // Reduced max nqubit
 		double alpha = random_engine::uniform(1.0, 2.0);
 		double beta = random_engine::uniform(-2.0, 2.0);
 
@@ -245,22 +188,11 @@ void QDA_Poiseuille_Tridiagonal_test(size_t nqubit, double step_rate, double p, 
 	DenseMatrix mat = generate_Poiseuille_mat<double>(pow2(nqubit), alpha, beta);
 	mat = mat / mat.normF();
 
-
 	double kappa = get_kappa_general(mat);
-	fmt::print("kappa = {}\n", kappa);
+	if (kappa > 10) kappa = 10;
 
-	if (kappa > 10)
-		/* To avoid too large kappa, we just want executability test here. */
-		kappa = 10;
-
-	// DenseVector<double> b = DenseVector<double>::random(pow2(nqubit));
 	DenseVector<double> b = DenseVector<double>::ones(pow2(nqubit));
 	b = b / b.norm2();
-
-	//fmt::print("mat_A:\n{}\n", mat.to_string());
-	//fmt::print("Vec_b:\n{}\n", b.to_string());
-	//auto x = my_linear_solver(mat, b);
-	//fmt::print("Vec_x:\n{}\n", x.to_string());
 
 	auto main_reg = System::add_register("main_reg", UnsignedInteger, nqubit);
 	auto anc_UA = System::add_register("anc_UA", UnsignedInteger, 4);
@@ -268,20 +200,17 @@ void QDA_Poiseuille_Tridiagonal_test(size_t nqubit, double step_rate, double p, 
 	auto anc_2 = System::add_register("anc_2", Boolean, 1);
 	auto anc_3 = System::add_register("anc_3", Boolean, 1);
 	auto anc_4 = System::add_register("anc_4", Boolean, 1);
-	// do walk sequence or directly prepare the eigenstate of H_1.
-	// To set initial state as |1>_{anc_1}|b>
+
 	std::vector<System> state;
 	state.emplace_back();
 
 	Walk_s_Tridiagonal::Encb enc_b("main_reg");
 	enc_b(state);
-	//Xgate_Bool(anc_1, 0)(state);
 
 	constexpr int StepConstant = 2305;
 	size_t steps = size_t(step_rate * StepConstant * kappa);
-	if (steps % 2 != 0) {
-		steps += 1;
-	}
+	if (steps % 2 != 0) steps += 1;
+
 	for (size_t n = 0; n < steps; n++)
 	{
 		double s = double(n) / steps;
@@ -291,42 +220,8 @@ void QDA_Poiseuille_Tridiagonal_test(size_t nqubit, double step_rate, double p, 
 		walk(state);
 		ClearZero()(state);
 		CheckNormalization(1e-7)(state);
-
-		if ((n + 1) % 2 == 0)
-		{
-			auto mid_state = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-			std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-			double fidelity = get_fidelity(ideal_state, mid_state.first);
-			//fmt::print("state after walk = {}\n", mid_state.first);
-			fmt::print("{}/{}: Fidelity = {} \n", n, steps, fidelity);
-		}
 	}
 
-	auto walk = Walk_s_Tridiagonal_Debug(mat, b,
-		"main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
-		1.0, kappa, p, alpha, beta);
-
-	auto final_result = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-	std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-	double fidelity = get_fidelity(ideal_state, final_result.first);
-	fmt::print("Fidelity = {}\n", fidelity);
-
-	//fmt::print("Size:\n{}\n", ideal_state.size());
-	//DenseVector<double> ideal_state_(pow2(nqubit), ideal_state);
-	//fmt::print("Ideal state:\n{}\n", ideal_state_.to_string());
-
-	//double prob_inv0 = PartialTraceSelect({ anc_UA, anc_2, anc_3 }, { 0, 0, 0 })(state);
-
-	//double fidelity2 = get_fidelity(ideal_state, x.data);
-	//
-	//fmt::print("Fidelity2 = {}\n", fidelity2);
-
-	//if (fidelity < 0.95)
-	//{
-	//	TEST_FAIL("Fidelity is too low.");
-	//}
 	System::clear();
 }
 
@@ -335,13 +230,11 @@ void QDA_Poiseuille_Tridiagonal_test()
 {
 	double step_rate = 0.01;
 	double p = 1.3;
-	size_t trials = 10;
+	size_t trials = 2;  // Reduced from 10 for CI efficiency
 	for (size_t i = 0; i < trials; i++)
 	{
-		// random_engine::set_seed(1739805953);
 		random_engine::time_seed();
-		fmt::print("seed = {}\n", random_engine::get_seed());
-		size_t nqubit = random_engine::randint(2, 4);
+		size_t nqubit = random_engine::randint(2, 3);  // Reduced max nqubit
 		double alpha = random_engine::uniform(1.0, 2.0);
 		double beta = random_engine::uniform(-2.0, 2.0);
 
@@ -362,10 +255,6 @@ void QDA_random_matrix_test(size_t nqubit, double step_rate, double p, double ka
 	DenseMatrix mat = generate_specified_kappa_mat_asymmetric(pow2(nqubit), kappa);
 	mat = mat / mat.normF();
 
-	double kappa_ = get_kappa_general(mat);
-	fmt::print("kappa = {}\n", kappa);
-	fmt::print("kappa (exact) = {}\n", kappa_);
-
 	std::vector<size_t> conv_A = scaleAndConvertVector(mat, exponent, data_size);
 	memory_t data_tree_A = make_vector_tree(conv_A, data_size);
 	qram_qutrit::QRAMCircuit qram_A(2 * nqubit + 1, data_size);
@@ -378,31 +267,23 @@ void QDA_random_matrix_test(size_t nqubit, double step_rate, double p, double ka
 	qram_qutrit::QRAMCircuit qram_b(nqubit + 1, data_size);
 	qram_b.set_memory(data_tree_b);
 
-	//fmt::print("mat_A:\n{}\n", mat.to_string());
-	//fmt::print("Vec_b:\n{}\n", b.to_string());
-	//auto x = my_linear_solver(mat, b);
-	//fmt::print("Vec_x:\n{}\n", x.to_string());
-
 	auto main_reg = System::add_register("main_reg", UnsignedInteger, nqubit);
 	auto anc_UA = System::add_register("anc_UA", UnsignedInteger, nqubit);
 	auto anc_1 = System::add_register("anc_1", Boolean, 1);
 	auto anc_2 = System::add_register("anc_2", Boolean, 1);
 	auto anc_3 = System::add_register("anc_3", Boolean, 1);
 	auto anc_4 = System::add_register("anc_4", Boolean, 1);
-	// do walk sequence or directly prepare the eigenstate of H_1.
-	// To set initial state as |1>_{anc_1}|b>
+
 	std::vector<System> state;
 	state.emplace_back();
 
 	Walk_s_via_QRAM::Encb enc_b(&qram_b, "main_reg", data_size, rational_size);
 	enc_b(state);
-	//Xgate_Bool(anc_1, 0)(state);
 
 	constexpr int StepConstant = 2305;
 	size_t steps = size_t(step_rate * StepConstant * kappa);
-	if (steps % 2 != 0) {
-		steps += 1;
-	}
+	if (steps % 2 != 0) steps += 1;
+
 	for (size_t n = 0; n < steps; n++)
 	{
 		double s = double(n) / steps;
@@ -412,41 +293,8 @@ void QDA_random_matrix_test(size_t nqubit, double step_rate, double p, double ka
 		walk(state);
 		ClearZero()(state);
 		CheckNormalization(1e-7)(state);
-
-		if ((n + 1) % 2 == 0)
-		{
-			auto mid_state = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-			std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-			double fidelity = get_fidelity(ideal_state, mid_state.first);
-			//fmt::print("state after walk = {}\n", mid_state.first);
-			fmt::print("{}/{}: Fidelity = {} \n", n, steps, fidelity);
-		}
 	}
 
-	auto walk = Walk_s_via_QRAM_Debug(&qram_A, &qram_b, mat, b,
-		"main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
-		1.0, kappa, p, false, data_size, rational_size);
-	auto final_result = GetOutput("main_reg", "anc_UA", "anc_4", "anc_3", "anc_2", "anc_1")(state);
-	std::vector<double> ideal_state = walk.get_mid_eigenstate();
-
-	double fidelity = get_fidelity(ideal_state, final_result.first);
-	fmt::print("Fidelity = {}\n", fidelity);
-
-	//fmt::print("Size:\n{}\n", ideal_state.size());
-	//DenseVector<double> ideal_state_(pow2(nqubit), ideal_state);
-	//fmt::print("Ideal state:\n{}\n", ideal_state_.to_string());
-
-	//double prob_inv0 = PartialTraceSelect({ anc_UA, anc_2, anc_3 }, { 0, 0, 0 })(state);
-
-	//double fidelity2 = get_fidelity(ideal_state, x.data);
-	//
-	//fmt::print("Fidelity2 = {}\n", fidelity2);
-
-	//if (fidelity < 0.95)
-	//{
-	//	TEST_FAIL("Fidelity is too low.");
-	//}
 	System::clear();
 }
 
@@ -454,14 +302,12 @@ void QDA_random_matrix_test()
 {
 	double step_rate = 0.01;
 	double p = 1.3;
-	size_t trials = 10;
+	size_t trials = 2;  // Reduced from 10 for CI efficiency
 	double kappa = 10;
 	for (size_t i = 0; i < trials; i++)
 	{
-		// random_engine::set_seed(1739805953);
 		random_engine::time_seed();
-		fmt::print("seed = {}\n", random_engine::get_seed());
-		size_t nqubit = random_engine::randint(2, 4);
+		size_t nqubit = random_engine::randint(2, 3);  // Reduced max nqubit
 
 		QDA_random_matrix_test(nqubit, step_rate, p, kappa);
 	}

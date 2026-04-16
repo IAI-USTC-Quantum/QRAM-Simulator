@@ -90,12 +90,12 @@ jobs:
     - name: Test (Unix)
       if: runner.os != 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest --output-on-failure
+      run: ctest --output-on-failure -j4
 
     - name: Test (Windows)
       if: runner.os == 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest --output-on-failure -C ${{ matrix.build_type }}
+      run: ctest --output-on-failure -C ${{ matrix.build_type }} -j4
 
     # --- Python package ---
     - name: Build Python Package

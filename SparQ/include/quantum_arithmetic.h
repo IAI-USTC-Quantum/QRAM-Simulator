@@ -2,6 +2,29 @@
  * @file quantum_arithmetic.h
  * @brief 量子算术运算定义
  * @details 实现各种量子算术操作，包括翻转、移位、乘法、加法、比较等运算
+ *
+ * @section unitary_notes Unitary性质说明
+ *
+ * 量子算子必须满足unitary性质（U^†U = I），这要求操作是可逆的。本文件中的算子分为两类：
+ *
+ * 1. Out-of-place操作（如Add_UInt_UInt）：
+ *    - 结果存储在独立的输出寄存器中
+ *    - 通过bitwise XOR保证unitary：result ^= f(inputs)
+ *    - 自动满足unitary，因为XOR是自逆操作
+ *
+ * 2. In-place操作（如Add_UInt_UInt_InPlace、Add_ConstUInt）：
+ *    - 结果直接修改输入寄存器
+ *    - 需要显式实现dagger()方法来保证可逆性
+ *    - 通常使用模运算实现逆操作：y = (y + (2^N - x)) % 2^N
+ *
+ * @section type_safety_notes 类型安全说明
+ *
+ * 所有算子在debug模式（非QRAM_Release）下会检查：
+ * - 输入/输出寄存器的类型（UnsignedInteger/SignedInteger/Boolean/Rational）
+ * - 寄存器大小是否匹配
+ * - 操作数的有效范围（如移位位数）
+ *
+ * Release模式下这些检查被编译移除，以获得最佳性能。
  */
 
 #pragma once
@@ -15,8 +38,19 @@ namespace qram_simulator
 
 	/**
 	 * @brief 布尔翻转操作
-	 * @details 翻转通用寄存器中的所有位
-	 * @note 数据类型：通用目的，剩余高位也会被翻转
+	 * @details 翻转寄存器中的所有位（按位取反），实现 y = ~y
+	 *
+	 * @note Unitary性质：自伴算子（SelfAdjointOperator），即 U^† = U
+	 * @note 数据类型：任意整数类型（UnsignedInteger/SignedInteger）
+	 * @note 溢出行为：只影响寄存器size范围内的位，高位被翻转但会被mask截断
+	 *
+	 * @pre 输入寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * // 4位寄存器，初始值 0b1010 (10)
+	 * FlipBools("reg");  // 结果: 0b0101 (5)
+	 * @endcode
 	 */
 	struct FlipBools : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -59,8 +93,22 @@ namespace qram_simulator
 
 	/**
 	 * @brief 双比特交换操作
-	 * @details 交换两个寄存器中指定位置的比特
-	 * @note 数据类型：通用目的，输入位可能溢出
+	 * @details 交换两个寄存器中指定位置的单个比特
+	 *
+	 * 实现：使用临时变量交换两个寄存器指定位的值
+	 * 这是一个自伴操作，应用两次等于恒等操作
+	 *
+	 * @note Unitary性质：自伴算子，Swap^2 = I
+	 * @note 数据类型：任意类型寄存器的布尔位
+	 *
+	 * @pre lhs和rhs寄存器必须是激活状态
+	 * @pre digit1和digit2必须在各自寄存器的有效位范围内 [0, size)
+	 *
+	 * @par 示例
+	 * @code
+	 * // reg1 = 0b1010, reg2 = 0b0101
+	 * Swap_Bool_Bool("reg1", 0, "reg2", 1);  // 交换reg1的第0位和reg2的第1位
+	 * @endcode
 	 */
 	struct Swap_Bool_Bool : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -86,12 +134,18 @@ namespace qram_simulator
 		 * @param d1 第一个位索引
 		 * @param reg2 第二个寄存器名称
 		 * @param d2 第二个位索引
+		 * @throws 当位索引超出寄存器大小时抛出异常
 		 */
 		Swap_Bool_Bool(std::string_view reg1, size_t d1,
 			std::string_view reg2, size_t d2)
 			: lhs(System::get(reg1)), rhs(System::get(reg2)),
 			digit1(d1), digit2(d2)
 		{
+			/* Size check */
+#ifndef QRAM_Release
+			if (d1 >= System::size_of(lhs) || d2 >= System::size_of(rhs))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -100,10 +154,16 @@ namespace qram_simulator
 		 * @param d1 第一个位索引
 		 * @param id2 第二个寄存器 ID
 		 * @param d2 第二个位索引
+		 * @throws 当位索引超出寄存器大小时抛出异常
 		 */
 		Swap_Bool_Bool(size_t id1, size_t d1,
 			size_t id2, size_t d2) : lhs(id1), rhs(id2), digit1(d1), digit2(d2)
 		{
+			/* Size check */
+#ifndef QRAM_Release
+			if (d1 >= System::size_of(lhs) || d2 >= System::size_of(rhs))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -122,9 +182,24 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 左移操作
-	 * @details 将寄存器值左移指定位数，最高位循环到最低位
-	 * @note 数据类型：建议使用无符号整数
+	 * @brief 循环左移操作
+	 * @details 将寄存器值循环左移指定位数，溢出的高位循环到低位
+	 *
+	 * 数学定义：y = (y << digit) | (y >> (N - digit))，其中N是寄存器位数
+	 *
+	 * @note Unitary性质：循环移位是双射，保证unitary
+	 * @note dagger操作：左移d位的dagger是右移d位（或左移N-d位）
+	 * @note 数据类型：建议UnsignedInteger，也可用于SignedInteger
+	 *
+	 * @pre register_1必须是激活状态
+	 * @pre digit <= 寄存器大小（digit == size时等于恒等操作）
+	 *
+	 * @par 示例
+	 * @code
+	 * // 4位寄存器，初始值 0b1010
+	 * ShiftLeft("reg", 1);  // 结果: 0b0101 (循环左移1位)
+	 * ShiftLeft("reg", 2);  // 结果: 0b1010 (循环左移2位)
+	 * @endcode
 	 */
 	struct ShiftLeft : BaseOperator {
 		using BaseOperator::operator();
@@ -142,20 +217,38 @@ namespace qram_simulator
 		 * @brief 构造函数（名称版本）
 		 * @param reg1 寄存器名称
 		 * @param d 移位位数
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		ShiftLeft(std::string_view reg1, size_t d) 
+		ShiftLeft(std::string_view reg1, size_t d)
 			:register_1(System::get(reg1)), digit(d)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(register_1);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+			if (d > System::size_of(register_1))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
 		 * @brief 构造函数（ID 版本）
 		 * @param reg1 寄存器 ID
 		 * @param d 移位位数
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
 		ShiftLeft(size_t reg1, size_t d)
 			:register_1(reg1), digit(d)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(register_1);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+			if (d > System::size_of(register_1))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -175,9 +268,23 @@ namespace qram_simulator
 
 
 	/**
-	 * @brief 右移操作
-	 * @details 将寄存器值右移指定位数，最低位循环到最高位
-	 * @note 数据类型：建议使用无符号整数
+	 * @brief 循环右移操作
+	 * @details 将寄存器值循环右移指定位数，溢出的低位循环到高位
+	 *
+	 * 数学定义：y = (y >> digit) | (y << (N - digit))，其中N是寄存器位数
+	 *
+	 * @note Unitary性质：循环移位是双射，保证unitary
+	 * @note dagger操作：右移d位的dagger是左移d位（或右移N-d位）
+	 * @note 数据类型：建议UnsignedInteger，也可用于SignedInteger
+	 *
+	 * @pre register_1必须是激活状态
+	 * @pre digit <= 寄存器大小（digit == size时等于恒等操作）
+	 *
+	 * @par 示例
+	 * @code
+	 * // 4位寄存器，初始值 0b1010
+	 * ShiftRight("reg", 1);  // 结果: 0b0101 (循环右移1位)
+	 * @endcode
 	 */
 	struct ShiftRight : BaseOperator {
 		using BaseOperator::operator();
@@ -195,20 +302,38 @@ namespace qram_simulator
 		 * @brief 构造函数（名称版本）
 		 * @param reg1 寄存器名称
 		 * @param d 移位位数
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
 		ShiftRight(std::string_view reg1, size_t d)
 			:register_1(System::get(reg1)), digit(d)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(register_1);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+			if (d > System::size_of(register_1))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
 		 * @brief 构造函数（ID 版本）
 		 * @param reg1 寄存器 ID
 		 * @param d 移位位数
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
 		ShiftRight(size_t reg1, size_t d)
 			:register_1(reg1), digit(d)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(register_1);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+			if (d > System::size_of(register_1))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -227,9 +352,27 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 无符号整数乘常量操作
-	 * @details z = x * mult，x 为寄存器值，mult 为常量
-	 * @note 数据类型：无符号整数，结果可能溢出
+	 * @brief 无符号整数乘常量操作（Out-of-place）
+	 * @details 实现 out-of-place 乘法：res ^= lhs * mult
+	 *
+	 * Unitary保证：通过XOR实现，res = res ⊕ (lhs * mult)
+	 * 应用两次：res ⊕ (lhs * mult) ⊕ (lhs * mult) = res，即 U^2 = I
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：输入和输出都必须是UnsignedInteger
+	 * @note 溢出行为：乘法结果按输出寄存器大小截断
+	 *
+	 * @pre lhs和res寄存器必须是UnsignedInteger类型
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 3);  // lhs = 3
+	 * // res = 0 ⊕ (3 * 4) = 12
+	 * Mult_UInt_ConstUInt("lhs", 4, "res");
+	 * @endcode
 	 */
 	struct Mult_UInt_ConstUInt : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -296,8 +439,31 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 累加乘常量操作
-	 * @details z += x * mult
+	 * @brief 累加乘常量操作（In-place）
+	 * @details 实现 in-place 累加乘法：res += lhs * mult
+	 *
+	 * 这是一个in-place操作，需要显式实现dagger来保证unitary。
+	 * dagger实现：res += (2^N - lhs * mult) mod 2^N
+	 *
+	 * @note Unitary性质：通过模运算保证可逆性
+	 * @note 数据类型：建议lhs和res都为UnsignedInteger
+	 * @note 溢出行为：结果按res寄存器大小模2^N回绕
+	 *
+	 * @pre res寄存器必须有足够位数存储结果
+	 * @pre 当mult * max(lhs)可能溢出时，dagger操作需要特别注意
+	 *
+	 * @warning 此操作的unitary性依赖于正确的dagger实现。如果mult * lhs
+	 *          在应用和dagger时溢出行为不一致，可能导致非unitary。
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 2);  // lhs = 2
+	 * Init_Unsafe(res, 3);  // res = 3
+	 * // res = 3 + (2 * 4) = 11
+	 * Add_Mult_UInt_ConstUInt("lhs", 4, "res");
+	 * @endcode
 	 */
 	struct Add_Mult_UInt_ConstUInt : BaseOperator {
 		using BaseOperator::operator();
@@ -318,22 +484,36 @@ namespace qram_simulator
 		 * @brief 构造函数（名称版本）
 		 * @param reg_in 输入寄存器名称
 		 * @param mult 乘数常量
-		 * @param reg_out 输出寄存器名称
+		 * @param reg_out 输出寄存器名称（结果累加至此）
+		 * @throws 当寄存器类型不是UnsignedInteger时抛出异常
 		 */
 		Add_Mult_UInt_ConstUInt(std::string_view reg_in, size_t mult, std::string_view reg_out)
 			: mult_int(mult), lhs(System::get(reg_in)), res(System::get(reg_out))
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
 		}
 
 		/**
 		 * @brief 构造函数（ID 版本）
 		 * @param reg_in 输入寄存器 ID
 		 * @param mult 乘数常量
-		 * @param reg_out 输出寄存器 ID
+		 * @param reg_out 输出寄存器 ID（结果累加至此）
+		 * @throws 当寄存器类型不是UnsignedInteger时抛出异常
 		 */
 		Add_Mult_UInt_ConstUInt(size_t reg_in, size_t mult, size_t reg_out)
 			: mult_int(mult), lhs(reg_in), res(reg_out)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -364,9 +544,30 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 无符号整数加法操作
-	 * @details z = x + y
-	 * @note 数据类型：无符号整数，结果可能溢出
+	 * @brief 无符号整数加法操作（Out-of-place）
+	 * @details 实现 out-of-place 加法：res ^= lhs + rhs
+	 *
+	 * Unitary保证：通过XOR实现，res = res ⊕ (lhs + rhs)
+	 * 应用两次：res ⊕ (lhs + rhs) ⊕ (lhs + rhs) = res，即 U^2 = I
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res都必须是UnsignedInteger
+	 * @note 溢出行为：加法结果按输出寄存器大小截断后XOR
+	 *
+	 * @pre lhs、rhs、res寄存器必须是UnsignedInteger类型
+	 * @pre 所有寄存器必须是激活状态
+	 * @pre res寄存器初始值通常为0，但也可以是任意值（XOR语义）
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 3);  // lhs = 3
+	 * Init_Unsafe(rhs, 5);  // rhs = 5
+	 * // res = 0 ⊕ (3 + 5) = 8
+	 * Add_UInt_UInt("lhs", "rhs", "res");
+	 * @endcode
 	 */
 	struct Add_UInt_UInt : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -435,8 +636,32 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 原地无符号整数加法操作
-	 * @details y += x，结果存储在 rhs 中
+	 * @brief 原地无符号整数加法操作（In-place）
+	 * @details 实现 in-place 加法：rhs += lhs
+	 *
+	 * 这是一个in-place操作，需要显式实现dagger来保证unitary。
+	 * dagger实现：rhs += (2^N - lhs) mod 2^N，其中N是rhs寄存器位数
+	 *
+	 * @note Unitary性质：通过模运算加法保证双射性
+	 * @note 数据类型：lhs和rhs都应该是UnsignedInteger
+	 * @note 溢出行为：结果按rhs寄存器大小模2^N回绕
+	 *
+	 * @pre lhs和rhs寄存器应该是相同大小（推荐）
+	 * @pre lhs和rhs必须是激活状态
+	 *
+	 * @warning 如果lhs和rhs大小不同，较小的值会被截断，可能导致非unitary行为
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 7);  // lhs = 7
+	 * Init_Unsafe(rhs, 3);  // rhs = 3
+	 * // rhs = 3 + 7 = 10
+	 * Add_UInt_UInt_InPlace("lhs", "rhs");
+	 * // dagger: rhs = 10 + (16 - 7) % 16 = 3 (恢复原值)
+	 * op.dag(state);
+	 * @endcode
 	 */
 	struct Add_UInt_UInt_InPlace : BaseOperator {
 		using BaseOperator::operator();
@@ -452,22 +677,42 @@ namespace qram_simulator
 
 		/**
 		 * @brief 构造函数（名称版本）
-		 * @param lhs_ 左操作数寄存器名称
-		 * @param rhs_ 右操作数寄存器名称
+		 * @param lhs_ 左操作数寄存器名称（加数）
+		 * @param rhs_ 右操作数寄存器名称（被加数，结果存储于此）
+		 * @throws 当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常
 		 */
 		Add_UInt_UInt_InPlace(std::string_view lhs_, std::string_view rhs_)
 			:lhs(System::get(lhs_)), rhs(System::get(rhs_))
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger)
+				throw_invalid_input();
+			/* Size check - warn if sizes don't match */
+			if (System::size_of(lhs) != System::size_of(rhs))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
 		 * @brief 构造函数（ID 版本）
-		 * @param lhs_ 左操作数寄存器 ID
-		 * @param rhs_ 右操作数寄存器 ID
+		 * @param lhs_ 左操作数寄存器 ID（加数）
+		 * @param rhs_ 右操作数寄存器 ID（被加数，结果存储于此）
+		 * @throws 当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常
 		 */
 		Add_UInt_UInt_InPlace(size_t lhs_, size_t rhs_)
 			: lhs(lhs_), rhs(rhs_)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger)
+				throw_invalid_input();
+			/* Size check - warn if sizes don't match */
+			if (System::size_of(lhs) != System::size_of(rhs))
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -498,8 +743,27 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 无符号整数加常量操作
-	 * @details z = x + add，add 为常量
+	 * @brief 无符号整数加常量操作（Out-of-place）
+	 * @details 实现 out-of-place 加常量：res ^= lhs + add_int
+	 *
+	 * Unitary保证：通过XOR实现，res = res ⊕ (lhs + add_int)
+	 * 应用两次：res ⊕ (lhs + add_int) ⊕ (lhs + add_int) = res
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs和res都必须是UnsignedInteger
+	 * @note 溢出行为：加法结果按输出寄存器大小截断后XOR
+	 *
+	 * @pre lhs和res寄存器必须是UnsignedInteger类型
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 6);  // lhs = 6
+	 * // res = 0 ⊕ (6 + 4) = 10
+	 * Add_UInt_ConstUInt("lhs", 4, "res");
+	 * @endcode
 	 */
 	struct Add_UInt_ConstUInt : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -566,8 +830,28 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 加常量操作（原地）
-	 * @details reg_in += add
+	 * @brief 加常量操作（In-place）
+	 * @details 实现 in-place 加常量：reg_in += add_int (mod 2^N)
+	 *
+	 * 这是一个in-place操作，需要显式实现dagger来保证unitary。
+	 * dagger实现：reg_in += (2^N - add_int) mod 2^N，其中N是寄存器位数
+	 *
+	 * @note Unitary性质：通过模运算加法保证双射性
+	 * @note 数据类型：建议reg_in为UnsignedInteger
+	 * @note 溢出行为：结果按寄存器大小模2^N回绕
+	 *
+	 * @pre reg_in必须是激活状态
+	 * @pre add_int应该小于2^N（N为寄存器位数），否则行为取决于模运算
+	 *
+	 * @par 示例
+	 * @code
+	 * auto reg = System::add_register("reg", UnsignedInteger, 4);
+	 * Init_Unsafe(reg, 12);  // reg = 12
+	 * // reg = (12 + 3) % 16 = 15
+	 * Add_ConstUInt("reg", 3);
+	 * // dagger: reg = (15 + 13) % 16 = 12 (恢复原值)
+	 * op.dag(state);
+	 * @endcode
 	 */
 	struct Add_ConstUInt : BaseOperator {
 		using BaseOperator::operator();
@@ -583,22 +867,36 @@ namespace qram_simulator
 
 		/**
 		 * @brief 构造函数（名称版本）
-		 * @param reg_in_ 输入寄存器名称
+		 * @param reg_in_ 输入寄存器名称（结果存储于此）
 		 * @param add 加数常量
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
 		Add_ConstUInt(std::string_view reg_in_, size_t add) :
 			reg_in(System::get(reg_in_)), add_int(add)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(reg_in);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+#endif
 		}
 
 		/**
 		 * @brief 构造函数（ID 版本）
-		 * @param reg_in 输入寄存器 ID
+		 * @param reg_in 输入寄存器 ID（结果存储于此）
 		 * @param add 加数常量
+		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
 		Add_ConstUInt(size_t reg_in, size_t add)
 			: reg_in(reg_in), add_int(add)
 		{
+			/* Type check */
+#ifndef QRAM_Release
+			auto type = System::type_of(reg_in);
+			if (type != UnsignedInteger && type != SignedInteger)
+				throw_invalid_input();
+#endif
 		}
 
 		/**
@@ -629,9 +927,33 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 除法平方根反余弦操作
-	 * @details z = arccos(sqrt(y / x))
-	 * @note 数据类型：无符号整数输入，有理数输出
+	 * @brief 除法平方根反余弦操作（Out-of-place）
+	 * @details 实现：res ^= arccos(sqrt(lhs / rhs)) / π / 2
+	 *
+	 * 用于计算量子旋转角度，常见于量子机器学习算法中。
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：lhs和rhs必须是UnsignedInteger，res必须是Rational
+	 * @note 数值范围：结果在[0, 0.5]范围内，编码为有理数
+	 *
+	 * @pre lhs和rhs必须是UnsignedInteger类型
+	 * @pre res必须是Rational类型
+	 * @pre lhs < rhs（否则sqrt参数超出[0,1]范围，可能产生NaN）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 数学公式
+	 * output = arccos(√(lhs / rhs)) / (2π)
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", Rational, 8);
+	 * Init_Unsafe(lhs, 1);  // lhs = 1
+	 * Init_Unsafe(rhs, 4);  // rhs = 4
+	 * // res = arccos(sqrt(1/4)) / 2π = arccos(0.5) / 2π = 1/6 ≈ 0.167
+	 * Div_Sqrt_Arccos_Int_Int("lhs", "rhs", "res");
+	 * @endcode
 	 */
 	struct Div_Sqrt_Arccos_Int_Int : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -704,9 +1026,34 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 平方根除法反余弦操作
-	 * @details z = arccos(sqrt(y) / x)
-	 * @note 数据类型：有符号/无符号整数输入，有理数输出
+	 * @brief 平方根除法反余弦操作（Out-of-place）
+	 * @details 实现：res ^= arccos(lhs / sqrt(rhs)) / π / 2
+	 *
+	 * 用于计算量子旋转角度，常见于量子振幅编码。
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：lhs必须是SignedInteger，rhs必须是UnsignedInteger，res必须是Rational
+	 * @note 数值范围：结果在[0, 1)范围内，编码为有理数
+	 *
+	 * @pre lhs必须是SignedInteger类型
+	 * @pre rhs必须是UnsignedInteger类型
+	 * @pre res必须是Rational类型
+	 * @pre |lhs| <= sqrt(rhs)（保证arccos参数在[-1,1]范围内）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 数学公式
+	 * output = arccos(lhs / √rhs) / (2π)
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", SignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", UnsignedInteger, 4);
+	 * auto res = System::add_register("res", Rational, 8);
+	 * Init_Unsafe(lhs, 1);   // lhs = 1
+	 * Init_Unsafe(rhs, 4);   // rhs = 4
+	 * // res = arccos(1/2) / 2π = 1/6 ≈ 0.167
+	 * Sqrt_Div_Arccos_Int_Int("lhs", "rhs", "res");
+	 * @endcode
 	 */
 	struct Sqrt_Div_Arccos_Int_Int : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -780,8 +1127,33 @@ namespace qram_simulator
 
 
 	/**
-	 * @brief 获取旋转角度操作
-	 * @details 计算两个整数之间的旋转角度
+	 * @brief 获取旋转角度操作（Out-of-place）
+	 * @details 计算从lhs到rhs的极坐标角度：res ^= atan2(rhs, lhs) / (2π)
+	 *
+	 * 将笛卡尔坐标(lhs, rhs)转换为极坐标角度，结果编码在[0, 1)范围内。
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：lhs和rhs可以是SignedInteger或UnsignedInteger，res必须是Rational
+	 * @note 数值范围：结果在[0, 1)范围内（归一化的角度）
+	 *
+	 * @pre res必须是Rational类型
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 数学公式
+	 * - 如果 lhs == 0 且 rhs >= 0: output = 0.25 (90°)
+	 * - 如果 lhs == 0 且 rhs < 0: output = 0.75 (270°)
+	 * - 其他: output = atan2(rhs, lhs) / (2π) 归一化到[0,1)
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", SignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", SignedInteger, 4);
+	 * auto res = System::add_register("res", Rational, 8);
+	 * Init_Unsafe(lhs, 1);  // lhs = 1
+	 * Init_Unsafe(rhs, 1);  // rhs = 1
+	 * // res = atan2(1, 1) / 2π = 0.125 (45°)
+	 * GetRotateAngle_Int_Int("lhs", "rhs", "res");
+	 * @endcode
 	 */
 	struct GetRotateAngle_Int_Int : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -840,8 +1212,33 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 任意整数累加操作
-	 * @details y += x，支持有符号和无符号整数
+	 * @brief 任意整数累加操作（In-place）
+	 * @details 实现 in-place 加法：lhs += rhs，支持有符号和无符号整数
+	 *
+	 * 这是一个in-place操作，需要显式实现dagger来保证unitary。
+	 * dagger实现：lhs -= rhs (mod 2^N)
+	 *
+	 * @note Unitary性质：通过模运算保证双射性
+	 * @note 数据类型：lhs和rhs可以是UnsignedInteger或SignedInteger
+	 * @note 溢出行为：结果按lhs寄存器大小模2^N回绕
+	 * @note 类型组合：支持混合类型（如lhs为SignedInteger，rhs为UnsignedInteger）
+	 *
+	 * @pre lhs和rhs必须是整数类型（UnsignedInteger或SignedInteger）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @warning 有符号整数的溢出行为是未定义的（C++标准），使用时需谨慎
+	 *
+	 * @par 示例
+	 * @code
+	 * auto lhs = System::add_register("lhs", UnsignedInteger, 4);
+	 * auto rhs = System::add_register("rhs", UnsignedInteger, 4);
+	 * Init_Unsafe(lhs, 8);  // lhs = 8
+	 * Init_Unsafe(rhs, 6);  // rhs = 6
+	 * // lhs = (8 + 6) % 16 = 14
+	 * AddAssign_AnyInt_AnyInt("lhs", "rhs");
+	 * // dagger: lhs = (14 - 6) % 16 = 8 (恢复原值)
+	 * op.dag(state);
+	 * @endcode
 	 */
 	struct AddAssign_AnyInt_AnyInt : BaseOperator
 	{
@@ -952,9 +1349,30 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 赋值操作
-	 * @details y = x，通过 XOR 实现
-	 * @note 数据类型：通用
+	 * @brief 赋值操作（Out-of-place）
+	 * @details 实现寄存器复制：register_2 ^= register_1
+	 *
+	 * 这是量子计算中"复制"操作的标准实现。通过XOR实现，应用两次会恢复原值。
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：任意类型，只要两个寄存器大小相同
+	 * @note 语义：register_2 = register_2 ⊕ register_1
+	 *           如果register_2初始为0，则效果为 register_2 = register_1
+	 *
+	 * @pre register_1和register_2大小必须相同
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto src = System::add_register("src", UnsignedInteger, 4);
+	 * auto dst = System::add_register("dst", UnsignedInteger, 4);
+	 * Init_Unsafe(src, 7);  // src = 7
+	 * Init_Unsafe(dst, 0);  // dst = 0
+	 * // dst = 0 ⊕ 7 = 7
+	 * Assign("src", "dst");
+	 * // 再次应用：dst = 7 ⊕ 7 = 0 (恢复原值)
+	 * Assign("src", "dst");
+	 * @endcode
 	 */
 	struct Assign : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
@@ -1004,8 +1422,32 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 无符号整数比较操作
-	 * @details |l>|r>|0>|0> -> |l>|r>|l < r?>|l == r?>
+	 * @brief 无符号整数比较操作（Out-of-place）
+	 * @details 比较两个无符号整数，输出小于和等于标志
+	 *
+	 * 实现：
+	 * - compare_less_id ^= (left < right)
+	 * - compare_equal_id ^= (left == right)
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：left_id和right_id必须是UnsignedInteger，compare_less_id和compare_equal_id必须是Boolean
+	 * @note 语义：输出标志是XOR到结果寄存器，如果初始为0则直接存储比较结果
+	 *
+	 * @pre left_id和right_id必须是UnsignedInteger类型
+	 * @pre compare_less_id和compare_equal_id必须是Boolean类型（大小为1）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto left = System::add_register("left", UnsignedInteger, 4);
+	 * auto right = System::add_register("right", UnsignedInteger, 4);
+	 * auto less = System::add_register("less", Boolean, 1);
+	 * auto equal = System::add_register("equal", Boolean, 1);
+	 * Init_Unsafe(left, 3);
+	 * Init_Unsafe(right, 5);
+	 * // less = (3 < 5) = 1, equal = (3 == 5) = 0
+	 * Compare_UInt_UInt("left", "right", "less", "equal");
+	 * @endcode
 	 */
 	struct Compare_UInt_UInt : SelfAdjointOperator
 	{
@@ -1089,8 +1531,29 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 小于比较操作
-	 * @details |l>|r>|0> -> |l>|r>|l < r?>
+	 * @brief 小于比较操作（Out-of-place）
+	 * @details 比较两个无符号整数，仅输出小于标志
+	 *
+	 * 实现：compare_less_id ^= (left < right)
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：left_id和right_id必须是UnsignedInteger，compare_less_id必须是Boolean
+	 * @note 语义：输出标志是XOR到结果寄存器，如果初始为0则直接存储比较结果
+	 *
+	 * @pre left_id和right_id必须是UnsignedInteger类型
+	 * @pre compare_less_id必须是Boolean类型（大小为1）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto left = System::add_register("left", UnsignedInteger, 4);
+	 * auto right = System::add_register("right", UnsignedInteger, 4);
+	 * auto less = System::add_register("less", Boolean, 1);
+	 * Init_Unsafe(left, 3);
+	 * Init_Unsafe(right, 5);
+	 * // less = (3 < 5) = 1
+	 * Less_UInt_UInt("left", "right", "less");
+	 * @endcode
 	 */
 	struct Less_UInt_UInt : SelfAdjointOperator
 	{
@@ -1165,8 +1628,28 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 通用交换操作
-	 * @details 交换两个寄存器的值
+	 * @brief 通用交换操作（In-place）
+	 * @details 交换两个寄存器的完整值
+	 *
+	 * 实现：使用std::swap交换两个寄存器的value字段。
+	 * 这是一个自伴操作，应用两次等于恒等操作。
+	 *
+	 * @note Unitary性质：自伴算子，Swap^2 = I
+	 * @note 数据类型：任意类型，但两个寄存器大小必须相同
+	 * @note 实现细节：直接交换寄存器值，不涉及XOR或算术运算
+	 *
+	 * @pre id1和id2大小必须相同
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto reg1 = System::add_register("reg1", UnsignedInteger, 4);
+	 * auto reg2 = System::add_register("reg2", UnsignedInteger, 4);
+	 * Init_Unsafe(reg1, 5);  // reg1 = 5
+	 * Init_Unsafe(reg2, 10); // reg2 = 10
+	 * // 交换后: reg1 = 10, reg2 = 5
+	 * Swap_General_General("reg1", "reg2");
+	 * @endcode
 	 */
 	struct Swap_General_General : SelfAdjointOperator
 	{
@@ -1230,8 +1713,29 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 获取中点操作
-	 * @details |l>|r>|0> -> |l>|r>|mid>
+	 * @brief 获取中点操作（Out-of-place）
+	 * @details 计算两个无符号整数的中点值：mid ^= (left + right) / 2
+	 *
+	 * 常用于量子算法中的二分查找和中点计算。
+	 *
+	 * @note Unitary性质：自伴算子，通过XOR实现
+	 * @note 数据类型：left_id、right_id、mid_id都必须是UnsignedInteger
+	 * @note 溢出行为：加法可能溢出，但除法后结果正确（整数除法向下取整）
+	 *
+	 * @pre left_id、right_id、mid_id必须是UnsignedInteger类型
+	 * @pre 三个寄存器大小必须相同
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @par 示例
+	 * @code
+	 * auto left = System::add_register("left", UnsignedInteger, 4);
+	 * auto right = System::add_register("right", UnsignedInteger, 4);
+	 * auto mid = System::add_register("mid", UnsignedInteger, 4);
+	 * Init_Unsafe(left, 0);
+	 * Init_Unsafe(right, 10);
+	 * // mid = (0 + 10) / 2 = 5
+	 * GetMid_UInt_UInt("left", "right", "mid");
+	 * @endcode
 	 */
 	struct GetMid_UInt_UInt : SelfAdjointOperator
 	{
@@ -1322,8 +1826,37 @@ namespace qram_simulator
 	using GenericArithmetic = std::function<std::vector<size_t>(const std::vector<size_t>&)>;
 
 	/**
-	 * @brief 自定义算术操作
+	 * @brief 自定义算术操作（Out-of-place）
 	 * @details 允许用户定义自定义算术函数并应用到量子状态
+	 *
+	 * 用户可以提供一个函数 func: vector<size_t> -> vector<size_t>，
+	 * 操作将输入寄存器的值传入func，然后将输出XOR到输出寄存器。
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为使用XOR实现
+	 * @note 约束：func必须是确定性的纯函数，否则无法保证unitary
+	 *
+	 * @pre 输入和输出寄存器数量必须在构造函数中正确指定
+	 * @pre func必须是确定性的（相同的输入总是产生相同的输出）
+	 * @pre 所有寄存器必须是激活状态
+	 *
+	 * @warning 用户负责确保func不会导致信息丢失（即func应该是输入的确定性函数）
+	 *
+	 * @par 示例
+	 * @code
+	 * // 自定义函数：输出 = 输入 * 2
+	 * GenericArithmetic double_func = [](const std::vector<size_t>& inputs) {
+	 *     return std::vector<size_t>{inputs[0] * 2};
+	 * };
+	 *
+	 * auto inp = System::add_register("inp", UnsignedInteger, 4);
+	 * auto out = System::add_register("out", UnsignedInteger, 4);
+	 * Init_Unsafe(inp, 7);  // inp = 7
+	 *
+	 * std::vector<std::string> regs = {"inp", "out"};
+	 * CustomArithmetic arith(regs, 1, 1, double_func);
+	 * // out = 0 ⊕ (7 * 2) = 14
+	 * arith(state);
+	 * @endcode
 	 */
 	struct CustomArithmetic : SelfAdjointOperator
 	{
