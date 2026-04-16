@@ -176,6 +176,9 @@ jobs:
         mkdir -p pages-deploy/api
         cp -r docs/api/html/* pages-deploy/api/
         cp docs/index.html pages-deploy/index.html
+        cp docs/operators.md pages-deploy/
+        cp docs/pysparq.md pages-deploy/
+        cp docs/README.md pages-deploy/
 
     - name: Deploy to GitHub Pages
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'

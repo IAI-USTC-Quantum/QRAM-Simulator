@@ -1,9 +1,52 @@
+"""
+PySparQ - Python bindings for QRAM-Simulator's sparse-state quantum circuit simulator.
+
+PySparQ provides a high-performance Python interface to the sparse-state quantum
+simulator with native QRAM support and Register Level Programming paradigm.
+
+Basic Usage:
+    >>> import pysparq as ps
+    >>> ps.System.clear()
+    >>> reg = ps.System.add_register("q", ps.UnsignedInteger, 4)
+    >>> state = ps.SparseState()
+    >>> ps.Init_Unsafe("q", 5)(state)
+    >>> ps.StatePrint()(state)
+
+Key Features:
+    - Register Level Programming: Operate on named registers instead of individual qubits
+    - Sparse State Simulation: Efficiently simulate states with few non-zero amplitudes
+    - Native QRAM Support: Quantum Random Access Memory for efficient data loading
+    - High Performance: C++ core with Python bindings
+
+See Also:
+    - Documentation: https://iai-ustc-quantum.github.io/QRAM-Simulator/
+    - C++ API Docs: https://iai-ustc-quantum.github.io/QRAM-Simulator/api/
+    - SparQ Paper: https://arxiv.org/abs/2503.15118
+    - QRAM Paper: https://arxiv.org/abs/2503.13832
+"""
+
 from __future__ import annotations
 
 from ._core import *
 
 
-def test_import():
+def test_import() -> None:
+    """Test that PySparQ imports are working correctly.
+
+    This function tests basic functionality including:
+    - Module creation
+    - SparseState creation
+    - BaseOperator and SelfAdjointOperator behavior
+
+    Raises:
+        RuntimeError: If any test fails
+        ImportError: If imports are not working correctly
+
+    Example:
+        >>> import pysparq as ps
+        >>> ps.test_import()
+        Test import passed.
+    """
     # Test imports
     module1 = ModuleInheritance_Test()
     print("module1 created.")
