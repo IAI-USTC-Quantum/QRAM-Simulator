@@ -67,6 +67,26 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 - **CMake**: cmake-format + cmake-lint
 - ThirdParty code is excluded from all formatting/linting rules
 
+## Papers
+
+This repository is supported by two papers with distinct contributions:
+
+- **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, Register Level Programming paradigm, sparse state optimization, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`, `Experiments/ErrorFiltration/`
+- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim), PySparQ Python API, GPU acceleration. Code: `SparQ/`, `SparQ_Algorithm/`, `PySparQ/`
+
+## GitHub Pages
+
+Doxygen documentation is auto-deployed on push to `main`:
+- **Landing page**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/` (source: `docs/index.html`)
+- **C++ API docs**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (source: Doxygen → `docs/api/html/`)
+- Deployed via `peaceiris/actions-gh-pages` to `gh-pages` branch (see `.github/workflows/cmake-multi-platform.yml`, `docs` job)
+
+## Git Workflow
+
+- `origin` → personal fork (`Agony5757/QRAM-Simulator`), active development
+- `upstream` → organization repo (`IAI-USTC-Quantum/QRAM-Simulator`), PR target
+- Changes are contributed via PR to `upstream/main`
+
 ## Dependencies
 
 All vendored in `ThirdParty/`: Eigen 3.4.0, fmt, pybind11, argparse. External requirements: OpenMP (required), CUDA 12+ (optional GPU), TBB (optional parallelization), Google Test (fetched via CMake FetchContent).

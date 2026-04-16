@@ -13,6 +13,8 @@
             --text-secondary: #8b949e;
             --accent: #58a6ff;
             --accent-hover: #79c0ff;
+            --paper1: #f0883e;
+            --paper2: #a371f7;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,9 +61,80 @@
             flex-wrap: wrap;
         }
 
-        .badges img {
-            height: 22px;
+        .badges img { height: 22px; }
+
+        .papers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 64px;
         }
+
+        .paper {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            border-top: 3px solid var(--border);
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .paper:hover {
+            transform: translateY(-2px);
+        }
+
+        .paper.paper1 { border-top-color: var(--paper1); }
+        .paper.paper2 { border-top-color: var(--paper2); }
+
+        .paper h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .paper .tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .paper1 .tag { background: rgba(240,136,62,0.15); color: var(--paper1); }
+        .paper2 .tag { background: rgba(163,113,247,0.15); color: var(--paper2); }
+
+        .paper p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 12px;
+        }
+
+        .paper ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .paper ul li {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            padding: 3px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .paper ul li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 11px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .paper1 ul li::before { background: var(--paper1); }
+        .paper2 ul li::before { background: var(--paper2); }
 
         .grid {
             display: grid;
@@ -145,6 +218,11 @@
         }
 
         footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .papers { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -153,11 +231,37 @@
             <h1>QRAM-Simulator</h1>
             <p>Sparse-state quantum circuit simulator with native QRAM support and Register Level Programming</p>
             <div class="badges">
-                <img src="https://img.shields.io/badge/arXiv-2503.13832-b31b1b.svg" alt="arXiv">
+                <a href="https://arxiv.org/abs/2503.13832"><img src="https://img.shields.io/badge/arXiv-QRAM_Simulator-2503.13832-b31b1b.svg" alt="arXiv: QRAM-Simulator"></a>
+                <a href="https://arxiv.org/abs/2503.15118"><img src="https://img.shields.io/badge/arXiv-SparQ-2503.15118-6f42c1.svg" alt="arXiv: SparQ"></a>
                 <img src="https://img.shields.io/pypi/v/pysparq.svg" alt="PyPI">
                 <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
             </div>
         </header>
+
+        <div class="papers">
+            <div class="paper paper1">
+                <h2>QRAM-Simulator</h2>
+                <span class="tag">arXiv:2503.13832</span>
+                <p>Efficient Simulation of Quantum Random Access Memory</p>
+                <ul>
+                    <li>QRAM circuit simulation (Qutrit &amp; Qubit)</li>
+                    <li>Register Level Programming paradigm</li>
+                    <li>Sparse state optimization (64+ qubits)</li>
+                    <li>Noise models &amp; error filtration</li>
+                </ul>
+            </div>
+            <div class="paper paper2">
+                <h2>SparQ</h2>
+                <span class="tag">arXiv:2503.15118</span>
+                <p>A Sparse Quantum Circuit Simulator with Register-Level Abstraction</p>
+                <ul>
+                    <li>General-purpose sparse-state simulator</li>
+                    <li>QFT, Grover, QDA, QCNN, Hamiltonian sim</li>
+                    <li>PySparQ Python API (<code>pip install pysparq</code>)</li>
+                    <li>CUDA GPU acceleration</li>
+                </ul>
+            </div>
+        </div>
 
         <div class="grid">
             <a class="card" href="api/index.html">
