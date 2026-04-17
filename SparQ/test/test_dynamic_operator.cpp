@@ -9,6 +9,11 @@
  *          - dagger 操作正确性
  */
 
+// Windows compatibility
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <fstream>
@@ -18,8 +23,12 @@
 // 平台相关的动态库头文件
 #ifndef _WIN32
 #include <dlfcn.h>
+#define POPEN popen
+#define PCLOSE pclose
 #else
 #include <windows.h>
+#define POPEN _popen
+#define PCLOSE _pclose
 #endif
 
 // 我们直接测试 dynamic_operator_loader 的实现
@@ -71,9 +80,38 @@ std::string find_project_root() {
 }
 
 /**
+ * @brief 检查编译器是否可用
+ */
+bool is_compiler_available() {
+#ifdef _WIN32
+    // Windows: check for g++ (MinGW)
+    FILE* pipe = POPEN("g++ --version 2>&1", "r");
+    if (pipe) {
+        PCLOSE(pipe);
+        return true;
+    }
+    return false;
+#else
+    // Unix: check for g++
+    FILE* pipe = POPEN("g++ --version 2>&1", "r");
+    if (pipe) {
+        PCLOSE(pipe);
+        return true;
+    }
+    return false;
+#endif
+}
+
+/**
  * @brief 编译 C++ 代码为共享库
  */
 std::string compile_to_shared_lib(const std::string& source_path, const std::string& lib_name) {
+    // 首先检查编译器是否可用
+    if (!is_compiler_available()) {
+        std::cerr << "No suitable C++ compiler found for dynamic operator test" << std::endl;
+        return "";
+    }
+
     std::string temp_dir = std::filesystem::temp_directory_path().string();
     std::string lib_path = temp_dir + "/" + lib_name;
 
@@ -81,32 +119,46 @@ std::string compile_to_shared_lib(const std::string& source_path, const std::str
     std::string project_root = find_project_root();
 
     // 构建编译命令
-    std::string cmd = "g++ -std=c++17 -O2 -fPIC -shared ";
+    std::string cmd;
+#ifdef _WIN32
+    // Windows (MinGW): need .dll extension and different flags
+    lib_path += ".dll";
+    cmd = "g++ -std=c++17 -O2 -shared ";
+    cmd += "-I\"" + project_root + "/SparQ/include\" ";
+    cmd += "-I\"" + project_root + "/Common/include\" ";
+    cmd += "-I\"" + project_root + "/QRAM/include\" ";
+    cmd += "-I\"" + project_root + "/ThirdParty/eigen-3.4.0\" ";
+    cmd += "-I\"" + project_root + "/ThirdParty/fmt/include\" ";
+    cmd += "-o \"" + lib_path + "\" \"" + source_path + "\" 2>&1";
+#else
+    // Unix/Linux/macOS
+    cmd = "g++ -std=c++17 -O2 -fPIC -shared ";
     cmd += "-I" + project_root + "/SparQ/include ";
     cmd += "-I" + project_root + "/Common/include ";
     cmd += "-I" + project_root + "/QRAM/include ";
     cmd += "-I" + project_root + "/ThirdParty/eigen-3.4.0 ";
     cmd += "-I" + project_root + "/ThirdParty/fmt/include ";
     cmd += "-o " + lib_path + " " + source_path + " 2>&1";
-    
+#endif
+
     // 执行编译
-    FILE* pipe = popen(cmd.c_str(), "r");
+    FILE* pipe = POPEN(cmd.c_str(), "r");
     if (!pipe) {
         return "";
     }
-    
+
     char buffer[128];
     std::string output;
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         output += buffer;
     }
-    pclose(pipe);
-    
+    PCLOSE(pipe);
+
     if (!std::filesystem::exists(lib_path)) {
         std::cerr << "Compilation failed: " << output << std::endl;
         return "";
     }
-    
+
     return lib_path;
 }
 
