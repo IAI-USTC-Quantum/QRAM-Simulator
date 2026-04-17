@@ -26,6 +26,41 @@
             line-height: 1.6;
         }
 
+        .lang-switch {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 4px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .lang-switch button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-switch button:hover {
+            color: var(--text);
+            background: var(--border);
+        }
+
+        .lang-switch button.active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
         .container {
             max-width: 960px;
             margin: 0 auto;
@@ -226,10 +261,14 @@
     </style>
 </head>
 <body>
+    <div class="lang-switch">
+        <button id="lang-en" class="active" onclick="switchLanguage('en')">EN</button>
+        <button id="lang-zh" onclick="switchLanguage('zh')">中文</button>
+    </div>
     <div class="container">
         <header>
-            <h1>QRAM-Simulator</h1>
-            <p>Sparse-state quantum circuit simulator with native QRAM support and Register Level Programming</p>
+            <h1 data-i18n="title">QRAM-Simulator</h1>
+            <p data-i18n="subtitle">Sparse-state quantum circuit simulator with native QRAM support and Register Level Programming</p>
             <div class="badges">
                 <a href="https://arxiv.org/abs/2503.13832"><img src="https://img.shields.io/badge/QRAM_Simulator-arXiv%3A2503%2E13832-b31b1b.svg" alt="arXiv: QRAM-Simulator"></a>
                 <a href="https://arxiv.org/abs/2503.15118"><img src="https://img.shields.io/badge/SparQ-arXiv%3A2503%2E15118-6f42c1.svg" alt="arXiv: SparQ"></a>
@@ -243,79 +282,184 @@
 
         <div class="papers">
             <div class="paper paper1">
-                <h2>QRAM-Simulator</h2>
+                <h2 data-i18n="paper1_title">QRAM-Simulator</h2>
                 <span class="tag">arXiv:2503.13832</span>
-                <p>Efficient Simulation of Quantum Random Access Memory</p>
+                <p data-i18n="paper1_desc">Efficient Simulation of Quantum Random Access Memory</p>
                 <ul>
-                    <li>QRAM circuit simulation (Qutrit &amp; Qubit)</li>
-                    <li>Register Level Programming paradigm</li>
-                    <li>Sparse state optimization (64+ qubits)</li>
-                    <li>Noise models &amp; error filtration</li>
+                    <li data-i18n="paper1_item1">QRAM circuit simulation (Qutrit &amp; Qubit)</li>
+                    <li data-i18n="paper1_item2">Register Level Programming paradigm</li>
+                    <li data-i18n="paper1_item3">Sparse state optimization (64+ qubits)</li>
+                    <li data-i18n="paper1_item4">Noise models &amp; error filtration</li>
                 </ul>
             </div>
             <div class="paper paper2">
-                <h2>SparQ</h2>
+                <h2 data-i18n="paper2_title">SparQ</h2>
                 <span class="tag">arXiv:2503.15118</span>
-                <p>A Sparse Quantum Circuit Simulator with Register-Level Abstraction</p>
+                <p data-i18n="paper2_desc">A Sparse Quantum Circuit Simulator with Register-Level Abstraction</p>
                 <ul>
-                    <li>General-purpose sparse-state simulator</li>
-                    <li>QFT, Grover, QDA, QCNN, Hamiltonian sim</li>
-                    <li>PySparQ Python API (<code>pip install pysparq</code>)</li>
-                    <li>CUDA GPU acceleration</li>
+                    <li data-i18n="paper2_item1">General-purpose sparse-state simulator</li>
+                    <li data-i18n="paper2_item2">QFT, Grover, QDA, QCNN, Hamiltonian sim</li>
+                    <li data-i18n="paper2_item3">PySparQ Python API (<code>pip install pysparq</code>)</li>
+                    <li data-i18n="paper2_item4">CUDA GPU acceleration</li>
                 </ul>
             </div>
         </div>
 
         <div class="grid">
             <a class="card" href="python/">
-                <h2>Python Documentation</h2>
-                <p>Sphinx-generated Python API reference, user guide, and code examples.</p>
-                <span class="arrow">Read docs &rarr;</span>
+                <h2 data-i18n="card_python_title">Python Documentation</h2>
+                <p data-i18n="card_python_desc">Sphinx-generated Python API reference, user guide, and code examples.</p>
+                <span class="arrow" data-i18n="card_python_arrow">Read docs &rarr;</span>
             </a>
             <a class="card" href="api/index.html">
-                <h2>C++ API Documentation</h2>
-                <p>Doxygen-generated C++ API for SparQ core, quantum gates, arithmetic operators, and QRAM circuits.</p>
-                <span class="arrow">Browse docs &rarr;</span>
+                <h2 data-i18n="card_cpp_title">C++ API Documentation</h2>
+                <p data-i18n="card_cpp_desc">Doxygen-generated C++ API for SparQ core, quantum gates, arithmetic operators, and QRAM circuits.</p>
+                <span class="arrow" data-i18n="card_cpp_arrow">Browse docs &rarr;</span>
             </a>
             <a class="card" href="operators.html">
-                <h2>Operators Reference</h2>
-                <p>Detailed documentation for quantum arithmetic operators and unitary guarantees.</p>
-                <span class="arrow">View reference &rarr;</span>
+                <h2 data-i18n="card_ops_title">Operators Reference</h2>
+                <p data-i18n="card_ops_desc">Detailed documentation for quantum arithmetic operators and unitary guarantees.</p>
+                <span class="arrow" data-i18n="card_ops_arrow">View reference &rarr;</span>
             </a>
             <a class="card" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator">
-                <h2>GitHub Repository</h2>
-                <p>Source code, issues, CI pipelines, and contribution guidelines.</p>
-                <span class="arrow">View repo &rarr;</span>
+                <h2 data-i18n="card_github_title">GitHub Repository</h2>
+                <p data-i18n="card_github_desc">Source code, issues, CI pipelines, and contribution guidelines.</p>
+                <span class="arrow" data-i18n="card_github_arrow">View repo &rarr;</span>
             </a>
             <a class="card" href="https://pypi.org/project/pysparq/">
-                <h2>PySparQ on PyPI</h2>
-                <p>Python bindings via pybind11. Install with <code>pip install pysparq</code>.</p>
-                <span class="arrow">Get package &rarr;</span>
+                <h2 data-i18n="card_pypi_title">PySparQ on PyPI</h2>
+                <p data-i18n="card_pypi_desc">Python bindings via pybind11. Install with <code>pip install pysparq</code>.</p>
+                <span class="arrow" data-i18n="card_pypi_arrow">Get package &rarr;</span>
             </a>
         </div>
 
         <div class="features">
             <div class="feature">
-                <h3>Register Level Programming</h3>
-                <p>Direct register operations with uint64_t storage instead of gate-by-gate circuit construction.</p>
+                <h3 data-i18n="feature1_title">Register Level Programming</h3>
+                <p data-i18n="feature1_desc">Direct register operations with uint64_t storage instead of gate-by-gate circuit construction.</p>
             </div>
             <div class="feature">
-                <h3>Sparse State Simulation</h3>
-                <p>Only non-zero amplitudes are stored, enabling simulation of 64+ qubits for structured algorithms.</p>
+                <h3 data-i18n="feature2_title">Sparse State Simulation</h3>
+                <p data-i18n="feature2_desc">Only non-zero amplitudes are stored, enabling simulation of 64+ qubits for structured algorithms.</p>
             </div>
             <div class="feature">
-                <h3>Native QRAM</h3>
-                <p>Qutrit-based and qubit-based QRAM circuit implementations with noise model support.</p>
+                <h3 data-i18n="feature3_title">Native QRAM</h3>
+                <p data-i18n="feature3_desc">Qutrit-based and qubit-based QRAM circuit implementations with noise model support.</p>
             </div>
             <div class="feature">
-                <h3>GPU Acceleration</h3>
-                <p>Optional CUDA backend for parallel sparse state operations.</p>
+                <h3 data-i18n="feature4_title">GPU Acceleration</h3>
+                <p data-i18n="feature4_desc">Optional CUDA backend for parallel sparse state operations.</p>
             </div>
         </div>
 
         <footer>
-            <p>Developed by <a href="https://github.com/IAI-USTC-Quantum">IAI-USTC-Quantum</a> &mdash; USTC Institute of Artificial Intelligence</p>
+            <p data-i18n="footer">Developed by <a href="https://github.com/IAI-USTC-Quantum">IAI-USTC-Quantum</a> &mdash; USTC Institute of Artificial Intelligence</p>
         </footer>
     </div>
+
+    <script>
+        const translations = {
+            en: {
+                title: "QRAM-Simulator",
+                subtitle: "Sparse-state quantum circuit simulator with native QRAM support and Register Level Programming",
+                paper1_title: "QRAM-Simulator",
+                paper1_desc: "Efficient Simulation of Quantum Random Access Memory",
+                paper1_item1: "QRAM circuit simulation (Qutrit &amp; Qubit)",
+                paper1_item2: "Register Level Programming paradigm",
+                paper1_item3: "Sparse state optimization (64+ qubits)",
+                paper1_item4: "Noise models &amp; error filtration",
+                paper2_title: "SparQ",
+                paper2_desc: "A Sparse Quantum Circuit Simulator with Register-Level Abstraction",
+                paper2_item1: "General-purpose sparse-state simulator",
+                paper2_item2: "QFT, Grover, QDA, QCNN, Hamiltonian sim",
+                paper2_item3: "PySparQ Python API (<code>pip install pysparq</code>)",
+                paper2_item4: "CUDA GPU acceleration",
+                card_python_title: "Python Documentation",
+                card_python_desc: "Sphinx-generated Python API reference, user guide, and code examples.",
+                card_python_arrow: "Read docs &rarr;",
+                card_cpp_title: "C++ API Documentation",
+                card_cpp_desc: "Doxygen-generated C++ API for SparQ core, quantum gates, arithmetic operators, and QRAM circuits.",
+                card_cpp_arrow: "Browse docs &rarr;",
+                card_ops_title: "Operators Reference",
+                card_ops_desc: "Detailed documentation for quantum arithmetic operators and unitary guarantees.",
+                card_ops_arrow: "View reference &rarr;",
+                card_github_title: "GitHub Repository",
+                card_github_desc: "Source code, issues, CI pipelines, and contribution guidelines.",
+                card_github_arrow: "View repo &rarr;",
+                card_pypi_title: "PySparQ on PyPI",
+                card_pypi_desc: "Python bindings via pybind11. Install with <code>pip install pysparq</code>.",
+                card_pypi_arrow: "Get package &rarr;",
+                feature1_title: "Register Level Programming",
+                feature1_desc: "Direct register operations with uint64_t storage instead of gate-by-gate circuit construction.",
+                feature2_title: "Sparse State Simulation",
+                feature2_desc: "Only non-zero amplitudes are stored, enabling simulation of 64+ qubits for structured algorithms.",
+                feature3_title: "Native QRAM",
+                feature3_desc: "Qutrit-based and qubit-based QRAM circuit implementations with noise model support.",
+                feature4_title: "GPU Acceleration",
+                feature4_desc: "Optional CUDA backend for parallel sparse state operations.",
+                footer: 'Developed by <a href="https://github.com/IAI-USTC-Quantum">IAI-USTC-Quantum</a> &mdash; USTC Institute of Artificial Intelligence'
+            },
+            zh: {
+                title: "QRAM-Simulator",
+                subtitle: "具有原生QRAM支持和寄存器级编程范式的稀疏态量子电路模拟器",
+                paper1_title: "QRAM-Simulator",
+                paper1_desc: "量子随机存取存储器的高效模拟",
+                paper1_item1: "QRAM电路模拟（Qutrit与Qubit）",
+                paper1_item2: "寄存器级编程范式",
+                paper1_item3: "稀疏态优化（64+量子比特）",
+                paper1_item4: "噪声模型与错误过滤",
+                paper2_title: "SparQ",
+                paper2_desc: "具有寄存器级抽象的稀疏量子电路模拟器",
+                paper2_item1: "通用稀疏态模拟器",
+                paper2_item2: "QFT、Grover、QDA、QCNN、哈密顿模拟",
+                paper2_item3: "PySparQ Python API（<code>pip install pysparq</code>）",
+                paper2_item4: "CUDA GPU 加速",
+                card_python_title: "Python 文档",
+                card_python_desc: "Sphinx 生成的 Python API 参考、用户指南和代码示例。",
+                card_python_arrow: "阅读文档 &rarr;",
+                card_cpp_title: "C++ API 文档",
+                card_cpp_desc: "Doxygen 生成的 C++ API，涵盖 SparQ 核心、量子门、算术算子和 QRAM 电路。",
+                card_cpp_arrow: "浏览文档 &rarr;",
+                card_ops_title: "算子参考",
+                card_ops_desc: "量子算术算子和幺正性保证的详细文档。",
+                card_ops_arrow: "查看参考 &rarr;",
+                card_github_title: "GitHub 仓库",
+                card_github_desc: "源代码、问题追踪、CI 流程和贡献指南。",
+                card_github_arrow: "查看仓库 &rarr;",
+                card_pypi_title: "PyPI 上的 PySparQ",
+                card_pypi_desc: "通过 pybind11 实现的 Python 绑定。使用 <code>pip install pysparq</code> 安装。",
+                card_pypi_arrow: "获取包 &rarr;",
+                feature1_title: "寄存器级编程",
+                feature1_desc: "直接对寄存器操作，使用 uint64_t 存储，无需逐门构建电路。",
+                feature2_title: "稀疏态模拟",
+                feature2_desc: "仅存储非零振幅，支持结构化算法的 64+ 量子比特模拟。",
+                feature3_title: "原生 QRAM",
+                feature3_desc: "基于 Qutrit 和 Qubit 的 QRAM 电路实现，支持噪声模型。",
+                feature4_title: "GPU 加速",
+                feature4_desc: "可选 CUDA 后端，实现并行稀疏态操作。",
+                footer: '由 <a href="https://github.com/IAI-USTC-Quantum">IAI-USTC-Quantum</a> 开发 &mdash; 中国科学技术大学人工智能学院'
+            }
+        };
+
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('.lang-switch button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+            localStorage.setItem('preferred-lang', lang);
+        }
+
+        // Load saved language preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferred-lang') || 'en';
+            switchLanguage(savedLang);
+        });
+    </script>
 </body>
 </html>

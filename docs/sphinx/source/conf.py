@@ -17,7 +17,7 @@ sys.path.insert(0, str(project_root / "PySparQ"))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "PySparQ"
-copyright = "2025, IAI-USTC-Quantum"
+copyright = "2021-2026, IAI-USTC-Quantum"
 author = "IAI-USTC-Quantum"
 release = "0.0.1"
 
