@@ -220,7 +220,7 @@ def find_project_root() -> Optional[Path]:
 
     对于已安装的包，目录结构为:
     - site-packages/pysparq/ (Python包)
-    - site-packages/include/ (头文件)
+    - site-packages/include/ (头文件，包含 basic_components.h)
 
     对于源代码目录:
     - 项目根目录包含 SparQ/ 和 PySparQ/
@@ -233,10 +233,11 @@ def find_project_root() -> Optional[Path]:
     # 检查是否在已安装的包中 (site-packages/pysparq/dynamic_operator)
     # 在这种情况下，头文件在 site-packages/include/
     for parent in [current] + list(current.parents):
-        # 已安装的包的情况
-        if (parent / "include").exists() and (parent / "pysparq").exists():
+        # 已安装的包的情况：检查 include/basic_components.h 是否存在
+        # 这确保是完整的头文件目录，而不是 PySparQ/include（只有绑定头文件）
+        if (parent / "include" / "basic_components.h").exists() and (parent / "pysparq").exists():
             return parent
-        # 源代码目录的情况
+        # 源代码目录的情况：检查大写的 SparQ/ 和 PySparQ/
         if (parent / "SparQ").exists() and (parent / "PySparQ").exists():
             return parent
     return None

@@ -143,8 +143,8 @@ jobs:
     - name: Run pytest
       shell: bash
       run: |
-        if [ -d "PySparQ/tests" ]; then
-          pytest PySparQ/tests/ -v || true
+        if [ -d "PySparQ/test" ]; then
+          pytest PySparQ/test/ -v || true
         else
           echo "No Python tests found"
         fi
