@@ -1,7 +1,7 @@
-PySparQ Documentation
-=====================
+PySparQ 文档
+============
 
-PySparQ is a sparse-state quantum circuit simulator with native QRAM support and Register Level Programming paradigm.
+PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄存器级编程范式。
 
 .. raw:: html
 
@@ -13,15 +13,15 @@ PySparQ is a sparse-state quantum circuit simulator with native QRAM support and
      <a href="https://iai-ustc-quantum.github.io/QRAM-Simulator/"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4" alt="Documentation"></a>
    </div>
 
-Quick Links
------------
+快速链接
+--------
 
-* `GitHub Repository <https://github.com/IAI-USTC-Quantum/QRAM-Simulator>`_ - Source code and issues
-* `Landing Page <https://iai-ustc-quantum.github.io/QRAM-Simulator/>`_ - Project overview and C++ API docs
+* `GitHub 仓库 <https://github.com/IAI-USTC-Quantum/QRAM-Simulator>`_ - 源码和问题反馈
+* `主页 <https://iai-ustc-quantum.github.io/QRAM-Simulator/>`_ - 项目概览和 C++ API 文档
 
 .. toctree::
    :maxdepth: 2
-   :caption: User Guide
+   :caption: 用户指南
 
    guide/installation
    guide/quickstart
@@ -31,21 +31,21 @@ Quick Links
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference
+   :caption: API 参考
 
    api/index
    autoapi/pysparq/index
 
-Getting Started
----------------
+快速开始
+--------
 
-Install PySparQ via pip:
+通过 pip 安装 PySparQ：
 
 .. code-block:: bash
 
    pip install pysparq
 
-Quick example:
+快速示例：
 
 .. code-block:: python
 
@@ -57,8 +57,8 @@ Quick example:
    Hadamard_Int("q")(state)
    print(state)
 
-Indices and tables
-==================
+索引和表格
+==========
 
 * :ref:`genindex`
 * :ref:`modindex`

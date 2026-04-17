@@ -1,62 +1,62 @@
-Quick Start
-===========
+快速入门
+========
 
-Register Level Programming
---------------------------
+寄存器级编程
+------------
 
-PySparQ uses a "Register Level Programming" paradigm. Instead of composing circuits from individual gates, you operate directly on named quantum registers.
+PySparQ 采用"寄存器级编程"范式。与从单个门组合电路不同，您直接对命名的量子寄存器进行操作。
 
-Basic Workflow
+基本工作流程
+------------
+
+1. 创建量子系统
+2. 创建稀疏量子态
+3. 分配寄存器（整数、布尔值）
+4. 应用量子操作
+5. 读取测量结果
+
+示例：量子加法
 --------------
-
-1. Create a quantum system
-2. Create a sparse quantum state
-3. Allocate registers (integers, booleans)
-4. Apply quantum operations
-5. Read measurement results
-
-Example: Quantum Addition
--------------------------
 
 .. code-block:: python
 
    from pysparq import System, SparseState, AddRegister, Add_UInt_UInt, Hadamard_Int
 
-   # Create system and state
+   # 创建系统和状态
    system = System()
    state = SparseState(system)
 
-   # Allocate two 4-bit unsigned integer registers
+   # 分配两个4位无符号整数寄存器
    AddRegister("a", pysparq.UnsignedInteger, 4)(state)
    AddRegister("b", pysparq.UnsignedInteger, 4)(state)
 
-   # Put both registers in superposition
+   # 将两个寄存器置于叠加态
    Hadamard_Int("a")(state)
    Hadamard_Int("b")(state)
 
-   # Quantum addition: a += b
+   # 量子加法：a += b
    Add_UInt_UInt("b", "a")(state)
 
-   # State now contains all possible sums in superposition
+   # 状态现在包含所有可能求和结果的叠加态
    print(state)
 
-Conditional Operations
-----------------------
+条件操作
+--------
 
-Operations can be conditioned on other registers:
+操作可以根据其他寄存器的值进行条件控制：
 
 .. code-block:: python
 
-   # Allocate a control register
+   # 分配控制寄存器
    AddRegister("control", pysparq.Boolean, 1)(state)
 
-   # Apply operation only when control is |1>
+   # 仅当 control 为 |1> 时应用操作
    Add_UInt_UInt("a", "b").conditioned_by_nonzeros("control")(state)
 
-Control Types
-^^^^^^^^^^^^^
+控制类型
+^^^^^^^^
 
-- :meth:`conditioned_by_nonzeros(reg)` - Condition on register being non-zero
-- :meth:`conditioned_by_all_ones(reg)` - Condition on register being all ones
-- :meth:`conditioned_by_bit(reg, pos)` - Condition on specific bit
-- :meth:`conditioned_by_value(reg, pos)` - Condition on value at position
+- :meth:`conditioned_by_nonzeros(reg)` - 当寄存器非零时执行
+- :meth:`conditioned_by_all_ones(reg)` - 当寄存器全为1时执行
+- :meth:`conditioned_by_bit(reg, pos)` - 当特定位为1时执行
+- :meth:`conditioned_by_value(reg, pos)` - 当指定位置的值为特定值时执行

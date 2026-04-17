@@ -1,5 +1,5 @@
 """
-CKS (Childs-Kothari-Somma) Linear System Solver Implementation
+CKS（Childs-Kothari-Somma）线性系统求解器实现
 """
 
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ import pysparq as ps
 
 
 class ChebyshevPolynomialCoefficient:
-    """Computes Chebyshev polynomial coefficients for quantum walk."""
+    """计算量子游走的切比雪夫多项式系数。"""
 
     b: int
 
@@ -24,27 +24,27 @@ class ChebyshevPolynomialCoefficient:
 def get_coef_positive_only(
     mat_data_size: int, v: int, row: int, col: int
 ) -> List[complex]:
-    """Get rotation matrix coefficients for positive-only matrix elements."""
+    """获取仅正矩阵元素的旋转矩阵系数。"""
     ...
 
 
 def get_coef_common(
     mat_data_size: int, v: int, row: int, col: int
 ) -> List[complex]:
-    """Get rotation matrix coefficients for general (signed) matrix elements."""
+    """获取一般（带符号）矩阵元素的旋转矩阵系数。"""
     ...
 
 
 def make_walk_angle_func(
     mat_data_size: int, positive_only: bool
 ) -> Callable[[int, int, int], List[complex]]:
-    """Create walk angle function for a matrix."""
+    """为矩阵创建游走角度函数。"""
     ...
 
 
 @dataclass
 class SparseMatrixData:
-    """Sparse matrix data for quantum simulation."""
+    """量子模拟的稀疏矩阵数据。"""
 
     n_row: int
     nnz_col: int
@@ -55,7 +55,7 @@ class SparseMatrixData:
 
 
 class SparseMatrix:
-    """Sparse matrix representation for CKS algorithm."""
+    """CKS 算法的稀疏矩阵表示。"""
 
     n_row: int
     nnz_col: int
@@ -85,7 +85,7 @@ class SparseMatrix:
 
 
 class QuantumBinarySearch:
-    """Quantum binary search for sparse matrix access."""
+    """用于稀疏矩阵访问的量子二分搜索。"""
 
     qram: ps.QRAMCircuit_qutrit
     address_offset_reg: str
@@ -106,7 +106,7 @@ class QuantumBinarySearch:
 
 
 class CondRotQW:
-    """Conditional rotation for quantum walk."""
+    """量子游走的条件旋转。"""
 
     j_reg: str
     k_reg: str
@@ -127,7 +127,7 @@ class CondRotQW:
 
 
 class TOperator:
-    """T operator for CKS algorithm."""
+    """CKS 算法的 T 算子。"""
 
     qram: ps.QRAMCircuit_qutrit
     data_offset_reg: str
@@ -160,7 +160,7 @@ class TOperator:
 
 
 class QuantumWalk:
-    """Quantum walk operator for CKS algorithm."""
+    """CKS 算法的量子游走算子。"""
 
     qram: ps.QRAMCircuit_qutrit
     j_reg: str
@@ -191,7 +191,7 @@ class QuantumWalk:
 
 
 class QuantumWalkNSteps:
-    """Multiple quantum walk steps for CKS algorithm."""
+    """CKS 算法的多步量子游走。"""
 
     mat: SparseMatrix
     qram: ps.QRAMCircuit_qutrit
@@ -220,7 +220,7 @@ class QuantumWalkNSteps:
 
 
 class LCUContainer:
-    """LCU (Linear Combination of Unitaries) container for CKS."""
+    """CKS 的酉组合（LCU）容器。"""
 
     kappa: float
     eps: float
@@ -251,10 +251,10 @@ def cks_solve(
     eps: float = ...,
     data_size: int = ...,
 ) -> np.ndarray:
-    """Solve Ax = b using CKS quantum linear solver."""
+    """使用 CKS 量子线性求解器求解 Ax = b。"""
     ...
 
 
 def create_cks_demo() -> str:
-    """Generate a demo script for CKS solver."""
+    """生成 CKS 求解器的演示脚本。"""
     ...

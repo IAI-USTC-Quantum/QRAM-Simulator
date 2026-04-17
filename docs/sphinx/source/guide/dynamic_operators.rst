@@ -3,6 +3,7 @@
 
 .. contents:: 目录
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 概述
 ----
@@ -224,7 +225,7 @@ BaseOperator
 ------------
 
 示例 1：受控相位门
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 实现一个受控相位门，当控制位和目标位都为 |1⟩ 时应用相位：
 
@@ -291,7 +292,7 @@ BaseOperator
    ps.StatePrint()(state)
 
 示例 2：量子游走算子
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 实现量子游走的移动算子：
 
@@ -370,7 +371,7 @@ BaseOperator
    )
 
 示例 4：哈密顿量演化
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 实现时间演化算子：
 
@@ -553,9 +554,3 @@ API 参考
 --------
 
 详细 API 文档请参考 :doc:`../api/dynamic_operator`。
-
-.. autofunction:: pysparq.dynamic_operator.compile_operator
-
-.. autofunction:: pysparq.dynamic_operator.get_cache_info
-
-.. autofunction:: pysparq.dynamic_operator.clear_cache

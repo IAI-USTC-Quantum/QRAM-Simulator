@@ -1,5 +1,5 @@
 """
-Grover's Quantum Search Algorithm Implementation
+Grover 量子搜索算法实现
 """
 
 from typing import List, Optional, Tuple, Union
@@ -8,7 +8,7 @@ import pysparq as ps
 
 
 class GroverOracle:
-    """Oracle for Grover's search that marks target values."""
+    """Grover 搜索预言机，用于标记目标值。"""
 
     qram: ps.QRAMCircuit_qutrit
     addr_reg: Union[str, int]
@@ -30,7 +30,7 @@ class GroverOracle:
 
 
 class DiffusionOperator:
-    """HPH (Hadamard-Phase-Hadamard) diffusion operator."""
+    """HPH（Hadamard-相位-Hadamard）扩散算子。"""
 
     addr_reg: Union[str, int]
 
@@ -43,7 +43,7 @@ class DiffusionOperator:
 
 
 class GroverOperator:
-    """Combined Grover operator: Oracle followed by Diffusion."""
+    """组合 Grover 算子：预言机后接扩散。"""
 
     oracle: GroverOracle
     diffusion: DiffusionOperator
@@ -67,7 +67,7 @@ def grover_search(
     n_iterations: Optional[int] = ...,
     data_size: int = ...,
 ) -> Tuple[int, float]:
-    """Execute Grover's search to find target in memory."""
+    """执行 Grover 搜索以在内存中找到目标值。"""
     ...
 
 
@@ -77,10 +77,10 @@ def grover_count(
     precision_bits: int = ...,
     data_size: int = ...,
 ) -> Tuple[int, float]:
-    """Quantum counting variant of Grover's algorithm."""
+    """Grover 算法的量子计数变体。"""
     ...
 
 
 def create_grover_demo() -> str:
-    """Generate a demo script for Grover's algorithm."""
+    """生成 Grover 算法的演示脚本。"""
     ...

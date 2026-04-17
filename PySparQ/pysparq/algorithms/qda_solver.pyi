@@ -1,5 +1,5 @@
 """
-QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation
+QDA（量子离散绝热）线性系统求解器实现
 """
 
 from dataclasses import dataclass
@@ -10,37 +10,37 @@ import pysparq as ps
 
 
 def compute_fs(s: float, kappa: float, p: float) -> float:
-    """Compute the interpolation parameter f(s)."""
+    """计算插值参数 f(s)。"""
     ...
 
 
 def compute_rotation_matrix(fs: float) -> List[complex]:
-    """Compute the rotation matrix R_s for block encoding."""
+    """计算块编码的旋转矩阵 R_s。"""
     ...
 
 
 def chebyshev_T(n: int, x: float) -> float:
-    """Compute Chebyshev polynomial T_n(x)."""
+    """计算切比雪夫多项式 T_n(x)。"""
     ...
 
 
 def dolph_chebyshev(epsilon: float, l: int, phi: float) -> float:
-    """Compute Dolph-Chebyshev window function."""
+    """计算 Dolph-Chebyshev 窗函数。"""
     ...
 
 
 def compute_fourier_coeffs(epsilon: float, l: int) -> List[float]:
-    """Compute Fourier coefficients for Dolph-Chebyshev filter."""
+    """计算 Dolph-Chebyshev 滤波器的傅里叶系数。"""
     ...
 
 
 def calculate_angles(coeffs: List[float]) -> List[float]:
-    """Calculate rotation angles from coefficients for state preparation."""
+    """从系数计算态制备的旋转角度。"""
     ...
 
 
 class BlockEncoding:
-    """Placeholder for block encoding implementation."""
+    """块编码实现的占位符。"""
 
     A: np.ndarray
     data_size: int
@@ -54,7 +54,7 @@ class BlockEncoding:
 
 
 class StatePreparation:
-    """Placeholder for state preparation implementation."""
+    """态制备实现的占位符。"""
 
     b: np.ndarray
 
@@ -67,7 +67,7 @@ class StatePreparation:
 
 
 class BlockEncodingHs:
-    """Block encoding of the interpolating Hamiltonian H(s)."""
+    """插值哈密顿量 H(s) 的块编码。"""
 
     enc_A: BlockEncoding
     enc_b: StatePreparation
@@ -100,7 +100,7 @@ class BlockEncodingHs:
 
 
 class BlockEncodingHsPD:
-    """Positive-definite version of block encoding H(s)."""
+    """块编码 H(s) 的正定版本。"""
 
     enc_A: BlockEncoding
     enc_b: StatePreparation
@@ -129,7 +129,7 @@ class BlockEncodingHsPD:
 
 
 class WalkS:
-    """Quantum walk operator at parameter s."""
+    """参数 s 处的量子游走算子。"""
 
     main_reg: str
     anc_UA: str
@@ -170,7 +170,7 @@ class WalkS:
 
 
 class LCU:
-    """Linear Combination of Unitaries for QDA."""
+    """QDA 的酉组合（LCU）。"""
 
     walk: WalkS
     index_reg: str
@@ -183,7 +183,7 @@ class LCU:
 
 
 class Filtering:
-    """Dolph-Chebyshev filtering for QDA."""
+    """QDA 的 Dolph-Chebyshev 滤波。"""
 
     walk: WalkS
     index_reg: str
@@ -206,7 +206,7 @@ class Filtering:
 def classical_to_quantum(
     A: np.ndarray, b: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], np.ndarray]]:
-    """Convert classical linear system to quantum-compatible form."""
+    """将经典线性系统转换为量子兼容形式。"""
     ...
 
 
@@ -218,10 +218,10 @@ def qda_solve(
     eps: float = ...,
     step_rate: float = ...,
 ) -> np.ndarray:
-    """Solve Ax = b using QDA algorithm."""
+    """使用 QDA 算法求解 Ax = b。"""
     ...
 
 
 def create_qda_demo() -> str:
-    """Generate a demo script for QDA solver."""
+    """生成 QDA 求解器的演示脚本。"""
     ...

@@ -21,6 +21,9 @@ copyright = "2021-2026, IAI-USTC-Quantum"
 author = "IAI-USTC-Quantum"
 release = "0.0.1"
 
+# 中文文档设置
+language = "zh_CN"
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -44,7 +47,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_static_path = ["_static"]
-html_title = "PySparQ Documentation"
+html_title = "PySparQ 文档"
 
 # Theme options for furo
 html_theme_options = {

@@ -1,21 +1,21 @@
-Installation
-============
+安装
+====
 
-Requirements
-------------
+环境要求
+--------
 
-- Python 3.9 or higher
+- Python 3.9 或更高版本
 - NumPy
 
-Install from PyPI
-------------------
+从 PyPI 安装
+------------
 
 .. code-block:: bash
 
    pip install pysparq
 
-Install from Source
--------------------
+从源码安装
+----------
 
 .. code-block:: bash
 
@@ -23,29 +23,29 @@ Install from Source
    cd QRAM-Simulator
    pip install .
 
-Build Requirements
-------------------
+编译要求
+--------
 
-For building from source, you need:
+从源码编译需要以下工具：
 
 - CMake 3.15+
-- C++17 compatible compiler
-- OpenMP (required for parallelization)
+- 支持 C++17 的编译器
+- OpenMP（用于并行化，必需）
 
-Optional:
+可选依赖：
 
-- CUDA 12+ (for GPU acceleration)
+- CUDA 12+（用于 GPU 加速）
 
-Verify Installation
--------------------
+验证安装
+--------
 
 .. code-block:: python
 
    import pysparq
    pysparq.test_import()
 
-   # Create a quantum system
+   # 创建量子系统
    system = pysparq.System()
    state = pysparq.SparseState(system)
 
-   print("PySparQ installed successfully!")
+   print("PySparQ 安装成功！")

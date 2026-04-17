@@ -1,5 +1,5 @@
-API Reference
-=============
+API 参考
+========
 
 .. toctree::
    :maxdepth: 2
@@ -7,4 +7,4 @@ API Reference
    python
    dynamic_operator
 
-This section provides the complete Python API reference for PySparQ.
+本节提供 PySparQ 的完整 Python API 参考。
