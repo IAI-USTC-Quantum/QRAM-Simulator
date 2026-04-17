@@ -34,7 +34,7 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
    :caption: API 参考
 
    api/index
-   autoapi/pysparq/index
+   autoapi/PySparQ/pysparq/index
 
 快速开始
 --------

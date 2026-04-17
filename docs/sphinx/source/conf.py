@@ -90,6 +90,7 @@ myst_enable_extensions = [
 
 autoapi_type = "python"
 autoapi_dirs = ["../../../PySparQ/pysparq"]
+autoapi_root = "autoapi"
 autoapi_file_patterns = ["*.pyi", "*.py"]
 autoapi_generate_api_docs = True
 autoapi_add_toctree_entry = False
@@ -102,6 +103,8 @@ autoapi_options = [
 ]
 autoapi_python_class_content = "both"
 autoapi_member_order = "groupwise"
+autoapi_keep_private_level = 0
+autoapi_ignore = []
 
 # -- Options for Intersphinx -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html
