@@ -1,12 +1,43 @@
 /**
  * @file test_dynamic_operator.cpp
  * @brief 动态算子加载器单元测试
- * @details 测试动态算子的 C++ 核心功能：
- *          - 简单 SelfAdjointOperator 扩展
- *          - 带参数的 BaseOperator 扩展
- *          - 编译错误处理
- *          - 缓存机制
- *          - dagger 操作正确性
+ *
+ * @section design_rationale 设计背景
+ *
+ * 本测试文件用于验证动态编译 C++ 算子的底层机制。动态算子功能允许用户在运行时
+ * 编写自定义 C++ 代码，编译为共享库并在模拟器中加载执行。
+ *
+ * @section why_cpp_tests 为什么需要 C++ 测试
+ *
+ * 虽然动态算子功能主要服务于 Python 用户（通过 pysparq.dynamic_operator 模块），
+ * 但保留 C++ 测试有以下原因：
+ *
+ * 1. **单元测试分层原则**：Python 测试 (test_dynamic_operator.py) 测试完整功能链，
+ *    而 C++ 测试聚焦于底层编译/加载机制，便于问题定位。
+ *
+ * 2. **开发调试工具**：当 Python 层出现问题时，可以用 C++ 测试验证底层是否正常。
+ *
+ * @section why_disabled 为什么默认禁用
+ *
+ * 这些测试默认禁用（需要设置环境变量 ENABLE_DYNAMIC_OPERATOR_TEST=1 才能运行），
+ * 原因如下：
+ *
+ * 1. **Windows ABI 不兼容**：主程序由 MSVC 编译，而动态编译使用 MinGW g++，
+ *    两者 C++ ABI 不兼容，会导致运行时崩溃 (SEGFAULT)。
+ *
+ * 2. **CI 环境差异**：不同 CI 环境的编译器版本、标准库版本可能不同，
+ *    导致编译产物与主程序不兼容。
+ *
+ * 3. **功能已由 Python 测试覆盖**：Python 测试 test_dynamic_operator.py
+ *    已完整验证用户层面的功能，C++ 测试主要用于底层调试。
+ *
+ * @section test_cases 测试内容
+ *
+ * - 简单 SelfAdjointOperator 扩展
+ * - 带参数的 BaseOperator 扩展
+ * - 编译错误处理
+ * - 缓存机制
+ * - dagger 操作正确性
  */
 
 // Windows compatibility
@@ -317,18 +348,47 @@ protected:
         return prefix;
     }
 
-    // 检查是否可以运行动态编译测试
-    // 动态编译测试在不同环境中有兼容性问题：
-    // - Windows MSVC 编译的主程序与 MinGW g++ 编译的 DLL ABI 不兼容
-    // - CI 环境中可能存在编译器版本/库版本差异导致运行时崩溃
-    // 因此默认禁用这些测试
+    /**
+     * @brief 检查是否可以运行动态编译测试
+     *
+     * @return true 如果环境变量 ENABLE_DYNAMIC_OPERATOR_TEST=1 且编译器可用
+     * @return false 默认返回 false（测试被跳过）
+     *
+     * @section skip_reason 跳过原因
+     *
+     * 动态编译测试在不同环境中有严重的兼容性问题：
+     *
+     * 1. **Windows ABI 不兼容**：
+     *    - 主程序由 MSVC 编译（CI 中的 Windows 构建任务）
+     *    - 动态编译使用 MinGW g++（系统上可用的编译器）
+     *    - MSVC 和 MinGW 的 C++ ABI 不兼容，会导致：
+     *      - 内存布局不匹配
+     *      - 异常处理机制不同
+     *      - 运行时类型信息 (RTTI) 格式不同
+     *    - 结果：加载 DLL 后调用函数时发生 SEGFAULT
+     *
+     * 2. **Linux/Unix 环境差异**：
+     *    - CI 环境中的 g++ 版本可能与编译主程序时不同
+     *    - libstdc++ 版本差异可能导致符号解析失败
+     *
+     * 3. **解决方案**：
+     *    - 默认跳过这些测试，避免 CI 不稳定
+     *    - Python 测试 (test_dynamic_operator.py) 已覆盖用户功能
+     *    - 开发者可在本地显式启用进行调试
+     *
+     * @section usage 本地启用方法
+     *
+     * 在 Linux 环境中本地调试时，可设置环境变量启用：
+     * @code
+     * export ENABLE_DYNAMIC_OPERATOR_TEST=1
+     * ctest -R DynamicOperator
+     * @endcode
+     */
     static bool can_run_dynamic_compile_test() {
-        // 检查环境变量是否显式启用动态编译测试
         const char* enable_dynamic_test = std::getenv("ENABLE_DYNAMIC_OPERATOR_TEST");
         if (enable_dynamic_test && std::string(enable_dynamic_test) == "1") {
             return is_compiler_available();
         }
-        // 默认禁用
         return false;
     }
 
