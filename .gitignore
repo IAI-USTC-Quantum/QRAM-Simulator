@@ -43,3 +43,6 @@ test/result/*.py
 __pycache__/
 pyqsparse.egg-info/
 /wheelhouse/
+
+# Sphinx documentation build
+docs/sphinx/build/

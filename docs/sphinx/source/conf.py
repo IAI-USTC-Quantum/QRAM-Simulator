@@ -1,0 +1,138 @@
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+# Add PySparQ to path for autodoc
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(project_root / "PySparQ"))
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+project = "PySparQ"
+copyright = "2025, IAI-USTC-Quantum"
+author = "IAI-USTC-Quantum"
+release = "0.0.1"
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "myst_parser",
+    "sphinx_copybutton",
+    "autoapi.extension",
+]
+
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_theme = "furo"
+html_static_path = ["_static"]
+html_title = "PySparQ Documentation"
+
+# Theme options for furo
+html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "#2563eb",
+        "color-brand-content": "#1d4ed8",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#3b82f6",
+        "color-brand-content": "#60a5fa",
+    },
+    "sidebar_hide_name": False,
+    "navigation_with_keys": True,
+    "source_repository": "https://github.com/IAI-USTC-Quantum/QRAM-Simulator/",
+    "source_branch": "main",
+    "source_directory": "docs/sphinx/source/",
+}
+
+# -- Options for MyST parser -------------------------------------------------
+# https://myst-parser.readthedocs.io/en/latest/configuration.html
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
+
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_admonition",
+    "html_image",
+    "replacements",
+    "smartquotes",
+    "tasklist",
+]
+
+# -- Options for AutoAPI -----------------------------------------------------
+# https://sphinx-autoapi.readthedocs.io/
+
+autoapi_type = "python"
+autoapi_dirs = ["../../../PySparQ/pysparq"]
+autoapi_file_patterns = ["*.pyi"]
+autoapi_generate_api_docs = True
+autoapi_add_toctree_entry = False
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "show-module-summary",
+    "imported-members",
+]
+autoapi_python_class_content = "both"
+autoapi_member_order = "groupwise"
+
+# -- Options for Intersphinx -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+}
+
+# -- Options for Napoleon ----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_keyword = True
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_preprocess_types = False
+napoleon_type_aliases = None
+napoleon_attr_annotations = True
+
+# -- Options for Todo --------------------------------------------------------
+
+todo_include_todos = True
+
+# -- Copy button options -----------------------------------------------------
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+copybutton_line_continuation_character = "\\"
+copybutton_here_doc_delimiter = "EOT"

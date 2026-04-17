@@ -90,12 +90,12 @@ jobs:
     - name: Test (Unix)
       if: runner.os != 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest --output-on-failure
+      run: ctest --output-on-failure -j4
 
     - name: Test (Windows)
       if: runner.os == 'Windows'
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest --output-on-failure -C ${{ matrix.build_type }}
+      run: ctest --output-on-failure -C ${{ matrix.build_type }} -j4
 
     # --- Python package ---
     - name: Build Python Package
@@ -157,25 +157,59 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Install Doxygen
-      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-    - name: Generate API Documentation
+    - name: Install Documentation Dependencies
+      run: |
+        pip install -r docs/sphinx/requirements.txt
+        sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+    - name: Generate Doxygen Documentation
       run: doxygen Doxyfile
+
+    - name: Build Sphinx Documentation
+      run: |
+        cd docs/sphinx
+        make html
+
+    - name: Validate Stub Synchronization
+      run: |
+        pip install pybind11-stubgen
+        pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py || true
+        diff -q PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
+          echo "::warning::Stub files may need regeneration. Run: pybind11-stubgen pysparq._core -o PySparQ/pysparq/"
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4
       with:
-        name: api-documentation
-        path: docs/api/html/
+        name: documentation
+        path: |
+          docs/api/html/
+          docs/sphinx/build/html/
         retention-days: 30
 
     - name: Prepare Pages directory
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
+        mkdir -p pages-deploy
+
+        # Landing page
+        cp docs/index.html pages-deploy/index.html
+
+        # Sphinx docs (Python API)
+        mkdir -p pages-deploy/python
+        cp -r docs/sphinx/build/html/* pages-deploy/python/
+
+        # Doxygen docs (C++ API)
         mkdir -p pages-deploy/api
         cp -r docs/api/html/* pages-deploy/api/
-        cp docs/index.html pages-deploy/index.html
+
+        # Other docs
+        cp docs/operators.md pages-deploy/
+        cp docs/README.md pages-deploy/
 
     - name: Deploy to GitHub Pages
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'

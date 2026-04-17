@@ -1,0 +1,58 @@
+/* Custom CSS for PySparQ documentation */
+
+/* Improve code block appearance */
+.highlight {
+    border-radius: 4px;
+    margin: 1em 0;
+}
+
+/* Better table formatting */
+table.docutils {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.docutils th,
+table.docutils td {
+    border: 1px solid var(--color-background-border);
+    padding: 0.5em;
+}
+
+/* API signature styling */
+.py.class > .sig.sig-object,
+.py.function > .sig.sig-object {
+    background-color: var(--color-background-secondary);
+    border-radius: 4px;
+    padding: 0.5em;
+    margin: 0.5em 0;
+}
+
+/* AutoAPI summary tables */
+.autoapi-entry .autoapi-description {
+    color: var(--color-foreground-secondary);
+}
+
+/* Better admonition styling */
+.admonition {
+    border-left: 4px solid var(--color-brand-primary);
+    padding-left: 1em;
+    margin: 1em 0;
+}
+
+.admonition.note {
+    border-left-color: var(--color-brand-primary);
+}
+
+.admonition.warning {
+    border-left-color: #f59e0b;
+}
+
+.admonition.danger {
+    border-left-color: #ef4444;
+}
+
+/* Math rendering improvements */
+.math {
+    overflow-x: auto;
+    padding: 0.5em 0;
+}

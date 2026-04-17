@@ -1603,16 +1603,16 @@ class PartialTraceSelectRange:
         ...
 class Phase_Bool(BaseOperator):
     @typing.overload
-    def __init__(self, reg: str, digit: int, lambda: float) -> None:
+    def __init__(self, reg: str, digit: int, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, digit: int, lambda: float) -> None:
+    def __init__(self, reg_id: int, digit: int, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg: str, lambda: float) -> None:
+    def __init__(self, reg: str, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, lambda: float) -> None:
+    def __init__(self, reg_id: int, lambda_: float) -> None:
         ...
     def clear_control_all_ones(self) -> None:
         ...
@@ -3048,29 +3048,29 @@ class Tgate_Bool(Phase_Bool):
         ...
 class U2gate_Bool(Rot_Bool):
     @typing.overload
-    def __init__(self, reg: str, digit: int, phi: float, lambda: float) -> None:
+    def __init__(self, reg: str, digit: int, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, digit: int, phi: float, lambda: float) -> None:
+    def __init__(self, reg_id: int, digit: int, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg: str, phi: float, lambda: float) -> None:
+    def __init__(self, reg: str, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, phi: float, lambda: float) -> None:
+    def __init__(self, reg_id: int, phi: float, lambda_: float) -> None:
         ...
 class U3gate_Bool(Rot_Bool):
     @typing.overload
-    def __init__(self, reg: str, digit: int, theta: float, phi: float, lambda: float) -> None:
+    def __init__(self, reg: str, digit: int, theta: float, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, digit: int, theta: float, phi: float, lambda: float) -> None:
+    def __init__(self, reg_id: int, digit: int, theta: float, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg: str, theta: float, phi: float, lambda: float) -> None:
+    def __init__(self, reg: str, theta: float, phi: float, lambda_: float) -> None:
         ...
     @typing.overload
-    def __init__(self, reg_id: int, theta: float, phi: float, lambda: float) -> None:
+    def __init__(self, reg_id: int, theta: float, phi: float, lambda_: float) -> None:
         ...
 class ViewNormalization(SelfAdjointOperator):
     def __call__(self, state: SparseState) -> None:
@@ -3388,7 +3388,7 @@ class inverseQFT(BaseOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-def combine_systems(to: SparseState, from: SparseState) -> None:
+def combine_systems(to: SparseState, from_: SparseState) -> None:
     ...
 def merge_system(arg0: System, arg1: System) -> None:
     ...

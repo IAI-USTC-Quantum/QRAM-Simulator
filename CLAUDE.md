@@ -83,9 +83,34 @@ Doxygen documentation is auto-deployed on push to `main`:
 
 ## Git Workflow
 
-- `origin` → personal fork (`Agony5757/QRAM-Simulator`), active development
-- `upstream` → organization repo (`IAI-USTC-Quantum/QRAM-Simulator`), PR target
-- Changes are contributed via PR to `upstream/main`
+**IMPORTANT: Never push directly to `origin/main`. Always work on fork and submit PRs.**
+
+Remote configuration:
+- `origin` → upstream organization repo (`IAI-USTC-Quantum/QRAM-Simulator`)
+- `fork` → personal fork (`Agony5757/QRAM-Simulator`)
+
+Workflow:
+1. All development happens on `fork` (personal fork)
+2. Changes are submitted via PR from `fork` to `origin/main`
+3. Never push directly to `origin` - it should be protected
+
+Typical workflow:
+```bash
+# Create feature branch on fork
+git checkout -b feature/my-feature fork/main
+
+# Push to fork
+git push fork feature/my-feature
+
+# Create PR to origin/main
+gh pr create --repo IAI-USTC-Quantum/QRAM-Simulator --head Agony5757:feature/my-feature
+```
+
+Sync fork with upstream:
+```bash
+gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
+git fetch fork
+```
 
 ## Dependencies
 
