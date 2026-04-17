@@ -52,6 +52,8 @@ std::string create_temp_source_file(const std::string& code, const std::string& 
 
 /**
  * @brief 查找项目根目录
+ * @details 在 CI 环境中，测试可执行文件可能在 build/ 目录中运行，
+ *          需要向上查找直到找到项目根目录
  */
 std::string find_project_root() {
     // 方法1: 检查环境变量
@@ -66,16 +68,66 @@ std::string find_project_root() {
         return github_workspace;
     }
 
-    // 方法3: 从当前目录向上查找
+    // 方法3: 从当前可执行文件路径向上查找
     std::filesystem::path current = std::filesystem::current_path();
-    for (auto p = current; p.has_parent_path(); p = p.parent_path()) {
-        if (std::filesystem::exists(p / "SparQ" / "include") &&
-            std::filesystem::exists(p / "Common" / "include")) {
-            return p.string();
+    
+    // 尝试从当前目录向上查找最多5层
+    for (int i = 0; i < 5; ++i) {
+        // 检查是否是项目根目录（包含 SparQ/include 和 Common/include）
+        if (std::filesystem::exists(current / "SparQ" / "include") &&
+            std::filesystem::exists(current / "Common" / "include")) {
+            return current.string();
         }
+        
+        // 检查是否是构建目录（在 build/ 或 build/Release/ 等子目录中）
+        // 向上查找直到找到包含 SparQ/CMakeLists.txt 或 pyproject.toml 的目录
+        if (std::filesystem::exists(current / "SparQ" / "CMakeLists.txt") ||
+            std::filesystem::exists(current / "CMakeLists.txt")) {
+            // 再向上找一层，可能是从 build/ 到项目根目录
+            if (current.has_parent_path()) {
+                auto parent = current.parent_path();
+                if (std::filesystem::exists(parent / "SparQ" / "include")) {
+                    return parent.string();
+                }
+            }
+        }
+        
+        // 检查源码目录特征文件
+        if (std::filesystem::exists(current / "pyproject.toml") &&
+            std::filesystem::exists(current / "SparQ")) {
+            return current.string();
+        }
+        
+        // 向上移动一层
+        if (!current.has_parent_path()) {
+            break;
+        }
+        current = current.parent_path();
     }
 
-    // 默认: 返回当前目录
+    // 方法4: 尝试从源码目录特征反向查找
+    // 检查是否在 build/SparQ/test/ 这样的结构中
+    current = std::filesystem::current_path();
+    std::filesystem::path candidate = current;
+    
+    // 移除已知的构建目录层次
+    while (candidate.has_parent_path()) {
+        std::string filename = candidate.filename().string();
+        // 如果是已知的构建目录，检查父目录
+        if (filename == "test" || filename == "SparQ" || filename == "build" ||
+            filename == "Release" || filename == "Debug") {
+            candidate = candidate.parent_path();
+            if (std::filesystem::exists(candidate / "SparQ" / "include")) {
+                return candidate.string();
+            }
+            continue;
+        }
+        break;
+    }
+
+    // 默认: 返回当前目录，但记录警告
+    std::cerr << "Warning: Could not find project root, using current directory: " 
+              << std::filesystem::current_path() << std::endl;
     return ".";
 }
 
