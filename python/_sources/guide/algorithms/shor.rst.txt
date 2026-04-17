@@ -3,6 +3,7 @@ Shor's Quantum Factorization Algorithm
 
 .. contents:: Table of Contents
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 Overview
 --------
@@ -35,13 +36,13 @@ The quantum part finds the period r of the function:
 
 .. math::
 
-   f(x) = a^x \\mod N
+   f(x) = a^x \mod N
 
 Using quantum phase estimation on unitary:
 
 .. math::
 
-   U|x\\rangle = |x \\oplus 1\\rangle
+   U|x\rangle = |x \oplus 1\rangle
 
 The eigenvalues of U are e^(2πik/r), giving the period.
 
@@ -52,7 +53,7 @@ The measurement result y/Q is related to c/r via:
 
 .. math::
 
-   \\frac{y}{Q} \\approx \\frac{c}{r}
+   \frac{y}{Q} \approx \frac{c}{r}
 
 where Q = 2^size (the precision register size).
 
@@ -309,7 +310,7 @@ The ModMul operation computes:
 
 .. math::
 
-   |y\\rangle \\rightarrow |y \\cdot a^{2^x} \\mod N\\rangle
+   |y\rangle \rightarrow |y \cdot a^{2^x} \mod N\rangle
 
 controlled by the work qubit.
 
@@ -320,7 +321,7 @@ After measuring bit x, we apply phase corrections for bits x+1, x+2, ...:
 
 .. math::
 
-   R_z\\left(-\\frac{2\\pi b_j}{2^{j-i}}\\right)
+   R_z\left(-\frac{2\pi b_j}{2^{j-i}}\right)
 
 This implements the iterative phase estimation correctly.
 

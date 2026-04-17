@@ -271,7 +271,7 @@
         <article role="main" id="furo-main-content">
           <section id="grover-s-quantum-search-algorithm">
 <h1>Grover’s Quantum Search Algorithm<a class="headerlink" href="#grover-s-quantum-search-algorithm" title="Link to this heading">¶</a></h1>
-<nav class="contents local" id="table-of-contents">
+<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#overview" id="id5">Overview</a></p></li>
@@ -319,7 +319,7 @@ Register Level Programming paradigm.</p>
 <li><p><strong>Initialization</strong>: Prepare equal superposition over all addresses</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}|\\psi_0\\rangle = \\frac{1}{\\sqrt{N}} \\sum_{x=0}^{N-1} |x\\rangle\end{split}\]</div>
+\[|\psi_0\rangle = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} |x\rangle\]</div>
 </div>
 </li>
 <li><p><strong>Grover Iteration</strong>: Repeatedly apply G = D · O</p>
@@ -327,14 +327,14 @@ Register Level Programming paradigm.</p>
 <li><p><strong>Oracle O</strong>: Marks target states with a negative phase</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}O|x\\rangle = (-1)^{f(x)} |x\\rangle\end{split}\]</div>
+\[O|x\rangle = (-1)^{f(x)} |x\rangle\]</div>
 </div>
 <p>where f(x) = 1 if x is marked, 0 otherwise.</p>
 </li>
 <li><p><strong>Diffusion D</strong>: Amplifies amplitude of marked states</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}D = 2|s\\rangle\\langle s| - I\end{split}\]</div>
+\[D = 2|s\rangle\langle s| - I\]</div>
 </div>
 <p>where <a href="#id1"><span class="problematic" id="id2">|</span></a>s⟩ is the uniform superposition.</p>
 </li>
@@ -348,13 +348,13 @@ Register Level Programming paradigm.</p>
 <p>After k iterations, the amplitude of marked states is:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}a_k = \\sin((2k+1)\\theta)\end{split}\]</div>
+\[a_k = \sin((2k+1)\theta)\]</div>
 </div>
-<p>where <span class="math notranslate nohighlight">\(\\theta = \\arcsin(\\sqrt{M/N})\)</span> and M is the number of marked items.</p>
+<p>where <span class="math notranslate nohighlight">\(\theta = \arcsin(\sqrt{M/N})\)</span> and M is the number of marked items.</p>
 <p>Optimal number of iterations:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}k_{opt} \\approx \\frac{\\pi}{4}\\sqrt{\\frac{N}{M}}\end{split}\]</div>
+\[k_{opt} \approx \frac{\pi}{4}\sqrt{\frac{N}{M}}\]</div>
 </div>
 </section>
 </section>

@@ -3,6 +3,7 @@ Grover's Quantum Search Algorithm
 
 .. contents:: Table of Contents
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 Overview
 --------
@@ -31,7 +32,7 @@ The algorithm consists of three main steps:
 
    .. math::
 
-      |\\psi_0\\rangle = \\frac{1}{\\sqrt{N}} \\sum_{x=0}^{N-1} |x\\rangle
+      |\psi_0\rangle = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} |x\rangle
 
 2. **Grover Iteration**: Repeatedly apply G = D · O
 
@@ -39,7 +40,7 @@ The algorithm consists of three main steps:
 
      .. math::
 
-        O|x\\rangle = (-1)^{f(x)} |x\\rangle
+        O|x\rangle = (-1)^{f(x)} |x\rangle
 
      where f(x) = 1 if x is marked, 0 otherwise.
 
@@ -47,7 +48,7 @@ The algorithm consists of three main steps:
 
      .. math::
 
-        D = 2|s\\rangle\\langle s| - I
+        D = 2|s\rangle\langle s| - I
 
      where |s⟩ is the uniform superposition.
 
@@ -60,15 +61,15 @@ After k iterations, the amplitude of marked states is:
 
 .. math::
 
-   a_k = \\sin((2k+1)\\theta)
+   a_k = \sin((2k+1)\theta)
 
-where :math:`\\theta = \\arcsin(\\sqrt{M/N})` and M is the number of marked items.
+where :math:`\theta = \arcsin(\sqrt{M/N})` and M is the number of marked items.
 
 Optimal number of iterations:
 
 .. math::
 
-   k_{opt} \\approx \\frac{\\pi}{4}\\sqrt{\\frac{N}{M}}
+   k_{opt} \approx \frac{\pi}{4}\sqrt{\frac{N}{M}}
 
 Implementation Steps
 --------------------

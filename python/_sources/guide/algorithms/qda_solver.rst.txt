@@ -3,6 +3,7 @@ QDA Linear System Solver
 
 .. contents:: Table of Contents
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 Overview
 --------
@@ -44,7 +45,7 @@ The algorithm uses block encoding to represent H(s):
 
 .. math::
 
-   U_{H(s)} = \\begin{pmatrix} H(s) & \\cdot \\\\ \\cdot & \\cdot \\end{pmatrix}
+   U_{H(s)} = \begin{pmatrix} H(s) & \cdot \\ \cdot & \cdot \end{pmatrix}
 
 Quantum Walk
 ~~~~~~~~~~~~
@@ -53,7 +54,7 @@ The walk operator W_s combines block encoding with reflection:
 
 .. math::
 
-   W_s = R \\cdot U_{H(s)}
+   W_s = R \cdot U_{H(s)}
 
 Applied repeatedly via LCU construction.
 
@@ -319,7 +320,7 @@ The QDA algorithm achieves optimal scaling:
 
 .. math::
 
-   T = O(\\kappa \\log(\\kappa/\\epsilon))
+   T = O(\kappa \log(\kappa/\epsilon))
 
 This is provably optimal for quantum linear system solvers.
 
@@ -337,14 +338,14 @@ Interpolation Function (Eq. 69)
 
 .. math::
 
-   f(s) = \\frac{\\kappa}{\\kappa - 1}\\left(1 - \\left(1 + s(\\kappa^{p-1} - 1)\\right)^{\\frac{1}{1-p}}\\right)
+   f(s) = \frac{\kappa}{\kappa - 1}\left(1 - \left(1 + s(\kappa^{p-1} - 1)\right)^{\frac{1}{1-p}}\right)
 
 Rotation Matrix
 ~~~~~~~~~~~~~~~
 
 .. math::
 
-   R_s = \\frac{1}{\\sqrt{(1-f)^2 + f^2}} \\begin{pmatrix} 1-f & f \\\\ f & f-1 \\end{pmatrix}
+   R_s = \frac{1}{\sqrt{(1-f)^2 + f^2}} \begin{pmatrix} 1-f & f \\ f & f-1 \end{pmatrix}
 
 API Reference
 -------------

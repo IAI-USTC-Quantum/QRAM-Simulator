@@ -271,7 +271,7 @@
         <article role="main" id="furo-main-content">
           <section id="shor-s-quantum-factorization-algorithm">
 <h1>Shor’s Quantum Factorization Algorithm<a class="headerlink" href="#shor-s-quantum-factorization-algorithm" title="Link to this heading">¶</a></h1>
-<nav class="contents local" id="table-of-contents">
+<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#overview" id="id1">Overview</a></p></li>
@@ -334,12 +334,12 @@ finds factors in polynomial time using quantum period finding.</p>
 <p>The quantum part finds the period r of the function:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}f(x) = a^x \\mod N\end{split}\]</div>
+\[f(x) = a^x \mod N\]</div>
 </div>
 <p>Using quantum phase estimation on unitary:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}U|x\\rangle = |x \\oplus 1\\rangle\end{split}\]</div>
+\[U|x\rangle = |x \oplus 1\rangle\]</div>
 </div>
 <p>The eigenvalues of U are e^(2πik/r), giving the period.</p>
 </section>
@@ -348,7 +348,7 @@ finds factors in polynomial time using quantum period finding.</p>
 <p>The measurement result y/Q is related to c/r via:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}\\frac{y}{Q} \\approx \\frac{c}{r}\end{split}\]</div>
+\[\frac{y}{Q} \approx \frac{c}{r}\]</div>
 </div>
 <p>where Q = 2^size (the precision register size).</p>
 <p>We extract r using continued fraction expansion (Farey sequence).</p>
@@ -587,7 +587,7 @@ finds factors in polynomial time using quantum period finding.</p>
 <p>The ModMul operation computes:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}|y\\rangle \\rightarrow |y \\cdot a^{2^x} \\mod N\\rangle\end{split}\]</div>
+\[|y\rangle \rightarrow |y \cdot a^{2^x} \mod N\rangle\]</div>
 </div>
 <p>controlled by the work qubit.</p>
 </section>
@@ -596,7 +596,7 @@ finds factors in polynomial time using quantum period finding.</p>
 <p>After measuring bit x, we apply phase corrections for bits x+1, x+2, …:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}R_z\\left(-\\frac{2\\pi b_j}{2^{j-i}}\\right)\end{split}\]</div>
+\[R_z\left(-\frac{2\pi b_j}{2^{j-i}}\right)\]</div>
 </div>
 <p>This implements the iterative phase estimation correctly.</p>
 </section>

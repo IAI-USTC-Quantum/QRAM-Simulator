@@ -271,7 +271,7 @@
         <article role="main" id="furo-main-content">
           <section id="qda-linear-system-solver">
 <h1>QDA Linear System Solver<a class="headerlink" href="#qda-linear-system-solver" title="Link to this heading">¶</a></h1>
-<nav class="contents local" id="table-of-contents">
+<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#overview" id="id5">Overview</a></p></li>
@@ -346,7 +346,7 @@ initial state to the desired solution.</p>
 <p>The algorithm uses block encoding to represent H(s):</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}U_{H(s)} = \\begin{pmatrix} H(s) &amp; \\cdot \\\\ \\cdot &amp; \\cdot \\end{pmatrix}\end{split}\]</div>
+\[\begin{split}U_{H(s)} = \begin{pmatrix} H(s) &amp; \cdot \\ \cdot &amp; \cdot \end{pmatrix}\end{split}\]</div>
 </div>
 </section>
 <section id="quantum-walk">
@@ -354,7 +354,7 @@ initial state to the desired solution.</p>
 <p>The walk operator W_s combines block encoding with reflection:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}W_s = R \\cdot U_{H(s)}\end{split}\]</div>
+\[W_s = R \cdot U_{H(s)}\]</div>
 </div>
 <p>Applied repeatedly via LCU construction.</p>
 </section>
@@ -598,7 +598,7 @@ spectral properties:</p>
 <p>The QDA algorithm achieves optimal scaling:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}T = O(\\kappa \\log(\\kappa/\\epsilon))\end{split}\]</div>
+\[T = O(\kappa \log(\kappa/\epsilon))\]</div>
 </div>
 <p>This is provably optimal for quantum linear system solvers.</p>
 </section>
@@ -614,14 +614,14 @@ for ancilla registers (5 ancilla qubits typically).</p>
 <h3><a class="toc-backref" href="#id27" role="doc-backlink">Interpolation Function (Eq. 69)</a><a class="headerlink" href="#interpolation-function-eq-69" title="Link to this heading">¶</a></h3>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}f(s) = \\frac{\\kappa}{\\kappa - 1}\\left(1 - \\left(1 + s(\\kappa^{p-1} - 1)\\right)^{\\frac{1}{1-p}}\\right)\end{split}\]</div>
+\[f(s) = \frac{\kappa}{\kappa - 1}\left(1 - \left(1 + s(\kappa^{p-1} - 1)\right)^{\frac{1}{1-p}}\right)\]</div>
 </div>
 </section>
 <section id="rotation-matrix">
 <h3><a class="toc-backref" href="#id28" role="doc-backlink">Rotation Matrix</a><a class="headerlink" href="#rotation-matrix" title="Link to this heading">¶</a></h3>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
-\[\begin{split}R_s = \\frac{1}{\\sqrt{(1-f)^2 + f^2}} \\begin{pmatrix} 1-f &amp; f \\\\ f &amp; f-1 \\end{pmatrix}\end{split}\]</div>
+\[\begin{split}R_s = \frac{1}{\sqrt{(1-f)^2 + f^2}} \begin{pmatrix} 1-f &amp; f \\ f &amp; f-1 \end{pmatrix}\end{split}\]</div>
 </div>
 </section>
 </section>

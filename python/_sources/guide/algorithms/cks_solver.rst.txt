@@ -3,6 +3,7 @@ CKS Linear System Solver
 
 .. contents:: Table of Contents
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 Overview
 --------
@@ -38,7 +39,7 @@ The walk operator is:
 
 .. math::
 
-   W = T^\\dagger \\cdot R \\cdot T \\cdot \\text{Swap}
+   W = T^\dagger \cdot R \cdot T \cdot \text{Swap}
 
 where:
 
@@ -50,7 +51,7 @@ The T operator creates superposition over non-zero columns:
 
 .. math::
 
-   |\\psi_j\\rangle = \\sum_{k: A_{jk} \\neq 0} \\sqrt{|A_{jk}|} |k\\rangle
+   |\psi_j\rangle = \sum_{k: A_{jk} \neq 0} \sqrt{|A_{jk}|} |k\rangle
 
 LCU Construction
 ~~~~~~~~~~~~~~~~~
@@ -59,7 +60,7 @@ The solution is constructed as:
 
 .. math::
 
-   |x\\rangle \\propto \\sum_{j=0}^{j_0} c_j W^j |b\\rangle
+   |x\rangle \propto \sum_{j=0}^{j_0} c_j W^j |b\rangle
 
 where c_j are Chebyshev polynomial coefficients.
 
@@ -284,7 +285,7 @@ The CKS algorithm achieves:
 
 .. math::
 
-   T = O(\\kappa \\log(\\kappa/\\epsilon))
+   T = O(\kappa \log(\kappa/\epsilon))
 
 compared to O(κ² log(κ/ε)) for classical iterative methods.
 
