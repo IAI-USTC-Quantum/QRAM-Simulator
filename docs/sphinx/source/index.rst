@@ -26,6 +26,7 @@ Quick Links
    guide/installation
    guide/quickstart
    guide/examples
+   guide/dynamic_operators
    guide/algorithms/index
 
 .. toctree::
