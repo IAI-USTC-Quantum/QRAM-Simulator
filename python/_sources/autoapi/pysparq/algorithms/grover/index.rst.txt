@@ -1,0 +1,107 @@
+pysparq.algorithms.grover
+=========================
+
+.. py:module:: pysparq.algorithms.grover
+
+.. autoapi-nested-parse::
+
+   Grover's Quantum Search Algorithm Implementation
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   pysparq.algorithms.grover.DiffusionOperator
+   pysparq.algorithms.grover.GroverOperator
+   pysparq.algorithms.grover.GroverOracle
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   pysparq.algorithms.grover.create_grover_demo
+   pysparq.algorithms.grover.grover_count
+   pysparq.algorithms.grover.grover_search
+
+
+Module Contents
+---------------
+
+.. py:class:: DiffusionOperator(addr_reg: Union[str, int])
+
+   HPH (Hadamard-Phase-Hadamard) diffusion operator.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> DiffusionOperator
+
+
+   .. py:attribute:: addr_reg
+      :type:  Union[str, int]
+
+
+.. py:class:: GroverOperator(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
+
+   Combined Grover operator: Oracle followed by Diffusion.
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> GroverOperator
+
+
+   .. py:attribute:: diffusion
+      :type:  DiffusionOperator
+
+
+   .. py:attribute:: oracle
+      :type:  GroverOracle
+
+
+.. py:class:: GroverOracle(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
+
+   Oracle for Grover's search that marks target values.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> GroverOracle
+
+
+   .. py:attribute:: addr_reg
+      :type:  Union[str, int]
+
+
+   .. py:attribute:: data_reg
+      :type:  Union[str, int]
+
+
+   .. py:attribute:: qram
+      :type:  pysparq.QRAMCircuit_qutrit
+
+
+   .. py:attribute:: search_reg
+      :type:  Union[str, int]
+
+
+.. py:function:: create_grover_demo() -> str
+
+   Generate a demo script for Grover's algorithm.
+
+
+.. py:function:: grover_count(memory: List[int], target: int, precision_bits: int = ..., data_size: int = ...) -> Tuple[int, float]
+
+   Quantum counting variant of Grover's algorithm.
+
+
+.. py:function:: grover_search(memory: List[int], target: int, n_iterations: Optional[int] = ..., data_size: int = ...) -> Tuple[int, float]
+
+   Execute Grover's search to find target in memory.
+
+

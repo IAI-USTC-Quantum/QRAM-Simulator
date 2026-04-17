@@ -1,0 +1,1063 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html"><link rel="next" title="pysparq.algorithms.grover" href="../grover/index.html"><link rel="prev" title="pysparq.algorithms" href="../index.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>pysparq.algorithms.cks_solver - PySparQ Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand">PySparQ Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+  
+  <span class="sidebar-brand-text">PySparQ Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guide/quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guide/examples.html">Examples</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../guide/algorithms/index.html">Quantum Algorithm Tutorials</a><input aria-label="Toggle navigation of Quantum Algorithm Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../guide/algorithms/grover.html">Grover’s Quantum Search Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../guide/algorithms/shor.html">Shor’s Quantum Factorization Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../guide/algorithms/cks_solver.html">CKS Linear System Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../guide/algorithms/qda_solver.html">QDA Linear System Solver</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/python.html">Python API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">pysparq</a><input aria-label="Toggle navigation of pysparq" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">pysparq.algorithms</a><input aria-label="Toggle navigation of pysparq.algorithms" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">pysparq.algorithms.cks_solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../grover/index.html">pysparq.algorithms.grover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../qda_solver/index.html">pysparq.algorithms.qda_solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../shor/index.html">pysparq.algorithms.shor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/autoapi/pysparq/algorithms/cks_solver/index.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/autoapi/pysparq/algorithms/cks_solver/index.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-pysparq.algorithms.cks_solver">
+<span id="pysparq-algorithms-cks-solver"></span><h1>pysparq.algorithms.cks_solver<a class="headerlink" href="#module-pysparq.algorithms.cks_solver" title="Link to this heading">¶</a></h1>
+<p>CKS (Childs-Kothari-Somma) Linear System Solver Implementation</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient" title="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient</span></code></a></p></td>
+<td><p>Computes Chebyshev polynomial coefficients for quantum walk.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW" title="pysparq.algorithms.cks_solver.CondRotQW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CondRotQW</span></code></a></p></td>
+<td><p>Conditional rotation for quantum walk.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer" title="pysparq.algorithms.cks_solver.LCUContainer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LCUContainer</span></code></a></p></td>
+<td><p>LCU (Linear Combination of Unitaries) container for CKS.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch" title="pysparq.algorithms.cks_solver.QuantumBinarySearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QuantumBinarySearch</span></code></a></p></td>
+<td><p>Quantum binary search for sparse matrix access.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk" title="pysparq.algorithms.cks_solver.QuantumWalk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QuantumWalk</span></code></a></p></td>
+<td><p>Quantum walk operator for CKS algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps" title="pysparq.algorithms.cks_solver.QuantumWalkNSteps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QuantumWalkNSteps</span></code></a></p></td>
+<td><p>Multiple quantum walk steps for CKS algorithm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseMatrix</span></code></a></p></td>
+<td><p>Sparse matrix representation for CKS algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData" title="pysparq.algorithms.cks_solver.SparseMatrixData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseMatrixData</span></code></a></p></td>
+<td><p>Sparse matrix data for quantum simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator" title="pysparq.algorithms.cks_solver.TOperator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TOperator</span></code></a></p></td>
+<td><p>T operator for CKS algorithm.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.cks_solve" title="pysparq.algorithms.cks_solver.cks_solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cks_solve</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Solve Ax = b using CKS quantum linear solver.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.create_cks_demo" title="pysparq.algorithms.cks_solver.create_cks_demo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_cks_demo</span></code></a>(→ str)</p></td>
+<td><p>Generate a demo script for CKS solver.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.get_coef_common" title="pysparq.algorithms.cks_solver.get_coef_common"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coef_common</span></code></a>(→ List[complex])</p></td>
+<td><p>Get rotation matrix coefficients for general (signed) matrix elements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.get_coef_positive_only" title="pysparq.algorithms.cks_solver.get_coef_positive_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_coef_positive_only</span></code></a>(→ List[complex])</p></td>
+<td><p>Get rotation matrix coefficients for positive-only matrix elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pysparq.algorithms.cks_solver.make_walk_angle_func" title="pysparq.algorithms.cks_solver.make_walk_angle_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_walk_angle_func</span></code></a>(→ Callable[[int, int, int], ...)</p></td>
+<td><p>Create walk angle function for a matrix.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">ChebyshevPolynomialCoefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient" title="Link to this definition">¶</a></dt>
+<dd><p>Computes Chebyshev polynomial coefficients for quantum walk.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.C">
+<span class="sig-name descname"><span class="pre">C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Big</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Small</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient.C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.C" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.coef">
+<span class="sig-name descname"><span class="pre">coef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient.coef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.coef" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.b">
+<span class="sig-name descname"><span class="pre">b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#ChebyshevPolynomialCoefficient.b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">CondRotQW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">j_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW" title="Link to this definition">¶</a></dt>
+<dd><p>Conditional rotation for quantum walk.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.data_reg">
+<span class="sig-name descname"><span class="pre">data_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.data_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.data_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.j_reg">
+<span class="sig-name descname"><span class="pre">j_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.j_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.j_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.k_reg">
+<span class="sig-name descname"><span class="pre">k_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.k_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.k_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.mat">
+<span class="sig-name descname"><span class="pre">mat</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.mat" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.CondRotQW.output_reg">
+<span class="sig-name descname"><span class="pre">output_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#CondRotQW.output_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.CondRotQW.output_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">LCUContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer" title="Link to this definition">¶</a></dt>
+<dd><p>LCU (Linear Combination of Unitaries) container for CKS.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.external_input">
+<span class="sig-name descname"><span class="pre">external_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.external_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.external_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.get_input_reg">
+<span class="sig-name descname"><span class="pre">get_input_reg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.get_input_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.get_input_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.initialize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.iterate">
+<span class="sig-name descname"><span class="pre">iterate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.iterate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.iterate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.b">
+<span class="sig-name descname"><span class="pre">b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.chebyshev">
+<span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient" title="pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient"><span class="pre">ChebyshevPolynomialCoefficient</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.chebyshev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.chebyshev" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.current_state">
+<span class="sig-name descname"><span class="pre">current_state</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.current_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.current_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.eps">
+<span class="sig-name descname"><span class="pre">eps</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.eps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.eps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.j0">
+<span class="sig-name descname"><span class="pre">j0</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.j0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.j0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.kappa">
+<span class="sig-name descname"><span class="pre">kappa</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.kappa" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.step_state">
+<span class="sig-name descname"><span class="pre">step_state</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.step_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.step_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.LCUContainer.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps" title="pysparq.algorithms.cks_solver.QuantumWalkNSteps"><span class="pre">QuantumWalkNSteps</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#LCUContainer.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.LCUContainer.walk" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">QuantumBinarySearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_offset_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch" title="Link to this definition">¶</a></dt>
+<dd><p>Quantum binary search for sparse matrix access.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.address_offset_reg">
+<span class="sig-name descname"><span class="pre">address_offset_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.address_offset_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.address_offset_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.max_step">
+<span class="sig-name descname"><span class="pre">max_step</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.max_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.max_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.qram">
+<span class="sig-name descname"><span class="pre">qram</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.qram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.qram" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.result_reg">
+<span class="sig-name descname"><span class="pre">result_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.result_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.result_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.target_reg">
+<span class="sig-name descname"><span class="pre">target_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.target_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.target_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumBinarySearch.total_length">
+<span class="sig-name descname"><span class="pre">total_length</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumBinarySearch.total_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.total_length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">QuantumWalk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_comp_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_comp_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_offset_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_offset_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk" title="Link to this definition">¶</a></dt>
+<dd><p>Quantum walk operator for CKS algorithm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.b1_reg">
+<span class="sig-name descname"><span class="pre">b1_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.b1_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.b1_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.b2_reg">
+<span class="sig-name descname"><span class="pre">b2_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.b2_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.b2_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.data_offset_reg">
+<span class="sig-name descname"><span class="pre">data_offset_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.data_offset_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.data_offset_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.j_comp_reg">
+<span class="sig-name descname"><span class="pre">j_comp_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.j_comp_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.j_comp_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.j_reg">
+<span class="sig-name descname"><span class="pre">j_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.j_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.j_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.k_comp_reg">
+<span class="sig-name descname"><span class="pre">k_comp_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.k_comp_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.k_comp_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.k_reg">
+<span class="sig-name descname"><span class="pre">k_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.k_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.k_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.mat">
+<span class="sig-name descname"><span class="pre">mat</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.mat" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.qram">
+<span class="sig-name descname"><span class="pre">qram</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.qram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.qram" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalk.sparse_offset_reg">
+<span class="sig-name descname"><span class="pre">sparse_offset_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalk.sparse_offset_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalk.sparse_offset_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">QuantumWalkNSteps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">qram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps" title="Link to this definition">¶</a></dt>
+<dd><p>Multiple quantum walk steps for CKS algorithm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.create_state">
+<span class="sig-name descname"><span class="pre">create_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.create_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.create_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.first_step">
+<span class="sig-name descname"><span class="pre">first_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.first_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.first_step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.init_environment">
+<span class="sig-name descname"><span class="pre">init_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.init_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.init_environment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.make_n_step_state">
+<span class="sig-name descname"><span class="pre">make_n_step_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.make_n_step_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.make_n_step_state" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.step" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.addr_size">
+<span class="sig-name descname"><span class="pre">addr_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.addr_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.addr_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.b1">
+<span class="sig-name descname"><span class="pre">b1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.b1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.b1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.b2">
+<span class="sig-name descname"><span class="pre">b2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.b2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.b2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_offset">
+<span class="sig-name descname"><span class="pre">data_offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.data_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.default_reg_size">
+<span class="sig-name descname"><span class="pre">default_reg_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.default_reg_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.default_reg_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.j">
+<span class="sig-name descname"><span class="pre">j</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.j"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.j" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.j_comp">
+<span class="sig-name descname"><span class="pre">j_comp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.j_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.j_comp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.k">
+<span class="sig-name descname"><span class="pre">k</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.k" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.k_comp">
+<span class="sig-name descname"><span class="pre">k_comp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.k_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.k_comp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.mat">
+<span class="sig-name descname"><span class="pre">mat</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.mat" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.n_row">
+<span class="sig-name descname"><span class="pre">n_row</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.n_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.n_row" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.nnz_col">
+<span class="sig-name descname"><span class="pre">nnz_col</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.nnz_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.nnz_col" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.qram">
+<span class="sig-name descname"><span class="pre">qram</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.qram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.qram" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.QuantumWalkNSteps.sparse_offset">
+<span class="sig-name descname"><span class="pre">sparse_offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#QuantumWalkNSteps.sparse_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.sparse_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">SparseMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nnz_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>Sparse matrix representation for CKS algorithm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.from_dense">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.from_dense"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.from_dense" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.get_sparsity_offset">
+<span class="sig-name descname"><span class="pre">get_sparsity_offset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.get_sparsity_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_sparsity_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.get_walk_angle_func">
+<span class="sig-name descname"><span class="pre">get_walk_angle_func</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.get_walk_angle_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_walk_angle_func" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.data">
+<span class="sig-name descname"><span class="pre">data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.data_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.n_row">
+<span class="sig-name descname"><span class="pre">n_row</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.n_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.n_row" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.nnz_col">
+<span class="sig-name descname"><span class="pre">nnz_col</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.nnz_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.nnz_col" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.positive_only">
+<span class="sig-name descname"><span class="pre">positive_only</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.positive_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.positive_only" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrix.sparsity_offset">
+<span class="sig-name descname"><span class="pre">sparsity_offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrix.sparsity_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrix.sparsity_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">SparseMatrixData</span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData" title="Link to this definition">¶</a></dt>
+<dd><p>Sparse matrix data for quantum simulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.data">
+<span class="sig-name descname"><span class="pre">data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.data_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.n_row">
+<span class="sig-name descname"><span class="pre">n_row</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.n_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.n_row" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.nnz_col">
+<span class="sig-name descname"><span class="pre">nnz_col</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.nnz_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.nnz_col" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.positive_only">
+<span class="sig-name descname"><span class="pre">positive_only</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.positive_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.positive_only" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.SparseMatrixData.sparsity_offset">
+<span class="sig-name descname"><span class="pre">sparsity_offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#SparseMatrixData.sparsity_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.SparseMatrixData.sparsity_offset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">TOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_offset_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_offset_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">j_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_result_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nnz_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator" title="Link to this definition">¶</a></dt>
+<dd><p>T operator for CKS algorithm.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../index.html#pysparq.SparseState" title="pysparq.SparseState"><span class="pre">pysparq.SparseState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.b1_reg">
+<span class="sig-name descname"><span class="pre">b1_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.b1_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.b1_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.b2_reg">
+<span class="sig-name descname"><span class="pre">b2_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.b2_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.b2_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.data_offset_reg">
+<span class="sig-name descname"><span class="pre">data_offset_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.data_offset_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.data_offset_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.data_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.j_reg">
+<span class="sig-name descname"><span class="pre">j_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.j_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.j_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.k_reg">
+<span class="sig-name descname"><span class="pre">k_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.k_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.k_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.mat">
+<span class="sig-name descname"><span class="pre">mat</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix" title="pysparq.algorithms.cks_solver.SparseMatrix"><span class="pre">SparseMatrix</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.mat" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.nnz_col">
+<span class="sig-name descname"><span class="pre">nnz_col</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.nnz_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.nnz_col" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.qram">
+<span class="sig-name descname"><span class="pre">qram</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><span class="pre">pysparq.QRAMCircuit_qutrit</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.qram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.qram" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.search_result_reg">
+<span class="sig-name descname"><span class="pre">search_result_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.search_result_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.search_result_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.TOperator.sparse_offset_reg">
+<span class="sig-name descname"><span class="pre">sparse_offset_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#TOperator.sparse_offset_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.TOperator.sparse_offset_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.cks_solve">
+<span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">cks_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#cks_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.cks_solve" title="Link to this definition">¶</a></dt>
+<dd><p>Solve Ax = b using CKS quantum linear solver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.create_cks_demo">
+<span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">create_cks_demo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#create_cks_demo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.create_cks_demo" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a demo script for CKS solver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.get_coef_common">
+<span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">get_coef_common</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat_data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#get_coef_common"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.get_coef_common" title="Link to this definition">¶</a></dt>
+<dd><p>Get rotation matrix coefficients for general (signed) matrix elements.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.get_coef_positive_only">
+<span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">get_coef_positive_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat_data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#get_coef_positive_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.get_coef_positive_only" title="Link to this definition">¶</a></dt>
+<dd><p>Get rotation matrix coefficients for positive-only matrix elements.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysparq.algorithms.cks_solver.make_walk_angle_func">
+<span class="sig-prename descclassname"><span class="pre">pysparq.algorithms.cks_solver.</span></span><span class="sig-name descname"><span class="pre">make_walk_angle_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat_data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/pysparq/algorithms/cks_solver.html#make_walk_angle_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysparq.algorithms.cks_solver.make_walk_angle_func" title="Link to this definition">¶</a></dt>
+<dd><p>Create walk angle function for a matrix.</p>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../grover/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">pysparq.algorithms.grover</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">pysparq.algorithms</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pysparq.algorithms.cks_solver</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.C"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient.C()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.coef"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient.coef()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.sign"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient.sign()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.step"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient.step()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.b"><code class="docutils literal notranslate"><span class="pre">ChebyshevPolynomialCoefficient.b</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW"><code class="docutils literal notranslate"><span class="pre">CondRotQW</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.dag"><code class="docutils literal notranslate"><span class="pre">CondRotQW.dag()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.data_reg"><code class="docutils literal notranslate"><span class="pre">CondRotQW.data_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.j_reg"><code class="docutils literal notranslate"><span class="pre">CondRotQW.j_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.k_reg"><code class="docutils literal notranslate"><span class="pre">CondRotQW.k_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.mat"><code class="docutils literal notranslate"><span class="pre">CondRotQW.mat</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.CondRotQW.output_reg"><code class="docutils literal notranslate"><span class="pre">CondRotQW.output_reg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer"><code class="docutils literal notranslate"><span class="pre">LCUContainer</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.external_input"><code class="docutils literal notranslate"><span class="pre">LCUContainer.external_input()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.get_input_reg"><code class="docutils literal notranslate"><span class="pre">LCUContainer.get_input_reg()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.initialize"><code class="docutils literal notranslate"><span class="pre">LCUContainer.initialize()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.iterate"><code class="docutils literal notranslate"><span class="pre">LCUContainer.iterate()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.b"><code class="docutils literal notranslate"><span class="pre">LCUContainer.b</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.chebyshev"><code class="docutils literal notranslate"><span class="pre">LCUContainer.chebyshev</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.current_state"><code class="docutils literal notranslate"><span class="pre">LCUContainer.current_state</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.eps"><code class="docutils literal notranslate"><span class="pre">LCUContainer.eps</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.j0"><code class="docutils literal notranslate"><span class="pre">LCUContainer.j0</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.kappa"><code class="docutils literal notranslate"><span class="pre">LCUContainer.kappa</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.step_state"><code class="docutils literal notranslate"><span class="pre">LCUContainer.step_state</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.LCUContainer.walk"><code class="docutils literal notranslate"><span class="pre">LCUContainer.walk</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.address_offset_reg"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.address_offset_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.max_step"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.max_step</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.qram"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.qram</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.result_reg"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.result_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.target_reg"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.target_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumBinarySearch.total_length"><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch.total_length</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk"><code class="docutils literal notranslate"><span class="pre">QuantumWalk</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.dag"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.dag()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.b1_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.b1_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.b2_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.b2_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.data_offset_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.data_offset_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.j_comp_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.j_comp_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.j_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.j_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.k_comp_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.k_comp_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.k_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.k_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.mat"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.mat</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.qram"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.qram</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalk.sparse_offset_reg"><code class="docutils literal notranslate"><span class="pre">QuantumWalk.sparse_offset_reg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.create_state"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.create_state()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.first_step"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.first_step()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.init_environment"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.init_environment()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.make_n_step_state"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.make_n_step_state()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.step"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.step()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.addr_size"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.addr_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.b1"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.b1</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.b2"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.b2</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_offset"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.data_offset</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.data_size"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.data_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.default_reg_size"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.default_reg_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.j"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.j</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.j_comp"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.j_comp</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.k"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.k</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.k_comp"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.k_comp</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.mat"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.mat</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.n_row"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.n_row</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.nnz_col"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.nnz_col</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.qram"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.qram</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.QuantumWalkNSteps.sparse_offset"><code class="docutils literal notranslate"><span class="pre">QuantumWalkNSteps.sparse_offset</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix"><code class="docutils literal notranslate"><span class="pre">SparseMatrix</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.from_dense"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.from_dense()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_data"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_sparsity_offset"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.get_sparsity_offset()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.get_walk_angle_func"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.get_walk_angle_func()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.data"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.data</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.data_size"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.data_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.n_row"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.n_row</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.nnz_col"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.nnz_col</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.positive_only"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.positive_only</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrix.sparsity_offset"><code class="docutils literal notranslate"><span class="pre">SparseMatrix.sparsity_offset</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.data"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.data</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.data_size"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.data_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.n_row"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.n_row</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.nnz_col"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.nnz_col</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.positive_only"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.positive_only</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.SparseMatrixData.sparsity_offset"><code class="docutils literal notranslate"><span class="pre">SparseMatrixData.sparsity_offset</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator"><code class="docutils literal notranslate"><span class="pre">TOperator</span></code></a><ul>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.dag"><code class="docutils literal notranslate"><span class="pre">TOperator.dag()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.b1_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.b1_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.b2_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.b2_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.data_offset_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.data_offset_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.data_size"><code class="docutils literal notranslate"><span class="pre">TOperator.data_size</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.j_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.j_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.k_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.k_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.mat"><code class="docutils literal notranslate"><span class="pre">TOperator.mat</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.nnz_col"><code class="docutils literal notranslate"><span class="pre">TOperator.nnz_col</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.qram"><code class="docutils literal notranslate"><span class="pre">TOperator.qram</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.search_result_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.search_result_reg</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.TOperator.sparse_offset_reg"><code class="docutils literal notranslate"><span class="pre">TOperator.sparse_offset_reg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.cks_solve"><code class="docutils literal notranslate"><span class="pre">cks_solve()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.create_cks_demo"><code class="docutils literal notranslate"><span class="pre">create_cks_demo()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.get_coef_common"><code class="docutils literal notranslate"><span class="pre">get_coef_common()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.get_coef_positive_only"><code class="docutils literal notranslate"><span class="pre">get_coef_positive_only()</span></code></a></li>
+<li><a class="reference internal" href="#pysparq.algorithms.cks_solver.make_walk_angle_func"><code class="docutils literal notranslate"><span class="pre">make_walk_angle_func()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=08f3124f"></script>
+    </body>
+</html>

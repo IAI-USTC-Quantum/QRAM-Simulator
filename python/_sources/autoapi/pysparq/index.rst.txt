@@ -9,6 +9,15 @@ pysparq
 
 
 
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/pysparq/algorithms/index
+
+
 Attributes
 ----------
 
