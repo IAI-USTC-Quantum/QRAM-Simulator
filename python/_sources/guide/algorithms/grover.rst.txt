@@ -1,244 +1,240 @@
-Grover's Quantum Search Algorithm
-==================================
+Grover 量子搜索算法
+==================
 
 .. contents:: Table of Contents
    :local:
    :class: this-will-duplicate-information-and-it-is-still-useful-here
 
-Overview
+概述
+----
+
+Grover 算法为非结构化搜索问题提供二次加速。给定包含 N 个元素的数据库，算法在 O(√N) 次量子查询内找到目标元素，而经典查询需要 O(N) 次。
+
+本教程演示使用 PySparQ 的寄存器级编程范式实现该算法。
+
+数学背景
 --------
 
-Grover's algorithm provides quadratic speedup for unstructured search
-problems. Given a database of N items, the algorithm finds a marked
-item in O(√N) quantum queries, compared to O(N) classical queries.
+算法原理
+~~~~~~~~
 
-This tutorial demonstrates the implementation using PySparQ's
-Register Level Programming paradigm.
+Grover 算法在两个量子寄存器上操作：
 
-Mathematical Background
------------------------
+1. **地址寄存器**（n 个量子比特）：编码索引 0 到 N-1，其中 N = 2^n
+2. **数据寄存器**：通过 QRAM 存储加载地址处的值
 
-The Algorithm
-~~~~~~~~~~~~~
+算法由三个主要步骤组成：
 
-Grover's algorithm operates on two quantum registers:
-
-1. **Address register** (n qubits): Encodes indices 0 to N-1 where N = 2^n
-2. **Data register**: Stores the value at the loaded address via QRAM
-
-The algorithm consists of three main steps:
-
-1. **Initialization**: Prepare equal superposition over all addresses
+1. **初始化**：在所有地址上准备等权叠加态
 
    .. math::
 
       |\psi_0\rangle = \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} |x\rangle
 
-2. **Grover Iteration**: Repeatedly apply G = D · O
+2. **Grover 迭代**：重复应用 G = D · O
 
-   - **Oracle O**: Marks target states with a negative phase
+   - **预言机 O**：用负相位标记目标状态
 
      .. math::
 
         O|x\rangle = (-1)^{f(x)} |x\rangle
 
-     where f(x) = 1 if x is marked, 0 otherwise.
+     其中 f(x) = 1 当 x 为目标时，否则为 0。
 
-   - **Diffusion D**: Amplifies amplitude of marked states
+   - **扩散 D**：放大标记状态的振幅
 
      .. math::
 
         D = 2|s\rangle\langle s| - I
 
-     where |s⟩ is the uniform superposition.
+     其中 |s⟩ 是均匀叠加态。
 
-3. **Measurement**: Read out the address register
+3. **测量**：读出地址寄存器
 
-Amplitude Amplification
-~~~~~~~~~~~~~~~~~~~~~~~
+振幅放大
+~~~~~~~~
 
-After k iterations, the amplitude of marked states is:
+经过 k 次迭代后，标记状态的振幅为：
 
 .. math::
 
    a_k = \sin((2k+1)\theta)
 
-where :math:`\theta = \arcsin(\sqrt{M/N})` and M is the number of marked items.
+其中 :math:`\theta = \arcsin(\sqrt{M/N})`，M 为标记项数量。
 
-Optimal number of iterations:
+最优迭代次数：
 
 .. math::
 
    k_{opt} \approx \frac{\pi}{4}\sqrt{\frac{N}{M}}
 
-Implementation Steps
---------------------
+实现步骤
+--------
 
-Step 1: Import and Setup
-~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 1：导入和设置
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
    import pysparq as ps
    from pysparq.algorithms.grover import GroverOracle, DiffusionOperator, grover_search
 
-   # Clear any existing quantum state
+   # 清除现有量子态
    ps.System.clear()
 
-Step 2: Create QRAM Memory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 2：创建 QRAM 内存
+~~~~~~~~~~~~~~~~~~~~~~
 
-The QRAM stores the data to be searched. Each address maps to a data value.
+QRAM 存储要搜索的数据。每个地址映射到一个数据值。
 
 .. code-block:: python
 
-   # Define memory to search
+   # 定义要搜索的内存
    memory = [5, 12, 3, 8, 15, 7, 2, 9]
    target = 8
 
-   # Calculate address register size (log2 of memory size)
+   # 计算地址寄存器大小（内存大小的 log2）
    import math
    n_bits = int(math.log2(len(memory))) + 1
 
-   # Create QRAM circuit
-   # addr_size: number of address bits
-   # data_size: number of bits per data value (64 for full integers)
+   # 创建 QRAM 电路
+   # addr_size: 地址比特数
+   # data_size: 每个数据值的比特数（64 表示完整整数）
    qram = ps.QRAMCircuit_qutrit(n_bits, 64, memory)
 
-Step 3: Initialize Quantum State
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 3：初始化量子态
+~~~~~~~~~~~~~~~~~~~
 
-Create the quantum state and necessary registers.
+创建量子态和必要的寄存器。
 
 .. code-block:: python
 
-   # Create quantum state
+   # 创建量子态
    state = ps.SparseState()
 
-   # Add registers
+   # 添加寄存器
    addr_reg = ps.AddRegister("addr", ps.UnsignedInteger, n_bits)(state)
    data_reg = ps.AddRegister("data", ps.UnsignedInteger, 64)(state)
    search_reg = ps.AddRegister("search", ps.UnsignedInteger, 64)(state)
 
-   # Initialize search value to target
+   # 将搜索值初始化为目标值
    ps.Init_Unsafe("search", target)(state)
 
-   # Create superposition over addresses
+   # 在地址上创建叠加态
    ps.Hadamard_Int_Full("addr")(state)
 
-Step 4: Build Oracle
-~~~~~~~~~~~~~~~~~~~~
+步骤 4：构建预言机
+~~~~~~~~~~~~~~~~~~
 
-The oracle marks states where data matches the target.
+预言机标记数据匹配目标的量子态。
 
 .. code-block:: python
 
-   # Create oracle
+   # 创建预言机
    oracle = GroverOracle(qram, "addr", "data", "search")
 
-The oracle performs:
+预言机执行：
 
-1. Load: ``|addr⟩|0⟩ → |addr⟩|data[addr]⟩`` via QRAM
-2. Compare: Check if ``data == target``
-3. Phase flip: Apply -1 to matching states
-4. Uncompute: Reverse comparison and QRAM load
+1. 加载：``|addr⟩|0⟩ → |addr⟩|data[addr]⟩``（通过 QRAM）
+2. 比较：检查 ``data == target``
+3. 相位翻转：对匹配状态应用 -1
+4. 撤销：逆序执行比较和 QRAM 加载
 
-Step 5: Build Diffusion Operator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 5：构建扩散算子
+~~~~~~~~~~~~~~~~~~~
 
-The diffusion operator amplifies marked states.
+扩散算子放大标记状态的振幅。
 
 .. code-block:: python
 
-   # Create diffusion operator
+   # 创建扩散算子
    diffusion = DiffusionOperator("addr")
 
-The diffusion operator performs: H · P₀ · H
+扩散算子执行：H · P₀ · H
 
-Where P₀ applies a phase flip to the |0⟩ state.
+其中 P₀ 对 |0⟩ 状态应用相位翻转。
 
-Step 6: Apply Grover Iterations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 6：执行 Grover 迭代
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Combine oracle and diffusion for amplitude amplification.
+组合预言机和扩散算子进行振幅放大。
 
 .. code-block:: python
 
-   # Calculate optimal iterations
+   # 计算最优迭代次数
    n_iterations = int(math.pi / 4 * math.sqrt(len(memory)))
 
-   # Apply iterations
+   # 执行迭代
    for _ in range(n_iterations):
-       # Add temporary data register for oracle
+       # 为预言机添加临时数据寄存器
        data_id = ps.AddRegister("data_tmp", ps.UnsignedInteger, 64)(state)
 
        oracle(state)
        diffusion(state)
 
-       # Clean up
+       # 清理
        ps.RemoveRegister("data_tmp")(state)
 
-Step 7: Measure Result
-~~~~~~~~~~~~~~~~~~~~~~~
+步骤 7：测量结果
+~~~~~~~~~~~~~~~
 
-Extract the address via partial trace.
+通过部分迹提取地址。
 
 .. code-block:: python
 
-   # Measure by tracing out data and search registers
+   # 通过对数据和搜索寄存器取部分迹来测量
    measured_results, probability = ps.PartialTrace(["data", "search"])(state)
 
    index = measured_results[0]
-   print(f"Found target at index {index}")
+   print(f"在索引 {index} 处找到目标")
    print(f"Memory[{index}] = {memory[index]}")
 
-Complete Example
-----------------
+完整示例
+--------
 
 .. code-block:: python
 
    import pysparq as ps
    from pysparq.algorithms.grover import grover_search
 
-   # Define search problem
+   # 定义搜索问题
    memory = [5, 12, 3, 8, 15, 7, 2, 9]
    target = 8
 
-   # Execute Grover search
+   # 执行 Grover 搜索
    index, prob = grover_search(memory, target)
 
-   print(f"Memory: {memory}")
-   print(f"Target: {target}")
-   print(f"Found at index {index}")
+   print(f"内存: {memory}")
+   print(f"目标: {target}")
+   print(f"在索引 {index} 处找到")
    print(f"Memory[{index}] = {memory[index]}")
-   print(f"Probability: {prob:.4f}")
+   print(f"概率: {prob:.4f}")
 
-   # Output:
-   # Memory: [5, 12, 3, 8, 15, 7, 2, 9]
-   # Target: 8
-   # Found at index 3
+   # 输出:
+   # 内存: [5, 12, 3, 8, 15, 7, 2, 9]
+   # 目标: 8
+   # 在索引 3 处找到
    # Memory[3] = 8
-   # Probability: 0.9453
+   # 概率: 0.9453
 
-Quantum Counting
-----------------
+量子计数
+--------
 
-The ``grover_count`` function uses phase estimation to estimate
-the number of marked items.
+``grover_count`` 函数使用相位估计来估计标记项的数量。
 
 .. code-block:: python
 
    from pysparq.algorithms.grover import grover_count
 
-   # Memory with duplicates
+   # 带重复元素的内存
    memory = [5, 5, 5, 8, 8, 7, 2, 9]
    target = 5
 
    count, prob = grover_count(memory, target, precision_bits=8)
-   print(f"Estimated {count} occurrences of {target}")
+   print(f"估计 {target} 出现了 {count} 次")
 
-API Reference
--------------
+API 参考
+---------
 
 .. autoclass:: pysparq.algorithms.grover.GroverOracle
    :members:

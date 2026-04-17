@@ -5,7 +5,7 @@ PySparQ.pysparq.algorithms.grover
 
 .. autoapi-nested-parse::
 
-   Grover's Quantum Search Algorithm Implementation
+   Grover 量子搜索算法实现
 
 
 
@@ -34,7 +34,7 @@ Module Contents
 
 .. py:class:: DiffusionOperator(addr_reg: Union[str, int])
 
-   HPH (Hadamard-Phase-Hadamard) diffusion operator.
+   HPH（Hadamard-相位-Hadamard）扩散算子。
 
 
    .. py:method:: clear_conditions() -> None
@@ -49,7 +49,7 @@ Module Contents
 
 .. py:class:: GroverOperator(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
 
-   Combined Grover operator: Oracle followed by Diffusion.
+   组合 Grover 算子：预言机后接扩散。
 
 
    .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> GroverOperator
@@ -65,7 +65,7 @@ Module Contents
 
 .. py:class:: GroverOracle(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
 
-   Oracle for Grover's search that marks target values.
+   Grover 搜索预言机，用于标记目标值。
 
 
    .. py:method:: clear_conditions() -> None
@@ -92,16 +92,16 @@ Module Contents
 
 .. py:function:: create_grover_demo() -> str
 
-   Generate a demo script for Grover's algorithm.
+   生成 Grover 算法的演示脚本。
 
 
 .. py:function:: grover_count(memory: List[int], target: int, precision_bits: int = ..., data_size: int = ...) -> Tuple[int, float]
 
-   Quantum counting variant of Grover's algorithm.
+   Grover 算法的量子计数变体。
 
 
 .. py:function:: grover_search(memory: List[int], target: int, n_iterations: Optional[int] = ..., data_size: int = ...) -> Tuple[int, float]
 
-   Execute Grover's search to find target in memory.
+   执行 Grover 搜索以在内存中找到目标值。
 
 

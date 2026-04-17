@@ -1,8 +1,7 @@
-Quantum Algorithm Tutorials
-===========================
+量子算法教程
+============
 
-This section provides step-by-step tutorials for implementing quantum algorithms
-using PySparQ's Register Level Programming paradigm.
+本节提供使用 PySparQ 寄存器级编程范式实现量子算法的逐步教程。
 
 .. toctree::
    :maxdepth: 2
@@ -12,32 +11,32 @@ using PySparQ's Register Level Programming paradigm.
    cks_solver
    qda_solver
 
-Overview
+概述
+----
+
+每个教程遵循一致的结构：
+
+1. **概述**：算法简介及其量子优势
+2. **数学背景**：核心公式和原理
+3. **实现步骤**：详细代码讲解
+4. **完整示例**：可运行代码及解释
+5. **API 参考**：自动生成的类和函数文档
+
+可用算法
 --------
 
-Each tutorial follows a consistent structure:
-
-1. **Overview**: Brief description of the algorithm and its quantum advantage
-2. **Mathematical Background**: Core formulas and principles
-3. **Implementation Steps**: Detailed code walkthrough
-4. **Complete Example**: Runnable code with explanations
-5. **API Reference**: Auto-generated documentation for classes and functions
-
-Available Algorithms
---------------------
-
-Grover's Search Algorithm
-   Quadratic speedup for unstructured search problems.
+Grover 搜索算法
+   非结构化搜索问题的二次加速。
    :doc:`grover`
 
-Shor's Factorization Algorithm
-   Exponential speedup for integer factorization.
+Shor 因式分解算法
+   整数分解的指数级加速。
    :doc:`shor`
 
-CKS Linear System Solver
-   Quantum linear system solver using quantum walk.
+CKS 线性系统求解器
+   使用量子游走的量子线性系统求解器。
    :doc:`cks_solver`
 
-QDA Linear System Solver
-   Optimal scaling quantum linear system solver.
+QDA 线性系统求解器
+   最优缩放量子线性系统求解器。
    :doc:`qda_solver`

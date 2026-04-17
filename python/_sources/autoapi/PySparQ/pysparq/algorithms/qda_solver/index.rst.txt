@@ -5,7 +5,7 @@ PySparQ.pysparq.algorithms.qda_solver
 
 .. autoapi-nested-parse::
 
-   QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation
+   QDA（量子离散绝热）线性系统求解器实现
 
 
 
@@ -44,7 +44,7 @@ Module Contents
 
 .. py:class:: BlockEncoding(A: numpy.ndarray, data_size: int = ...)
 
-   Placeholder for block encoding implementation.
+   块编码实现的占位符。
 
 
    .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> BlockEncoding
@@ -63,7 +63,7 @@ Module Contents
 
 .. py:class:: BlockEncodingHs(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, fs: float)
 
-   Block encoding of the interpolating Hamiltonian H(s).
+   插值哈密顿量 H(s) 的块编码。
 
 
    .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> BlockEncodingHs
@@ -114,7 +114,7 @@ Module Contents
 
 .. py:class:: BlockEncodingHsPD(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, fs: float)
 
-   Positive-definite version of block encoding H(s).
+   块编码 H(s) 的正定版本。
 
 
    .. py:attribute:: R_s
@@ -159,7 +159,7 @@ Module Contents
 
 .. py:class:: Filtering(walk: WalkS, index_reg: str, anc_h: str, epsilon: float = ..., l: int = ...)
 
-   Dolph-Chebyshev filtering for QDA.
+   QDA 的 Dolph-Chebyshev 滤波。
 
 
    .. py:attribute:: anc_h
@@ -188,7 +188,7 @@ Module Contents
 
 .. py:class:: LCU(walk: WalkS, index_reg: str, log_file: str = ...)
 
-   Linear Combination of Unitaries for QDA.
+   QDA 的酉组合（LCU）。
 
 
    .. py:method:: dag(state: pysparq.SparseState) -> None
@@ -212,7 +212,7 @@ Module Contents
 
 .. py:class:: StatePreparation(b: numpy.ndarray)
 
-   Placeholder for state preparation implementation.
+   态制备实现的占位符。
 
 
    .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> StatePreparation
@@ -227,7 +227,7 @@ Module Contents
 
 .. py:class:: WalkS(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, s: float, kappa: float, p: float, is_positive_definite: bool = ...)
 
-   Quantum walk operator at parameter s.
+   参数 s 处的量子游走算子。
 
 
    .. py:method:: clear_control_by_bit() -> None
@@ -296,46 +296,46 @@ Module Contents
 
 .. py:function:: calculate_angles(coeffs: List[float]) -> List[float]
 
-   Calculate rotation angles from coefficients for state preparation.
+   从系数计算态制备的旋转角度。
 
 
 .. py:function:: chebyshev_T(n: int, x: float) -> float
 
-   Compute Chebyshev polynomial T_n(x).
+   计算切比雪夫多项式 T_n(x)。
 
 
 .. py:function:: classical_to_quantum(A: numpy.ndarray, b: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray, Callable[[numpy.ndarray], numpy.ndarray]]
 
-   Convert classical linear system to quantum-compatible form.
+   将经典线性系统转换为量子兼容形式。
 
 
 .. py:function:: compute_fourier_coeffs(epsilon: float, l: int) -> List[float]
 
-   Compute Fourier coefficients for Dolph-Chebyshev filter.
+   计算 Dolph-Chebyshev 滤波器的傅里叶系数。
 
 
 .. py:function:: compute_fs(s: float, kappa: float, p: float) -> float
 
-   Compute the interpolation parameter f(s).
+   计算插值参数 f(s)。
 
 
 .. py:function:: compute_rotation_matrix(fs: float) -> List[complex]
 
-   Compute the rotation matrix R_s for block encoding.
+   计算块编码的旋转矩阵 R_s。
 
 
 .. py:function:: create_qda_demo() -> str
 
-   Generate a demo script for QDA solver.
+   生成 QDA 求解器的演示脚本。
 
 
 .. py:function:: dolph_chebyshev(epsilon: float, l: int, phi: float) -> float
 
-   Compute Dolph-Chebyshev window function.
+   计算 Dolph-Chebyshev 窗函数。
 
 
 .. py:function:: qda_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: Optional[float] = ..., p: float = ..., eps: float = ..., step_rate: float = ...) -> numpy.ndarray
 
-   Solve Ax = b using QDA algorithm.
+   使用 QDA 算法求解 Ax = b。
 
 

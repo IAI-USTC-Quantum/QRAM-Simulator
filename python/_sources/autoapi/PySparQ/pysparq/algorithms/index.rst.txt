@@ -5,10 +5,9 @@ PySparQ.pysparq.algorithms
 
 .. autoapi-nested-parse::
 
-   PySparQ Algorithm Examples
+   PySparQ 算法示例
 
-   This package contains educational implementations of quantum algorithms
-   using PySparQ's Register Level Programming paradigm.
+   本包包含使用 PySparQ 寄存器级编程范式的量子算法教学实现。
 
 
 

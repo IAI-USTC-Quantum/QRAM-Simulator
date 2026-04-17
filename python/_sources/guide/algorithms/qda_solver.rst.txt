@@ -1,68 +1,61 @@
-QDA Linear System Solver
-========================
+QDA 线性系统求解器
+==================
 
 .. contents:: Table of Contents
    :local:
    :class: this-will-duplicate-information-and-it-is-still-useful-here
 
-Overview
+概述
+----
+
+QDA（量子离散绝热）算法为求解线性系统 Ax = b 提供最优缩放，实现 O(κ log(κ/ε)) 复杂度，其中 κ 为条件数。这是量子线性系统求解器的最优复杂度。
+
+本教程演示使用 PySparQ 寄存器级编程范式的完整实现。
+
+数学背景
 --------
 
-The QDA (Quantum Discrete Adiabatic) algorithm provides optimal scaling
-for solving linear systems Ax = b, achieving O(κ log(κ/ε)) complexity
-where κ is the condition number. This is optimal for quantum linear
-system solvers.
+离散绝热定理
+~~~~~~~~~~~~
 
-This tutorial demonstrates the complete implementation using PySparQ's
-Register Level Programming paradigm.
+算法使用离散绝热演化来制备解态 |x⟩ ∝ A⁻¹|b⟩。关键洞察是插值哈密顿量 H(s) 的基态从易于制备的初始态平滑演化到期望的解。
 
-Mathematical Background
------------------------
+插值哈密顿量
+~~~~~~~~~~~~
 
-Discrete Adiabatic Theorem
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+定义 H(s) = (1 - f(s))H₀ + f(s)H₁，其中：
 
-The algorithm uses discrete adiabatic evolution to prepare the solution
-state |x⟩ ∝ A⁻¹|b⟩. The key insight is that the ground state of an
-interpolating Hamiltonian H(s) evolves smoothly from an easy-to-prepare
-initial state to the desired solution.
-
-Interpolating Hamiltonian
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Define H(s) = (1 - f(s))H₀ + f(s)H₁ where:
-
-- **H₀** = σ_z ⊗ I (initial Hamiltonian, easy ground state)
-- **H₁** = A ⊗ |b⟩⟨b| (problem Hamiltonian)
+- **H₀** = σ_z ⊗ I（初始哈密顿量，易于制备基态）
+- **H₁** = A ⊗ |b⟩⟨b|（问题哈密顿量）
 - **f(s)** = κ/(κ-1) × (1 - (1 + s(κ^(p-1) - 1))^(1/(1-p)))
 
-The interpolation function f(s) (Eq. 69) is chosen for optimal scaling.
+插值函数 f(s)（公式 69）的选择是为了实现最优缩放。
 
-Block Encoding
-~~~~~~~~~~~~~~
+块编码
+~~~~~~
 
-The algorithm uses block encoding to represent H(s):
+算法使用块编码表示 H(s)：
 
 .. math::
 
    U_{H(s)} = \begin{pmatrix} H(s) & \cdot \\ \cdot & \cdot \end{pmatrix}
 
-Quantum Walk
-~~~~~~~~~~~~
+量子游走
+~~~~~~~~
 
-The walk operator W_s combines block encoding with reflection:
+游走算子 W_s 组合块编码和反射：
 
 .. math::
 
    W_s = R \cdot U_{H(s)}
 
-Applied repeatedly via LCU construction.
+通过 LCU 构建重复应用。
 
-Implementation Steps
---------------------
+实现步骤
+--------
 
-Step 1: Import and Setup
-~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 1：导入和设置
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -78,91 +71,91 @@ Step 1: Import and Setup
        BlockEncodingHs,
    )
 
-Step 2: Interpolation Parameter f(s)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 2：插值参数 f(s)
+~~~~~~~~~~~~~~~~~~~~~
 
-Compute the interpolation parameter for each discretization point:
+计算每个离散点的插值参数：
 
 .. code-block:: python
 
-   # Parameters
-   kappa = 10.0  # Condition number
-   p = 0.5       # Schedule parameter
+   # 参数
+   kappa = 10.0  # 条件数
+   p = 0.5       # 调度参数
 
-   # Compute f(s) for s in [0, 1]
+   # 计算 s 在 [0, 1] 上的 f(s)
    for s in np.linspace(0, 1, 5):
        fs = compute_fs(s, kappa, p)
        print(f"s = {s:.2f}: f(s) = {fs:.4f}")
 
-   # Output:
+   # 输出:
    # s = 0.00: f(s) = 0.0000
    # s = 0.25: f(s) = 0.1234
    # s = 0.50: f(s) = 0.3456
    # s = 0.75: f(s) = 0.6789
    # s = 1.00: f(s) = 1.0000
 
-Step 3: Rotation Matrix R_s
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 3：旋转矩阵 R_s
+~~~~~~~~~~~~~~~~~~~
 
-Compute the rotation matrix for block encoding:
+计算块编码的旋转矩阵：
 
 .. code-block:: python
 
-   # For f(s) = 0.5
+   # 对于 f(s) = 0.5
    fs = 0.5
    R_s = compute_rotation_matrix(fs)
 
-   print("Rotation matrix R_s:")
+   print("旋转矩阵 R_s:")
    print(f"  [[{R_s[0].real:.4f}, {R_s[1].real:.4f}],")
    print(f"   [{R_s[2].real:.4f}, {R_s[3].real:.4f}]]")
 
-   # For f(s) = 0.5:
+   # 对于 f(s) = 0.5:
    # [[0.7071, 0.7071],
    #  [0.7071, -0.7071]]
 
-Step 4: Initialize Quantum State
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 4：初始化量子态
+~~~~~~~~~~~~~~~~~~~
 
-Create the necessary quantum registers:
+创建必要的量子寄存器：
 
 .. code-block:: python
 
    ps.System.clear()
 
-   n = 2  # Matrix size is 2^k
+   n = 2  # 矩阵大小为 2^k
    n_bits = int(np.log2(n)) + 1
 
-   # Main data register
+   # 主数据寄存器
    main_reg = ps.AddRegister("main", ps.UnsignedInteger, n_bits)(None)
 
-   # Ancilla registers for block encoding
+   # 块编码辅助寄存器
    anc_UA = ps.AddRegister("anc_UA", ps.UnsignedInteger, n_bits)(None)
    anc_1 = ps.AddRegister("anc_1", ps.Boolean, 1)(None)
    anc_2 = ps.AddRegister("anc_2", ps.Boolean, 1)(None)
    anc_3 = ps.AddRegister("anc_3", ps.Boolean, 1)(None)
    anc_4 = ps.AddRegister("anc_4", ps.Boolean, 1)(None)
 
-   # Index register for LCU
+   # LCU 索引寄存器
    index_reg = ps.AddRegister("index", ps.UnsignedInteger, 8)(None)
 
-Step 5: Block Encoding of H(s)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 5：H(s) 的块编码
+~~~~~~~~~~~~~~~~~~~~~
 
-Construct the block encoding operator:
+构建块编码算子：
 
 .. code-block:: python
 
    from pysparq.algorithms.qda_solver import BlockEncoding, StatePreparation
 
-   # Define problem
+   # 定义问题
    A = np.array([[2, 1], [1, 2]], dtype=float)
    b = np.array([1, 0], dtype=float)
 
-   # Create block encoding components
+   # 创建块编码组件
    enc_A = BlockEncoding(A)
    enc_b = StatePreparation(b)
 
-   # Create block encoding at s = 0.5
+   # 在 s = 0.5 处创建块编码
    fs = compute_fs(0.5, kappa=2.0, p=0.5)
 
    enc_Hs = BlockEncodingHs(
@@ -172,53 +165,53 @@ Construct the block encoding operator:
        fs
    )
 
-Step 6: Walk Operator
-~~~~~~~~~~~~~~~~~~~~~
+步骤 6：游走算子
+~~~~~~~~~~~~~~~
 
-Create and apply the walk operator:
+创建并应用游走算子：
 
 .. code-block:: python
 
-   # Create walk operator
+   # 创建游走算子
    walk = WalkS(
        enc_A, enc_b,
        "main", "anc_UA",
        "anc_1", "anc_2", "anc_3", "anc_4",
-       s=0.5,          # Current discretization point
-       kappa=2.0,      # Condition number
-       p=0.5           # Schedule parameter
+       s=0.5,          # 当前离散点
+       kappa=2.0,      # 条件数
+       p=0.5           # 调度参数
    )
 
-   # Apply walk to state
+   # 应用游走到状态
    state = ps.SparseState()
    walk(state)
 
-Step 7: LCU Construction
-~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 7：LCU 构建
+~~~~~~~~~~~~~~~
 
-Apply repeated walk iterations:
+应用重复游走迭代：
 
 .. code-block:: python
 
-   # Create LCU operator
+   # 创建 LCU 算子
    lcu = LCU(walk, index_reg="index")
 
-   # Apply LCU
+   # 应用 LCU
    state = ps.SparseState()
    lcu(state)
 
-   # This applies W^(2^0), W^(2^1), W^(2^2), ... controlled by index bits
+   # 这应用 W^(2^0), W^(2^1), W^(2^2), ... 由索引比特控制
 
-Step 8: Dolph-Chebyshev Filtering
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+步骤 8：Dolph-Chebyshev 滤波
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Apply filtering for error reduction:
+应用滤波以减少误差：
 
 .. code-block:: python
 
    from pysparq.algorithms.qda_solver import Filtering
 
-   # Create filter
+   # 创建滤波器
    filtering = Filtering(
        walk,
        index_reg="index",
@@ -227,37 +220,37 @@ Apply filtering for error reduction:
        l=5
    )
 
-   # Apply filtering
+   # 应用滤波
    state = ps.SparseState()
    success_prob = filtering(state)
-   print(f"Success probability: {success_prob:.4f}")
+   print(f"成功概率: {success_prob:.4f}")
 
-Step 9: Complete Solver
-~~~~~~~~~~~~~~~~~~~~~~~
+步骤 9：完整求解器
+~~~~~~~~~~~~~~~~~~
 
-Use the high-level solver function:
+使用高级求解器函数：
 
 .. code-block:: python
 
-   # Define problem
+   # 定义问题
    A = np.array([[2, 1], [1, 2]], dtype=float)
    b = np.array([1, 1], dtype=float)
 
-   # Solve using QDA
+   # 使用 QDA 求解
    x = qda_solve(A, b, kappa=2.0, eps=0.01)
 
-   print(f"Solution: {x}")
-   print(f"Verification Ax = {A @ x}")
+   print(f"解: {x}")
+   print(f"验证 Ax = {A @ x}")
 
-Complete Example
-----------------
+完整示例
+--------
 
 .. code-block:: python
 
    import numpy as np
    from pysparq.algorithms.qda_solver import qda_solve
 
-   # Example 1: Well-conditioned matrix
+   # 示例 1：良好条件数矩阵
    A = np.array([
        [4, 1, 0],
        [1, 4, 1],
@@ -266,89 +259,87 @@ Complete Example
    b = np.array([1, 2, 1], dtype=float)
 
    kappa = np.linalg.cond(A)
-   print(f"Condition number: {kappa:.2f}")
+   print(f"条件数: {kappa:.2f}")
 
    x = qda_solve(A, b, kappa=kappa, eps=0.01)
-   print(f"Solution: {x}")
-   print(f"Residual: {np.linalg.norm(A @ x - b):.6f}")
+   print(f"解: {x}")
+   print(f"残差: {np.linalg.norm(A @ x - b):.6f}")
 
-   # Example 2: Larger system
+   # 示例 2：更大系统
    n = 8
    A = np.diag(np.ones(n) * 2) + np.diag(np.ones(n-1), 1) + np.diag(np.ones(n-1), -1)
    b = np.ones(n)
 
    x = qda_solve(A, b)
-   print(f"\\nLarge system (n={n})")
-   print(f"Residual norm: {np.linalg.norm(A @ x - b):.6f}")
+   print(f"\n大系统 (n={n})")
+   print(f"残差范数: {np.linalg.norm(A @ x - b):.6f}")
 
-   # Example 3: Compare with classical
+   # 示例 3：与经典比较
    x_classical = np.linalg.solve(A, b)
    error = np.linalg.norm(x - x_classical)
-   print(f"Error vs classical: {error:.6f}")
+   print(f"与经典解的误差: {error:.6f}")
 
-Dolph-Chebyshev Window
------------------------
+Dolph-Chebyshev 窗口
+--------------------
 
-The filtering uses Dolph-Chebyshev polynomials for optimal
-spectral properties:
+滤波使用 Dolph-Chebyshev 多项式实现最优频谱特性：
 
 .. code-block:: python
 
    from pysparq.algorithms.qda_solver import chebyshev_T, dolph_chebyshev
 
-   # Chebyshev polynomial T_n(x)
+   # 切比雪夫多项式 T_n(x)
    for n in range(5):
        x = 0.5
        Tn = chebyshev_T(n, x)
        print(f"T_{n}({x}) = {Tn:.4f}")
 
-   # Dolph-Chebyshev window
+   # Dolph-Chebyshev 窗口
    epsilon = 0.1
    l = 5
    phi = np.pi / 4
 
    window_val = dolph_chebyshev(epsilon, l, phi)
-   print(f"\\nDolph-Chebyshev(eps={epsilon}, l={l}, phi={phi:.4f}) = {window_val:.4f}")
+   print(f"\nDolph-Chebyshev(eps={epsilon}, l={l}, phi={phi:.4f}) = {window_val:.4f}")
 
-Complexity Analysis
--------------------
+复杂度分析
+----------
 
-Time Complexity
-~~~~~~~~~~~~~~~~
+时间复杂度
+~~~~~~~~~~
 
-The QDA algorithm achieves optimal scaling:
+QDA 算法实现最优缩放：
 
 .. math::
 
    T = O(\kappa \log(\kappa/\epsilon))
 
-This is provably optimal for quantum linear system solvers.
+这是量子线性系统求解器的最优复杂度。
 
-Space Complexity
-~~~~~~~~~~~~~~~~
+空间复杂度
+~~~~~~~~~~
 
-Requires O(log n) qubits for n×n matrix, with constant overhead
-for ancilla registers (5 ancilla qubits typically).
+对于 n×n 矩阵需要 O(log n) 个量子比特，辅助寄存器有常数开销（通常 5 个辅助量子比特）。
 
-Key Formulas
-------------
+关键公式
+--------
 
-Interpolation Function (Eq. 69)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+插值函数（公式 69）
+~~~~~~~~~~~~~~~~~~~
 
 .. math::
 
    f(s) = \frac{\kappa}{\kappa - 1}\left(1 - \left(1 + s(\kappa^{p-1} - 1)\right)^{\frac{1}{1-p}}\right)
 
-Rotation Matrix
-~~~~~~~~~~~~~~~
+旋转矩阵
+~~~~~~~~
 
 .. math::
 
    R_s = \frac{1}{\sqrt{(1-f)^2 + f^2}} \begin{pmatrix} 1-f & f \\ f & f-1 \end{pmatrix}
 
-API Reference
--------------
+API 参考
+---------
 
 .. autoclass:: pysparq.algorithms.qda_solver.WalkS
    :members:

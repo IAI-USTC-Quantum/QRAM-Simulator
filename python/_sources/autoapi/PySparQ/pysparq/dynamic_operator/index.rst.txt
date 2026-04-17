@@ -455,7 +455,7 @@ Package Contents
    :raises DynamicOperatorLoadError: 动态库加载失败。
    :raises ValueError: 参数错误（如空名称、无效基类等）。
 
-   .. rubric:: Example
+   .. rubric:: 示例
 
    创建一个简单的翻转算子:
 

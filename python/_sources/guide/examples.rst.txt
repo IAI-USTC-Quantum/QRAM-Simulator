@@ -1,13 +1,14 @@
-Examples
-========
+示例
+====
 
-This section provides comprehensive examples demonstrating PySparQ's capabilities.
+本节提供展示 PySparQ 功能的综合示例。
 
 .. contents:: Table of Contents
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
-Example 1: QFT-based Phase Estimation
---------------------------------------
+示例 1：基于 QFT 的相位估计
+----------------------------
 
 .. code-block:: python
 
@@ -16,110 +17,110 @@ Example 1: QFT-based Phase Estimation
        Hadamard_Int, QFT, inverseQFT
    )
 
-   # Initialize system
+   # 初始化系统
    system = System()
    state = SparseState(system)
 
-   # Create registers for phase estimation
+   # 创建相位估计所需的寄存器
    n_precision = 4
    AddRegister("precision", pysparq.UnsignedInteger, n_precision)(state)
    AddRegister("eigenstate", pysparq.Boolean, 1)(state)
 
-   # Prepare eigenstate |1>
+   # 准备本征态 |1>
    pysparq.Xgate_Bool("eigenstate")(state)
 
-   # Apply Hadamard to precision register
+   # 对精度寄存器应用 Hadamard
    Hadamard_Int("precision")(state)
 
-   # Apply controlled-U operations (simplified)
-   # ... custom controlled operations here ...
+   # 应用受控-U操作（简化版）
+   # ... 这里添加自定义受控操作 ...
 
-   # Apply inverse QFT
+   # 应用逆 QFT
    inverseQFT("precision")(state)
 
-   # Measure the precision register
+   # 测量精度寄存器
    print(state)
 
-Example 2: QRAM Data Loading
------------------------------
+示例 2：QRAM 数据加载
+---------------------
 
 .. code-block:: python
 
    import numpy as np
    from pysparq import System, SparseState, AddRegister, QRAMLoad, Hadamard_Int
 
-   # Initialize system
+   # 初始化系统
    system = System()
    state = SparseState(system)
 
-   # Create address and data registers
-   n_address = 3  # 8 memory locations
-   n_data = 4     # 4-bit data width
+   # 创建地址和数据寄存器
+   n_address = 3  # 8个内存位置
+   n_data = 4     # 4位数据宽度
 
    AddRegister("addr", pysparq.UnsignedInteger, n_address)(state)
    AddRegister("data", pysparq.UnsignedInteger, n_data)(state)
 
-   # Create classical data to load
+   # 创建要加载的经典数据
    memory = np.array([1, 3, 5, 7, 2, 4, 6, 8], dtype=np.uint64)
 
-   # Put address in superposition (query all addresses simultaneously)
+   # 将地址置于叠加态（同时查询所有地址）
    Hadamard_Int("addr")(state)
 
-   # QRAM load: data = memory[addr]
+   # QRAM 加载：data = memory[addr]
    qram = QRAMLoad("addr", "data", memory)
    qram(state)
 
-   # State now contains superposition of all (addr, memory[addr]) pairs
+   # 状态现在包含所有 (addr, memory[addr]) 对的叠加态
    print(state)
 
-Example 3: Quantum Binary Search
----------------------------------
+示例 3：量子二分搜索
+-------------------
 
 .. code-block:: python
 
    from pysparq import System, SparseState, AddRegister, QuantumBinarySearch
 
-   # Initialize system
+   # 初始化系统
    system = System()
    state = SparseState(system)
 
-   # Create sorted array (classical oracle)
+   # 创建有序数组（经典预言机）
    sorted_array = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
 
-   # Search for value 23
+   # 搜索值 23
    target = 23
    n_bits = 4  # log2(len(sorted_array))
 
    AddRegister("index", pysparq.UnsignedInteger, n_bits)(state)
 
-   # Perform quantum binary search
+   # 执行量子二分搜索
    qbs = QuantumBinarySearch(sorted_array, target, "index")
    result_idx = qbs(state)
 
-   print(f"Found {target} at index {result_idx}")
+   print(f"在索引 {result_idx} 处找到 {target}")
 
-Example 4: Block Encoding
--------------------------
+示例 4：块编码
+-------------
 
 .. code-block:: python
 
    from pysparq import System, SparseState, AddRegister, Block_Encoding_Tridiagonal
 
-   # Initialize system
+   # 初始化系统
    system = System()
    state = SparseState(system)
 
-   # Block encode a tridiagonal matrix
-   # Matrix: [[a, b, 0], [c, d, e], [0, f, g]]
-   alpha = 0.5  # diagonal parameter
-   beta = 0.3   # off-diagonal parameter
+   # 块编码三对角矩阵
+   # 矩阵: [[a, b, 0], [c, d, e], [0, f, g]]
+   alpha = 0.5  # 对角线参数
+   beta = 0.3   # 非对角线参数
 
    n_qubits = 2
    AddRegister("system", pysparq.UnsignedInteger, n_qubits)(state)
    AddRegister("ancilla", pysparq.Boolean, 1)(state)
 
-   # Create block encoding operator
+   # 创建块编码算子
    block_encoder = Block_Encoding_Tridiagonal(alpha, beta, n_qubits)
    block_encoder(state)
 
-   print("Block encoding applied successfully")
+   print("块编码应用成功")
