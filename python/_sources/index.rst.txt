@@ -10,6 +10,7 @@ PySparQ is a sparse-state quantum circuit simulator with native QRAM support and
    guide/installation
    guide/quickstart
    guide/examples
+   guide/algorithms/index
 
 .. toctree::
    :maxdepth: 2
