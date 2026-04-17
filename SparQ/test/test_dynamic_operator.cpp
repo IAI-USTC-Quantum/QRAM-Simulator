@@ -317,6 +317,26 @@ protected:
         return prefix;
     }
 
+    // 检查是否可以运行动态编译测试
+    // Windows MSVC 编译的主程序与 MinGW g++ 编译的 DLL ABI 不兼容
+    static bool can_run_dynamic_compile_test() {
+#ifdef _WIN32
+        // Windows 上，如果主程序是 MSVC 编译的，g++ 编译的 DLL 无法加载
+        // 检测是否有可用的 MSVC 编译器 (cl.exe)
+        FILE* pipe = POPEN("cl 2>&1", "r");
+        if (pipe) {
+            PCLOSE(pipe);
+            // 有 cl.exe，但我们测试代码目前使用 g++，仍然会失败
+            // 所以在 Windows 上暂时禁用动态编译测试
+            return false;
+        }
+        return false;
+#else
+        // Unix/Linux/macOS 上可以正常使用 g++
+        return is_compiler_available();
+#endif
+    }
+
     void SetUp() override {
         System::clear();
     }
@@ -353,6 +373,11 @@ protected:
  * @brief 测试简单的 SelfAdjointOperator 扩展
  */
 TEST_F(DynamicOperatorTest, SelfAdjointOperatorExtension) {
+    // Windows MSVC 与 MinGW ABI 不兼容，跳过测试
+    if (!can_run_dynamic_compile_test()) {
+        GTEST_SKIP() << "Skipped: Dynamic compilation not supported on Windows MSVC (ABI incompatibility with MinGW)";
+    }
+
     // 创建一个简单的翻转算子
     std::string cpp_code = R"(
 #include "basic_components.h"
@@ -440,6 +465,11 @@ extern "C" const char* get_base_class() {
  * @brief 测试带参数的 BaseOperator 扩展
  */
 TEST_F(DynamicOperatorTest, BaseOperatorWithParams) {
+    // Windows MSVC 与 MinGW ABI 不兼容，跳过测试
+    if (!can_run_dynamic_compile_test()) {
+        GTEST_SKIP() << "Skipped: Dynamic compilation not supported on Windows MSVC (ABI incompatibility with MinGW)";
+    }
+
     // 创建带参数的相位算子
     std::string cpp_code = R"(
 #include "basic_components.h"
@@ -541,6 +571,11 @@ class BadOp : public BaseOperator {  // 缺少分号
  * @brief 测试缓存机制
  */
 TEST_F(DynamicOperatorTest, CacheMechanism) {
+    // Windows MSVC 与 MinGW ABI 不兼容，跳过测试
+    if (!can_run_dynamic_compile_test()) {
+        GTEST_SKIP() << "Skipped: Dynamic compilation not supported on Windows MSVC (ABI incompatibility with MinGW)";
+    }
+
     // 相同的代码应该产生相同的库
     std::string cpp_code = R"(
 #include "basic_components.h"
@@ -602,6 +637,11 @@ extern "C" void destroy_operator(BaseOperator* op) { delete op; }
  * @brief 测试 dagger 操作正确性
  */
 TEST_F(DynamicOperatorTest, DaggerOperation) {
+    // Windows MSVC 与 MinGW ABI 不兼容，跳过测试
+    if (!can_run_dynamic_compile_test()) {
+        GTEST_SKIP() << "Skipped: Dynamic compilation not supported on Windows MSVC (ABI incompatibility with MinGW)";
+    }
+
     // SelfAdjointOperator: dagger 应该等于自身
     std::string self_adjoint_code = R"(
 #include "basic_components.h"
@@ -666,6 +706,11 @@ TEST_F(DynamicOperatorTest, InvalidLibraryLoad) {
  * @brief 测试动态库中的符号获取
  */
 TEST_F(DynamicOperatorTest, SymbolRetrieval) {
+    // Windows MSVC 与 MinGW ABI 不兼容，跳过测试
+    if (!can_run_dynamic_compile_test()) {
+        GTEST_SKIP() << "Skipped: Dynamic compilation not supported on Windows MSVC (ABI incompatibility with MinGW)";
+    }
+
     std::string cpp_code = R"(
 #include "basic_components.h"
 #include <vector>
