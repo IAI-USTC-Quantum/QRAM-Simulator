@@ -1,0 +1,211 @@
+PySparQ.pysparq.algorithms.shor
+===============================
+
+.. py:module:: PySparQ.pysparq.algorithms.shor
+
+.. autoapi-nested-parse::
+
+   Shor's Quantum Factorization Algorithm Implementation
+
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.shor.ShorExecutionFailed
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.shor.ExpMod
+   PySparQ.pysparq.algorithms.shor.ModMul
+   PySparQ.pysparq.algorithms.shor.SemiClassicalShor
+   PySparQ.pysparq.algorithms.shor.Shor
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.shor.check_period
+   PySparQ.pysparq.algorithms.shor.compute_period
+   PySparQ.pysparq.algorithms.shor.create_shor_demo
+   PySparQ.pysparq.algorithms.shor.factor
+   PySparQ.pysparq.algorithms.shor.factor_full_quantum
+   PySparQ.pysparq.algorithms.shor.find_best_fraction
+   PySparQ.pysparq.algorithms.shor.general_expmod
+   PySparQ.pysparq.algorithms.shor.shor_postprocess
+
+
+Module Contents
+---------------
+
+.. py:exception:: ShorExecutionFailed
+
+   Bases: :py:obj:`Exception`
+
+
+   Exception raised when Shor's algorithm fails to find factors.
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+.. py:class:: ExpMod(input_reg: str, output_reg: str, a: int, N: int, period: int)
+
+   Modular exponentiation operation.
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: N
+      :type:  int
+
+
+   .. py:attribute:: a
+      :type:  int
+
+
+   .. py:attribute:: input_reg
+      :type:  str
+
+
+   .. py:attribute:: output_reg
+      :type:  str
+
+
+   .. py:attribute:: period
+      :type:  int
+
+
+.. py:class:: ModMul(reg: str, a: int, x: int, N: int)
+
+   Controlled modular multiplication operation.
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str) -> ModMul
+
+
+   .. py:attribute:: N
+      :type:  int
+
+
+   .. py:attribute:: a
+      :type:  int
+
+
+   .. py:attribute:: opnum
+      :type:  int
+
+
+   .. py:attribute:: reg
+      :type:  str
+
+
+   .. py:attribute:: x
+      :type:  int
+
+
+.. py:class:: SemiClassicalShor(a: int, N: int)
+
+   Semi-classical implementation of Shor's algorithm.
+
+
+   .. py:method:: run() -> Tuple[int, int]
+
+
+   .. py:attribute:: N
+      :type:  int
+
+
+   .. py:attribute:: a
+      :type:  int
+
+
+   .. py:attribute:: meas_result
+      :type:  int
+
+
+   .. py:attribute:: n
+      :type:  int
+
+
+   .. py:attribute:: p
+      :type:  int
+
+
+   .. py:attribute:: period
+      :type:  int
+
+
+   .. py:attribute:: q
+      :type:  int
+
+
+   .. py:attribute:: size
+      :type:  int
+
+
+.. py:class:: Shor(work_reg: str, ancilla_reg: str, a: int, N: int, period: int)
+
+   Full quantum Shor's algorithm.
+
+
+   .. py:attribute:: ancilla_reg
+      :type:  str
+
+
+   .. py:attribute:: expmod
+      :type:  ExpMod
+
+
+   .. py:attribute:: work_reg
+      :type:  str
+
+
+.. py:function:: check_period(period: int, a: int, N: int) -> None
+
+   Check if period is valid for factoring.
+
+
+.. py:function:: compute_period(meas_result: int, size: int, N: int) -> int
+
+   Compute the period from measurement result.
+
+
+.. py:function:: create_shor_demo() -> str
+
+   Generate a demo script for Shor's algorithm.
+
+
+.. py:function:: factor(N: int, a: Optional[int] = ...) -> Tuple[int, int]
+
+   Factor N using Shor's algorithm.
+
+
+.. py:function:: factor_full_quantum(N: int, a: Optional[int] = ...) -> Tuple[int, int]
+
+   Factor N using full quantum Shor's algorithm.
+
+
+.. py:function:: find_best_fraction(y: int, Q: int, N: int) -> Tuple[int, int]
+
+   Find the best fraction c/r approximating y/Q using Farey sequence.
+
+
+.. py:function:: general_expmod(a: int, x: int, N: int) -> int
+
+   Compute a^x mod N efficiently using square-and-multiply.
+
+
+.. py:function:: shor_postprocess(meas: int, size: int, a: int, N: int) -> Tuple[int, int]
+
+   Classical post-processing for Shor's algorithm.
+
+

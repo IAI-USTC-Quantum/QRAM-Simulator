@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="pysparq" href="../autoapi/pysparq/index.html"><link rel="prev" title="API Reference" href="index.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="API Reference" href="index.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
         <title>Python API Reference - PySparQ Documentation</title>
@@ -217,16 +217,6 @@
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Python API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/pysparq/index.html">pysparq</a><input aria-label="Toggle navigation of pysparq" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/pysparq/algorithms/index.html">pysparq.algorithms</a><input aria-label="Toggle navigation of pysparq.algorithms" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../autoapi/pysparq/algorithms/cks_solver/index.html">pysparq.algorithms.cks_solver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../autoapi/pysparq/algorithms/grover/index.html">pysparq.algorithms.grover</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../autoapi/pysparq/algorithms/qda_solver/index.html">pysparq.algorithms.qda_solver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../autoapi/pysparq/algorithms/shor/index.html">pysparq.algorithms.shor</a></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 
 </div>
@@ -271,130 +261,60 @@
         <article role="main" id="furo-main-content">
           <section id="python-api-reference">
 <h1>Python API Reference<a class="headerlink" href="#python-api-reference" title="Link to this heading">¶</a></h1>
-<p>PySparQ exposes all quantum operations as Python classes and functions through the <a class="reference internal" href="../autoapi/pysparq/index.html#module-pysparq" title="pysparq"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pysparq</span></code></a> module.</p>
+<p>PySparQ exposes all quantum operations as Python classes and functions through the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pysparq</span></code> module.</p>
 <section id="core-classes">
 <span id="api-modules"></span><h2>Core Classes<a class="headerlink" href="#core-classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.System" title="pysparq.System"><code class="xref py py-obj docutils literal notranslate"><span class="pre">System</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.SparseState" title="pysparq.SparseState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseState</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.BaseOperator" title="pysparq.BaseOperator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseOperator</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.SelfAdjointOperator" title="pysparq.SelfAdjointOperator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">System</span></code> - System management for quantum registers</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SparseState</span></code> - Sparse quantum state representation</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code> - Base class for quantum operators</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code> - Self-adjoint quantum operators</p></li>
+</ul>
 </section>
 <section id="quantum-arithmetic-operators">
 <h2>Quantum Arithmetic Operators<a class="headerlink" href="#quantum-arithmetic-operators" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Add_UInt_UInt" title="pysparq.Add_UInt_UInt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Add_UInt_UInt</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Add_UInt_ConstUInt" title="pysparq.Add_UInt_ConstUInt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Add_UInt_ConstUInt</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Add_ConstUInt" title="pysparq.Add_ConstUInt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Add_ConstUInt</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Mult_UInt_ConstUInt" title="pysparq.Mult_UInt_ConstUInt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.AddAssign_AnyInt_AnyInt" title="pysparq.AddAssign_AnyInt_AnyInt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddAssign_AnyInt_AnyInt</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_UInt_UInt()</span></code> - Add two unsigned integer registers</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_UInt_ConstUInt()</span></code> - Add constant to unsigned integer register</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_ConstUInt()</span></code> - Add constant unsigned integer</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt()</span></code> - Multiply unsigned integer by constant</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">AddAssign_AnyInt_AnyInt()</span></code> - Add and assign operation</p></li>
+</ul>
 </section>
 <section id="quantum-gates">
 <h2>Quantum Gates<a class="headerlink" href="#quantum-gates" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Hadamard_Int" title="pysparq.Hadamard_Int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hadamard_Int</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Hadamard_Bool" title="pysparq.Hadamard_Bool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hadamard_Bool</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.QFT" title="pysparq.QFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QFT</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.inverseQFT" title="pysparq.inverseQFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverseQFT</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Xgate_Bool" title="pysparq.Xgate_Bool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Xgate_Bool</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Ygate_Bool" title="pysparq.Ygate_Bool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ygate_Bool</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Zgate_Bool" title="pysparq.Zgate_Bool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Zgate_Bool</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Hadamard_Int()</span></code> - Hadamard gate on integer register</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Hadamard_Bool()</span></code> - Hadamard gate on boolean register</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QFT()</span></code> - Quantum Fourier Transform</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">inverseQFT()</span></code> - Inverse Quantum Fourier Transform</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Xgate_Bool()</span></code> - Pauli X gate on boolean</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Ygate_Bool()</span></code> - Pauli Y gate on boolean</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Zgate_Bool()</span></code> - Pauli Z gate on boolean</p></li>
+</ul>
 </section>
 <section id="qram-operations">
 <h2>QRAM Operations<a class="headerlink" href="#qram-operations" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.QRAMLoad" title="pysparq.QRAMLoad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QRAMLoad</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.QRAMLoadFast" title="pysparq.QRAMLoadFast"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QRAMLoadFast</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.QRAMCircuit_qutrit" title="pysparq.QRAMCircuit_qutrit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMLoad()</span></code> - QRAM load operation</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMLoadFast()</span></code> - Fast QRAM load operation</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit()</span></code> - QRAM circuit using qutrits</p></li>
+</ul>
 </section>
 <section id="state-management">
 <h2>State Management<a class="headerlink" href="#state-management" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.AddRegister" title="pysparq.AddRegister"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddRegister</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.RemoveRegister" title="pysparq.RemoveRegister"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveRegister</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Push" title="pysparq.Push"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Push</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Pop" title="pysparq.Pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pop</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.Normalize" title="pysparq.Normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Normalize</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../autoapi/pysparq/index.html#pysparq.CheckNormalization" title="pysparq.CheckNormalization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CheckNormalization</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">AddRegister()</span></code> - Add a new quantum register</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">RemoveRegister()</span></code> - Remove a quantum register</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Push()</span></code> - Push operation</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Pop()</span></code> - Pop operation</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Normalize()</span></code> - Normalize quantum state</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">CheckNormalization()</span></code> - Check state normalization</p></li>
+</ul>
 </section>
 <section id="full-api-documentation">
 <h2>Full API Documentation<a class="headerlink" href="#full-api-documentation" title="Link to this heading">¶</a></h2>
-<p>For complete API documentation with all classes, functions, and methods, see the <a class="reference internal" href="../autoapi/pysparq/index.html"><span class="doc">API Reference</span></a>.</p>
+<p>For complete API documentation with all classes, functions, and methods, see the <span class="xref std std-doc">API Reference</span>.</p>
 </section>
 </section>
 
@@ -403,15 +323,7 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../autoapi/pysparq/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">pysparq</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           <a class="prev-page" href="index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">

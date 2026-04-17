@@ -1,0 +1,183 @@
+PySparQ.pysparq.dynamic_operator.operator_wrapper
+=================================================
+
+.. py:module:: PySparQ.pysparq.dynamic_operator.operator_wrapper
+
+.. autoapi-nested-parse::
+
+   动态算子包装模块
+
+   使用 ctypes 调用动态库中的 C++ 算子，创建 Python 代理类。
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.SparseState
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.DynamicOperatorError
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.DynamicOperatorFactoryError
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.DynamicOperatorLoadError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.CppOperatorWrapper
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.cleanup_all_instances
+   PySparQ.pysparq.dynamic_operator.operator_wrapper.create_operator_class
+
+
+Module Contents
+---------------
+
+.. py:exception:: DynamicOperatorError
+
+   Bases: :py:obj:`Exception`
+
+
+   动态算子错误
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+.. py:exception:: DynamicOperatorFactoryError
+
+   Bases: :py:obj:`DynamicOperatorError`
+
+
+   工厂函数调用错误
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+.. py:exception:: DynamicOperatorLoadError
+
+   Bases: :py:obj:`DynamicOperatorError`
+
+
+   动态库加载错误
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+.. py:class:: CppOperatorWrapper(lib_path: str)
+
+   C++ 算子包装器
+
+   负责加载动态库、调用工厂函数创建/销毁 C++ 算子对象
+
+   初始化包装器
+
+   :param lib_path: 动态库路径
+
+
+   .. py:method:: apply(ptr: int, state_ptr: int)
+
+      应用算子到状态
+
+      :param ptr: 算子对象地址
+      :param state_ptr: 状态对象地址
+
+
+
+   .. py:method:: apply_dag(ptr: int, state_ptr: int)
+
+      应用 dagger 到状态
+
+      :param ptr: 算子对象地址
+      :param state_ptr: 状态对象地址
+
+
+
+   .. py:method:: close()
+
+      关闭动态库并释放资源
+
+      注意：在 Windows 上，必须确保所有 C++ 对象都已销毁
+      才能成功删除动态库文件
+
+
+
+   .. py:method:: create(*args) -> int
+
+      创建 C++ 算子实例
+
+      :param \*args: 构造函数参数
+
+      :returns: C++ 对象地址（作为 Python int）
+
+
+
+   .. py:method:: destroy(ptr: int)
+
+      销毁 C++ 算子实例
+
+      :param ptr: C++ 对象地址
+
+
+
+   .. py:method:: get_base_class() -> str
+
+      获取基类名称
+
+
+
+   .. py:method:: get_name() -> str
+
+      获取算子名称
+
+
+
+   .. py:method:: load(arg_types: List[str] = None)
+
+      加载动态库
+
+      :param arg_types: 构造函数参数类型列表
+
+      :raises DynamicOperatorLoadError: 加载失败
+
+
+
+   .. py:attribute:: lib_path
+
+
+.. py:function:: cleanup_all_instances()
+
+   清理所有活跃的动态算子实例
+
+
+.. py:function:: create_operator_class(name: str, lib_path: str, base_class: str = 'BaseOperator', constructor_args: List[Tuple[str, str]] = None) -> Type
+
+   创建动态算子 Python 类
+
+   :param name: 算子类名
+   :param lib_path: 动态库路径
+   :param base_class: 基类名 ("BaseOperator" 或 "SelfAdjointOperator")
+   :param constructor_args: 构造函数参数列表 [(type, name), ...]
+
+   :returns: 动态创建的算子类
+
+
+.. py:data:: SparseState
+   :value: None
+
+

@@ -1,0 +1,37 @@
+PySparQ.pysparq
+===============
+
+.. py:module:: PySparQ.pysparq
+
+.. autoapi-nested-parse::
+
+   PySparQ type stubs - re-exports all public API from _core module.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/PySparQ/pysparq/algorithms/index
+   /autoapi/PySparQ/pysparq/dynamic_operator/index
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.test_import
+
+
+Package Contents
+----------------
+
+.. py:function:: test_import() -> None
+
+   Test that PySparQ imports are working correctly.
+
+

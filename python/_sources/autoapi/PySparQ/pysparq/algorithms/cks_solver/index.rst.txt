@@ -1,0 +1,446 @@
+PySparQ.pysparq.algorithms.cks_solver
+=====================================
+
+.. py:module:: PySparQ.pysparq.algorithms.cks_solver
+
+.. autoapi-nested-parse::
+
+   CKS (Childs-Kothari-Somma) Linear System Solver Implementation
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient
+   PySparQ.pysparq.algorithms.cks_solver.CondRotQW
+   PySparQ.pysparq.algorithms.cks_solver.LCUContainer
+   PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch
+   PySparQ.pysparq.algorithms.cks_solver.QuantumWalk
+   PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps
+   PySparQ.pysparq.algorithms.cks_solver.SparseMatrix
+   PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData
+   PySparQ.pysparq.algorithms.cks_solver.TOperator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.cks_solver.cks_solve
+   PySparQ.pysparq.algorithms.cks_solver.create_cks_demo
+   PySparQ.pysparq.algorithms.cks_solver.get_coef_common
+   PySparQ.pysparq.algorithms.cks_solver.get_coef_positive_only
+   PySparQ.pysparq.algorithms.cks_solver.make_walk_angle_func
+
+
+Module Contents
+---------------
+
+.. py:class:: ChebyshevPolynomialCoefficient(b: int)
+
+   Computes Chebyshev polynomial coefficients for quantum walk.
+
+
+   .. py:method:: C(Big: int, Small: int) -> float
+
+
+   .. py:method:: coef(j: int) -> float
+
+
+   .. py:method:: sign(j: int) -> bool
+
+
+   .. py:method:: step(j: int) -> int
+
+
+   .. py:attribute:: b
+      :type:  int
+
+
+.. py:class:: CondRotQW(j_reg: str, k_reg: str, data_reg: str, output_reg: str, mat: SparseMatrix)
+
+   Conditional rotation for quantum walk.
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: data_reg
+      :type:  str
+
+
+   .. py:attribute:: j_reg
+      :type:  str
+
+
+   .. py:attribute:: k_reg
+      :type:  str
+
+
+   .. py:attribute:: mat
+      :type:  SparseMatrix
+
+
+   .. py:attribute:: output_reg
+      :type:  str
+
+
+.. py:class:: LCUContainer(mat: SparseMatrix, kappa: float, eps: float, qram: Optional[pysparq.QRAMCircuit_qutrit] = ...)
+
+   LCU (Linear Combination of Unitaries) container for CKS.
+
+
+   .. py:method:: external_input(init_op: Callable[[pysparq.SparseState], None]) -> None
+
+
+   .. py:method:: get_input_reg() -> str
+
+
+   .. py:method:: initialize() -> None
+
+
+   .. py:method:: iterate() -> bool
+
+
+   .. py:attribute:: b
+      :type:  int
+
+
+   .. py:attribute:: chebyshev
+      :type:  ChebyshevPolynomialCoefficient
+
+
+   .. py:attribute:: current_state
+      :type:  Optional[pysparq.SparseState]
+
+
+   .. py:attribute:: eps
+      :type:  float
+
+
+   .. py:attribute:: j0
+      :type:  int
+
+
+   .. py:attribute:: kappa
+      :type:  float
+
+
+   .. py:attribute:: step_state
+      :type:  Optional[pysparq.SparseState]
+
+
+   .. py:attribute:: walk
+      :type:  QuantumWalkNSteps
+
+
+.. py:class:: QuantumBinarySearch(qram: pysparq.QRAMCircuit_qutrit, address_offset_reg: str, total_length: int, target_reg: str, result_reg: str)
+
+   Quantum binary search for sparse matrix access.
+
+
+   .. py:attribute:: address_offset_reg
+      :type:  str
+
+
+   .. py:attribute:: max_step
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  pysparq.QRAMCircuit_qutrit
+
+
+   .. py:attribute:: result_reg
+      :type:  str
+
+
+   .. py:attribute:: target_reg
+      :type:  str
+
+
+   .. py:attribute:: total_length
+      :type:  int
+
+
+.. py:class:: QuantumWalk(qram: pysparq.QRAMCircuit_qutrit, j_reg: str, b1_reg: str, k_reg: str, b2_reg: str, j_comp_reg: str, k_comp_reg: str, data_offset_reg: str, sparse_offset_reg: str, mat: SparseMatrix)
+
+   Quantum walk operator for CKS algorithm.
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: b1_reg
+      :type:  str
+
+
+   .. py:attribute:: b2_reg
+      :type:  str
+
+
+   .. py:attribute:: data_offset_reg
+      :type:  str
+
+
+   .. py:attribute:: j_comp_reg
+      :type:  str
+
+
+   .. py:attribute:: j_reg
+      :type:  str
+
+
+   .. py:attribute:: k_comp_reg
+      :type:  str
+
+
+   .. py:attribute:: k_reg
+      :type:  str
+
+
+   .. py:attribute:: mat
+      :type:  SparseMatrix
+
+
+   .. py:attribute:: qram
+      :type:  pysparq.QRAMCircuit_qutrit
+
+
+   .. py:attribute:: sparse_offset_reg
+      :type:  str
+
+
+.. py:class:: QuantumWalkNSteps(mat: SparseMatrix, qram: Optional[pysparq.QRAMCircuit_qutrit] = ...)
+
+   Multiple quantum walk steps for CKS algorithm.
+
+
+   .. py:method:: create_state() -> pysparq.SparseState
+
+
+   .. py:method:: first_step(state: pysparq.SparseState) -> None
+
+
+   .. py:method:: init_environment() -> None
+
+
+   .. py:method:: make_n_step_state(n_steps: int) -> pysparq.SparseState
+
+
+   .. py:method:: step(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: addr_size
+      :type:  int
+
+
+   .. py:attribute:: b1
+      :type:  str
+
+
+   .. py:attribute:: b2
+      :type:  str
+
+
+   .. py:attribute:: data_offset
+      :type:  str
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: default_reg_size
+      :type:  int
+
+
+   .. py:attribute:: j
+      :type:  str
+
+
+   .. py:attribute:: j_comp
+      :type:  str
+
+
+   .. py:attribute:: k
+      :type:  str
+
+
+   .. py:attribute:: k_comp
+      :type:  str
+
+
+   .. py:attribute:: mat
+      :type:  SparseMatrix
+
+
+   .. py:attribute:: n_row
+      :type:  int
+
+
+   .. py:attribute:: nnz_col
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  pysparq.QRAMCircuit_qutrit
+
+
+   .. py:attribute:: sparse_offset
+      :type:  str
+
+
+.. py:class:: SparseMatrix(n_row: int, nnz_col: int, data: List[int], data_size: int, positive_only: bool = ...)
+
+   Sparse matrix representation for CKS algorithm.
+
+
+   .. py:method:: from_dense(matrix: numpy.ndarray, data_size: int = ..., positive_only: Optional[bool] = ...) -> SparseMatrix
+      :classmethod:
+
+
+
+   .. py:method:: get_data() -> List[int]
+
+
+   .. py:method:: get_sparsity_offset() -> int
+
+
+   .. py:method:: get_walk_angle_func() -> Callable[[int, int, int], List[complex]]
+
+
+   .. py:attribute:: data
+      :type:  List[int]
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: n_row
+      :type:  int
+
+
+   .. py:attribute:: nnz_col
+      :type:  int
+
+
+   .. py:attribute:: positive_only
+      :type:  bool
+
+
+   .. py:attribute:: sparsity_offset
+      :type:  int
+
+
+.. py:class:: SparseMatrixData
+
+   Sparse matrix data for quantum simulation.
+
+
+   .. py:attribute:: data
+      :type:  List[int]
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: n_row
+      :type:  int
+
+
+   .. py:attribute:: nnz_col
+      :type:  int
+
+
+   .. py:attribute:: positive_only
+      :type:  bool
+
+
+   .. py:attribute:: sparsity_offset
+      :type:  int
+
+
+.. py:class:: TOperator(qram: pysparq.QRAMCircuit_qutrit, data_offset_reg: str, sparse_offset_reg: str, j_reg: str, b1_reg: str, k_reg: str, b2_reg: str, search_result_reg: str, nnz_col: int, data_size: int, mat: SparseMatrix)
+
+   T operator for CKS algorithm.
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: b1_reg
+      :type:  str
+
+
+   .. py:attribute:: b2_reg
+      :type:  str
+
+
+   .. py:attribute:: data_offset_reg
+      :type:  str
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: j_reg
+      :type:  str
+
+
+   .. py:attribute:: k_reg
+      :type:  str
+
+
+   .. py:attribute:: mat
+      :type:  SparseMatrix
+
+
+   .. py:attribute:: nnz_col
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  pysparq.QRAMCircuit_qutrit
+
+
+   .. py:attribute:: search_result_reg
+      :type:  str
+
+
+   .. py:attribute:: sparse_offset_reg
+      :type:  str
+
+
+.. py:function:: cks_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: Optional[float] = ..., eps: float = ..., data_size: int = ...) -> numpy.ndarray
+
+   Solve Ax = b using CKS quantum linear solver.
+
+
+.. py:function:: create_cks_demo() -> str
+
+   Generate a demo script for CKS solver.
+
+
+.. py:function:: get_coef_common(mat_data_size: int, v: int, row: int, col: int) -> List[complex]
+
+   Get rotation matrix coefficients for general (signed) matrix elements.
+
+
+.. py:function:: get_coef_positive_only(mat_data_size: int, v: int, row: int, col: int) -> List[complex]
+
+   Get rotation matrix coefficients for positive-only matrix elements.
+
+
+.. py:function:: make_walk_angle_func(mat_data_size: int, positive_only: bool) -> Callable[[int, int, int], List[complex]]
+
+   Create walk angle function for a matrix.
+
+

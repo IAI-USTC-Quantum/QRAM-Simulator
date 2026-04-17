@@ -1,0 +1,26 @@
+PySparQ.pysparq.algorithms
+==========================
+
+.. py:module:: PySparQ.pysparq.algorithms
+
+.. autoapi-nested-parse::
+
+   PySparQ Algorithm Examples
+
+   This package contains educational implementations of quantum algorithms
+   using PySparQ's Register Level Programming paradigm.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/PySparQ/pysparq/algorithms/cks_solver/index
+   /autoapi/PySparQ/pysparq/algorithms/grover/index
+   /autoapi/PySparQ/pysparq/algorithms/qda_solver/index
+   /autoapi/PySparQ/pysparq/algorithms/shor/index
+
+

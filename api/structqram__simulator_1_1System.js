@@ -1,8 +1,8 @@
 var structqram__simulator_1_1System =
 [
     [ "System", "structqram__simulator_1_1System.html#a12b343b56f0666cb503465e043651c35", null ],
-    [ "get", "structqram__simulator_1_1System.html#a90a4376da8f5eccc45599865b61d56c3", null ],
-    [ "get", "structqram__simulator_1_1System.html#aa2326c5e4b00a27937882f3af8cc77cc", null ],
+    [ "get", "structqram__simulator_1_1System.html#a94c2e20513d5100a08a82cde918b543c", null ],
+    [ "get", "structqram__simulator_1_1System.html#a13ac0cd0cc23404aca5943e726cbfbd6", null ],
     [ "last_register", "structqram__simulator_1_1System.html#aaa8cf9c865668c9c0bfde30f68718128", null ],
     [ "last_register", "structqram__simulator_1_1System.html#a8d12381913acde6ca3e6e7b34b44c327", null ],
     [ "operator!=", "structqram__simulator_1_1System.html#ad65e7637646aea6dc7f551912eea62ac", null ],

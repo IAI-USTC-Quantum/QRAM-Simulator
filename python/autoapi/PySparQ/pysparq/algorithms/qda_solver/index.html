@@ -1,0 +1,865 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../../../genindex.html"><link rel="search" title="Search" href="../../../../../search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>PySparQ.pysparq.algorithms.qda_solver - PySparQ Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../../index.html"><div class="brand">PySparQ Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../../index.html">
+  
+  <span class="sidebar-brand-text">PySparQ Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../guide/quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../guide/examples.html">Examples</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../guide/algorithms/index.html">Quantum Algorithm Tutorials</a><input aria-label="Toggle navigation of Quantum Algorithm Tutorials" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../guide/algorithms/grover.html">Grover’s Quantum Search Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../guide/algorithms/shor.html">Shor’s Quantum Factorization Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../guide/algorithms/cks_solver.html">CKS Linear System Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../guide/algorithms/qda_solver.html">QDA Linear System Solver</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../api/python.html">Python API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/autoapi/PySparQ/pysparq/algorithms/qda_solver/index.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/autoapi/PySparQ/pysparq/algorithms/qda_solver/index.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-PySparQ.pysparq.algorithms.qda_solver">
+<span id="pysparq-pysparq-algorithms-qda-solver"></span><h1>PySparQ.pysparq.algorithms.qda_solver<a class="headerlink" href="#module-PySparQ.pysparq.algorithms.qda_solver" title="Link to this heading">¶</a></h1>
+<p>QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BlockEncoding</span></code></a></p></td>
+<td><p>Placeholder for block encoding implementation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BlockEncodingHs</span></code></a></p></td>
+<td><p>Block encoding of the interpolating Hamiltonian H(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BlockEncodingHsPD</span></code></a></p></td>
+<td><p>Positive-definite version of block encoding H(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering" title="PySparQ.pysparq.algorithms.qda_solver.Filtering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Filtering</span></code></a></p></td>
+<td><p>Dolph-Chebyshev filtering for QDA.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU" title="PySparQ.pysparq.algorithms.qda_solver.LCU"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LCU</span></code></a></p></td>
+<td><p>Linear Combination of Unitaries for QDA.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatePreparation</span></code></a></p></td>
+<td><p>Placeholder for state preparation implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WalkS</span></code></a></p></td>
+<td><p>Quantum walk operator at parameter s.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.calculate_angles" title="PySparQ.pysparq.algorithms.qda_solver.calculate_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_angles</span></code></a>(→ List[float])</p></td>
+<td><p>Calculate rotation angles from coefficients for state preparation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.chebyshev_T" title="PySparQ.pysparq.algorithms.qda_solver.chebyshev_T"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chebyshev_T</span></code></a>(→ float)</p></td>
+<td><p>Compute Chebyshev polynomial T_n(x).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum" title="PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classical_to_quantum</span></code></a>(→ Tuple[numpy.ndarray, ...)</p></td>
+<td><p>Convert classical linear system to quantum-compatible form.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs" title="PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_fourier_coeffs</span></code></a>(→ List[float])</p></td>
+<td><p>Compute Fourier coefficients for Dolph-Chebyshev filter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fs" title="PySparQ.pysparq.algorithms.qda_solver.compute_fs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_fs</span></code></a>(→ float)</p></td>
+<td><p>Compute the interpolation parameter f(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix" title="PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rotation_matrix</span></code></a>(→ List[complex])</p></td>
+<td><p>Compute the rotation matrix R_s for block encoding.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.create_qda_demo" title="PySparQ.pysparq.algorithms.qda_solver.create_qda_demo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_qda_demo</span></code></a>(→ str)</p></td>
+<td><p>Generate a demo script for QDA solver.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev" title="PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dolph_chebyshev</span></code></a>(→ float)</p></td>
+<td><p>Compute Dolph-Chebyshev window function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.qda_solve" title="PySparQ.pysparq.algorithms.qda_solver.qda_solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qda_solve</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Solve Ax = b using QDA algorithm.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">BlockEncoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="Link to this definition">¶</a></dt>
+<dd><p>Placeholder for block encoding implementation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.conditioned_by_all_ones">
+<span class="sig-name descname"><span class="pre">conditioned_by_all_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncoding.conditioned_by_all_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.conditioned_by_all_ones" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pysparq.SparseState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncoding.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.A">
+<span class="sig-name descname"><span class="pre">A</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncoding.A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.A" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.data_size">
+<span class="sig-name descname"><span class="pre">data_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncoding.data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.data_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">BlockEncodingHs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_UA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs" title="Link to this definition">¶</a></dt>
+<dd><p>Block encoding of the interpolating Hamiltonian H(s).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.conditioned_by_all_ones">
+<span class="sig-name descname"><span class="pre">conditioned_by_all_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs"><span class="pre">BlockEncodingHs</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.conditioned_by_all_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.conditioned_by_all_ones" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pysparq.SparseState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.R_s">
+<span class="sig-name descname"><span class="pre">R_s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.R_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.R_s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_1">
+<span class="sig-name descname"><span class="pre">anc_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.anc_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_2">
+<span class="sig-name descname"><span class="pre">anc_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.anc_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_3">
+<span class="sig-name descname"><span class="pre">anc_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.anc_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_4">
+<span class="sig-name descname"><span class="pre">anc_4</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.anc_4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_UA">
+<span class="sig-name descname"><span class="pre">anc_UA</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.anc_UA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_UA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_A">
+<span class="sig-name descname"><span class="pre">enc_A</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.enc_A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_A" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_b">
+<span class="sig-name descname"><span class="pre">enc_b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.enc_b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.fs">
+<span class="sig-name descname"><span class="pre">fs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.fs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.main_reg">
+<span class="sig-name descname"><span class="pre">main_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHs.main_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.main_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">BlockEncodingHsPD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_UA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD" title="Link to this definition">¶</a></dt>
+<dd><p>Positive-definite version of block encoding H(s).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.R_s">
+<span class="sig-name descname"><span class="pre">R_s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.R_s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.R_s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_1">
+<span class="sig-name descname"><span class="pre">anc_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.anc_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_2">
+<span class="sig-name descname"><span class="pre">anc_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.anc_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_3">
+<span class="sig-name descname"><span class="pre">anc_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.anc_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_4">
+<span class="sig-name descname"><span class="pre">anc_4</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.anc_4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_UA">
+<span class="sig-name descname"><span class="pre">anc_UA</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.anc_UA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_UA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_A">
+<span class="sig-name descname"><span class="pre">enc_A</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.enc_A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_A" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_b">
+<span class="sig-name descname"><span class="pre">enc_b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.enc_b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.fs">
+<span class="sig-name descname"><span class="pre">fs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.fs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.main_reg">
+<span class="sig-name descname"><span class="pre">main_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#BlockEncodingHsPD.main_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.main_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">Filtering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering" title="Link to this definition">¶</a></dt>
+<dd><p>Dolph-Chebyshev filtering for QDA.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.anc_h">
+<span class="sig-name descname"><span class="pre">anc_h</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.anc_h"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.anc_h" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.coeffs">
+<span class="sig-name descname"><span class="pre">coeffs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.coeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.coeffs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.epsilon">
+<span class="sig-name descname"><span class="pre">epsilon</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.epsilon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.epsilon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.index_reg">
+<span class="sig-name descname"><span class="pre">index_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.index_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.index_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.l">
+<span class="sig-name descname"><span class="pre">l</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.l"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.l" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.Filtering.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#Filtering.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.walk" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">LCU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU" title="Link to this definition">¶</a></dt>
+<dd><p>Linear Combination of Unitaries for QDA.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pysparq.SparseState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU.index_reg">
+<span class="sig-name descname"><span class="pre">index_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU.index_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.index_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU.index_size">
+<span class="sig-name descname"><span class="pre">index_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU.index_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.index_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU.log_file">
+<span class="sig-name descname"><span class="pre">log_file</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU.log_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.log_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.LCU.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#LCU.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.walk" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.StatePreparation">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">StatePreparation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#StatePreparation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="Link to this definition">¶</a></dt>
+<dd><p>Placeholder for state preparation implementation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.StatePreparation.conditioned_by_all_ones">
+<span class="sig-name descname"><span class="pre">conditioned_by_all_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#StatePreparation.conditioned_by_all_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.conditioned_by_all_ones" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.StatePreparation.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pysparq.SparseState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#StatePreparation.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.StatePreparation.b">
+<span class="sig-name descname"><span class="pre">b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#StatePreparation.b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">WalkS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><span class="pre">BlockEncoding</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation" title="PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><span class="pre">StatePreparation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_UA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">anc_4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_positive_definite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="Link to this definition">¶</a></dt>
+<dd><p>Quantum walk operator at parameter s.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.clear_control_by_bit">
+<span class="sig-name descname"><span class="pre">clear_control_by_bit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.clear_control_by_bit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.clear_control_by_bit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_all_ones">
+<span class="sig-name descname"><span class="pre">conditioned_by_all_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.conditioned_by_all_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_all_ones" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_bit">
+<span class="sig-name descname"><span class="pre">conditioned_by_bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS" title="PySparQ.pysparq.algorithms.qda_solver.WalkS"><span class="pre">WalkS</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.conditioned_by_bit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_bit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.dag">
+<span class="sig-name descname"><span class="pre">dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pysparq.SparseState</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.dag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_1">
+<span class="sig-name descname"><span class="pre">anc_1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.anc_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_2">
+<span class="sig-name descname"><span class="pre">anc_2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.anc_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_3">
+<span class="sig-name descname"><span class="pre">anc_3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.anc_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_4">
+<span class="sig-name descname"><span class="pre">anc_4</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.anc_4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_UA">
+<span class="sig-name descname"><span class="pre">anc_UA</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.anc_UA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_UA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.enc_Hs">
+<span class="sig-name descname"><span class="pre">enc_Hs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs" title="PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs"><span class="pre">BlockEncodingHs</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.enc_Hs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.enc_Hs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.fs">
+<span class="sig-name descname"><span class="pre">fs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.fs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.is_positive_definite">
+<span class="sig-name descname"><span class="pre">is_positive_definite</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.is_positive_definite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.is_positive_definite" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.kappa">
+<span class="sig-name descname"><span class="pre">kappa</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.kappa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.kappa" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.main_reg">
+<span class="sig-name descname"><span class="pre">main_reg</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.main_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.main_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.p">
+<span class="sig-name descname"><span class="pre">p</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.p" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.phase">
+<span class="sig-name descname"><span class="pre">phase</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.phase" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.WalkS.s">
+<span class="sig-name descname"><span class="pre">s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#WalkS.s"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.s" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.calculate_angles">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">calculate_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coeffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#calculate_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.calculate_angles" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate rotation angles from coefficients for state preparation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.chebyshev_T">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">chebyshev_T</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#chebyshev_T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.chebyshev_T" title="Link to this definition">¶</a></dt>
+<dd><p>Compute Chebyshev polynomial T_n(x).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">classical_to_quantum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#classical_to_quantum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum" title="Link to this definition">¶</a></dt>
+<dd><p>Convert classical linear system to quantum-compatible form.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">compute_fourier_coeffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#compute_fourier_coeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs" title="Link to this definition">¶</a></dt>
+<dd><p>Compute Fourier coefficients for Dolph-Chebyshev filter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.compute_fs">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">compute_fs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#compute_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fs" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the interpolation parameter f(s).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">compute_rotation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.14)"><span class="pre">complex</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#compute_rotation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the rotation matrix R_s for block encoding.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.create_qda_demo">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">create_qda_demo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#create_qda_demo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.create_qda_demo" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a demo script for QDA solver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">dolph_chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#dolph_chebyshev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev" title="Link to this definition">¶</a></dt>
+<dd><p>Compute Dolph-Chebyshev window function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="PySparQ.pysparq.algorithms.qda_solver.qda_solve">
+<span class="sig-prename descclassname"><span class="pre">PySparQ.pysparq.algorithms.qda_solver.</span></span><span class="sig-name descname"><span class="pre">qda_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">...</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference internal" href="../../../../../_modules/PySparQ/pysparq/algorithms/qda_solver.html#qda_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PySparQ.pysparq.algorithms.qda_solver.qda_solve" title="Link to this definition">¶</a></dt>
+<dd><p>Solve Ax = b using QDA algorithm.</p>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">PySparQ.pysparq.algorithms.qda_solver</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding"><code class="docutils literal notranslate"><span class="pre">BlockEncoding</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.conditioned_by_all_ones"><code class="docutils literal notranslate"><span class="pre">BlockEncoding.conditioned_by_all_ones()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.dag"><code class="docutils literal notranslate"><span class="pre">BlockEncoding.dag()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.A"><code class="docutils literal notranslate"><span class="pre">BlockEncoding.A</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.data_size"><code class="docutils literal notranslate"><span class="pre">BlockEncoding.data_size</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.conditioned_by_all_ones"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.conditioned_by_all_ones()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.dag"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.dag()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.R_s"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.R_s</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_1"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.anc_1</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_2"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.anc_2</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_3"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.anc_3</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_4"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.anc_4</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.anc_UA"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.anc_UA</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_A"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.enc_A</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_b"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.enc_b</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.fs"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.fs</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.main_reg"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHs.main_reg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.R_s"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.R_s</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_1"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.anc_1</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_2"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.anc_2</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_3"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.anc_3</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_4"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.anc_4</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.anc_UA"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.anc_UA</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_A"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.enc_A</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_b"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.enc_b</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.fs"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.fs</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.main_reg"><code class="docutils literal notranslate"><span class="pre">BlockEncodingHsPD.main_reg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering"><code class="docutils literal notranslate"><span class="pre">Filtering</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.anc_h"><code class="docutils literal notranslate"><span class="pre">Filtering.anc_h</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.coeffs"><code class="docutils literal notranslate"><span class="pre">Filtering.coeffs</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.epsilon"><code class="docutils literal notranslate"><span class="pre">Filtering.epsilon</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.index_reg"><code class="docutils literal notranslate"><span class="pre">Filtering.index_reg</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.l"><code class="docutils literal notranslate"><span class="pre">Filtering.l</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.Filtering.walk"><code class="docutils literal notranslate"><span class="pre">Filtering.walk</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU"><code class="docutils literal notranslate"><span class="pre">LCU</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.dag"><code class="docutils literal notranslate"><span class="pre">LCU.dag()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.index_reg"><code class="docutils literal notranslate"><span class="pre">LCU.index_reg</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.index_size"><code class="docutils literal notranslate"><span class="pre">LCU.index_size</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.log_file"><code class="docutils literal notranslate"><span class="pre">LCU.log_file</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.LCU.walk"><code class="docutils literal notranslate"><span class="pre">LCU.walk</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation"><code class="docutils literal notranslate"><span class="pre">StatePreparation</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.conditioned_by_all_ones"><code class="docutils literal notranslate"><span class="pre">StatePreparation.conditioned_by_all_ones()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.dag"><code class="docutils literal notranslate"><span class="pre">StatePreparation.dag()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.b"><code class="docutils literal notranslate"><span class="pre">StatePreparation.b</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS"><code class="docutils literal notranslate"><span class="pre">WalkS</span></code></a><ul>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.clear_control_by_bit"><code class="docutils literal notranslate"><span class="pre">WalkS.clear_control_by_bit()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_all_ones"><code class="docutils literal notranslate"><span class="pre">WalkS.conditioned_by_all_ones()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_bit"><code class="docutils literal notranslate"><span class="pre">WalkS.conditioned_by_bit()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.dag"><code class="docutils literal notranslate"><span class="pre">WalkS.dag()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_1"><code class="docutils literal notranslate"><span class="pre">WalkS.anc_1</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_2"><code class="docutils literal notranslate"><span class="pre">WalkS.anc_2</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_3"><code class="docutils literal notranslate"><span class="pre">WalkS.anc_3</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_4"><code class="docutils literal notranslate"><span class="pre">WalkS.anc_4</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.anc_UA"><code class="docutils literal notranslate"><span class="pre">WalkS.anc_UA</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.enc_Hs"><code class="docutils literal notranslate"><span class="pre">WalkS.enc_Hs</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.fs"><code class="docutils literal notranslate"><span class="pre">WalkS.fs</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.is_positive_definite"><code class="docutils literal notranslate"><span class="pre">WalkS.is_positive_definite</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.kappa"><code class="docutils literal notranslate"><span class="pre">WalkS.kappa</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.main_reg"><code class="docutils literal notranslate"><span class="pre">WalkS.main_reg</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.p"><code class="docutils literal notranslate"><span class="pre">WalkS.p</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.phase"><code class="docutils literal notranslate"><span class="pre">WalkS.phase</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.WalkS.s"><code class="docutils literal notranslate"><span class="pre">WalkS.s</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.calculate_angles"><code class="docutils literal notranslate"><span class="pre">calculate_angles()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.chebyshev_T"><code class="docutils literal notranslate"><span class="pre">chebyshev_T()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum"><code class="docutils literal notranslate"><span class="pre">classical_to_quantum()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs"><code class="docutils literal notranslate"><span class="pre">compute_fourier_coeffs()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_fs"><code class="docutils literal notranslate"><span class="pre">compute_fs()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix"><code class="docutils literal notranslate"><span class="pre">compute_rotation_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.create_qda_demo"><code class="docutils literal notranslate"><span class="pre">create_qda_demo()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev"><code class="docutils literal notranslate"><span class="pre">dolph_chebyshev()</span></code></a></li>
+<li><a class="reference internal" href="#PySparQ.pysparq.algorithms.qda_solver.qda_solve"><code class="docutils literal notranslate"><span class="pre">qda_solve()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=08f3124f"></script>
+    </body>
+</html>

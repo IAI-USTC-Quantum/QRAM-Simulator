@@ -1,0 +1,374 @@
+PySparQ.pysparq.dynamic_operator.compiler
+=========================================
+
+.. py:module:: PySparQ.pysparq.dynamic_operator.compiler
+
+.. autoapi-nested-parse::
+
+   运行时 C++ 代码编译系统
+
+   提供动态编译用户自定义 C++ 算子的功能，支持：
+   - 自动生成代码框架
+   - 调用 g++ 编译为共享库 (.so)
+   - 代码哈希缓存机制，避免重复编译
+   - 编译错误捕获和格式化
+
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.compiler.CompilationError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.compiler.CompilerConfig
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.dynamic_operator.compiler.clear_cache
+   PySparQ.pysparq.dynamic_operator.compiler.compile_cpp_code
+   PySparQ.pysparq.dynamic_operator.compiler.compute_code_hash
+   PySparQ.pysparq.dynamic_operator.compiler.find_project_root
+   PySparQ.pysparq.dynamic_operator.compiler.format_compile_error
+   PySparQ.pysparq.dynamic_operator.compiler.generate_cpp_source
+   PySparQ.pysparq.dynamic_operator.compiler.get_cache_info
+   PySparQ.pysparq.dynamic_operator.compiler.quick_compile
+
+
+Module Contents
+---------------
+
+.. py:exception:: CompilationError(message: str, stderr: str = '', returncode: int = 0)
+
+   Bases: :py:obj:`Exception`
+
+
+   编译错误异常
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+   .. py:attribute:: returncode
+      :value: 0
+
+
+
+   .. py:attribute:: stderr
+      :value: ''
+
+
+
+.. py:class:: CompilerConfig(cxx: str = 'g++', std: str = 'c++17', opt_level: str = 'O2', include_paths: Optional[list] = None, lib_paths: Optional[list] = None, libraries: Optional[list] = None, extra_flags: Optional[list] = None, template: Optional[str] = None)
+
+   编译器配置
+
+   初始化编译器配置
+
+   :param cxx: C++ 编译器命令（默认 g++）
+   :param std: C++ 标准版本（默认 c++17）
+   :param opt_level: 优化级别（默认 O2）
+   :param include_paths: 额外的头文件搜索路径
+   :param lib_paths: 额外的库文件搜索路径
+   :param libraries: 需要链接的库
+   :param extra_flags: 额外的编译器标志
+   :param template: 自定义代码模板
+
+
+   .. py:method:: get_compile_flags() -> list
+
+      生成编译器标志列表
+
+
+
+   .. py:attribute:: DEFAULT_TEMPLATE
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """#include "basic_components.h"
+         #include <vector>
+         #include <complex>
+         
+         using namespace qram_simulator;
+         
+         {USER_CPP_CODE}
+         
+         extern "C" BaseOperator* create_operator({CTOR_PARAMS}) {{
+             return new {CLASS_NAME}({CTOR_ARGS});
+         }}
+         
+         extern "C" void destroy_operator(BaseOperator* op) {{
+             delete op;
+         }}
+         
+         extern "C" const char* get_operator_name() {{
+             return "{CLASS_NAME}";
+         }}
+         """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: PYTHON_TEMPLATE
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """#include "basic_components.h"
+         #include <vector>
+         #include <complex>
+         
+         using namespace qram_simulator;
+         
+         {USER_CPP_CODE}
+         
+         extern "C" BaseOperator* create_operator({CTOR_PARAMS}) {{
+             return new {CLASS_NAME}({CTOR_ARGS});
+         }}
+         
+         extern "C" void destroy_operator(BaseOperator* op) {{
+             delete op;
+         }}
+         
+         extern "C" const char* get_operator_name() {{
+             return "{CLASS_NAME}";
+         }}
+         
+         // Python 调用辅助函数 - 应用算子到 SparseState
+         extern "C" void apply_operator(BaseOperator* op, SparseState* state) {{
+             if (op && state) {{
+                 (*op)(*state);
+             }}
+         }}
+         
+         // Python 调用辅助函数 - 应用 dagger
+         extern "C" void apply_operator_dag(BaseOperator* op, SparseState* state) {{
+             if (op && state) {{
+                 op->dag(*state);
+             }}
+         }}
+         
+         // Python 调用辅助函数 - 应用算子到 basis_states 向量
+         extern "C" void apply_operator_vec(BaseOperator* op, std::vector<System>* state) {{
+             if (op && state) {{
+                 (*op)(*state);
+             }}
+         }}
+         
+         // Python 调用辅助函数 - 应用 dagger 到 basis_states 向量
+         extern "C" void apply_operator_vec_dag(BaseOperator* op, std::vector<System>* state) {{
+             if (op && state) {{
+                 op->dag(*state);
+             }}
+         }}
+         
+         // 获取基类类型
+         extern "C" const char* get_base_class() {{
+             return "{BASE_CLASS}";
+         }}
+         """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: cxx
+      :value: 'g++'
+
+
+
+   .. py:attribute:: extra_flags
+      :value: []
+
+
+
+   .. py:attribute:: include_paths
+      :value: []
+
+
+
+   .. py:attribute:: lib_paths
+      :value: []
+
+
+
+   .. py:attribute:: libraries
+      :value: []
+
+
+
+   .. py:attribute:: opt_level
+      :value: 'O2'
+
+
+
+   .. py:attribute:: std
+      :value: 'c++17'
+
+
+
+   .. py:attribute:: template
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """#include "basic_components.h"
+         #include <vector>
+         #include <complex>
+         
+         using namespace qram_simulator;
+         
+         {USER_CPP_CODE}
+         
+         extern "C" BaseOperator* create_operator({CTOR_PARAMS}) {{
+             return new {CLASS_NAME}({CTOR_ARGS});
+         }}
+         
+         extern "C" void destroy_operator(BaseOperator* op) {{
+             delete op;
+         }}
+         
+         extern "C" const char* get_operator_name() {{
+             return "{CLASS_NAME}";
+         }}
+         """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+.. py:function:: clear_cache(cache_dir: Optional[str] = None) -> int
+
+   清除编译缓存
+
+   :param cache_dir: 缓存目录（默认使用系统临时目录）
+
+   :returns: 删除的文件数量
+
+
+.. py:function:: compile_cpp_code(cpp_code: str, class_name: str, cache_dir: Optional[str] = None, ctor_params: str = '', ctor_args: str = '', config: Optional[CompilerConfig] = None, project_root: Optional[str] = None, verbose: bool = False) -> str
+
+   编译 C++ 代码为共享库
+
+   :param cpp_code: 用户提供的 C++ 代码（包含类定义）
+   :param class_name: 算子类名
+   :param cache_dir: 缓存目录（默认使用系统临时目录）
+   :param ctor_params: 构造函数参数声明
+   :param ctor_args: 构造函数参数调用
+   :param config: 编译器配置
+   :param project_root: 项目根目录（自动检测）
+   :param verbose: 是否输出详细日志
+
+   :returns: 编译后的共享库路径 (.so 文件)
+
+   :raises CompilationError: 编译失败
+   :raises FileNotFoundError: 找不到编译器
+
+
+.. py:function:: compute_code_hash(cpp_code: str, class_name: str, config: CompilerConfig) -> str
+
+   计算代码哈希值，用于缓存
+
+   哈希包括：代码内容、类名、编译器版本和配置
+
+   :param cpp_code: 用户 C++ 代码
+   :param class_name: 算子类名
+   :param config: 编译器配置
+
+   :returns: 16 字符的十六进制哈希字符串
+
+
+.. py:function:: find_project_root() -> Optional[pathlib.Path]
+
+   查找项目根目录或已安装的包目录
+
+   对于已安装的包，目录结构为:
+   - site-packages/pysparq/ (Python包)
+   - site-packages/include/ (头文件，包含 basic_components.h)
+
+   对于源代码目录:
+   - 项目根目录包含 SparQ/ 和 PySparQ/
+
+   :returns: 项目根目录路径或已安装的包目录，未找到返回 None
+
+
+.. py:function:: format_compile_error(stderr: str, source_path: str) -> str
+
+   格式化编译错误输出
+
+   - 简化文件路径
+   - 高亮错误行
+   - 提取关键错误信息
+
+   :param stderr: 编译器标准错误输出
+   :param source_path: 源文件路径
+
+   :returns: 格式化后的错误信息
+
+
+.. py:function:: generate_cpp_source(cpp_code: str, class_name: str, ctor_params: str = '', ctor_args: str = '', config: Optional[CompilerConfig] = None) -> str
+
+   生成完整的 C++ 源文件
+
+   :param cpp_code: 用户提供的 C++ 代码（包含类定义）
+   :param class_name: 算子类名
+   :param ctor_params: 构造函数参数声明（如 "int n, double theta"）
+   :param ctor_args: 构造函数参数调用（如 "n, theta"）
+   :param config: 编译器配置（使用模板）
+
+   :returns: 完整的 C++ 源代码字符串
+
+
+.. py:function:: get_cache_info(cache_dir: Optional[str] = None) -> dict
+
+   获取缓存信息
+
+   :param cache_dir: 缓存目录
+
+   :returns: 包含缓存统计信息的字典
+
+
+.. py:function:: quick_compile(class_code: str, class_name: str, verbose: bool = False) -> str
+
+   快速编译 C++ 算子代码
+
+   :param class_code: 包含类定义的 C++ 代码
+   :param class_name: 类名
+   :param verbose: 是否输出详细日志
+
+   :returns: 共享库文件路径
+
+

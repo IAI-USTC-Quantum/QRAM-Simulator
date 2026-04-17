@@ -84,6 +84,7 @@ var hierarchy =
     [ "qram_simulator::qram_qubit::BranchGroup", "structqram__simulator_1_1qram__qubit_1_1BranchGroup.html", null ],
     [ "qram_simulator::CombineRegister", "structqram__simulator_1_1CombineRegister.html", null ],
     [ "qram_simulator::ContinuousRange", "structqram__simulator_1_1ContinuousRange.html", null ],
+    [ "pysparq::DynamicOperatorLoader", "classpysparq_1_1DynamicOperatorLoader.html", null ],
     [ "fmt::formatter< qram_simulator::qram_qutrit::QRAMNode >", "structfmt_1_1formatter_3_01qram__simulator_1_1qram__qutrit_1_1QRAMNode_01_4.html", null ],
     [ "qram_simulator::GateBase", "structqram__simulator_1_1GateBase.html", [
       [ "qram_simulator::Phase_Bool", "structqram__simulator_1_1Phase__Bool.html", null ],

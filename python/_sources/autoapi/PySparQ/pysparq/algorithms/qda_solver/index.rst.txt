@@ -1,0 +1,341 @@
+PySparQ.pysparq.algorithms.qda_solver
+=====================================
+
+.. py:module:: PySparQ.pysparq.algorithms.qda_solver
+
+.. autoapi-nested-parse::
+
+   QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.qda_solver.BlockEncoding
+   PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs
+   PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD
+   PySparQ.pysparq.algorithms.qda_solver.Filtering
+   PySparQ.pysparq.algorithms.qda_solver.LCU
+   PySparQ.pysparq.algorithms.qda_solver.StatePreparation
+   PySparQ.pysparq.algorithms.qda_solver.WalkS
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.qda_solver.calculate_angles
+   PySparQ.pysparq.algorithms.qda_solver.chebyshev_T
+   PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum
+   PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs
+   PySparQ.pysparq.algorithms.qda_solver.compute_fs
+   PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix
+   PySparQ.pysparq.algorithms.qda_solver.create_qda_demo
+   PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev
+   PySparQ.pysparq.algorithms.qda_solver.qda_solve
+
+
+Module Contents
+---------------
+
+.. py:class:: BlockEncoding(A: numpy.ndarray, data_size: int = ...)
+
+   Placeholder for block encoding implementation.
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> BlockEncoding
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: A
+      :type:  numpy.ndarray
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+.. py:class:: BlockEncodingHs(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, fs: float)
+
+   Block encoding of the interpolating Hamiltonian H(s).
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> BlockEncodingHs
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: R_s
+      :type:  List[complex]
+
+
+   .. py:attribute:: anc_1
+      :type:  str
+
+
+   .. py:attribute:: anc_2
+      :type:  str
+
+
+   .. py:attribute:: anc_3
+      :type:  str
+
+
+   .. py:attribute:: anc_4
+      :type:  str
+
+
+   .. py:attribute:: anc_UA
+      :type:  str
+
+
+   .. py:attribute:: enc_A
+      :type:  BlockEncoding
+
+
+   .. py:attribute:: enc_b
+      :type:  StatePreparation
+
+
+   .. py:attribute:: fs
+      :type:  float
+
+
+   .. py:attribute:: main_reg
+      :type:  str
+
+
+.. py:class:: BlockEncodingHsPD(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, fs: float)
+
+   Positive-definite version of block encoding H(s).
+
+
+   .. py:attribute:: R_s
+      :type:  List[complex]
+
+
+   .. py:attribute:: anc_1
+      :type:  str
+
+
+   .. py:attribute:: anc_2
+      :type:  str
+
+
+   .. py:attribute:: anc_3
+      :type:  str
+
+
+   .. py:attribute:: anc_4
+      :type:  str
+
+
+   .. py:attribute:: anc_UA
+      :type:  str
+
+
+   .. py:attribute:: enc_A
+      :type:  BlockEncoding
+
+
+   .. py:attribute:: enc_b
+      :type:  StatePreparation
+
+
+   .. py:attribute:: fs
+      :type:  float
+
+
+   .. py:attribute:: main_reg
+      :type:  str
+
+
+.. py:class:: Filtering(walk: WalkS, index_reg: str, anc_h: str, epsilon: float = ..., l: int = ...)
+
+   Dolph-Chebyshev filtering for QDA.
+
+
+   .. py:attribute:: anc_h
+      :type:  str
+
+
+   .. py:attribute:: coeffs
+      :type:  List[float]
+
+
+   .. py:attribute:: epsilon
+      :type:  float
+
+
+   .. py:attribute:: index_reg
+      :type:  str
+
+
+   .. py:attribute:: l
+      :type:  int
+
+
+   .. py:attribute:: walk
+      :type:  WalkS
+
+
+.. py:class:: LCU(walk: WalkS, index_reg: str, log_file: str = ...)
+
+   Linear Combination of Unitaries for QDA.
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: index_reg
+      :type:  str
+
+
+   .. py:attribute:: index_size
+      :type:  int
+
+
+   .. py:attribute:: log_file
+      :type:  str
+
+
+   .. py:attribute:: walk
+      :type:  WalkS
+
+
+.. py:class:: StatePreparation(b: numpy.ndarray)
+
+   Placeholder for state preparation implementation.
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> StatePreparation
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: b
+      :type:  numpy.ndarray
+
+
+.. py:class:: WalkS(enc_A: BlockEncoding, enc_b: StatePreparation, main_reg: str, anc_UA: str, anc_1: str, anc_2: str, anc_3: str, anc_4: str, s: float, kappa: float, p: float, is_positive_definite: bool = ...)
+
+   Quantum walk operator at parameter s.
+
+
+   .. py:method:: clear_control_by_bit() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, List[str]]) -> WalkS
+
+
+   .. py:method:: conditioned_by_bit(reg: str, pos: int) -> WalkS
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
+   .. py:attribute:: anc_1
+      :type:  str
+
+
+   .. py:attribute:: anc_2
+      :type:  str
+
+
+   .. py:attribute:: anc_3
+      :type:  str
+
+
+   .. py:attribute:: anc_4
+      :type:  str
+
+
+   .. py:attribute:: anc_UA
+      :type:  str
+
+
+   .. py:attribute:: enc_Hs
+      :type:  BlockEncodingHs
+
+
+   .. py:attribute:: fs
+      :type:  float
+
+
+   .. py:attribute:: is_positive_definite
+      :type:  bool
+
+
+   .. py:attribute:: kappa
+      :type:  float
+
+
+   .. py:attribute:: main_reg
+      :type:  str
+
+
+   .. py:attribute:: p
+      :type:  float
+
+
+   .. py:attribute:: phase
+      :type:  complex
+
+
+   .. py:attribute:: s
+      :type:  float
+
+
+.. py:function:: calculate_angles(coeffs: List[float]) -> List[float]
+
+   Calculate rotation angles from coefficients for state preparation.
+
+
+.. py:function:: chebyshev_T(n: int, x: float) -> float
+
+   Compute Chebyshev polynomial T_n(x).
+
+
+.. py:function:: classical_to_quantum(A: numpy.ndarray, b: numpy.ndarray) -> Tuple[numpy.ndarray, numpy.ndarray, Callable[[numpy.ndarray], numpy.ndarray]]
+
+   Convert classical linear system to quantum-compatible form.
+
+
+.. py:function:: compute_fourier_coeffs(epsilon: float, l: int) -> List[float]
+
+   Compute Fourier coefficients for Dolph-Chebyshev filter.
+
+
+.. py:function:: compute_fs(s: float, kappa: float, p: float) -> float
+
+   Compute the interpolation parameter f(s).
+
+
+.. py:function:: compute_rotation_matrix(fs: float) -> List[complex]
+
+   Compute the rotation matrix R_s for block encoding.
+
+
+.. py:function:: create_qda_demo() -> str
+
+   Generate a demo script for QDA solver.
+
+
+.. py:function:: dolph_chebyshev(epsilon: float, l: int, phi: float) -> float
+
+   Compute Dolph-Chebyshev window function.
+
+
+.. py:function:: qda_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: Optional[float] = ..., p: float = ..., eps: float = ..., step_rate: float = ...) -> numpy.ndarray
+
+   Solve Ax = b using QDA algorithm.
+
+

@@ -61,18 +61,18 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "BindUtils_8h.html",
-"namespaceqram__simulator.html#ab8a5df704a72b01f8a67b083a7e8324e",
-"structqram__simulator_1_1BaseOperator.html",
-"structqram__simulator_1_1FlipBools.html#aebf7b904639fed5c70a8b1ba1824618b",
-"structqram__simulator_1_1MoveBackRegister.html#a1086522e2f70012703ae36d74d2559f6",
-"structqram__simulator_1_1QRAMInputGenerator.html#a6e25c02e4ea5bc4a6d7aa19c02657dbf",
-"structqram__simulator_1_1Rot__GeneralStatePrep.html#acb5fae6af06b506a02c9e122e910c79c",
-"structqram__simulator_1_1SparseState.html#a31002c81c4c3fa3741229781202db124",
-"structqram__simulator_1_1Swap__General__General.html#a799e1d11bb53fbf61e15cc6fefeff35e",
-"structqram__simulator_1_1Ygate__Bool.html",
-"structqram__simulator_1_1qram__qubit_1_1QRAMCircuit.html#a5db67f903bfda3cb7200a94b22b1f858",
-"structqram__simulator_1_1qram__qutrit_1_1Branch.html#afc34f5d9e838ea7d4e18653664a337dc",
-"structqram__simulator_1_1qram__qutrit_1_1SubBranch.html#a1b27a3bf748279fcfffc0fafdb622887"
+"namespaceqram__simulator.html#a2582c95cec2d6643bea1248f25e65c83",
+"structqram__simulator_1_1Add__UInt__UInt__InPlace.html#a2f6352d638902f8d9e2ac709bc64497c",
+"structqram__simulator_1_1Div__Sqrt__Arccos__Int__Int.html#a2aee8f6e1e0279b0d93b7676df64d950",
+"structqram__simulator_1_1Less__UInt__UInt.html#aa87b59f4ff91336e396ecd1dcafe531d",
+"structqram__simulator_1_1QFT__Full.html#a6488a6032cec10dcc59eb5be6754e08d",
+"structqram__simulator_1_1Rot__Bool.html#a9c5c59cdccd8478a3ca6dd77bfc16d3c",
+"structqram__simulator_1_1SortExceptKeyHadamard.html#ace97f26b94ab90f62e2c48e52f3c71cd",
+"structqram__simulator_1_1StateStorage.html#afa441e06046964750f3e867ae6732b17",
+"structqram__simulator_1_1ViewNormalization.html",
+"structqram__simulator_1_1qram__qubit_1_1QRAMCircuit.html#a30490fd9b067492fb4373188ec708a93",
+"structqram__simulator_1_1qram__qutrit_1_1Branch.html#a9bc6728050fc19e61ab6475dec63b32d",
+"structqram__simulator_1_1qram__qutrit_1_1QRAMState.html#a74789d03b7909babd578520d3c33dc03"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

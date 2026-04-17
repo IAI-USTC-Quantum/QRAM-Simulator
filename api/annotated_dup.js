@@ -3,6 +3,9 @@ var annotated_dup =
     [ "fmt", null, [
       [ "formatter< qram_simulator::qram_qutrit::QRAMNode >", "structfmt_1_1formatter_3_01qram__simulator_1_1qram__qutrit_1_1QRAMNode_01_4.html", "structfmt_1_1formatter_3_01qram__simulator_1_1qram__qutrit_1_1QRAMNode_01_4" ]
     ] ],
+    [ "pysparq", "namespacepysparq.html", [
+      [ "DynamicOperatorLoader", "classpysparq_1_1DynamicOperatorLoader.html", "classpysparq_1_1DynamicOperatorLoader" ]
+    ] ],
     [ "qram_simulator", "namespaceqram__simulator.html", [
       [ "qram_qubit", "namespaceqram__simulator_1_1qram__qubit.html", [
         [ "Branch", "structqram__simulator_1_1qram__qubit_1_1Branch.html", "structqram__simulator_1_1qram__qubit_1_1Branch" ],
