@@ -87,7 +87,7 @@ myst_enable_extensions = [
 
 autoapi_type = "python"
 autoapi_dirs = ["../../../PySparQ/pysparq"]
-autoapi_file_patterns = ["*.pyi"]
+autoapi_file_patterns = ["*.pyi", "*.py"]
 autoapi_generate_api_docs = True
 autoapi_add_toctree_entry = False
 autoapi_options = [
