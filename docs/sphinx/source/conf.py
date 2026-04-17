@@ -37,6 +37,7 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
     "autoapi.extension",
+    "nbsphinx",
 ]
 
 templates_path = ["_templates"]
@@ -142,3 +143,18 @@ copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: 
 copybutton_prompt_is_regexp = True
 copybutton_line_continuation_character = "\\"
 copybutton_here_doc_delimiter = "EOT"
+
+# -- nbsphinx options --------------------------------------------------------
+# https://nbsphinx.readthedocs.io/
+
+nbsphinx_execute = "never"  # Don't execute notebooks during build
+nbsphinx_allow_errors = False
+nbsphinx_timeout = 60
+nbsphinx_prolog = r"""
+{% if docname.endswith('.ipynb') %}
+.. note::
+
+   This page was generated from a Jupyter notebook. The notebook file is
+   available in the source repository.
+{% endif %}
+"""
