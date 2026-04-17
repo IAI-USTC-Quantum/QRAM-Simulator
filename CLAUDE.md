@@ -83,34 +83,54 @@ Doxygen documentation is auto-deployed on push to `main`:
 
 ## Git Workflow
 
-**IMPORTANT: Never push directly to `origin/main`. Always work on fork and submit PRs.**
+**IMPORTANT: Never push directly to `upstream/main`. Always work on fork and submit PRs.**
 
 Remote configuration:
-- `origin` → upstream organization repo (`IAI-USTC-Quantum/QRAM-Simulator`)
-- `fork` → personal fork (`Agony5757/QRAM-Simulator`)
+- `origin` → personal fork (`Agony5757/QRAM-Simulator`), active development
+- `upstream` → organization repo (`IAI-USTC-Quantum/QRAM-Simulator`), PR target
 
-Workflow:
-1. All development happens on `fork` (personal fork)
-2. Changes are submitted via PR from `fork` to `origin/main`
-3. Never push directly to `origin` - it should be protected
+### CI Verification Before Submitting to Upstream
 
-Typical workflow:
+**CRITICAL: Always verify CI passes on fork before submitting PR to upstream.**
+
+1. Push changes to fork: `git push origin <branch-name>`
+2. Check CI status on fork: `gh run list --repo Agony5757/QRAM-Simulator`
+3. View CI details: `gh run view <run-id> --repo Agony5757/QRAM-Simulator`
+4. Only after all CI checks pass, create PR to upstream
+
+### Typical Workflow
+
 ```bash
-# Create feature branch on fork
-git checkout -b feature/my-feature fork/main
+# Create feature branch from origin (fork)
+git checkout -b feature/my-feature origin/main
 
 # Push to fork
-git push fork feature/my-feature
+git push origin feature/my-feature
 
-# Create PR to origin/main
-gh pr create --repo IAI-USTC-Quantum/QRAM-Simulator --head Agony5757:feature/my-feature
+# Check CI status on fork
+gh run list --repo Agony5757/QRAM-Simulator --limit 3
+
+# After CI passes, create PR to upstream
+gh pr create --repo IAI-USTC-Quantum/QRAM-Simulator \
+    --head Agony5757:feature/my-feature \
+    --title "feat: description" \
+    --body "Summary and test plan"
 ```
 
-Sync fork with upstream:
+### Sync Fork with Upstream
+
 ```bash
 gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
-git fetch fork
+git fetch origin
 ```
+
+### CI Jobs
+
+The CI workflow includes:
+- **Build**: Ubuntu (GCC C++17/C++20), Windows (MSVC)
+- **Test**: C++ unit tests via ctest
+- **Python Tests**: Multiple Python versions (3.9, 3.11, 3.12) on Ubuntu and Windows
+- **Docs**: Doxygen + Sphinx documentation build
 
 ## Dependencies
 
