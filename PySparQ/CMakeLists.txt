@@ -11,7 +11,8 @@ project(
 
 # Find the module development requirements (requires FindPython from 3.17 or
 # scikit-build-core's built-in backport)
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+# Use FindPython3 to match what pybind11 uses
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 # find_package(pybind11 CONFIG REQUIRED)
 
 # Add a library using FindPython's tooling (pybind11 also provides a helper like

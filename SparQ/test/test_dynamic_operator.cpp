@@ -40,10 +40,20 @@ using namespace qram_simulator;
 
 /**
  * @brief 创建临时 C++ 源文件
+ * @details 使用进程 ID 作为前缀避免并行测试文件名冲突
  */
 std::string create_temp_source_file(const std::string& code, const std::string& filename) {
     std::string temp_dir = std::filesystem::temp_directory_path().string();
-    std::string filepath = temp_dir + "/" + filename;
+    // 使用进程 ID 作为前缀避免并行测试冲突
+    static std::string pid_prefix;
+    if (pid_prefix.empty()) {
+#ifndef _WIN32
+        pid_prefix = std::to_string(getpid()) + "_";
+#else
+        pid_prefix = std::to_string(GetCurrentProcessId()) + "_";
+#endif
+    }
+    std::string filepath = temp_dir + "/" + pid_prefix + filename;
     std::ofstream file(filepath);
     file << code;
     file.close();
@@ -183,6 +193,7 @@ bool is_compiler_available() {
 
 /**
  * @brief 编译 C++ 代码为共享库
+ * @details 使用进程 ID 作为前缀避免并行测试文件名冲突
  */
 std::string compile_to_shared_lib(const std::string& source_path, const std::string& lib_name) {
     // 首先检查编译器是否可用
@@ -191,8 +202,18 @@ std::string compile_to_shared_lib(const std::string& source_path, const std::str
         return "";
     }
 
+    // 使用进程 ID 作为前缀避免并行测试冲突
+    static std::string pid_prefix;
+    if (pid_prefix.empty()) {
+#ifndef _WIN32
+        pid_prefix = std::to_string(getpid()) + "_";
+#else
+        pid_prefix = std::to_string(GetCurrentProcessId()) + "_";
+#endif
+    }
+
     std::string temp_dir = std::filesystem::temp_directory_path().string();
-    std::string lib_path = temp_dir + "/" + lib_name;
+    std::string lib_path = temp_dir + "/" + pid_prefix + lib_name;
 
     // 查找项目根目录
     std::string project_root = find_project_root();
@@ -283,23 +304,45 @@ public:
 
 class DynamicOperatorTest : public ::testing::Test {
 protected:
+    // 获取当前进程的 PID 前缀（只清理本进程创建的文件）
+    static std::string get_pid_prefix() {
+        static std::string prefix;
+        if (prefix.empty()) {
+#ifndef _WIN32
+            prefix = std::to_string(getpid()) + "_";
+#else
+            prefix = std::to_string(GetCurrentProcessId()) + "_";
+#endif
+        }
+        return prefix;
+    }
+
     void SetUp() override {
         System::clear();
     }
-    
+
     void TearDown() override {
         System::clear();
-        // 清理临时文件
+        // 只清理当前进程创建的临时文件，避免干扰并行测试
         cleanup_temp_files();
     }
-    
+
     void cleanup_temp_files() {
         std::string temp_dir = std::filesystem::temp_directory_path().string();
-        for (const auto& entry : std::filesystem::directory_iterator(temp_dir)) {
-            std::string name = entry.path().filename().string();
-            if (name.find("test_op_") == 0 || name.find("test_dynamic_") == 0) {
-                std::filesystem::remove(entry.path());
+        std::string pid_prefix = get_pid_prefix();
+        try {
+            for (const auto& entry : std::filesystem::directory_iterator(temp_dir)) {
+                std::string name = entry.path().filename().string();
+                // 只清理以当前进程 PID 为前缀的文件
+                if (name.find(pid_prefix + "test_op_") == 0 ||
+                    name.find(pid_prefix + "test_dynamic_") == 0) {
+                    std::error_code ec;
+                    std::filesystem::remove(entry.path(), ec);
+                    // 忽略删除失败（Windows 上文件可能被锁定）
+                }
             }
+        } catch (const std::exception& e) {
+            // 忽略清理异常
         }
     }
 };
@@ -522,17 +565,22 @@ extern "C" BaseOperator* create_operator(size_t reg_id) {
 extern "C" void destroy_operator(BaseOperator* op) { delete op; }
 )";
 
-    std::string source_path1 = create_temp_source_file(cpp_code, "test_op_cache1.cpp");
-    std::string source_path2 = create_temp_source_file(cpp_code, "test_op_cache2.cpp");
-    
-    // 清除可能存在的缓存
+    // 清除可能存在的旧缓存文件（只清理当前进程的 .so 文件）
     std::string temp_dir = std::filesystem::temp_directory_path().string();
+    std::string pid_prefix = get_pid_prefix();
     for (const auto& entry : std::filesystem::directory_iterator(temp_dir)) {
         std::string name = entry.path().filename().string();
-        if (name.find("test_op_cache") == 0 && name.size() > 3 && name.substr(name.size() - 3) == ".so") {
-            std::filesystem::remove(entry.path());
+        // 只清理编译产物 (.so/.dll)，不清理源文件
+        if (name.find(pid_prefix + "test_op_cache") == 0 &&
+            (name.find(".so") != std::string::npos || name.find(".dll") != std::string::npos)) {
+            std::error_code ec;
+            std::filesystem::remove(entry.path(), ec);
         }
     }
+
+    // 创建源文件（放在清理之后）
+    std::string source_path1 = create_temp_source_file(cpp_code, "test_op_cache1.cpp");
+    std::string source_path2 = create_temp_source_file(cpp_code, "test_op_cache2.cpp");
     
     // 第一次编译
     std::string lib_path1 = compile_to_shared_lib(source_path1, "test_op_cache_a.so");

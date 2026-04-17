@@ -253,14 +253,18 @@ namespace qram_simulator
 		 * @param id 寄存器 ID
 		 * @return 状态存储的引用
 		 */
-		StateStorage& get(size_t id);
+		HOST_DEVICE StateStorage& get(size_t id) {
+			return registers[id];
+		}
 
 		/**
 		 * @brief 获取指定位置的状态组件（const 版本）
 		 * @param id 寄存器 ID
 		 * @return 状态存储的 const 引用
 		 */
-		const StateStorage& get(size_t id) const;
+		HOST_DEVICE const StateStorage& get(size_t id) const {
+			return registers[id];
+		}
 
 		/**
 		 * @brief 清除寄存器分配信息

@@ -131,16 +131,6 @@ namespace qram_simulator
 		value = flip_digit(value, digit);
 	}
 
-	StateStorage& System::get(size_t id)
-	{
-		return registers[id];
-	}
-
-	const StateStorage& System::get(size_t id) const
-	{
-		return registers[id];
-	}
-
 	/* Static variables */
 	//std::vector<StateInfoType> System::name_register_map;
 	//size_t System::max_qubit_count = 0;
