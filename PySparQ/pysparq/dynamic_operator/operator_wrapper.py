@@ -201,6 +201,49 @@ class CppOperatorWrapper:
             except Exception:
                 pass  # 忽略销毁错误
     
+    def close(self):
+        """
+        关闭动态库并释放资源
+        
+        注意：在 Windows 上，必须确保所有 C++ 对象都已销毁
+        才能成功删除动态库文件
+        """
+        # 清理函数引用，帮助垃圾回收
+        self._create_func = None
+        self._destroy_func = None
+        self._get_name_func = None
+        self._get_base_class_func = None
+        self._apply_func = None
+        self._apply_dag_func = None
+        
+        # 释放动态库句柄
+        if self._handle is not None:
+            # 在 Windows 上，需要强制垃圾回收以确保句柄释放
+            import gc
+            gc.collect()
+            
+            # 删除 handle 引用，让 ctypes 释放库
+            handle = self._handle
+            self._handle = None
+            
+            # Windows 特定：强制释放库句柄
+            if os.name == 'nt':
+                try:
+                    import ctypes
+                    kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+                    # 获取模块句柄并释放
+                    hmodule = ctypes.c_void_p(handle._handle)
+                    if hmodule:
+                        kernel32.FreeLibrary(hmodule)
+                except Exception:
+                    pass  # 忽略释放错误
+            
+            # 删除 handle 对象
+            del handle
+            
+            # 再次强制垃圾回收
+            gc.collect()
+    
     def get_name(self) -> str:
         """获取算子名称"""
         if self._get_name_func:
@@ -384,6 +427,12 @@ def create_operator_class(
             self._cpp_ptr = 0
         if hasattr(self, '_instance_id'):
             _unregister_instance(self._instance_id)
+        # 关闭动态库句柄（Windows 需要显式释放才能删除文件）
+        if hasattr(self, '_wrapper'):
+            try:
+                self._wrapper.close()
+            except Exception:
+                pass
     
     # 创建动态类
     DynamicOpClass = type(
@@ -442,20 +491,24 @@ def _call_dag_via_pybind11(operator_instance, state):
 
 def cleanup_all_instances():
     """清理所有活跃的动态算子实例"""
-    # 由于使用了弱引用，实例会被自动清理
-    # 这里我们强制进行垃圾回收
     import gc
-    gc.collect()
     
     # 清理仍然存在的实例
     for instance_id, ref in list(_active_instances.items()):
         instance = ref()
         if instance is not None:
             try:
+                # 先销毁 C++ 对象
                 if hasattr(instance, '_cpp_ptr') and instance._cpp_ptr:
                     instance._wrapper.destroy(instance._cpp_ptr)
                     instance._cpp_ptr = 0
+                # 关闭动态库句柄
+                if hasattr(instance, '_wrapper'):
+                    instance._wrapper.close()
             except:
                 pass
     
     _active_instances.clear()
+    
+    # 强制垃圾回收确保资源释放
+    gc.collect()

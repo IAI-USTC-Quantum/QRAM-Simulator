@@ -114,6 +114,13 @@ def compile_operator(
         print(f"[compile_operator] 基类: {base_class}")
         print(f"[compile_operator] 参数: {ctor_params}")
 
+    # 自动检测项目根目录
+    project_root = find_project_root()
+    if project_root is None:
+        raise RuntimeError(
+            "无法自动检测项目根目录。请确保 SparQ/ 和 PySparQ/ 目录存在。"
+        )
+
     # 编译 C++ 代码
     lib_path = compile_cpp_code(
         cpp_code=cpp_code,
@@ -122,6 +129,7 @@ def compile_operator(
         ctor_params=ctor_params,
         ctor_args=ctor_args,
         config=config,
+        project_root=str(project_root),
         verbose=verbose,
     )
 
