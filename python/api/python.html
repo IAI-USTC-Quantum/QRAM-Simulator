@@ -219,6 +219,21 @@
 <li class="toctree-l2"><a class="reference internal" href="dynamic_operator.html">动态算子 API 参考</a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/PySparQ/pysparq/index.html">PySparQ.pysparq</a><input aria-label="Toggle navigation of PySparQ.pysparq" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/PySparQ/pysparq/algorithms/index.html">PySparQ.pysparq.algorithms</a><input aria-label="Toggle navigation of PySparQ.pysparq.algorithms" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html">PySparQ.pysparq.algorithms.cks_solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/algorithms/grover/index.html">PySparQ.pysparq.algorithms.grover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html">PySparQ.pysparq.algorithms.qda_solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/algorithms/shor/index.html">PySparQ.pysparq.algorithms.shor</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../autoapi/PySparQ/pysparq/dynamic_operator/index.html">PySparQ.pysparq.dynamic_operator</a><input aria-label="Toggle navigation of PySparQ.pysparq.dynamic_operator" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/dynamic_operator/compiler/index.html">PySparQ.pysparq.dynamic_operator.compiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../autoapi/PySparQ/pysparq/dynamic_operator/operator_wrapper/index.html">PySparQ.pysparq.dynamic_operator.operator_wrapper</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -266,57 +281,22 @@
 <p>PySparQ 通过 <code class="xref py py-mod docutils literal notranslate"><span class="pre">pysparq</span></code> 模块将所有量子操作暴露为 Python 类和函数。</p>
 <section id="api-modules">
 <span id="id1"></span><h2>核心类<a class="headerlink" href="#api-modules" title="链接到此标题。">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">System</span></code> - 量子寄存器的系统管理</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SparseState</span></code> - 稀疏量子态表示</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOperator</span></code> - 量子算子的基类</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code> - 自伴量子算子</p></li>
-</ul>
 </section>
 <section id="id2">
 <h2>量子算术算子<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_UInt_UInt()</span></code> - 两个无符号整数寄存器相加</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_UInt_ConstUInt()</span></code> - 无符号整数寄存器加常数</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Add_ConstUInt()</span></code> - 加常数无符号整数</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt()</span></code> - 无符号整数乘以常数</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">AddAssign_AnyInt_AnyInt()</span></code> - 加法赋值操作</p></li>
-</ul>
 </section>
 <section id="id3">
 <h2>量子门<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Hadamard_Int()</span></code> - 整数寄存器上的 Hadamard 门</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Hadamard_Bool()</span></code> - 布尔寄存器上的 Hadamard 门</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QFT()</span></code> - 量子傅里叶变换</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">inverseQFT()</span></code> - 逆量子傅里叶变换</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Xgate_Bool()</span></code> - 布尔寄存器上的 Pauli X 门</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Ygate_Bool()</span></code> - 布尔寄存器上的 Pauli Y 门</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Zgate_Bool()</span></code> - 布尔寄存器上的 Pauli Z 门</p></li>
-</ul>
 </section>
 <section id="qram">
 <h2>QRAM 操作<a class="headerlink" href="#qram" title="链接到此标题。">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMLoad()</span></code> - QRAM 加载操作</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMLoadFast()</span></code> - 快速 QRAM 加载操作</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit()</span></code> - 使用 qutrit 的 QRAM 电路</p></li>
-</ul>
 </section>
 <section id="id4">
 <h2>状态管理<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">AddRegister()</span></code> - 添加新的量子寄存器</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">RemoveRegister()</span></code> - 移除量子寄存器</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Push()</span></code> - Push 操作</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Pop()</span></code> - Pop 操作</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">Normalize()</span></code> - 归一化量子态</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">CheckNormalization()</span></code> - 检查态归一化</p></li>
-</ul>
 </section>
 <section id="api">
 <h2>完整 API 文档<a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
-<p>完整的 API 文档（所有类、函数和方法），请参见 <span class="xref std std-doc">API 参考</span>。</p>
+<p>完整的 API 文档（所有类、函数和方法），请参见 <a class="reference internal" href="../autoapi/PySparQ/pysparq/index.html"><span class="doc">API 参考</span></a>。</p>
 </section>
 </section>
 
