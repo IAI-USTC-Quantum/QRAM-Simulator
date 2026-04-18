@@ -4,3 +4,6 @@ furo
 myst-parser
 sphinx-copybutton
 sphinx-autoapi
+nbsphinx
+ipykernel
+nbconvert>=7.0.0
