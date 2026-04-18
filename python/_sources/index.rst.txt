@@ -31,6 +31,26 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
 
 .. toctree::
    :maxdepth: 2
+   :caption: 核心概念
+
+   guide/core_concepts/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 算子参考
+
+   operators/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 交互教程
+
+   notebooks/01_快速入门
+   notebooks/02_稀疏态演化
+   notebooks/03_算子示例
+
+.. toctree::
+   :maxdepth: 2
    :caption: API 参考
 
    api/index
