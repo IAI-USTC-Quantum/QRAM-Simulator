@@ -33,53 +33,28 @@ fallback_version = "0.0.0"
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 # 暂不支持 32 位系统(size_t != uint64_t)
-windows.archs = ["AMD64"]
-# windows.archs = ["ARM64"]
-linux.archs = ["x86_64", "aarch64", "ppc64le", "s390x"]
-macos.archs = ["x86_64", "arm64"]
-
 container-engine = "docker"
 
-# Install OpenMP dependency for each platform
 [tool.cibuildwheel.linux]
+archs = ["x86_64", "aarch64", "ppc64le", "s390x"]
 before-all = "yum install -y libgomp-devel"
-
-[tool.cibuildwheel.musllinux]
-before-all = "apk add libgomp-dev"
-
-[tool.cibuildwheel.macos]
-before-all = "brew install libomp"
-
-[tool.cibuildwheel.windows]
-# Windows MSVC has built-in OpenMP support, just need to enable it
-# No additional installation needed
-
 manylinux-x86_64-image = "manylinux2014"
-# manylinux-i686-image = "manylinux2014"
 manylinux-aarch64-image = "manylinux2014"
 manylinux-ppc64le-image = "manylinux2014"
 manylinux-s390x-image = "manylinux2014"
-# manylinux-armv7l-image = "manylinux_2_31"
 manylinux-pypy_x86_64-image = "manylinux2014"
-# manylinux-pypy_i686-image = "manylinux2014"
 manylinux-pypy_aarch64-image = "manylinux2014"
 
+[tool.cibuildwheel.musllinux]
+before-all = "apk add libgomp-dev"
 musllinux-x86_64-image = "musllinux_1_2"
-# musllinux-i686-image = "musllinux_1_2"
 musllinux-aarch64-image = "musllinux_1_2"
 musllinux-ppc64le-image = "musllinux_1_2"
 musllinux-s390x-image = "musllinux_1_2"
-# musllinux-armv7l-image = "musllinux_1_2"
 
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+before-all = "brew install libomp"
 
-# # Run the package tests using `pytest`
-# test-command = "pytest {package}/tests"
-
-# # Trigger an install of the package, but run nothing of note
-# test-command = "echo Wheel installed"
-
-# # Multiline example
-# test-command = [
-#   "pytest {package}/tests",
-#   "python {package}/test.py",
-# ]
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
