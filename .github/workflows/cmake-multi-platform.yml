@@ -147,6 +147,14 @@ jobs:
     - name: Test Python Package
       run: python -c "import pysparq; pysparq.test_import()"
 
+    - name: Validate Stub Synchronization
+      if: runner.os == 'Linux' && matrix.cpp_standard == '17'
+      run: |
+        pip install pybind11-stubgen
+        pybind11-stubgen pysparq._core -o /tmp/stubs
+        diff PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
+          (echo "::error::Stub files are out of sync. Regenerate with: pybind11-stubgen pysparq._core -o PySparQ/pysparq/" && exit 1)
+
   # ============================================================================
   # Python tests with multiple versions
   # ============================================================================
@@ -218,13 +226,6 @@ jobs:
       run: |
         cd docs/sphinx
         make html
-
-    - name: Validate Stub Synchronization
-      run: |
-        pip install pybind11-stubgen
-        pybind11-stubgen pysparq._core -o /tmp/stubs
-        diff PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
-          (echo "::error::Stub files are out of sync. Regenerate with: pybind11-stubgen pysparq._core -o PySparQ/pysparq/" && exit 1)
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4
