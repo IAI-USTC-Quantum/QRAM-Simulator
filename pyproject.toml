@@ -38,7 +38,7 @@ skip = ["*-musllinux_*", "*-win32", "*-macos*"]
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64"]
-before-all = "yum install -y libgomp-devel"
+before-all = "dnf install -y libgomp-devel"
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
