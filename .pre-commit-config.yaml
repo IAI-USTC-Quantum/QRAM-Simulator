@@ -128,7 +128,7 @@ repos:
     hooks:
       - id: stub-validation
         name: Validate stub files
-        entry: bash -c 'pip install -q . && pip install -q pybind11-stubgen && pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py && diff -q PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi'
+        entry: bash -c 'pip install -q . && pip install -q pybind11-stubgen && pybind11-stubgen pysparq._core -o /tmp/stubs && diff -q PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi'
         language: system
         pass_filenames: false
         files: '(PySparQ/.*\.(cpp|h)$|pyproject\.toml$)'

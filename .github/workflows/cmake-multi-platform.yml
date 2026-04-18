@@ -222,7 +222,7 @@ jobs:
     - name: Validate Stub Synchronization
       run: |
         pip install pybind11-stubgen
-        pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py
+        pybind11-stubgen pysparq._core -o /tmp/stubs
         diff PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
           (echo "::error::Stub files are out of sync. Regenerate with: pybind11-stubgen pysparq._core -o PySparQ/pysparq/" && exit 1)
 
