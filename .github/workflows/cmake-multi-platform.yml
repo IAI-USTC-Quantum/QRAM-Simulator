@@ -222,9 +222,9 @@ jobs:
     - name: Validate Stub Synchronization
       run: |
         pip install pybind11-stubgen
-        pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py || true
-        diff -q PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
-          echo "::warning::Stub files may need regeneration. Run: pybind11-stubgen pysparq._core -o PySparQ/pysparq/"
+        pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py
+        diff PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi || \
+          (echo "::error::Stub files are out of sync. Regenerate with: pybind11-stubgen pysparq._core -o PySparQ/pysparq/" && exit 1)
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4

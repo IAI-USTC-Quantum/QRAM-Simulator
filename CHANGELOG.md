@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 项目架构文档 ARCHITECTURE.md（已移至 `docs/architecture.md`）
 - 变更日志 CHANGELOG.md
 - 完善的 README.md，包含复现说明
+- 为 PySparQ 核心类添加文档字符串（System, SparseState, QRAMLoad, QFT, Add_UInt_UInt 等）
+- 为可控方法添加共享文档字符串（conditioned_by_nonzeros, conditioned_by_all_ones 等）
 
 ### Changed
 - 文档结构优化
+- CI 存根验证现在会在不同步时失败（不再只是警告）
+- 添加 pre-commit hook 验证存根文件同步
 - GitHub Actions 现在持久化 ccache（Linux）和 sccache（Windows）缓存
 - GitHub Actions 添加 pip 缓存支持
 - Python CI 矩阵从 [3.9, 3.11, 3.12] 更新为 [3.10, 3.12, 3.13]

@@ -7,7 +7,27 @@
 
 PYBIND11_MODULE(_core, m)
 {
-    m.doc() = "[Module sparq]";
+    m.doc() = R"doc(
+PySparQ - Sparse-state quantum circuit simulator with native QRAM support.
+
+This module provides a Register Level Programming paradigm for quantum algorithm
+development. Instead of composing circuits from individual gates, operate directly
+on named registers using high-level arithmetic operations.
+
+Key classes:
+    System: Quantum system managing registers
+    SparseState: Sparse quantum state representation
+    BaseOperator: Base class for all quantum operators
+
+Example:
+    from pysparq import System, SparseState, AddRegister, Hadamard_Int
+
+    system = System()
+    state = SparseState()
+    AddRegister("q", UnsignedInteger, 4)(state)
+    Hadamard_Int("q")(state)
+    print(state)
+)doc";
 
     py::class_<DenseMatrix<complex_t>>(m, "DenseMatrix_complex")
         .def(py::init<>())
@@ -33,11 +53,39 @@ PYBIND11_MODULE(_core, m)
         .def(py::init<>())
         .def_readonly("value", &StateStorage::value);
 
-    py::class_<SparseState> sparse_state(m, "SparseState");
-    sparse_state.def(py::init<>());
+    py::class_<SparseState> sparse_state(m, "SparseState", R"doc(
+Sparse quantum state representation.
 
-    py::class_<System>(m, "System")
-        .def(py::init<>())
+Stores only non-zero amplitude entries, making it efficient for states
+with limited superposition. Works with the global System registry.
+
+Example:
+    state = SparseState()
+    AddRegister("q", UnsignedInteger, 4)(state)
+    Hadamard_Int("q")(state)
+
+Note:
+    The sparse representation is memory-efficient but may be slower
+    for dense superposition states.
+)doc");
+    sparse_state.def(py::init<>(), "Create an empty sparse quantum state");
+
+    py::class_<System>(m, "System", R"doc(
+Quantum system managing named registers.
+
+The System class provides the foundation for register management. It tracks
+register names, types, and sizes via a global registry shared by all
+SparseState instances.
+
+Example:
+    system = System()
+    state = SparseState()
+
+Attributes:
+    registers: Dict mapping register names to their metadata.
+    amplitude: Amplitude coefficient for this system instance.
+)doc")
+        .def(py::init<>(), "Create an empty quantum system")
         .def_readonly("amplitude", &System::amplitude)
         .def_readonly("registers", &System::registers)
         .def_readonly_static("name_register_map", &System::name_register_map)
@@ -127,10 +175,31 @@ PYBIND11_MODULE(_core, m)
         .def("operate_alone_one", &CondRot_Rational_Bool_Cpp::operate_alone_one);
 
     /* dark_magic.h */
-    BIND_SELF_ADJOINT_OPERATOR(Normalize)
+    BIND_SELF_ADJOINT_OPERATOR(Normalize, R"doc(
+Normalize the quantum state.
+
+Ensures the state vector has unit norm by dividing all amplitudes
+by the total norm. Call after operations that may leave the state
+unnormalized.
+
+Example:
+    Normalize()(state)
+)doc")
         .def(py::init<>());
 
-    BIND_SELF_ADJOINT_OPERATOR(Init_Unsafe)
+    BIND_SELF_ADJOINT_OPERATOR(Init_Unsafe, R"doc(
+Initialize a register to a specific value (unsafe).
+
+Sets the register to a classical value without checking normalization.
+Use with caution as it modifies amplitudes directly.
+
+Args:
+    reg: Register name (str) or ID (int).
+    value: Classical value to set.
+
+Example:
+    Init_Unsafe("q", 5)(state)  # Set register q to value 5
+)doc")
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("value"))
         .def(py::init<size_t, size_t>(),
@@ -182,7 +251,19 @@ PYBIND11_MODULE(_core, m)
 
     /* hadamard.h */
     // 绑定Hadamard_Int
-    BIND_SELF_ADJOINT_OPERATOR(Hadamard_Int)
+    BIND_SELF_ADJOINT_OPERATOR(Hadamard_Int, R"doc(
+Apply Hadamard transform to an integer register.
+
+Creates an equal superposition over all integer values from 0 to 2^n - 1
+for the specified number of digits.
+
+Args:
+    reg_in: Name/ID of the input register.
+    n_digits: Number of digits (qubits) to apply Hadamard to.
+
+Example:
+    Hadamard_Int("q", 4)(state)  # Superpose q over 0..15
+)doc")
         .def(py::init<std::string_view, size_t>(), py::arg("reg_in"), py::arg("n_digits"))
         .def(py::init<size_t, size_t>(), py::arg("reg_in"), py::arg("n_digits"))
             BIND_CONTROLLABLE_METHODS(Hadamard_Int);
@@ -276,14 +357,35 @@ PYBIND11_MODULE(_core, m)
 
     /* qft.h */
     // 绑定QFT
-    BIND_BASE_OPERATOR(QFT)
+    BIND_BASE_OPERATOR(QFT, R"doc(
+Quantum Fourier Transform on a register.
+
+Applies the QFT to transform between computational and Fourier bases.
+Commonly used in phase estimation and Shor's algorithm.
+
+Args:
+    reg_name: Name of the register to transform (str) or register ID (int).
+
+Example:
+    QFT("data")(state)  # Apply QFT
+    # ... computation ...
+    inverseQFT("data")(state)  # Apply inverse QFT
+)doc")
         // 寄存器名称/ID构造
         .def(py::init<std::string_view>(), py::arg("reg_name"))
         .def(py::init<size_t>(), py::arg("reg_id"))
             BIND_CONTROLLABLE_METHODS(QFT);
 
     // 绑定inverseQFT（保持C++命名风格）
-    BIND_BASE_OPERATOR(inverseQFT)
+    BIND_BASE_OPERATOR(inverseQFT, R"doc(
+Inverse Quantum Fourier Transform on a register.
+
+Applies the inverse QFT to transform from Fourier basis back to
+computational basis.
+
+Args:
+    reg_name: Name of the register (str) or register ID (int).
+)doc")
         .def(py::init<std::string_view>(), py::arg("reg_name"))
         .def(py::init<size_t>(), py::arg("reg_id"))
             BIND_CONTROLLABLE_METHODS(inverseQFT);
@@ -295,7 +397,25 @@ PYBIND11_MODULE(_core, m)
         .def(py::init<size_t, size_t, memory_t &&>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"));
 
     // 绑定QRAMLoad
-    BIND_SELF_ADJOINT_OPERATOR(QRAMLoad)
+    BIND_SELF_ADJOINT_OPERATOR(QRAMLoad, R"doc(
+Load classical data into quantum superposition via QRAM.
+
+Performs the QRAM load operation, creating a superposition where each
+basis state is entangled with its corresponding data value.
+
+Args:
+    qram: QRAMCircuit_qutrit instance containing the memory.
+    addr_reg: Name/ID of the address register.
+    data_reg: Name/ID of the data register.
+
+Example:
+    qram = QRAMCircuit_qutrit(addr_size=3, data_size=4, memory=data)
+    QRAMLoad(qram, "address", "data")(state)
+
+Note:
+    Use QRAMLoadFast for optimized execution when address distribution
+    is uniform.
+)doc")
         // 构造函数（处理寄存器名称到ID的转换）
         .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, std::string_view>(),
              py::arg("qram"), py::arg("addr_reg"), py::arg("data_reg"))
@@ -376,7 +496,19 @@ PYBIND11_MODULE(_core, m)
             BIND_DAG_METHODS(Add_Mult_UInt_ConstUInt)
                 BIND_CONTROLLABLE_METHODS(Add_Mult_UInt_ConstUInt);
 
-    BIND_SELF_ADJOINT_OPERATOR(Add_UInt_UInt)
+    BIND_SELF_ADJOINT_OPERATOR(Add_UInt_UInt, R"doc(
+Add two unsigned integer registers.
+
+Computes: |a⟩|b⟩|0⟩ → |a⟩|b⟩|a+b⟩ (mod 2^n)
+
+Args:
+    input_reg1: Name/ID of the first input register (addend).
+    input_reg2: Name/ID of the second input register (addend).
+    output_reg: Name/ID of the output register (accumulates sum).
+
+Example:
+    Add_UInt_UInt("a", "b", "result")(state)  # result = a + b
+)doc")
         .def(py::init<std::string_view, std::string_view, std::string_view>(),
              py::arg("input_reg1"), py::arg("input_reg2"), py::arg("output_reg"))
         .def(py::init<size_t, size_t, size_t>(),

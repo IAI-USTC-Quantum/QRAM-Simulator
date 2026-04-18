@@ -122,17 +122,16 @@ repos:
           - '{extends: relaxed, rules: {line-length: {max: 120}}}'
 
   # ============================================================================
-  # Local hooks (optional - can be customized per project)
+  # Local hooks
   # ============================================================================
-  # Uncomment to enable custom local hooks
-  # - repo: local
-  #   hooks:
-  #     - id: custom-check
-  #       name: Custom project check
-  #       entry: ./scripts/check.sh
-  #       language: script
-  #       pass_filenames: false
-  #       always_run: true
+  - repo: local
+    hooks:
+      - id: stub-validation
+        name: Validate stub files
+        entry: bash -c 'pip install -q . && pip install -q pybind11-stubgen && pybind11-stubgen pysparq._core -o /tmp/stubs --no-setup-py && diff -q PySparQ/pysparq/_core.pyi /tmp/stubs/pysparq/_core.pyi'
+        language: system
+        pass_filenames: false
+        files: '(PySparQ/.*\.(cpp|h)$|pyproject\.toml$)'
 
 ci:
   autofix_commit_msg: |
