@@ -91,7 +91,9 @@ $(document).ready(function(){initNavTree('BindUtils_8h.html',''); initResizable(
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">BindUtils.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -105,22 +107,42 @@ $(document).ready(function(){initNavTree('BindUtils_8h.html',''); initResizable(
 </div>
 <p><a href="BindUtils_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacepysparq__docs" id="r_namespacepysparq__docs"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html">pysparq_docs</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a2c3127f1505485299a8ac7e8befd2037" id="r_a2c3127f1505485299a8ac7e8befd2037"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#a2c3127f1505485299a8ac7e8befd2037">BIND_CONTROLLABLE_METHODS</a>(CLASS_NAME)</td></tr>
 <tr class="separator:a2c3127f1505485299a8ac7e8befd2037"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af017c1b6a2272ff0cb17ee224eda7bff" id="r_af017c1b6a2272ff0cb17ee224eda7bff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#af017c1b6a2272ff0cb17ee224eda7bff">BIND_BASE_OPERATOR</a>(NAME)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #NAME)</td></tr>
-<tr class="separator:af017c1b6a2272ff0cb17ee224eda7bff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02d2307e0d21843c58e870173e92f5c4" id="r_a02d2307e0d21843c58e870173e92f5c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#a02d2307e0d21843c58e870173e92f5c4">BIND_SELF_ADJOINT_OPERATOR</a>(NAME)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="classqram__simulator_1_1SelfAdjointOperator.html">SelfAdjointOperator</a>&gt;(m, #NAME)</td></tr>
-<tr class="separator:a02d2307e0d21843c58e870173e92f5c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2604145eef68187e736a9316b974d868" id="r_a2604145eef68187e736a9316b974d868"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#a2604145eef68187e736a9316b974d868">BIND_BASE_OPERATOR_SUBNAME</a>(NAME,  PYNAME)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #PYNAME)</td></tr>
-<tr class="separator:a2604145eef68187e736a9316b974d868"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdc4d5423583d50db894b0ab84156610" id="r_abdc4d5423583d50db894b0ab84156610"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#abdc4d5423583d50db894b0ab84156610">BIND_DAG_METHODS</a>(NAME)&#160;&#160;&#160;    .def(&quot;dag&quot;, (void (NAME::*)(<a class="el" href="structqram__simulator_1_1SparseState.html">SparseState</a> &amp;) const) &amp; NAME::dag, py::arg(&quot;state&quot;))</td></tr>
+<tr class="memitem:a0d2ad7a134523ecddaca594af01b345b" id="r_a0d2ad7a134523ecddaca594af01b345b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#a0d2ad7a134523ecddaca594af01b345b">BIND_BASE_OPERATOR</a>(NAME, ...)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #NAME, ##__VA_ARGS__)</td></tr>
+<tr class="separator:a0d2ad7a134523ecddaca594af01b345b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4306095666e379bfc44fdf553c03178b" id="r_a4306095666e379bfc44fdf553c03178b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#a4306095666e379bfc44fdf553c03178b">BIND_SELF_ADJOINT_OPERATOR</a>(NAME, ...)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="classqram__simulator_1_1SelfAdjointOperator.html">SelfAdjointOperator</a>&gt;(m, #NAME, ##__VA_ARGS__)</td></tr>
+<tr class="separator:a4306095666e379bfc44fdf553c03178b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3d4e86c6252e3e1c56f94ea8648692e" id="r_ab3d4e86c6252e3e1c56f94ea8648692e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#ab3d4e86c6252e3e1c56f94ea8648692e">BIND_BASE_OPERATOR_SUBNAME</a>(NAME,  PYNAME, ...)&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #PYNAME, ##__VA_ARGS__)</td></tr>
+<tr class="separator:ab3d4e86c6252e3e1c56f94ea8648692e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdc4d5423583d50db894b0ab84156610" id="r_abdc4d5423583d50db894b0ab84156610"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8h.html#abdc4d5423583d50db894b0ab84156610">BIND_DAG_METHODS</a>(NAME)&#160;&#160;&#160;    .def(&quot;dag&quot;, (void (NAME::*)(<a class="el" href="structqram__simulator_1_1SparseState.html">SparseState</a> &amp;) const) &amp; NAME::dag, py::arg(&quot;state&quot;), <a class="el" href="namespacepysparq__docs.html#a944d50d4f590240200e5958143583dd7">pysparq_docs::DOC_DAG</a>)</td></tr>
 <tr class="separator:abdc4d5423583d50db894b0ab84156610"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a5a56ee0711562b53e41115135dbd3094" id="r_a5a56ee0711562b53e41115135dbd3094"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#a5a56ee0711562b53e41115135dbd3094">pysparq_docs::DOC_CONDITIONED_BY_NONZEROS</a></td></tr>
+<tr class="separator:a5a56ee0711562b53e41115135dbd3094"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6a8c4353ebd2246b8bda6cbd41e4db7" id="r_ad6a8c4353ebd2246b8bda6cbd41e4db7"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#ad6a8c4353ebd2246b8bda6cbd41e4db7">pysparq_docs::DOC_CONDITIONED_BY_ALL_ONES</a></td></tr>
+<tr class="separator:ad6a8c4353ebd2246b8bda6cbd41e4db7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af44a1f6e546dd61ec65210902bccb964" id="r_af44a1f6e546dd61ec65210902bccb964"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#af44a1f6e546dd61ec65210902bccb964">pysparq_docs::DOC_CONDITIONED_BY_BIT</a></td></tr>
+<tr class="separator:af44a1f6e546dd61ec65210902bccb964"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae81be0f1daa851abf84bc806c61c1ea1" id="r_ae81be0f1daa851abf84bc806c61c1ea1"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#ae81be0f1daa851abf84bc806c61c1ea1">pysparq_docs::DOC_CONDITIONED_BY_VALUE</a></td></tr>
+<tr class="separator:ae81be0f1daa851abf84bc806c61c1ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a944d50d4f590240200e5958143583dd7" id="r_a944d50d4f590240200e5958143583dd7"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#a944d50d4f590240200e5958143583dd7">pysparq_docs::DOC_DAG</a></td></tr>
+<tr class="separator:a944d50d4f590240200e5958143583dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77441dae8c70bad6247270a0a77527b0" id="r_a77441dae8c70bad6247270a0a77527b0"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacepysparq__docs.html#a77441dae8c70bad6247270a0a77527b0">pysparq_docs::DOC_CLEAR_CONTROL</a></td></tr>
+<tr class="separator:a77441dae8c70bad6247270a0a77527b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="af017c1b6a2272ff0cb17ee224eda7bff" name="af017c1b6a2272ff0cb17ee224eda7bff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af017c1b6a2272ff0cb17ee224eda7bff">&#9670;&#160;</a></span>BIND_BASE_OPERATOR</h2>
+<a id="a0d2ad7a134523ecddaca594af01b345b" name="a0d2ad7a134523ecddaca594af01b345b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d2ad7a134523ecddaca594af01b345b">&#9670;&#160;</a></span>BIND_BASE_OPERATOR</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,16 +151,26 @@ Macros</h2></td></tr>
           <td class="memname">#define BIND_BASE_OPERATOR</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">NAME</td><td>)</td>
-          <td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #NAME)</td>
+          <td class="paramname">NAME, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #NAME, ##__VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a2604145eef68187e736a9316b974d868" name="a2604145eef68187e736a9316b974d868"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2604145eef68187e736a9316b974d868">&#9670;&#160;</a></span>BIND_BASE_OPERATOR_SUBNAME</h2>
+<a id="ab3d4e86c6252e3e1c56f94ea8648692e" name="ab3d4e86c6252e3e1c56f94ea8648692e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3d4e86c6252e3e1c56f94ea8648692e">&#9670;&#160;</a></span>BIND_BASE_OPERATOR_SUBNAME</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,12 +185,18 @@ Macros</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">PYNAME&#160;</td>
+          <td class="paramname">PYNAME, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #PYNAME)</td>
+          <td></td><td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="structqram__simulator_1_1BaseOperator.html">BaseOperator</a>&gt;(m, #PYNAME, ##__VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -194,15 +232,15 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">NAME</td><td>)</td>
-          <td>&#160;&#160;&#160;    .def(&quot;dag&quot;, (void (NAME::*)(<a class="el" href="structqram__simulator_1_1SparseState.html">SparseState</a> &amp;) const) &amp; NAME::dag, py::arg(&quot;state&quot;))</td>
+          <td>&#160;&#160;&#160;    .def(&quot;dag&quot;, (void (NAME::*)(<a class="el" href="structqram__simulator_1_1SparseState.html">SparseState</a> &amp;) const) &amp; NAME::dag, py::arg(&quot;state&quot;), <a class="el" href="namespacepysparq__docs.html#a944d50d4f590240200e5958143583dd7">pysparq_docs::DOC_DAG</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a02d2307e0d21843c58e870173e92f5c4" name="a02d2307e0d21843c58e870173e92f5c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02d2307e0d21843c58e870173e92f5c4">&#9670;&#160;</a></span>BIND_SELF_ADJOINT_OPERATOR</h2>
+<a id="a4306095666e379bfc44fdf553c03178b" name="a4306095666e379bfc44fdf553c03178b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4306095666e379bfc44fdf553c03178b">&#9670;&#160;</a></span>BIND_SELF_ADJOINT_OPERATOR</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,8 +249,18 @@ Macros</h2></td></tr>
           <td class="memname">#define BIND_SELF_ADJOINT_OPERATOR</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">NAME</td><td>)</td>
-          <td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="classqram__simulator_1_1SelfAdjointOperator.html">SelfAdjointOperator</a>&gt;(m, #NAME)</td>
+          <td class="paramname">NAME, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;    py::class_&lt;NAME, <a class="el" href="classqram__simulator_1_1SelfAdjointOperator.html">SelfAdjointOperator</a>&gt;(m, #NAME, ##__VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">

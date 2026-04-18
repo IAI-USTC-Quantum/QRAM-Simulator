@@ -2,10 +2,11 @@
 <html class="no-js" lang="zh-CN" data-content_root="../">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="示例" href="examples.html"><link rel="prev" title="快速入门" href="quickstart.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>概览：模块代码 - PySparQ 文档</title>
+        <title>QRAM Simulator 架构 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -179,7 +180,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -198,26 +199,26 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">用户指南</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guide/installation.html">安装</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart.html">快速入门</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guide/architecture.html">QRAM Simulator 架构</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guide/examples.html">示例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guide/dynamic_operators.html">动态算子扩展</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/algorithms/index.html">量子算法教程</a><input aria-label="Toggle navigation of 量子算法教程" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guide/algorithms/grover.html">Grover 量子搜索算法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/algorithms/shor.html">Shor 量子因式分解算法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/algorithms/cks_solver.html">CKS 线性系统求解器</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/algorithms/qda_solver.html">QDA 线性系统求解器</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速入门</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">QRAM Simulator 架构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_operators.html">动态算子扩展</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="algorithms/index.html">量子算法教程</a><input aria-label="Toggle navigation of 量子算法教程" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="algorithms/grover.html">Grover 量子搜索算法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms/shor.html">Shor 量子因式分解算法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms/cks_solver.html">CKS 线性系统求解器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithms/qda_solver.html">QDA 线性系统求解器</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/system.html">System 类</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/sparse_state.html">SparseState 类</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/register_types.html">寄存器类型</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="core_concepts/system.html">System 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_concepts/sparse_state.html">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_concepts/register_types.html">寄存器类型</a></li>
 </ul>
 </li>
 </ul>
@@ -280,7 +281,17 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/architecture.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/architecture.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -288,28 +299,204 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>代码可用的所有模块</h1>
-<ul><li><a href="PySparQ/pysparq.html">PySparQ.pysparq</a></li>
-<ul><li><a href="PySparQ/pysparq/algorithms/cks_solver.html">PySparQ.pysparq.algorithms.cks_solver</a></li>
-<li><a href="PySparQ/pysparq/algorithms/grover.html">PySparQ.pysparq.algorithms.grover</a></li>
-<li><a href="PySparQ/pysparq/algorithms/qda_solver.html">PySparQ.pysparq.algorithms.qda_solver</a></li>
-<li><a href="PySparQ/pysparq/algorithms/shor.html">PySparQ.pysparq.algorithms.shor</a></li>
-<li><a href="PySparQ/pysparq/dynamic_operator.html">PySparQ.pysparq.dynamic_operator</a></li>
-<ul><li><a href="PySparQ/pysparq/dynamic_operator/compiler.html">PySparQ.pysparq.dynamic_operator.compiler</a></li>
-<li><a href="PySparQ/pysparq/dynamic_operator/operator_wrapper.html">PySparQ.pysparq.dynamic_operator.operator_wrapper</a></li>
-</ul></ul></ul>
+          <section class="tex2jax_ignore mathjax_ignore" id="qram-simulator">
+<h1>QRAM Simulator 架构<a class="headerlink" href="#qram-simulator" title="链接到此标题。">¶</a></h1>
+<p>本文档描述 QRAM Simulator 项目的整体架构、设计哲学和核心模块。</p>
+<section id="id1">
+<h2>概述<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
+<section id="id2">
+<h3>项目目标<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h3>
+<p>QRAM Simulator 是一个用于模拟<strong>量子随机存取存储器（QRAM）<strong>和</strong>稀疏态量子计算</strong>的高性能模拟器。它旨在为量子算法研究者和开发者提供一个能够：</p>
+<ul class="simple">
+<li><p>高效模拟大规模量子系统的工具（利用稀疏态表示）</p></li>
+<li><p>精确建模 QRAM 电路的行为和噪声影响</p></li>
+<li><p>支持 GPU 加速以获得更高的计算性能</p></li>
+<li><p>提供简洁的 Python API 便于快速原型开发</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>设计哲学<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>稀疏态优先</strong>：利用量子态的稀疏性，将存储和计算复杂度从指数级降低到与纠缠程度成正比</p></li>
+<li><p><strong>模块化设计</strong>：清晰的模块边界，便于扩展和维护</p></li>
+<li><p><strong>性能与易用性并重</strong>：C++ 核心提供性能，Python 绑定提供易用性</p></li>
+<li><p><strong>噪声感知</strong>：原生支持去极化和退相干噪声模型</p></li>
+</ol>
+</section>
+</section>
+<section id="id4">
+<h2>核心模块<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>QRAM-Simulator/
+├── Common/           # 共享基础设施
+├── SparQ/            # 稀疏态模拟器核心
+├── QRAM/             # QRAM 电路实现
+├── SparQ_Algorithm/  # 高层量子算法
+├── PySparQ/          # Python 绑定
+├── Experiments/      # 实验代码
+└── ThirdParty/       # 第三方依赖（Eigen）
+</pre></div>
+</div>
+<section id="common">
+<h3>Common/ - 共享基础设施<a class="headerlink" href="#common" title="链接到此标题。">¶</a></h3>
+<p><strong>职责</strong>：提供跨模块的通用工具和数据结构</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>文件</p></th>
+<th class="head"><p>功能</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">basic.h</span></code></p></td>
+<td><p>基础数学工具、复数运算、哈希函数</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">matrix.h</span></code></p></td>
+<td><p>稀疏/稠密矩阵的 Eigen 封装和扩展</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">logger.h</span></code></p></td>
+<td><p>日志系统，支持分级日志和性能计时</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">error_handler.h</span></code></p></td>
+<td><p>统一的错误处理和异常定义</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">typedefs.h</span></code></p></td>
+<td><p>项目通用类型别名（QIndex、Complex 等）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="sparq">
+<h3>SparQ/ - 稀疏态模拟器核心<a class="headerlink" href="#sparq" title="链接到此标题。">¶</a></h3>
+<p><strong>职责</strong>：实现稀疏态量子模拟的核心功能</p>
+<p><strong>核心类</strong>：</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumState</span></code></strong>：稀疏态表示，仅存储非零振幅的基态</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumGate</span></code></strong> 和 <strong><code class="docutils literal notranslate"><span class="pre">SparseGate</span></code></strong>：门操作的抽象基类和稀疏优化实现</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumOperator</span></code></strong>：算子的统一接口，支持复合算子和条件算子</p></li>
+</ul>
+</section>
+<section id="qram-qram">
+<h3>QRAM/ - QRAM 电路实现<a class="headerlink" href="#qram-qram" title="链接到此标题。">¶</a></h3>
+<p><strong>核心类</strong>：</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">QRAMCircuit</span></code>（qutrit/qubit）</strong>：QRAM 电路实现</p>
+<ul>
+<li><p>地址线和数据线位数配置</p></li>
+<li><p>时步逻辑：生成 QRAM 操作序列</p></li>
+<li><p>噪声模型：支持去极化和退相干噪声</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">CuQRAMCircuit</span></code></strong>（CUDA 版本）：GPU 加速实现</p></li>
+</ul>
+</section>
+<section id="pysparq-python">
+<h3>PySparQ/ - Python 绑定<a class="headerlink" href="#pysparq-python" title="链接到此标题。">¶</a></h3>
+<p>通过 pybind11 提供完整 Python API，包括：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">QuantumState</span></code> → Python 类</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QuantumGate</span></code> 及其子类 → Python 类</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit/qubit</span></code> → Python 类</p></li>
+<li><p>所有算子（<code class="docutils literal notranslate"><span class="pre">QRAMLoad</span></code>、<code class="docutils literal notranslate"><span class="pre">QRAMLoadFast</span></code> 等）</p></li>
+<li><p>类型提示文件（<code class="docutils literal notranslate"><span class="pre">_core.pyi</span></code>）提供 IDE 支持</p></li>
+</ul>
+</section>
+</section>
+<section id="id5">
+<h2>量子态表示<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────┐
+│                    QuantumState                          │
+├─────────────────────────────────────────────────────────┤
+│  稀疏存储: map&lt;QIndex, Complex&gt; amplitudes              │
+│  - QIndex: 基态的整数索引 (0 到 2^n-1)                  │
+│  - Complex: 复数振幅                                    │
+│  - 仅存储 |amplitude| &gt; ε 的非零项                      │
+└─────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>关键特性</strong>：</p>
+<ul class="simple">
+<li><p>内存使用：O(k × n)，k 为非零项数，n 为量子比特数</p></li>
+<li><p>对比稠密表示的 O(2^n)，可实现更大规模的模拟</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>关键设计决策<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<section id="id7">
+<h3>为什么使用稀疏态模拟<a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>内存效率</strong>：稀疏表示内存使用与纠缠程度成正比</p></li>
+<li><p><strong>计算效率</strong>：门操作只需处理非零振幅的基态</p></li>
+<li><p><strong>适用场景</strong>：QRAM 操作、量子漫步、稀疏哈密顿量模拟</p></li>
+</ol>
+</section>
+<section id="qutrit-based-vs-qubit-based-qram">
+<h3>Qutrit-based vs Qubit-based QRAM<a class="headerlink" href="#qutrit-based-vs-qubit-based-qram" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Qutrit-based</strong>：更自然的树结构表示，更高效的电路深度</p></li>
+<li><p><strong>Qubit-based</strong>：硬件兼容性更好，更成熟的理论</p></li>
+</ul>
+</section>
+</section>
+<section id="id8">
+<h2>扩展性<a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
+<section id="id9">
+<h3>添加新量子门<a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">SparQ/include/</span></code> 创建新的头文件</p></li>
+<li><p>继承 <code class="docutils literal notranslate"><span class="pre">QuantumGate</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SparseGate</span></code> 基类</p></li>
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">SparQ/src/</span></code> 实现 <code class="docutils literal notranslate"><span class="pre">apply()</span></code> 方法</p></li>
+</ol>
+</section>
+<section id="id10">
+<h3>添加新算法<a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">SparQ_Algorithm/include/</span></code> 创建算法头文件</p></li>
+<li><p>继承 <code class="docutils literal notranslate"><span class="pre">QuantumAlgorithm</span></code> 基类</p></li>
+<li><p>实现 <code class="docutils literal notranslate"><span class="pre">prepare()</span></code>、<code class="docutils literal notranslate"><span class="pre">run()</span></code> 和 <code class="docutils literal notranslate"><span class="pre">measure()</span></code> 方法</p></li>
+</ol>
+</section>
+<section id="python">
+<h3>添加 Python 绑定<a class="headerlink" href="#python" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">PySparQ/src/pybind_wrapper.cpp</span></code> 添加绑定代码</p></li>
+<li><p>在 <code class="docutils literal notranslate"><span class="pre">_core.pyi</span></code> 添加类型提示</p></li>
+<li><p>重新构建 PySparQ 模块</p></li>
+</ol>
+</section>
+</section>
+</section>
+
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="examples.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">示例</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="quickstart.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">快速入门</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -328,8 +515,50 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">QRAM Simulator 架构</a><ul>
+<li><a class="reference internal" href="#id1">概述</a><ul>
+<li><a class="reference internal" href="#id2">项目目标</a></li>
+<li><a class="reference internal" href="#id3">设计哲学</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">核心模块</a><ul>
+<li><a class="reference internal" href="#common">Common/ - 共享基础设施</a></li>
+<li><a class="reference internal" href="#sparq">SparQ/ - 稀疏态模拟器核心</a></li>
+<li><a class="reference internal" href="#qram-qram">QRAM/ - QRAM 电路实现</a></li>
+<li><a class="reference internal" href="#pysparq-python">PySparQ/ - Python 绑定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">量子态表示</a></li>
+<li><a class="reference internal" href="#id6">关键设计决策</a><ul>
+<li><a class="reference internal" href="#id7">为什么使用稀疏态模拟</a></li>
+<li><a class="reference internal" href="#qutrit-based-vs-qubit-based-qram">Qutrit-based vs Qubit-based QRAM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">扩展性</a><ul>
+<li><a class="reference internal" href="#id9">添加新量子门</a></li>
+<li><a class="reference internal" href="#id10">添加新算法</a></li>
+<li><a class="reference internal" href="#python">添加 Python 绑定</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

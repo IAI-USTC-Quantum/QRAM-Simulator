@@ -8,6 +8,7 @@ This directory contains documentation resources for the QRAM-Simulator project.
 docs/
 ├── README.md          # This document
 ├── index.html         # GitHub Pages landing page
+├── architecture.md    # Project architecture documentation
 ├── operators.md       # C++ quantum arithmetic operators documentation
 ├── pysparq.md         # PySparQ Python bindings documentation
 ├── paper/             # Paper-related documentation
@@ -20,6 +21,7 @@ docs/
 ## Documentation Overview
 
 ### For C++ Users
+- **[Architecture](architecture.md)**: Project architecture and design philosophy
 - **[Operators Reference](operators.md)**: Detailed documentation for quantum arithmetic operators
 - **[API Docs](https://iai-ustc-quantum.github.io/QRAM-Simulator/api/)**: Auto-generated Doxygen documentation
 
