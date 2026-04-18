@@ -34,11 +34,25 @@ fallback_version = "0.0.0"
 build-frontend = "build[uv]"
 # 暂不支持 32 位系统(size_t != uint64_t)
 windows.archs = ["AMD64"]
-# windows.archs = ["ARM64"]   
+# windows.archs = ["ARM64"]
 linux.archs = ["x86_64", "aarch64", "ppc64le", "s390x"]
 macos.archs = ["x86_64", "arm64"]
 
 container-engine = "docker"
+
+# Install OpenMP dependency for each platform
+[tool.cibuildwheel.linux]
+before-all = "yum install -y libgomp-devel"
+
+[tool.cibuildwheel.musllinux]
+before-all = "apk add libgomp-dev"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install libomp"
+
+[tool.cibuildwheel.windows]
+# Windows MSVC has built-in OpenMP support, just need to enable it
+# No additional installation needed
 
 manylinux-x86_64-image = "manylinux2014"
 # manylinux-i686-image = "manylinux2014"
