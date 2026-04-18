@@ -33,28 +33,12 @@ fallback_version = "0.0.0"
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 # 暂不支持 32 位系统(size_t != uint64_t)
-container-engine = "docker"
+# 暂时移除 macOS 支持
+skip = ["*-musllinux_*", "*-win32", "*-macos*"]
 
 [tool.cibuildwheel.linux]
-archs = ["x86_64", "aarch64", "ppc64le", "s390x"]
+archs = ["x86_64"]
 before-all = "yum install -y libgomp-devel"
-manylinux-x86_64-image = "manylinux2014"
-manylinux-aarch64-image = "manylinux2014"
-manylinux-ppc64le-image = "manylinux2014"
-manylinux-s390x-image = "manylinux2014"
-manylinux-pypy_x86_64-image = "manylinux2014"
-manylinux-pypy_aarch64-image = "manylinux2014"
-
-[tool.cibuildwheel.musllinux]
-before-all = "apk add libgomp-dev"
-musllinux-x86_64-image = "musllinux_1_2"
-musllinux-aarch64-image = "musllinux_1_2"
-musllinux-ppc64le-image = "musllinux_1_2"
-musllinux-s390x-image = "musllinux_1_2"
-
-[tool.cibuildwheel.macos]
-archs = ["x86_64", "arm64"]
-before-all = "brew install libomp"
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]

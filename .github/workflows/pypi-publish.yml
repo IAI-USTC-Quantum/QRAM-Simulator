@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.22
         env:
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
-          CIBW_SKIP: "*-musllinux_* *-win32"
+          CIBW_SKIP: "*-musllinux_* *-win32 *-macos*"
 
       - uses: actions/upload-artifact@v4
         with:
