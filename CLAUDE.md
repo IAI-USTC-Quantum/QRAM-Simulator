@@ -60,6 +60,18 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 - **`PySparQ/pysparq/`** — pybind11 bindings exposing the full C++ API
 - All register-level operations are exposed: `Add_UInt_UInt`, `Add_ConstUInt`, `Mult_UInt_ConstUInt`, `Hadamard_Int`, `QRAMLoad`, etc.
 
+## Sphinx Documentation
+
+The Sphinx docs use the **Furo** theme, which provides a sidebar table of contents automatically. When writing `.rst` documentation, if a `.. contents::` directive is used for an inline TOC, it **must** include the `:class:` attribute to suppress the Furo duplication warning:
+
+```rst
+.. contents:: 目录
+   :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
+```
+
+Without `:class: this-will-duplicate-information-and-it-is-still-useful-here`, Furo will emit a warning about duplicated TOC information. This applies to all `.rst` files under `docs/sphinx/source/`.
+
 ## Code Style
 
 - **C++**: LLVM-based clang-format with 4-space indent, 120 column limit, attach braces. Run `clang-format -i` via pre-commit.

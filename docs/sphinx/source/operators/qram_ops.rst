@@ -5,6 +5,7 @@ QRAM (Quantum Random Access Memory) 算子实现量子并行数据访问。
 
 .. contents:: 目录
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 概述
 ----

@@ -5,6 +5,7 @@
 
 .. contents:: 目录
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 .. toctree::
    :maxdepth: 2

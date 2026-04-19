@@ -5,6 +5,7 @@ SparseState 类
 
 .. contents:: 目录
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
 
 稀疏表示原理
 ------------
