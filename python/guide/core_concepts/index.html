@@ -218,6 +218,7 @@
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">核心概念</a><input aria-label="Toggle navigation of 核心概念" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html">寄存器管理</a></li>
 <li class="toctree-l2"><a class="reference internal" href="register_types.html">寄存器类型</a></li>
 </ul>
 </li>
@@ -310,25 +311,39 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="system.html">System 类</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id2">概述</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id3">静态变量：全局寄存器追踪</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id5">实例成员</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id6">寄存器管理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id9">查询方法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id12">访问基态中的寄存器值</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id13">比较与排序</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html#id14">最佳实践</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id2">核心概念</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id7">静态变量：全局寄存器追踪</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id9">实例成员</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id10">寄存器的存储原理</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id11">查询方法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id14">访问基态中的寄存器值</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id15">比较与排序</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#id16">最佳实践</a></li>
 <li class="toctree-l2"><a class="reference internal" href="system.html#api">API 参考</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sparse_state.html">SparseState 类</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id2">稀疏表示原理</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id3">基本用法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id6">状态演化示例</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id7">状态打印模式</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id8">状态操作函数</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id13">迭代器支持</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id3">唯一性规则</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id4">基本用法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id7">状态演化示例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id8">状态打印模式</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id9">清除接近零的振幅</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id10">合并重复基态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html#id11">迭代器支持</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html#api">API 参考</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="register_management.html">寄存器管理</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#id3">寄存器的本质</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#addregister">添加寄存器：AddRegister</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#removeregister">删除寄存器：RemoveRegister</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#splitregister">拆分寄存器：SplitRegister</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#combineregister">合并寄存器：CombineRegister</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#partialtrace">PartialTrace：测量</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#push-pop">寄存器栈操作：Push / Pop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#id4">寄存器操作与量子态的关系总结</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html#api">API 参考</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="register_types.html">寄存器类型</a><ul>
@@ -345,10 +360,18 @@
 <h2>核心抽象<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
 <p>PySparQ 基于三个核心抽象构建：</p>
 <ol class="arabic simple">
-<li><p><strong>System</strong> — 单个计算基态（稀疏表示的基本单元）</p></li>
-<li><p><strong>SparseState</strong> — System 的集合（稀疏量子态）</p></li>
-<li><p><strong>Registers</strong> — 具有类型存储的命名量子变量</p></li>
+<li><p><strong>System</strong> — 单个计算基态，包含一个复数振幅 <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> 和所有寄存器的值 <code class="docutils literal notranslate"><span class="pre">registers</span></code></p></li>
+<li><p><strong>SparseState</strong> — 托管 <code class="docutils literal notranslate"><span class="pre">std::vector&lt;System&gt;</span></code> 的稀疏量子态，仅存储振幅非零的基态</p></li>
+<li><p><strong>Registers</strong> — 具有类型存储的命名量子变量，以 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 为存储单位，允许 <code class="docutils literal notranslate"><span class="pre">|a⟩|b⟩|c⟩</span></code> 式的多寄存器编码</p></li>
 </ol>
+</section>
+<section id="id3">
+<h2>核心数据关系<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 的默认构造函数会创建一个 <code class="docutils literal notranslate"><span class="pre">|0...0⟩</span></code> 的初态（内部包含一个所有寄存器值为 0、振幅为 1 的 <code class="docutils literal notranslate"><span class="pre">System</span></code>）</p></li>
+<li><p>每个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 实例中的寄存器值组合在 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 中必须是唯一的——若出现重复，意味着发生了量子干涉，两个振幅应相加并去重</p></li>
+<li><p>量子编程的操作层面从量子比特上升到了量子寄存器，几乎所有操作都以寄存器为单位</p></li>
+</ul>
 <p>与传统全态矢量模拟器存储 <span class="math notranslate nohighlight">\(2^n\)</span> 个振幅不同，PySparQ 仅存储非零基态，使得叠加态数量有限的量子算法可以在多项式资源内模拟。</p>
 </section>
 </section>
@@ -410,6 +433,7 @@
             <ul>
 <li><a class="reference internal" href="#">核心概念</a><ul>
 <li><a class="reference internal" href="#id2">核心抽象</a></li>
+<li><a class="reference internal" href="#id3">核心数据关系</a></li>
 </ul>
 </li>
 </ul>

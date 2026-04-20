@@ -218,6 +218,7 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_management.html">寄存器管理</a></li>
 <li class="toctree-l2"><a class="reference internal" href="register_types.html">寄存器类型</a></li>
 </ul>
 </li>
@@ -306,46 +307,50 @@
         <article role="main" id="furo-main-content">
           <section id="system">
 <h1>System 类<a class="headerlink" href="#system" title="链接到此标题。">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">System</span></code> 类是稀疏态模拟器的基本单元，代表一个计算基态。每个 System 存储一个复数振幅和所有寄存器的值。</p>
+<p><code class="docutils literal notranslate"><span class="pre">System</span></code> 类是稀疏态模拟器的基本单元，代表一个计算基态。每个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 存储一个复数振幅 <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> 和所有寄存器的值 <code class="docutils literal notranslate"><span class="pre">registers</span></code>。</p>
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id1">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id2" id="id17">概述</a></p></li>
-<li><p><a class="reference internal" href="#id3" id="id18">静态变量：全局寄存器追踪</a></p>
+<li><p><a class="reference internal" href="#id2" id="id19">核心概念</a></p></li>
+<li><p><a class="reference internal" href="#id7" id="id20">静态变量：全局寄存器追踪</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id4" id="id19">静态成员</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id21">静态成员</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id5" id="id20">实例成员</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id21">寄存器管理</a></p>
+<li><p><a class="reference internal" href="#id9" id="id22">实例成员</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id23">寄存器的存储原理</a></p></li>
+<li><p><a class="reference internal" href="#id11" id="id24">查询方法</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id7" id="id22">添加寄存器</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id23">删除寄存器</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id25">获取寄存器信息</a></p></li>
+<li><p><a class="reference internal" href="#id13" id="id26">统计信息</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id9" id="id24">查询方法</a></p>
-<ul>
-<li><p><a class="reference internal" href="#id10" id="id25">获取寄存器信息</a></p></li>
-<li><p><a class="reference internal" href="#id11" id="id26">统计信息</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#id12" id="id27">访问基态中的寄存器值</a></p></li>
-<li><p><a class="reference internal" href="#id13" id="id28">比较与排序</a></p></li>
-<li><p><a class="reference internal" href="#id14" id="id29">最佳实践</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id27">访问基态中的寄存器值</a></p></li>
+<li><p><a class="reference internal" href="#id15" id="id28">比较与排序</a></p></li>
+<li><p><a class="reference internal" href="#id16" id="id29">最佳实践</a></p></li>
 <li><p><a class="reference internal" href="#api" id="id30">API 参考</a></p></li>
 </ul>
 </nav>
 <section id="id2">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">概述</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">核心概念</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
 <p>在 PySparQ 中，量子态用稀疏表示：只存储振幅非零的基态。每个基态用一个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 对象表示：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[|\psi\rangle = \sum_{i \in \text{non-zero}} \alpha_i |i\rangle\]</div>
 </div>
 <p>其中每个 <span class="math notranslate nohighlight">\(|i\rangle\)</span> 对应一个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 实例。</p>
+<p>一个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 包含两部分核心数据：</p>
+<ul class="simple">
+<li><p><a href="#id3"><span class="problematic" id="id4">**</span></a>amplitude**（<code class="docutils literal notranslate"><span class="pre">complex</span></code>）：该基态的复数振幅</p></li>
+<li><p><a href="#id5"><span class="problematic" id="id6">**</span></a>registers**（<code class="docutils literal notranslate"><span class="pre">list[StateStorage]</span></code>）：各寄存器的值，按寄存器 ID 索引。每个寄存器值以 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 存储</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">重要</p>
+<p><code class="docutils literal notranslate"><span class="pre">System</span></code> 不是独立使用的对象。它始终由 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 托管。<code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 保证其中所有 <code class="docutils literal notranslate"><span class="pre">System</span></code> 的寄存器值组合唯一——如果两个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 具有相同的寄存器值，意味着发生了量子干涉，它们的振幅应当相加合并为一个 <code class="docutils literal notranslate"><span class="pre">System</span></code>。</p>
+</div>
 </section>
-<section id="id3">
-<h2><a class="toc-backref" href="#id18" role="doc-backlink">静态变量：全局寄存器追踪</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<section id="id7">
+<h2><a class="toc-backref" href="#id20" role="doc-backlink">静态变量：全局寄存器追踪</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">System</span></code> 类使用静态（类级）变量追踪所有寄存器的元信息。这意味着：</p>
 <ul class="simple">
 <li><p>所有 <code class="docutils literal notranslate"><span class="pre">System</span></code> 实例共享同一套寄存器元数据</p></li>
@@ -356,11 +361,11 @@
 <p class="admonition-title">警告</p>
 <p><strong>重要</strong>：每次运行新程序前，必须调用 <code class="docutils literal notranslate"><span class="pre">System.clear()</span></code> 清理静态状态，否则会残留上次运行的信息！</p>
 </div>
-<section id="id4">
-<h3><a class="toc-backref" href="#id19" role="doc-backlink">静态成员</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
-<div class="table-wrapper docutils container" id="id15">
-<table class="docutils align-default" id="id15">
-<caption><span class="caption-text">System 静态变量</span><a class="headerlink" href="#id15" title="链接到此表格。">¶</a></caption>
+<section id="id8">
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">静态成员</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<div class="table-wrapper docutils container" id="id17">
+<table class="docutils align-default" id="id17">
+<caption><span class="caption-text">System 静态变量</span><a class="headerlink" href="#id17" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>变量名</p></th>
 <th class="head"><p>类型</p></th>
@@ -393,12 +398,11 @@
 </div>
 </section>
 </section>
-<section id="id5">
-<h2><a class="toc-backref" href="#id20" role="doc-backlink">实例成员</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
-<p>每个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 实例包含：</p>
-<div class="table-wrapper docutils container" id="id16">
-<table class="docutils align-default" id="id16">
-<caption><span class="caption-text">System 实例成员</span><a class="headerlink" href="#id16" title="链接到此表格。">¶</a></caption>
+<section id="id9">
+<h2><a class="toc-backref" href="#id22" role="doc-backlink">实例成员</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id18">
+<table class="docutils align-default" id="id18">
+<caption><span class="caption-text">System 实例成员</span><a class="headerlink" href="#id18" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>成员</p></th>
 <th class="head"><p>类型</p></th>
@@ -412,53 +416,21 @@
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">registers</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list[StateStorage]</span></code></p></td>
-<td><p>各寄存器的值（按寄存器 ID 索引）</p></td>
+<td><p>各寄存器的值（按寄存器 ID 索引），底层以 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 存储</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="id6">
-<h2><a class="toc-backref" href="#id21" role="doc-backlink">寄存器管理</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
-<section id="id7">
-<h3><a class="toc-backref" href="#id22" role="doc-backlink">添加寄存器</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
-
-<span class="c1"># 清理之前的静态状态（必须！）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># 添加寄存器：名称、类型、比特数</span>
-<span class="n">reg_id</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;寄存器 ID: </span><span class="si">{</span><span class="n">reg_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># 0</span>
-
-<span class="c1"># 同步添加：同时初始化所有基态中的寄存器值为 0</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="n">reg_id2</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register_synchronous</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 添加并施加 Hadamard（创建叠加态）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">AddRegisterWithHadamard</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># 现在 &quot;q&quot; 寄存器处于 |0⟩, |1⟩, |2⟩, |3⟩ 的均匀叠加</span>
-</pre></div>
-</div>
-</section>
-<section id="id8">
-<h3><a class="toc-backref" href="#id23" role="doc-backlink">删除寄存器</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 按名称删除</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">remove_register</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">)</span>
-
-<span class="c1"># 按 ID 删除</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">remove_register</span><span class="p">(</span><span class="n">reg_id</span><span class="p">)</span>
-
-<span class="c1"># 同步删除：同时更新所有基态</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">remove_register_synchronous</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="id9">
-<h2><a class="toc-backref" href="#id24" role="doc-backlink">查询方法</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
 <section id="id10">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">获取寄存器信息</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">寄存器的存储原理</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
+<p>系统中的寄存器托管了 <code class="docutils literal notranslate"><span class="pre">n</span></code> 个 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 的存储方式。这使得我们可以将量子态编码为类似 <span class="math notranslate nohighlight">\(|a\rangle|b\rangle|c\rangle\)</span> 的多寄存器形式，而无需管理量子比特是如何编码的。</p>
+<p>例如，QRAM 访问 <span class="math notranslate nohighlight">\(|i\rangle|0\rangle \to |i\rangle|d[i]\rangle\)</span> 可以被轻松编码——只需要一个地址寄存器和一个数据寄存器。整个项目的管理层面从量子比特上升到了量子寄存器，几乎所有操作都以量子寄存器为单位。</p>
+</section>
+<section id="id11">
+<h2><a class="toc-backref" href="#id24" role="doc-backlink">查询方法</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h2>
+<section id="id12">
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">获取寄存器信息</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 获取寄存器 ID</span>
 <span class="n">reg_id</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">)</span>
 
@@ -480,8 +452,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id11">
-<h3><a class="toc-backref" href="#id26" role="doc-backlink">统计信息</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
+<section id="id13">
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">统计信息</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 获取量子比特总数</span>
 <span class="n">n_qubits</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_qubit_count</span><span class="p">()</span>
 
@@ -491,12 +463,11 @@
 </div>
 </section>
 </section>
-<section id="id12">
-<h2><a class="toc-backref" href="#id27" role="doc-backlink">访问基态中的寄存器值</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-
-<span class="c1"># 添加寄存器并初始化</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register_synchronous</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<section id="id14">
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">访问基态中的寄存器值</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 
 <span class="c1"># 遍历所有基态</span>
 <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">:</span>
@@ -515,13 +486,10 @@
 </pre></div>
 </div>
 </section>
-<section id="id13">
-<h2><a class="toc-backref" href="#id28" role="doc-backlink">比较与排序</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
+<section id="id15">
+<h2><a class="toc-backref" href="#id28" role="doc-backlink">比较与排序</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">System</span></code> 类支持比较运算符，用于排序和去重：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">s1</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="p">()</span>
-<span class="n">s2</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="p">()</span>
-
-<span class="c1"># 相等比较（所有寄存器值和振幅都相同）</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 相等比较（所有寄存器值和振幅都相同）</span>
 <span class="k">if</span> <span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;相同基态&quot;</span><span class="p">)</span>
 
@@ -534,8 +502,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id14">
-<h2><a class="toc-backref" href="#id29" role="doc-backlink">最佳实践</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h2>
+<section id="id16">
+<h2><a class="toc-backref" href="#id29" role="doc-backlink">最佳实践</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h2>
 <ol class="arabic">
 <li><p><strong>始终在程序开始时调用 ``System.clear()``</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
@@ -544,11 +512,14 @@
 
 <span class="c1"># 然后创建寄存器...</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># SparseState() 默认创建 |0...0⟩ 初态</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 </pre></div>
 </div>
 </li>
-<li><p><strong>使用 ``add_register_synchronous`` 确保状态一致性</strong></p>
-<p>当 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 已存在时，使用同步版本自动更新所有基态。</p>
+<li><p><strong>不要手动构造 System 列表来创建 SparseState</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 的默认构造函数已经创建了一个所有寄存器值为 0 的初态。通常不需要手动构造 <code class="docutils literal notranslate"><span class="pre">System</span></code> 对象。</p>
 </li>
 <li><p><strong>使用有意义的寄存器名称</strong></p>
 <p>名称用于调试和 <code class="docutils literal notranslate"><span class="pre">StatePrint</span></code> 输出，应具有描述性。</p>
@@ -616,25 +587,21 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">System 类</a><ul>
-<li><a class="reference internal" href="#id2">概述</a></li>
-<li><a class="reference internal" href="#id3">静态变量：全局寄存器追踪</a><ul>
-<li><a class="reference internal" href="#id4">静态成员</a></li>
+<li><a class="reference internal" href="#id2">核心概念</a></li>
+<li><a class="reference internal" href="#id7">静态变量：全局寄存器追踪</a><ul>
+<li><a class="reference internal" href="#id8">静态成员</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">实例成员</a></li>
-<li><a class="reference internal" href="#id6">寄存器管理</a><ul>
-<li><a class="reference internal" href="#id7">添加寄存器</a></li>
-<li><a class="reference internal" href="#id8">删除寄存器</a></li>
+<li><a class="reference internal" href="#id9">实例成员</a></li>
+<li><a class="reference internal" href="#id10">寄存器的存储原理</a></li>
+<li><a class="reference internal" href="#id11">查询方法</a><ul>
+<li><a class="reference internal" href="#id12">获取寄存器信息</a></li>
+<li><a class="reference internal" href="#id13">统计信息</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id9">查询方法</a><ul>
-<li><a class="reference internal" href="#id10">获取寄存器信息</a></li>
-<li><a class="reference internal" href="#id11">统计信息</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id12">访问基态中的寄存器值</a></li>
-<li><a class="reference internal" href="#id13">比较与排序</a></li>
-<li><a class="reference internal" href="#id14">最佳实践</a></li>
+<li><a class="reference internal" href="#id14">访问基态中的寄存器值</a></li>
+<li><a class="reference internal" href="#id15">比较与排序</a></li>
+<li><a class="reference internal" href="#id16">最佳实践</a></li>
 <li><a class="reference internal" href="#api">API 参考</a></li>
 </ul>
 </li>

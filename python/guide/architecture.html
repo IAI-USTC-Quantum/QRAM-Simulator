@@ -218,6 +218,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/sparse_state.html">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_concepts/register_management.html">寄存器管理</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/register_types.html">寄存器类型</a></li>
 </ul>
 </li>
@@ -376,9 +377,10 @@
 <p><strong>职责</strong>：实现稀疏态量子模拟的核心功能</p>
 <p><strong>核心类</strong>：</p>
 <ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumState</span></code></strong>：稀疏态表示，仅存储非零振幅的基态</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumGate</span></code></strong> 和 <strong><code class="docutils literal notranslate"><span class="pre">SparseGate</span></code></strong>：门操作的抽象基类和稀疏优化实现</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">QuantumOperator</span></code></strong>：算子的统一接口，支持复合算子和条件算子</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">System</span></code></strong>：单个计算基态，包含复数振幅 <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> 和寄存器值数组 <code class="docutils literal notranslate"><span class="pre">registers</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SparseState</span></code></strong>：稀疏量子态，托管 <code class="docutils literal notranslate"><span class="pre">std::vector&lt;System&gt;</span></code>，默认构造创建 <code class="docutils literal notranslate"><span class="pre">|0...0⟩</span></code> 初态</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code></strong>：算子的统一接口，支持复合算子和条件算子</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code></strong>：自伴算子（<code class="docutils literal notranslate"><span class="pre">dag()</span> <span class="pre">==</span> <span class="pre">operator()</span></code>），如 Hadamard、Pauli-X</p></li>
 </ul>
 </section>
 <section id="qram-qram">
@@ -409,20 +411,26 @@
 </section>
 <section id="id5">
 <h2>量子态表示<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────┐
-│                    QuantumState                          │
-├─────────────────────────────────────────────────────────┤
-│  稀疏存储: map&lt;QIndex, Complex&gt; amplitudes              │
-│  - QIndex: 基态的整数索引 (0 到 2^n-1)                  │
-│  - Complex: 复数振幅                                    │
-│  - 仅存储 |amplitude| &gt; ε 的非零项                      │
-└─────────────────────────────────────────────────────────┘
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────────────────┐
+│                      SparseState                              │
+├──────────────────────────────────────────────────────────────┤
+│  稀疏存储: std::vector&lt;System&gt; basis_states                  │
+│  - 每个 System = { amplitude: complex, registers: uint64_t[] }│
+│  - 寄存器值组合唯一（干涉时振幅相加去重）                    │
+│  - 仅存储 |amplitude| &gt; ε 的非零基态                         │
+│  - 默认构造创建 |0...0⟩ 初态                                 │
+├──────────────────────────────────────────────────────────────┤
+│  System（静态共享元数据）                                     │
+│  - name_register_map: [(name, type, size, status), ...]      │
+│  - 寄存器以 uint64_t 存储，支持 |a⟩|b⟩|c⟩ 多寄存器编码     │
+└──────────────────────────────────────────────────────────────┘
 </pre></div>
 </div>
 <p><strong>关键特性</strong>：</p>
 <ul class="simple">
-<li><p>内存使用：O(k × n)，k 为非零项数，n 为量子比特数</p></li>
+<li><p>内存使用：O(k × r)，k 为非零基态数，r 为寄存器数</p></li>
 <li><p>对比稠密表示的 O(2^n)，可实现更大规模的模拟</p></li>
+<li><p>寄存器级操作：AddRegister ≈ ⊗|0⟩，RemoveRegister ≈ PartialTrace</p></li>
 </ul>
 </section>
 <section id="id6">

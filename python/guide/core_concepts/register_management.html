@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="量子算子" href="../../operators/index.html"><link rel="prev" title="寄存器管理" href="register_management.html">
+<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="寄存器类型" href="register_types.html"><link rel="prev" title="SparseState 类" href="sparse_state.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>寄存器类型 - PySparQ 文档</title>
+        <title>寄存器管理 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -218,8 +218,8 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html">SparseState 类</a></li>
-<li class="toctree-l2"><a class="reference internal" href="register_management.html">寄存器管理</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">寄存器类型</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">寄存器管理</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_types.html">寄存器类型</a></li>
 </ul>
 </li>
 </ul>
@@ -283,12 +283,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/core_concepts/register_types.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/core_concepts/register_management.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/core_concepts/register_types.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/core_concepts/register_management.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -306,157 +306,216 @@
         </div>
         <article role="main" id="furo-main-content">
           <section id="id1">
-<h1>寄存器类型<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
-<p>每个量子寄存器具有特定的存储类型，决定了其值的解释方式和有效范围。</p>
+<h1>寄存器管理<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<p>寄存器是 PySparQ &quot;寄存器级编程&quot;（Register Level Programming）的核心抽象。与传统的量子比特级编程不同，PySparQ 将操作层面提升到量子寄存器，使算法开发更加直观。</p>
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#statestoragetype" id="id7">StateStorageType 枚举</a></p></li>
-<li><p><a class="reference internal" href="#id3" id="id8">类型详解</a></p>
-<ul>
-<li><p><a class="reference internal" href="#unsignedinteger" id="id9">UnsignedInteger（无符号整数）</a></p></li>
-<li><p><a class="reference internal" href="#signedinteger" id="id10">SignedInteger（有符号整数）</a></p></li>
-<li><p><a class="reference internal" href="#boolean" id="id11">Boolean（布尔/单量子比特）</a></p></li>
-<li><p><a class="reference internal" href="#rational" id="id12">Rational（有理数/定点小数）</a></p></li>
-<li><p><a class="reference internal" href="#general" id="id13">General（通用存储）</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#statestorage" id="id14">StateStorage 类</a></p></li>
-<li><p><a class="reference internal" href="#id4" id="id15">类型约束在算子中的应用</a></p></li>
-<li><p><a class="reference internal" href="#id5" id="id16">类型选择建议</a></p></li>
+<li><p><a class="reference internal" href="#id3" id="id9">寄存器的本质</a></p></li>
+<li><p><a class="reference internal" href="#addregister" id="id10">添加寄存器：AddRegister</a></p></li>
+<li><p><a class="reference internal" href="#removeregister" id="id11">删除寄存器：RemoveRegister</a></p></li>
+<li><p><a class="reference internal" href="#splitregister" id="id12">拆分寄存器：SplitRegister</a></p></li>
+<li><p><a class="reference internal" href="#combineregister" id="id13">合并寄存器：CombineRegister</a></p></li>
+<li><p><a class="reference internal" href="#partialtrace" id="id14">PartialTrace：测量</a></p></li>
+<li><p><a class="reference internal" href="#push-pop" id="id15">寄存器栈操作：Push / Pop</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id16">寄存器操作与量子态的关系总结</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id17">API 参考</a></p></li>
 </ul>
 </nav>
-<section id="statestoragetype">
-<h2><a class="toc-backref" href="#id7" role="doc-backlink">StateStorageType 枚举</a><a class="headerlink" href="#statestoragetype" title="链接到此标题。">¶</a></h2>
-</section>
 <section id="id3">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">类型详解</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
-<section id="unsignedinteger">
-<h3><a class="toc-backref" href="#id9" role="doc-backlink">UnsignedInteger（无符号整数）</a><a class="headerlink" href="#unsignedinteger" title="链接到此标题。">¶</a></h3>
-<ul class="simple">
-<li><p><strong>值域</strong>: <span class="math notranslate nohighlight">\([0, 2^n - 1]\)</span></p></li>
-<li><p><strong>存储</strong>: 直接存储二进制值</p></li>
-<li><p><strong>用途</strong>: 计数器、地址、数组索引</p></li>
-</ul>
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">寄存器的本质</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<p>系统中的寄存器托管了 <code class="docutils literal notranslate"><span class="pre">n</span></code> 个 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 的存储。每个寄存器拥有名称、类型和比特宽度，其值以 <code class="docutils literal notranslate"><span class="pre">uint64_t</span></code> 存储。这种设计允许我们将量子态编码为类似 <span class="math notranslate nohighlight">\(|a\rangle|b\rangle|c\rangle\)</span> 的多寄存器形式，而无需关心底层量子比特的编码方式。</p>
+<p>例如，QRAM 访问 <span class="math notranslate nohighlight">\(|i\rangle|0\rangle \to |i\rangle|d[i]\rangle\)</span> 只需要一个地址寄存器 <code class="docutils literal notranslate"><span class="pre">i</span></code> 和一个数据寄存器 <code class="docutils literal notranslate"><span class="pre">d</span></code>，<code class="docutils literal notranslate"><span class="pre">QRAMLoad</span></code> 算子直接在寄存器级别完成映射，完全不需要管理量子比特。</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[|\psi\rangle = \sum_j \alpha_j \, |a_j\rangle |b_j\rangle |c_j\rangle\]</div>
+</div>
+<p>其中每个 <span class="math notranslate nohighlight">\(|a_j\rangle |b_j\rangle |c_j\rangle\)</span> 对应一个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 中的 <code class="docutils literal notranslate"><span class="pre">registers</span></code> 数组。</p>
+</section>
+<section id="addregister">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">添加寄存器：AddRegister</a><a class="headerlink" href="#addregister" title="链接到此标题。">¶</a></h2>
+<p>添加寄存器等价于与 <span class="math notranslate nohighlight">\(|0\rangle\)</span> 寄存器做直积（tensor product）。新寄存器在所有现有基态中的初始值为 0。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 0-15 的地址</span>
-
-<span class="c1"># 典型用法</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># 初始化为 5</span>
+
+<span class="c1"># 添加寄存器 &quot;b&quot;：等价于 |a⟩ ⊗ |0⟩</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">AddRegister</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># state 中所有基态的 &quot;b&quot; 值为 0</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">AddRegister</span></code> 会同时更新静态元数据（<code class="docutils literal notranslate"><span class="pre">name_register_map</span></code>）和所有现有基态的寄存器值。</p>
+<p>也可以使用 <code class="docutils literal notranslate"><span class="pre">AddRegisterWithHadamard</span></code> 在添加寄存器的同时施加 Hadamard，直接创建均匀叠加态：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 添加 &quot;q&quot; 并创建 |0⟩, |1⟩, ..., |2^n - 1⟩ 的均匀叠加</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">AddRegisterWithHadamard</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="signedinteger">
-<h3><a class="toc-backref" href="#id10" role="doc-backlink">SignedInteger（有符号整数）</a><a class="headerlink" href="#signedinteger" title="链接到此标题。">¶</a></h3>
-<ul class="simple">
-<li><p><strong>值域</strong>: <span class="math notranslate nohighlight">\([-2^{n-1},\ 2^{n-1}-1]\)</span> （二补码表示）</p></li>
-<li><p><strong>存储</strong>: 二补码编码</p></li>
-<li><p><strong>用途</strong>: 带符号的算术运算</p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">SignedInteger</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>  <span class="c1"># -128 到 127</span>
-
-<span class="c1"># 支持 Add_UInt_UInt 等算术算子</span>
+<section id="removeregister">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">删除寄存器：RemoveRegister</a><a class="headerlink" href="#removeregister" title="链接到此标题。">¶</a></h2>
+<p>删除寄存器等价于对该寄存器做 PartialTrace（偏迹），即消除该寄存器对量子态的贡献。在模拟中，这相当于测量该寄存器后丢弃测量结果的效果。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 删除寄存器 &quot;b&quot;：等价于对 &quot;b&quot; 做 PartialTrace</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">RemoveRegister</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition important">
+<p class="admonition-title">重要</p>
+<p><code class="docutils literal notranslate"><span class="pre">RemoveRegister</span></code> 在执行前会检查该寄存器是否与剩余寄存器存在纠缠（通过 <code class="docutils literal notranslate"><span class="pre">TestRemovable</span></code>）。如果存在纠缠，删除操作会抛出异常，因为此时对单个寄存器的 PartialTrace 不能简单地等价于丢弃。</p>
+</div>
 </section>
-<section id="boolean">
-<h3><a class="toc-backref" href="#id11" role="doc-backlink">Boolean（布尔/单量子比特）</a><a class="headerlink" href="#boolean" title="链接到此标题。">¶</a></h3>
-<ul class="simple">
-<li><p><strong>值域</strong>: {0, 1}</p></li>
-<li><p><strong>大小</strong>: 必须是 1 比特</p></li>
-<li><p><strong>用途</strong>: 标志位、控制比特、单量子比特门操作</p></li>
-</ul>
+<section id="splitregister">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">拆分寄存器：SplitRegister</a><a class="headerlink" href="#splitregister" title="链接到此标题。">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">SplitRegister</span></code> 将一个寄存器拆分为两个：原寄存器保留高位，新寄存器获取低位。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 必须是 1 比特</span>
-
-<span class="c1"># 施加单量子比特门</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Xgate_Bool</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># 翻转</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Bool</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># Hadamard</span>
-</pre></div>
-</div>
-</section>
-<section id="rational">
-<h3><a class="toc-backref" href="#id12" role="doc-backlink">Rational（有理数/定点小数）</a><a class="headerlink" href="#rational" title="链接到此标题。">¶</a></h3>
-<ul class="simple">
-<li><p><strong>值域</strong>: <span class="math notranslate nohighlight">\([0, 1)\)</span></p></li>
-<li><p><strong>存储</strong>: 定点表示，解释为 <span class="math notranslate nohighlight">\(value / 2^n\)</span></p></li>
-<li><p><strong>用途</strong>: 角度编码、条件旋转</p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Rational</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>  <span class="c1"># 高精度角度</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="mb">0b10110011</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="c1"># 用于条件旋转</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">CondRot_Rational_Bool</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 拆分：原 &quot;full&quot; 保留高 4 位，新 &quot;low&quot; 获取低 4 位</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">SplitRegister</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># &quot;full&quot; = 0b1011（高 4 位），&quot;low&quot; = 0b0011（低 4 位）</span>
 </pre></div>
 </div>
+<p>拆分过程：</p>
+<ol class="arabic simple">
+<li><p>添加新寄存器（获取低位）</p></li>
+<li><p>缩小原寄存器的比特宽度</p></li>
+<li><p>在所有基态中，将原值的高位保留在原寄存器，低位写入新寄存器</p></li>
+</ol>
 </section>
-<section id="general">
-<h3><a class="toc-backref" href="#id13" role="doc-backlink">General（通用存储）</a><a class="headerlink" href="#general" title="链接到此标题。">¶</a></h3>
-<ul class="simple">
-<li><p><strong>值域</strong>: 任意比特模式</p></li>
-<li><p><strong>用途</strong>: 原始比特存储、特殊用途</p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">General</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<section id="combineregister">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">合并寄存器：CombineRegister</a><a class="headerlink" href="#combineregister" title="链接到此标题。">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">CombineRegister</span></code> 将两个寄存器合并为一个：第一个寄存器的值左移后拼接第二个寄存器的值。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 合并：&quot;full&quot; = (full &lt;&lt; 4) + low</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">CombineRegister</span><span class="p">(</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># &quot;full&quot; = 0b10110011</span>
 </pre></div>
 </div>
+<p>合并过程：</p>
+<ol class="arabic simple">
+<li><p>扩展第一个寄存器的比特宽度（加上第二个的宽度）</p></li>
+<li><p>在所有基态中，将第一个寄存器的值左移第二个的宽度后加上第二个的值</p></li>
+<li><p>删除第二个寄存器</p></li>
+</ol>
 </section>
-</section>
-<section id="statestorage">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">StateStorage 类</a><a class="headerlink" href="#statestorage" title="链接到此标题。">¶</a></h2>
-<p>每个寄存器值存储在 <code class="docutils literal notranslate"><span class="pre">StateStorage</span></code> 对象中：</p>
-</section>
-<section id="id4">
-<h2><a class="toc-backref" href="#id15" role="doc-backlink">类型约束在算子中的应用</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
-<p>算子会检查寄存器类型是否符合要求：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 正确：Boolean 寄存器用于单量子比特门</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Xgate_Bool</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 错误：UnsignedInteger 不能用于 Boolean 算子</span>
-<span class="c1"># ps.Xgate_Bool(&quot;counter&quot;, 0)(state)  # 类型不匹配！</span>
-</pre></div>
-</div>
-</section>
-<section id="id5">
-<h2><a class="toc-backref" href="#id16" role="doc-backlink">类型选择建议</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
-<div class="table-wrapper docutils container" id="id6">
-<table class="docutils align-default" id="id6">
-<caption><span class="caption-text">类型选择指南</span><a class="headerlink" href="#id6" title="链接到此表格。">¶</a></caption>
+<section id="partialtrace">
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">PartialTrace：测量</a><a class="headerlink" href="#partialtrace" title="链接到此标题。">¶</a></h2>
+<p>在 PySparQ 中，<code class="docutils literal notranslate"><span class="pre">PartialTrace</span></code> 被等价视为测量操作。这在模拟层面是合理的——对某些寄存器进行偏迹等同于对它们进行测量并丢弃结果。</p>
+<p><code class="docutils literal notranslate"><span class="pre">PartialTrace</span></code> 提供三种模式：</p>
+<div class="table-wrapper docutils container" id="id5">
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">PartialTrace 变体</span><a class="headerlink" href="#id5" title="链接到此表格。">¶</a></caption>
 <thead>
-<tr class="row-odd"><th class="head"><p>场景</p></th>
-<th class="head"><p>推荐类型</p></th>
-<th class="head"><p>示例</p></th>
+<tr class="row-odd"><th class="head"><p>类</p></th>
+<th class="head"><p>行为</p></th>
+<th class="head"><p>返回值</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>地址/索引</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code></p></td>
-<td><p>QRAM 地址</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PartialTrace</span></code></p></td>
+<td><p>随机测量：按概率分布随机选择测量结果，然后坍缩态</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(measured_values,</span> <span class="pre">probability)</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>计数器</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code></p></td>
-<td><p>循环变量</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PartialTraceSelect</span></code></p></td>
+<td><p>选择性坍缩：保留指定寄存器值为指定值的基态，归一化其余基态</p></td>
+<td><p>归一化概率</p></td>
 </tr>
-<tr class="row-even"><td><p>控制标志</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">Boolean</span></code></p></td>
-<td><p>比较结果</p></td>
-</tr>
-<tr class="row-odd"><td><p>角度参数</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">Rational</span></code></p></td>
-<td><p>旋转角度</p></td>
-</tr>
-<tr class="row-even"><td><p>温度/物理量</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">SignedInteger</span></code></p></td>
-<td><p>带符号测量</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PartialTraceSelectRange</span></code></p></td>
+<td><p>范围坍缩：保留指定寄存器值在给定范围内的基态</p></td>
+<td><p>归一化概率</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">PartialTrace 测量示例</span><a class="headerlink" href="#id6" title="链接到此段代码">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
+
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
+
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># 随机测量寄存器 &quot;a&quot;</span>
+<span class="n">measured_values</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PartialTrace</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;测量结果: </span><span class="si">{</span><span class="n">measured_values</span><span class="si">}</span><span class="s2">, 概率: </span><span class="si">{</span><span class="n">prob</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># state 中 &quot;a&quot; 的值坍缩为测量结果</span>
+
+<span class="c1"># 选择性坍缩：强制 &quot;b&quot; = 2</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PartialTraceSelect</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">])(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">PartialTraceSelect 确定性坍缩示例</span><a class="headerlink" href="#id7" title="链接到此段代码">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 只保留 &quot;a&quot; = 1 的基态并归一化</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PartialTraceSelect</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="push-pop">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">寄存器栈操作：Push / Pop</a><a class="headerlink" href="#push-pop" title="链接到此标题。">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Push</span></code> 和 <code class="docutils literal notranslate"><span class="pre">Pop</span></code> 提供临时寄存器的栈管理，适用于算法中需要临时变量的场景：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Push：将临时寄存器入栈</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Push</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># 使用临时寄存器进行计算...</span>
+
+<span class="c1"># Pop：弹出临时寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Pop</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">寄存器操作与量子态的关系总结</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id8">
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">寄存器操作的物理意义</span><a class="headerlink" href="#id8" title="链接到此表格。">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>操作</p></th>
+<th class="head"><p>物理意义</p></th>
+<th class="head"><p>对量子态的影响</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AddRegister</span></code></p></td>
+<td><p>与 <span class="math notranslate nohighlight">\(|0\rangle\)</span> 直积</p></td>
+<td><p>所有基态增加一个值为 0 的寄存器</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RemoveRegister</span></code></p></td>
+<td><p>PartialTrace（测量后丢弃）</p></td>
+<td><p>消除该寄存器，前提是无纠缠</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SplitRegister</span></code></p></td>
+<td><p>将一个子系统拆分为两个</p></td>
+<td><p>基态数量不变，寄存器数加 1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CombineRegister</span></code></p></td>
+<td><p>将两个子系统合并为一个</p></td>
+<td><p>基态数量不变，寄存器数减 1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PartialTrace</span></code></p></td>
+<td><p>测量</p></td>
+<td><p>按概率坍缩态，基态数量减少</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Push</span></code> / <code class="docutils literal notranslate"><span class="pre">Pop</span></code></p></td>
+<td><p>临时寄存器入栈/出栈</p></td>
+<td><p>辅助操作，保存/恢复寄存器状态</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="api">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
 </section>
 </section>
 
@@ -465,23 +524,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../../operators/index.html">
+          <a class="next-page" href="register_types.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">量子算子</div>
+                <div class="title">寄存器类型</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="register_management.html">
+          <a class="prev-page" href="sparse_state.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">寄存器管理</div>
+                <div class="title">SparseState 类</div>
                 
               </div>
             </a>
@@ -515,19 +574,16 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">寄存器类型</a><ul>
-<li><a class="reference internal" href="#statestoragetype">StateStorageType 枚举</a></li>
-<li><a class="reference internal" href="#id3">类型详解</a><ul>
-<li><a class="reference internal" href="#unsignedinteger">UnsignedInteger（无符号整数）</a></li>
-<li><a class="reference internal" href="#signedinteger">SignedInteger（有符号整数）</a></li>
-<li><a class="reference internal" href="#boolean">Boolean（布尔/单量子比特）</a></li>
-<li><a class="reference internal" href="#rational">Rational（有理数/定点小数）</a></li>
-<li><a class="reference internal" href="#general">General（通用存储）</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#statestorage">StateStorage 类</a></li>
-<li><a class="reference internal" href="#id4">类型约束在算子中的应用</a></li>
-<li><a class="reference internal" href="#id5">类型选择建议</a></li>
+<li><a class="reference internal" href="#">寄存器管理</a><ul>
+<li><a class="reference internal" href="#id3">寄存器的本质</a></li>
+<li><a class="reference internal" href="#addregister">添加寄存器：AddRegister</a></li>
+<li><a class="reference internal" href="#removeregister">删除寄存器：RemoveRegister</a></li>
+<li><a class="reference internal" href="#splitregister">拆分寄存器：SplitRegister</a></li>
+<li><a class="reference internal" href="#combineregister">合并寄存器：CombineRegister</a></li>
+<li><a class="reference internal" href="#partialtrace">PartialTrace：测量</a></li>
+<li><a class="reference internal" href="#push-pop">寄存器栈操作：Push / Pop</a></li>
+<li><a class="reference internal" href="#id4">寄存器操作与量子态的关系总结</a></li>
+<li><a class="reference internal" href="#api">API 参考</a></li>
 </ul>
 </li>
 </ul>

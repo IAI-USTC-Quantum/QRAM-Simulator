@@ -218,6 +218,7 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/sparse_state.html">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_concepts/register_management.html">寄存器管理</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/register_types.html">寄存器类型</a></li>
 </ul>
 </li>
@@ -308,50 +309,52 @@
 <h1>快速入门<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
 <section id="id2">
 <h2>寄存器级编程<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<p>PySparQ 采用&quot;寄存器级编程&quot;范式。与从单个门组合电路不同，您直接对命名的量子寄存器进行操作。</p>
+<p>PySparQ 采用&quot;寄存器级编程&quot;范式。与从单个门组合电路不同，您直接对命名的量子寄存器进行操作。操作层面从量子比特上升到了量子寄存器，几乎所有操作都以寄存器为单位。</p>
 </section>
 <section id="id3">
 <h2>基本工作流程<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
 <ol class="arabic simple">
-<li><p>创建量子系统</p></li>
-<li><p>创建稀疏量子态</p></li>
-<li><p>分配寄存器（整数、布尔值）</p></li>
+<li><p>调用 <code class="docutils literal notranslate"><span class="pre">System.clear()</span></code> 清理静态状态</p></li>
+<li><p>声明寄存器（名称、类型、比特数）</p></li>
+<li><p>创建 <code class="docutils literal notranslate"><span class="pre">SparseState()</span></code>——默认构造函数自动创建 <code class="docutils literal notranslate"><span class="pre">|0...0⟩</span></code> 初态</p></li>
 <li><p>应用量子操作</p></li>
 <li><p>读取测量结果</p></li>
 </ol>
 </section>
 <section id="id4">
 <h2>示例：量子加法<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="kn">import</span> <span class="n">System</span><span class="p">,</span> <span class="n">SparseState</span><span class="p">,</span> <span class="n">AddRegister</span><span class="p">,</span> <span class="n">Add_UInt_UInt</span><span class="p">,</span> <span class="n">Hadamard_Int</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
-<span class="c1"># 创建系统和状态</span>
-<span class="n">system</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">SparseState</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+<span class="c1"># 第一步：清理静态状态</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
-<span class="c1"># 分配两个4位无符号整数寄存器</span>
-<span class="n">AddRegister</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">pysparq</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">AddRegister</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">pysparq</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 第二步：声明寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
-<span class="c1"># 将两个寄存器置于叠加态</span>
-<span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 第三步：创建稀疏量子态（自动创建 |a=0, b=0⟩ 初态）</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
+
+<span class="c1"># 第四步：将寄存器置于叠加态</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 量子加法：a += b</span>
-<span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 状态现在包含所有可能求和结果的叠加态</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="id5">
 <h2>条件操作<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
 <p>操作可以根据其他寄存器的值进行条件控制：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 分配控制寄存器</span>
-<span class="n">AddRegister</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">pysparq</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 添加控制寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">AddRegister</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 仅当 control 为 |1&gt; 时应用操作</span>
-<span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">(</span><span class="s2">&quot;control&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="id6">
