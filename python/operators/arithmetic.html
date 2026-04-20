@@ -580,7 +580,7 @@
 <section id="shiftleft">
 <h3><a class="toc-backref" href="#id22" role="doc-backlink">ShiftLeft（循环左移）</a><a class="headerlink" href="#shiftleft" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 循环左移 <code class="docutils literal notranslate"><span class="pre">digit</span></code> 位</p>
-<p><strong>Dagger</strong>: <code class="docutils literal notranslate"><span class="pre">ShiftRight(reg,</span> <span class="pre">digit)</span></code> 或 <code class="docutils literal notranslate"><span class="pre">ShiftLeft(reg,</span> <span class="pre">n</span> <span class="pre">-</span> <span class="pre">digit)</span></code></p>
+<p><strong>Dagger</strong>: ShiftLeft 和 ShiftRight 在概念上互为逆，但 <code class="docutils literal notranslate"><span class="pre">.dag()</span></code> 方法未实现。使用 <code class="docutils literal notranslate"><span class="pre">ShiftRight(reg,</span> <span class="pre">digit)</span></code> 撤销。</p>
 <p><strong>类型约束</strong>: <code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SignedInteger</span></code>。</p>
 <p><strong>位约束</strong>: <code class="docutils literal notranslate"><span class="pre">digit</span> <span class="pre">&lt;=</span> <span class="pre">寄存器大小</span></code>。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -593,8 +593,8 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># reg = 0b0101 = 5</span>
 
-<span class="c1"># 撤销</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 撤销（使用 ShiftRight，因为 ShiftLeft.dag() 未实现）</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">ShiftRight</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># reg = 0b1010 = 10</span>
 </pre></div>
 </div>

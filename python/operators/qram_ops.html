@@ -304,29 +304,29 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id1">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id2" id="id10">概述</a></p></li>
-<li><p><a class="reference internal" href="#id3" id="id11">量子并行数据访问</a></p></li>
-<li><p><a class="reference internal" href="#qramload" id="id12">QRAMLoad</a></p></li>
-<li><p><a class="reference internal" href="#qramloadfast" id="id13">QRAMLoadFast</a></p></li>
-<li><p><a class="reference internal" href="#qramcircuit-qutrit" id="id14">QRAMCircuit_qutrit</a></p>
+<li><p><a class="reference internal" href="#id2" id="id12">概述</a></p></li>
+<li><p><a class="reference internal" href="#id3" id="id13">量子并行数据访问</a></p></li>
+<li><p><a class="reference internal" href="#qramload" id="id14">QRAMLoad</a></p></li>
+<li><p><a class="reference internal" href="#qramloadfast" id="id15">QRAMLoadFast</a></p></li>
+<li><p><a class="reference internal" href="#qramcircuit-qutrit" id="id16">QRAMCircuit_qutrit</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id4" id="id15">创建和配置 QRAM 电路</a></p></li>
+<li><p><a class="reference internal" href="#id6" id="id17">创建和配置 QRAM 电路</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id5" id="id16">条件加载</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id17">使用场景</a></p>
+<li><p><a class="reference internal" href="#id7" id="id18">条件加载</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id19">使用场景</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id7" id="id18">量子数据库搜索</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id19">量子机器学习</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id20">量子数据库搜索</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id21">量子机器学习</a></p></li>
 </ul>
 </li>
 </ul>
 </nav>
 <section id="id2">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">概述</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<div class="table-wrapper docutils container" id="id9">
-<table class="docutils align-default" id="id9">
-<caption><span class="caption-text">QRAM 算子总览</span><a class="headerlink" href="#id9" title="链接到此表格。">¶</a></caption>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">概述</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id11">
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">QRAM 算子总览</span><a class="headerlink" href="#id11" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>算子</p></th>
 <th class="head"><p>操作</p></th>
@@ -347,7 +347,7 @@
 </div>
 </section>
 <section id="id3">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">量子并行数据访问</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">量子并行数据访问</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
 <p>QRAM 实现量子并行存储访问：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -357,7 +357,7 @@
 <p>---</p>
 </section>
 <section id="qramload">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">QRAMLoad</a><a class="headerlink" href="#qramload" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">QRAMLoad</a><a class="headerlink" href="#qramload" title="链接到此标题。">¶</a></h2>
 <p><strong>操作</strong>: 从 QRAM 电路加载数据到量子寄存器</p>
 <p><strong>类型约束</strong>:
 - 地址寄存器: <code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code>
@@ -372,11 +372,10 @@
 <span class="c1"># 创建 QRAM 电路（qutrit 版本）</span>
 <span class="n">addr_size</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># 4 位地址 → 16 个存储单元</span>
 <span class="n">data_size</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 8 位数据</span>
-<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_size</span><span class="p">,</span> <span class="n">data_size</span><span class="p">)</span>
 
-<span class="c1"># 设置存储内容</span>
+<span class="c1"># 设置存储内容（memory 需在构造时传入）</span>
 <span class="n">memory</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span>  <span class="c1"># 0, 10, 20, ..., 150</span>
-<span class="n">qram</span><span class="o">.</span><span class="n">set_memory</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
+<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_size</span><span class="p">,</span> <span class="n">data_size</span><span class="p">,</span> <span class="n">memory</span><span class="p">)</span>
 
 <span class="c1"># 创建寄存器</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="n">addr_size</span><span class="p">)</span>
@@ -401,7 +400,7 @@
 </div>
 </section>
 <section id="qramloadfast">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">QRAMLoadFast</a><a class="headerlink" href="#qramloadfast" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">QRAMLoadFast</a><a class="headerlink" href="#qramloadfast" title="链接到此标题。">¶</a></h2>
 <p><strong>操作</strong>: 优化的 QRAM 加载</p>
 <p><strong>特点</strong>: 针特定存储模式优化，性能更高。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 快速加载（相同接口）</span>
@@ -411,25 +410,27 @@
 <p>---</p>
 </section>
 <section id="qramcircuit-qutrit">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">QRAMCircuit_qutrit</a><a class="headerlink" href="#qramcircuit-qutrit" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">QRAMCircuit_qutrit</a><a class="headerlink" href="#qramcircuit-qutrit" title="链接到此标题。">¶</a></h2>
 <p>PySparQ 提供 <code class="docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit</span></code> 类用于配置 QRAM：</p>
-<section id="id4">
-<h3><a class="toc-backref" href="#id15" role="doc-backlink">创建和配置 QRAM 电路</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p><a href="#id4"><span class="problematic" id="id5">``</span></a>QRAMCircuit_qubit``（C++ API 中的 qubit 版本 QRAM）在 PySparQ 中**不可用**。PySparQ 仅提供 qutrit 版本。</p>
+</div>
+<section id="id6">
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">创建和配置 QRAM 电路</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
 <span class="c1"># 创建 QRAM 电路</span>
 <span class="n">addr_bits</span> <span class="o">=</span> <span class="mi">4</span>   <span class="c1"># 地址位数</span>
 <span class="n">data_bits</span> <span class="o">=</span> <span class="mi">8</span>   <span class="c1"># 数据位数</span>
-<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_bits</span><span class="p">,</span> <span class="n">data_bits</span><span class="p">)</span>
 
-<span class="c1"># 设置存储内容</span>
-<span class="c1"># 方式 1: 直接设置列表</span>
+<span class="c1"># 设置存储内容（memory 需在构造时传入）</span>
 <span class="n">memory_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span>
                <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">150</span><span class="p">]</span>
-<span class="n">qram</span><span class="o">.</span><span class="n">set_memory</span><span class="p">(</span><span class="n">memory_list</span><span class="p">)</span>
+<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_bits</span><span class="p">,</span> <span class="n">data_bits</span><span class="p">,</span> <span class="n">memory_list</span><span class="p">)</span>
 
-<span class="c1"># 方式 2: 使用树结构（高级）</span>
-<span class="c1"># qram.set_memory_tree(tree_data)</span>
+<span class="c1"># 注意：set_memory() 方法在 PySparQ 中不可用</span>
+<span class="c1"># memory 必须在构造 QRAMCircuit_qutrit 时传入</span>
 
 <span class="c1"># 查询信息</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;地址大小: </span><span class="si">{</span><span class="n">qram</span><span class="o">.</span><span class="n">addr_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -438,8 +439,8 @@
 </div>
 </section>
 </section>
-<section id="id5">
-<h2><a class="toc-backref" href="#id16" role="doc-backlink">条件加载</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<section id="id7">
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">条件加载</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
 <p>QRAM 加载支持条件执行：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMLoad</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
 
@@ -451,13 +452,15 @@
 </pre></div>
 </div>
 </section>
-<section id="id6">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">使用场景</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
-<section id="id7">
-<h3><a class="toc-backref" href="#id18" role="doc-backlink">量子数据库搜索</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<section id="id8">
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">使用场景</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
+<section id="id9">
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">量子数据库搜索</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 数据库内容</span>
 <span class="n">database</span> <span class="o">=</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-<span class="n">qram</span><span class="o">.</span><span class="n">set_memory</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
+
+<span class="c1"># 创建 QRAM（memory 在构造时传入）</span>
+<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_bits</span><span class="p">,</span> <span class="n">data_bits</span><span class="p">,</span> <span class="n">database</span><span class="p">)</span>
 
 <span class="c1"># 地址叠加态</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
@@ -469,10 +472,10 @@
 </pre></div>
 </div>
 </section>
-<section id="id8">
-<h3><a class="toc-backref" href="#id19" role="doc-backlink">量子机器学习</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 加载训练数据</span>
-<span class="n">qram</span><span class="o">.</span><span class="n">set_memory</span><span class="p">(</span><span class="n">training_data</span><span class="p">)</span>
+<section id="id10">
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">量子机器学习</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 加载训练数据（memory 在构造时传入）</span>
+<span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">addr_bits</span><span class="p">,</span> <span class="n">data_bits</span><span class="p">,</span> <span class="n">training_data</span><span class="p">)</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;sample_id&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QRAMLoad</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;sample_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_data&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
@@ -544,13 +547,13 @@
 <li><a class="reference internal" href="#qramload">QRAMLoad</a></li>
 <li><a class="reference internal" href="#qramloadfast">QRAMLoadFast</a></li>
 <li><a class="reference internal" href="#qramcircuit-qutrit">QRAMCircuit_qutrit</a><ul>
-<li><a class="reference internal" href="#id4">创建和配置 QRAM 电路</a></li>
+<li><a class="reference internal" href="#id6">创建和配置 QRAM 电路</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">条件加载</a></li>
-<li><a class="reference internal" href="#id6">使用场景</a><ul>
-<li><a class="reference internal" href="#id7">量子数据库搜索</a></li>
-<li><a class="reference internal" href="#id8">量子机器学习</a></li>
+<li><a class="reference internal" href="#id7">条件加载</a></li>
+<li><a class="reference internal" href="#id8">使用场景</a><ul>
+<li><a class="reference internal" href="#id9">量子数据库搜索</a></li>
+<li><a class="reference internal" href="#id10">量子机器学习</a></li>
 </ul>
 </li>
 </ul>

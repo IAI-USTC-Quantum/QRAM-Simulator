@@ -362,6 +362,7 @@
 <li><p><strong>值域</strong>: {0, 1}</p></li>
 <li><p><strong>大小</strong>: 必须是 1 比特</p></li>
 <li><p><strong>用途</strong>: 标志位、控制比特、单量子比特门操作</p></li>
+<li><p><strong>显示格式</strong>: 状态打印时显示为 <code class="docutils literal notranslate"><span class="pre">|true&gt;</span></code> / <code class="docutils literal notranslate"><span class="pre">|false&gt;</span></code>，而非 <code class="docutils literal notranslate"><span class="pre">|1&gt;</span></code> / <code class="docutils literal notranslate"><span class="pre">|0&gt;</span></code></p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;flag&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 必须是 1 比特</span>
