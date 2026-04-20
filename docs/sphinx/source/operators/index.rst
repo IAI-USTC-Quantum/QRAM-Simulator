@@ -7,44 +7,6 @@
    :local:
    :class: this-will-duplicate-information-and-it-is-still-useful-here
 
-.. toctree::
-   :maxdepth: 2
-   :caption: 量子算术
-
-   arithmetic
-
-.. toctree::
-   :maxdepth: 2
-   :caption: 量子门与变换
-
-   gates
-   hadamard
-   qft
-   condrot
-   phase_ops
-   rot_state_prep
-
-.. toctree::
-   :maxdepth: 2
-   :caption: QRAM 操作
-
-   qram_ops
-
-.. toctree::
-   :maxdepth: 2
-   :caption: 系统操作
-
-   system_ops
-   partial_trace
-   sort_ops
-
-.. toctree::
-   :maxdepth: 2
-   :caption: 辅助工具
-
-   dark_magic
-   debug
-
 什么是算子？
 ------------
 
