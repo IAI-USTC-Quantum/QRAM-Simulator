@@ -10,6 +10,7 @@
    sparse_state
    register_management
    register_types
+   operators
 
 核心抽象
 --------
