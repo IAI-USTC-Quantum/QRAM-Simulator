@@ -197,46 +197,9 @@ PartialTrace：测量
 API 参考
 --------
 
-.. autoclass:: pysparq.AddRegister
-   :members:
-   :undoc-members:
+寄存器管理算子的完整 API 文档，请参见以下算子参考页面：
 
-.. autoclass:: pysparq.RemoveRegister
-   :members:
-   :undoc-members:
+- :doc:`Push / Pop / ClearZero 等系统操作 </operators/system_ops>`
+- :doc:`PartialTrace 测量算子 </operators/partial_trace>`
 
-.. autoclass:: pysparq.SplitRegister
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.CombineRegister
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.PartialTrace
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.PartialTraceSelect
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.PartialTraceSelectRange
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.AddRegisterWithHadamard
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.Push
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.Pop
-   :members:
-   :undoc-members:
-
-.. autoclass:: pysparq.ClearZero
-   :members:
-   :undoc-members:
+或查阅 :ref:`算子参考` 章节获取所有算子的完整列表。

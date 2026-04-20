@@ -216,3 +216,25 @@ API 参考
 .. autoclass:: pysparq.SelfAdjointOperator
    :members:
    :undoc-members:
+
+.. _算子参考:
+
+算子分类详解
+-----------
+
+.. toctree::
+   :maxdepth: 2
+
+   arithmetic
+   gates
+   hadamard
+   qft
+   condrot
+   phase_ops
+   rot_state_prep
+   qram_ops
+   system_ops
+   partial_trace
+   sort_ops
+   dark_magic
+   debug
