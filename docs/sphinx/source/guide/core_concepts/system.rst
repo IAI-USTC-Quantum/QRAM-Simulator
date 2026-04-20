@@ -1,14 +1,14 @@
 System 类
 =========
 
-``System`` 类是稀疏态模拟器的基本单元，代表一个计算基态。每个 System 存储一个复数振幅和所有寄存器的值。
+``System`` 类是稀疏态模拟器的基本单元，代表一个计算基态。每个 ``System`` 存储一个复数振幅 ``amplitude`` 和所有寄存器的值 ``registers``。
 
 .. contents:: 目录
    :local:
    :class: this-will-duplicate-information-and-it-is-still-useful-here
 
-概述
-----
+核心概念
+--------
 
 在 PySparQ 中，量子态用稀疏表示：只存储振幅非零的基态。每个基态用一个 ``System`` 对象表示：
 
@@ -17,6 +17,15 @@ System 类
    |\psi\rangle = \sum_{i \in \text{non-zero}} \alpha_i |i\rangle
 
 其中每个 :math:`|i\rangle` 对应一个 ``System`` 实例。
+
+一个 ``System`` 包含两部分核心数据：
+
+- **amplitude**（``complex``）：该基态的复数振幅
+- **registers**（``list[StateStorage]``）：各寄存器的值，按寄存器 ID 索引。每个寄存器值以 ``uint64_t`` 存储
+
+.. important::
+
+   ``System`` 不是独立使用的对象。它始终由 ``SparseState`` 托管。``SparseState`` 保证其中所有 ``System`` 的寄存器值组合唯一——如果两个 ``System`` 具有相同的寄存器值，意味着发生了量子干涉，它们的振幅应当相加合并为一个 ``System``。
 
 静态变量：全局寄存器追踪
 ------------------------
@@ -59,8 +68,6 @@ System 类
 实例成员
 --------
 
-每个 ``System`` 实例包含：
-
 .. list-table:: System 实例成员
    :header-rows: 1
 
@@ -72,46 +79,14 @@ System 类
      - 该基态的复数振幅
    * - ``registers``
      - ``list[StateStorage]``
-     - 各寄存器的值（按寄存器 ID 索引）
+     - 各寄存器的值（按寄存器 ID 索引），底层以 ``uint64_t`` 存储
 
-寄存器管理
-----------
+寄存器的存储原理
+----------------
 
-添加寄存器
-^^^^^^^^^^
+系统中的寄存器托管了 ``n`` 个 ``uint64_t`` 的存储方式。这使得我们可以将量子态编码为类似 :math:`|a\rangle|b\rangle|c\rangle` 的多寄存器形式，而无需管理量子比特是如何编码的。
 
-.. code-block:: python
-
-   import pysparq as ps
-
-   # 清理之前的静态状态（必须！）
-   ps.System.clear()
-
-   # 添加寄存器：名称、类型、比特数
-   reg_id = ps.System.add_register("counter", ps.UnsignedInteger, 4)
-   print(f"寄存器 ID: {reg_id}")  # 0
-
-   # 同步添加：同时初始化所有基态中的寄存器值为 0
-   state = ps.SparseState()
-   reg_id2 = ps.System.add_register_synchronous("flag", ps.Boolean, 1, state)
-
-   # 添加并施加 Hadamard（创建叠加态）
-   ps.AddRegisterWithHadamard("q", ps.UnsignedInteger, 2)(state)
-   # 现在 "q" 寄存器处于 |0⟩, |1⟩, |2⟩, |3⟩ 的均匀叠加
-
-删除寄存器
-^^^^^^^^^^
-
-.. code-block:: python
-
-   # 按名称删除
-   ps.System.remove_register("counter")
-
-   # 按 ID 删除
-   ps.System.remove_register(reg_id)
-
-   # 同步删除：同时更新所有基态
-   ps.System.remove_register_synchronous("flag", state)
+例如，QRAM 访问 :math:`|i\rangle|0\rangle \to |i\rangle|d[i]\rangle` 可以被轻松编码——只需要一个地址寄存器和一个数据寄存器。整个项目的管理层面从量子比特上升到了量子寄存器，几乎所有操作都以量子寄存器为单位。
 
 查询方法
 --------
@@ -156,10 +131,9 @@ System 类
 
 .. code-block:: python
 
+   ps.System.clear()
+   ps.System.add_register("x", ps.UnsignedInteger, 4)
    state = ps.SparseState()
-
-   # 添加寄存器并初始化
-   ps.System.add_register_synchronous("x", ps.UnsignedInteger, 4, state)
 
    # 遍历所有基态
    for system in state.basis_states:
@@ -182,9 +156,6 @@ System 类
 ``System`` 类支持比较运算符，用于排序和去重：
 
 .. code-block:: python
-
-   s1 = ps.System()
-   s2 = ps.System()
 
    # 相等比较（所有寄存器值和振幅都相同）
    if s1 == s2:
@@ -211,9 +182,12 @@ System 类
       # 然后创建寄存器...
       ps.System.add_register("a", ps.UnsignedInteger, 4)
 
-2. **使用 ``add_register_synchronous`` 确保状态一致性**
+      # SparseState() 默认创建 |0...0⟩ 初态
+      state = ps.SparseState()
 
-   当 ``SparseState`` 已存在时，使用同步版本自动更新所有基态。
+2. **不要手动构造 System 列表来创建 SparseState**
+
+   ``SparseState`` 的默认构造函数已经创建了一个所有寄存器值为 0 的初态。通常不需要手动构造 ``System`` 对象。
 
 3. **使用有意义的寄存器名称**
 
