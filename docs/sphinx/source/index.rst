@@ -20,7 +20,7 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
 * `主页 <https://iai-ustc-quantum.github.io/QRAM-Simulator/>`_ - 项目概览和 C++ API 文档
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: 用户指南
 
    guide/installation
@@ -29,11 +29,6 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
    guide/examples
    guide/dynamic_operators
    guide/algorithms/index
-
-.. toctree::
-   :maxdepth: 2
-   :caption: 核心概念
-
    guide/core_concepts/index
 
 .. toctree::
@@ -41,19 +36,6 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
    :caption: 算子参考
 
    operators/index
-   operators/arithmetic
-   operators/gates
-   operators/hadamard
-   operators/qft
-   operators/condrot
-   operators/phase_ops
-   operators/rot_state_prep
-   operators/qram_ops
-   operators/system_ops
-   operators/partial_trace
-   operators/sort_ops
-   operators/dark_magic
-   operators/debug
 
 .. toctree::
    :maxdepth: 2
@@ -68,7 +50,6 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
    :caption: API 参考
 
    api/index
-   autoapi/PySparQ/pysparq/index
 
 快速开始
 --------
