@@ -6,7 +6,7 @@
 <link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="System 类" href="system.html"><link rel="prev" title="QDA 线性系统求解器" href="../algorithms/qda_solver.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>核心概念 - PySparQ 文档</title>
+        <title>量子态与寄存器表示 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
+<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">核心概念</a><input aria-label="Toggle navigation of 核心概念" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="register_management.html">寄存器管理</a></li>
@@ -223,15 +223,26 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">算子</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="operators.html">算子</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../operators/index.html">量子算子</a><input aria-label="Toggle navigation of 量子算子" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../operators/index.html">算子参考</a><input aria-label="Toggle navigation of 算子参考" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../operators/arithmetic.html">算术算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../operators/gates.html">基本量子门</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../operators/hadamard.html">Hadamard 操作</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../operators/qram_ops.html">QRAM 算子</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../operators/condrot.html">条件旋转算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../operators/qft.html">量子傅里叶变换 (QFT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/condrot.html">条件旋转算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/phase_ops.html">相位与反射算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/rot_state_prep.html">旋转与态制备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/qram_ops.html">QRAM 算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/system_ops.html">系统操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/partial_trace.html">部分追迹</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/sort_ops.html">排序算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/dark_magic.html">黑魔法操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../operators/debug.html">调试工具</a></li>
 </ul>
 </li>
 </ul>
@@ -306,7 +317,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <section id="id1">
-<h1>核心概念<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<h1>量子态与寄存器表示<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
 <p>本节介绍 PySparQ 稀疏态量子模拟的基础构建模块。理解这些概念是使用 Register Level Programming 范式的前提。</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -431,7 +442,7 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">核心概念</a><ul>
+<li><a class="reference internal" href="#">量子态与寄存器表示</a><ul>
 <li><a class="reference internal" href="#id2">核心抽象</a></li>
 <li><a class="reference internal" href="#id3">核心数据关系</a></li>
 </ul>

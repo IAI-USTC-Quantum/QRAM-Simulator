@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="算术算子" href="arithmetic.html"><link rel="prev" title="寄存器类型" href="../guide/core_concepts/register_types.html">
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="算术算子" href="arithmetic.html"><link rel="prev" title="算子" href="../guide/core_concepts/operators.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>量子算子 - PySparQ 文档</title>
+        <title>算子参考 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
+<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,15 +223,26 @@
 </ul>
 </li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">算子</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">量子算子</a><input aria-label="Toggle navigation of 量子算子" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">算子参考</a><input aria-label="Toggle navigation of 算子参考" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="arithmetic.html">算术算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gates.html">基本量子门</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hadamard.html">Hadamard 操作</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html">QRAM 算子</a></li>
-<li class="toctree-l2"><a class="reference internal" href="condrot.html">条件旋转算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qft.html">量子傅里叶变换 (QFT)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="condrot.html">条件旋转算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phase_ops.html">相位与反射算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html">旋转与态制备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html">QRAM 算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system_ops.html">系统操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_trace.html">部分追迹</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html">排序算子</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dark_magic.html">黑魔法操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug.html">调试工具</a></li>
 </ul>
 </li>
 </ul>
@@ -306,7 +317,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <section id="id1">
-<h1>量子算子<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<h1>算子参考<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
 <p>算子是 PySparQ 中量子操作的构建模块。所有操作都以算子对象的形式实现，它们接受 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 并对其进行变换。</p>
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
@@ -335,7 +346,7 @@
 </ul>
 </nav>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">算子分类</span></p>
+<p class="caption" role="heading"><span class="caption-text">量子算术</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="arithmetic.html">算术算子</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="arithmetic.html#id3">概述</a></li>
@@ -346,6 +357,11 @@
 <li class="toctree-l2"><a class="reference internal" href="arithmetic.html#id10">其他算子</a></li>
 </ul>
 </li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">量子门与变换</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="gates.html">基本量子门</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gates.html#id3">概述</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gates.html#id4">类型约束</a></li>
@@ -365,14 +381,14 @@
 <li class="toctree-l2"><a class="reference internal" href="hadamard.html#id5">使用场景</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="qram_ops.html">QRAM 算子</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id2">概述</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id3">量子并行数据访问</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramload">QRAMLoad</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramloadfast">QRAMLoadFast</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramcircuit-qutrit">QRAMCircuit_qutrit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id5">条件加载</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id6">使用场景</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qft.html">量子傅里叶变换 (QFT)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id2">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id3">数学定义</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id4">QFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#inverseqft">inverseQFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id5">使用场景</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id8">性能考虑</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qft.html#id9">实际示例</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="condrot.html">条件旋转算子</a><ul>
@@ -383,14 +399,81 @@
 <li class="toctree-l2"><a class="reference internal" href="condrot.html#id9">使用场景</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="qft.html">量子傅里叶变换 (QFT)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id2">概述</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id3">数学定义</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id4">QFT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#inverseqft">inverseQFT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id5">使用场景</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id8">性能考虑</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qft.html#id9">实际示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="phase_ops.html">相位与反射算子</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="phase_ops.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phase_ops.html#zeroconditionalphaseflip">ZeroConditionalPhaseFlip（零条件相位翻转）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phase_ops.html#reflection-bool">Reflection_Bool（反射）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phase_ops.html#globalphase-int">GlobalPhase_Int（全局相位）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rot_state_prep.html">旋转与态制备</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html#rot-generalunitary">Rot_GeneralUnitary（通用幺正旋转）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html#rot-generalstateprep">Rot_GeneralStatePrep（量子态制备）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html#id6">辅助函数</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">QRAM 操作</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="qram_ops.html">QRAM 算子</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id2">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id3">量子并行数据访问</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramload">QRAMLoad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramloadfast">QRAMLoadFast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#qramcircuit-qutrit">QRAMCircuit_qutrit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id5">条件加载</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qram_ops.html#id6">使用场景</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">系统操作</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="system_ops.html">系统操作</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="system_ops.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system_ops.html#id4">寄存器栈管理</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system_ops.html#id5">基态清理</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system_ops.html#id6">基态拆分与合并</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="partial_trace.html">部分追迹</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="partial_trace.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_trace.html#partialtrace">PartialTrace（随机测量）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_trace.html#partialtraceselect">PartialTraceSelect（选择性坍缩）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_trace.html#partialtraceselectrange">PartialTraceSelectRange（范围坍缩）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sort_ops.html">排序算子</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortbykey">SortByKey（按键排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortbykey2">SortByKey2（双键排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortexceptkey">SortExceptKey（排除键排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortexceptbit">SortExceptBit（排除位排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortexceptkeyhadamard-hadamard">SortExceptKeyHadamard（排除 Hadamard 键排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortunconditional">SortUnconditional（无条件排序）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sort_ops.html#sortbyamplitude">SortByAmplitude（按振幅排序）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">辅助工具</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dark_magic.html">黑魔法操作</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dark_magic.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dark_magic.html#normalize">Normalize（归一化）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dark_magic.html#init-unsafe">Init_Unsafe（不安全初始化）</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">调试工具</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="debug.html#id3">概述</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug.html#id4">状态打印</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug.html#id5">归一化检查</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug.html#id6">数据完整性检查</a></li>
 </ul>
 </li>
 </ul>
@@ -639,14 +722,14 @@
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../guide/core_concepts/register_types.html">
+          <a class="prev-page" href="../guide/core_concepts/operators.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">寄存器类型</div>
+                <div class="title">算子</div>
                 
               </div>
             </a>
@@ -680,7 +763,7 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">量子算子</a><ul>
+<li><a class="reference internal" href="#">算子参考</a><ul>
 <li><a class="reference internal" href="#id3">什么是算子？</a><ul>
 <li><a class="reference internal" href="#id6">基本用法</a></li>
 </ul>

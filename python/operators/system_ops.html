@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="量子傅里叶变换 (QFT)" href="qft.html"><link rel="prev" title="基本量子门" href="gates.html">
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="部分追迹" href="partial_trace.html"><link rel="prev" title="QRAM 算子" href="qram_ops.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>Hadamard 操作 - PySparQ 文档</title>
+        <title>系统操作 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -232,13 +232,13 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">算子参考</a><input aria-label="Toggle navigation of 算子参考" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="arithmetic.html">算术算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gates.html">基本量子门</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Hadamard 操作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hadamard.html">Hadamard 操作</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qft.html">量子傅里叶变换 (QFT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="condrot.html">条件旋转算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="phase_ops.html">相位与反射算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rot_state_prep.html">旋转与态制备</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qram_ops.html">QRAM 算子</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system_ops.html">系统操作</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">系统操作</a></li>
 <li class="toctree-l2"><a class="reference internal" href="partial_trace.html">部分追迹</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sort_ops.html">排序算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dark_magic.html">黑魔法操作</a></li>
@@ -294,12 +294,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/operators/hadamard.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/operators/system_ops.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/operators/hadamard.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/operators/system_ops.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -316,214 +316,193 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="hadamard">
-<h1>Hadamard 操作<a class="headerlink" href="#hadamard" title="链接到此标题。">¶</a></h1>
-<p>Hadamard 算子在寄存器上创建量子叠加态，是量子算法的基础操作。</p>
-<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id1">
+          <section id="id1">
+<h1>系统操作<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<p>系统操作管理寄存器生命周期、基态的拆分与合并、以及零振幅清理。这些操作虽然不直接对应量子门，但在算法流程中不可或缺。</p>
+<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id2" id="id10">概述</a></p></li>
-<li><p><a class="reference internal" href="#hadamard-int" id="id11">Hadamard_Int</a></p></li>
-<li><p><a class="reference internal" href="#hadamard-int-full" id="id12">Hadamard_Int_Full</a></p></li>
-<li><p><a class="reference internal" href="#hadamard-bool" id="id13">Hadamard_Bool</a></p></li>
-<li><p><a class="reference internal" href="#hadamard-partialqubit" id="id14">Hadamard_PartialQubit</a></p></li>
-<li><p><a class="reference internal" href="#id5" id="id15">使用场景</a></p>
+<li><p><a class="reference internal" href="#id3" id="id9">概述</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id10">寄存器栈管理</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id6" id="id16">均匀叠加态</a></p></li>
-<li><p><a class="reference internal" href="#id7" id="id17">单个量子比特初始化</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id18">部分叠加态</a></p></li>
+<li><p><a class="reference internal" href="#push" id="id11">Push（压栈）</a></p></li>
+<li><p><a class="reference internal" href="#pop" id="id12">Pop（弹栈）</a></p>
+<ul>
+<li><p><a class="reference internal" href="#push-pop" id="id13">Push/Pop 模式</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id5" id="id14">基态清理</a></p>
+<ul>
+<li><p><a class="reference internal" href="#clearzero" id="id15">ClearZero（清除零振幅）</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id6" id="id16">基态拆分与合并</a></p>
+<ul>
+<li><p><a class="reference internal" href="#split-systems" id="id17">split_systems（拆分基态）</a></p></li>
+<li><p><a class="reference internal" href="#combine-systems" id="id18">combine_systems（合并基态）</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id7" id="id19">拆分-变换-合并模式</a></p></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </nav>
-<section id="id2">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">概述</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<div class="table-wrapper docutils container" id="id9">
-<table class="docutils align-default" id="id9">
-<caption><span class="caption-text">Hadamard 算子总览</span><a class="headerlink" href="#id9" title="链接到此表格。">¶</a></caption>
+<section id="id3">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id8">
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">系统操作总览</span><a class="headerlink" href="#id8" title="链接到此表格。">¶</a></caption>
 <thead>
-<tr class="row-odd"><th class="head"><p>算子</p></th>
+<tr class="row-odd"><th class="head"><p>算子 / 函数</p></th>
 <th class="head"><p>操作</p></th>
-<th class="head"><p>类型约束</p></th>
-<th class="head"><p>幺正类</p></th>
+<th class="head"><p>类型</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_Int</span></code></p></td>
-<td><p>整数寄存器 Hadamard</p></td>
-<td><p>整数类型</p></td>
-<td><p>SelfAdjoint</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Push</span></code></p></td>
+<td><p>将寄存器压入栈，保存当前值</p></td>
+<td><p>BaseOperator</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_Int_Full</span></code></p></td>
-<td><p>完整 Hadamard（所有输出状态）</p></td>
-<td><p>整数类型</p></td>
-<td><p>SelfAdjoint</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Pop</span></code></p></td>
+<td><p>从栈中恢复寄存器值</p></td>
+<td><p>SelfAdjointOperator</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_Bool</span></code></p></td>
-<td><p>单量子比特 Hadamard</p></td>
-<td><p>Boolean（size=1）</p></td>
-<td><p>SelfAdjoint</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ClearZero</span></code></p></td>
+<td><p>清除振幅接近零的基态</p></td>
+<td><p>SelfAdjointOperator</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_PartialQubit</span></code></p></td>
-<td><p>部分量子比特 Hadamard</p></td>
-<td><p>整数类型</p></td>
-<td><p>SelfAdjoint</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">split_systems</span></code></p></td>
+<td><p>按条件拆分基态集合</p></td>
+<td><p>自由函数</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">combine_systems</span></code></p></td>
+<td><p>合并基态集合</p></td>
+<td><p>自由函数</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>---</p>
 </section>
-<section id="hadamard-int">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">Hadamard_Int</a><a class="headerlink" href="#hadamard-int" title="链接到此标题。">¶</a></h2>
-<p><strong>操作</strong>: 对整数寄存器的指定量子比特应用 Hadamard</p>
-<p><strong>数学定义</strong>:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[H|x\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle) \quad \text{for each qubit}\]</div>
-</div>
-<p><strong>类型约束</strong>: <code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SignedInteger</span></code></p>
+<section id="id4">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">寄存器栈管理</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<section id="push">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Push（压栈）</a><a class="headerlink" href="#push" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 将寄存器当前值保存到内部栈中，并将寄存器重置为 <code class="docutils literal notranslate"><span class="pre">|0⟩</span></code>。</p>
+<p><strong>参数</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> — 目标寄存器（名称或 ID）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">garbage_name</span></code> — 栈中保存用的临时名称（可选）</p></li>
+</ul>
+<p><strong>用途</strong>: 在需要临时使用一个寄存器作为辅助（ancilla）时，先保存其值，使用完毕后通过 <code class="docutils literal notranslate"><span class="pre">Pop</span></code> 恢复。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># 4 比特寄存器</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># [1 basis state]</span>
-<span class="c1"># |q=0⟩ : (1+0j)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="c1"># 对前 2 比特应用 Hadamard</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 保存 temp 的当前值，重置为 0</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Push</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Hadamard 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># [2 basis states]</span>
-<span class="c1"># |q=0⟩ : (0.707+0j)</span>
-<span class="c1"># |q=2⟩ : (0.707+0j)</span>
+<span class="c1"># 现在可以自由使用 temp 作为辅助寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;temp&quot;</span><span class="p">,</span> <span class="s2">&quot;temp&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="pop">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Pop（弹栈）</a><a class="headerlink" href="#pop" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 从栈中恢复寄存器的值。</p>
+<p><strong>参数</strong>: <code class="docutils literal notranslate"><span class="pre">reg</span></code> — 要恢复的寄存器（名称或 ID）</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><code class="docutils literal notranslate"><span class="pre">Pop</span></code> 要求栈中保存的值与当前其他寄存器无纠缠，否则行为未定义。通常应与 <code class="docutils literal notranslate"><span class="pre">Push</span></code> 成对使用。</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 恢复 temp 到 Push 前的值</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Pop</span><span class="p">(</span><span class="s2">&quot;temp&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="push-pop">
+<h4><a class="toc-backref" href="#id13" role="doc-backlink">Push/Pop 模式</a><a class="headerlink" href="#push-pop" title="链接到此标题。">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">Push</span></code> / <code class="docutils literal notranslate"><span class="pre">Pop</span></code> 的典型工作流：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. 保存辅助寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Push</span><span class="p">(</span><span class="s2">&quot;ancilla&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># 2. 使用辅助寄存器进行计算</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">,</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># ... 更多操作 ...</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">,</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># 撤销（SelfAdjoint）</span>
+
+<span class="c1"># 3. 恢复辅助寄存器</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Pop</span><span class="p">(</span><span class="s2">&quot;ancilla&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>---</p>
 </section>
-<section id="hadamard-int-full">
-<h2><a class="toc-backref" href="#id12" role="doc-backlink">Hadamard_Int_Full</a><a class="headerlink" href="#hadamard-int-full" title="链接到此标题。">¶</a></h2>
-<p><strong>操作</strong>: 对整个寄存器应用完整 Hadamard，创建所有 <span class="math notranslate nohighlight">\(2^n\)</span> 个状态的均匀叠加</p>
-<p><strong>数学定义</strong>:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[H^n|x\rangle = \frac{1}{\sqrt{2^n}}\sum_{y=0}^{2^n-1}|y\rangle\]</div>
-</div>
-<p><strong>类型约束</strong>: 整数类型</p>
-<p><strong>注意</strong>: 会创建 <span class="math notranslate nohighlight">\(2^n\)</span> 个基态，当 n 较大时可能导致内存问题。</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># 2 比特寄存器</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-
-<span class="c1"># 完整 Hadamard：创建 2^2 = 4 个状态</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># [4 basis states]</span>
-<span class="c1"># |q=0⟩ : (0.5+0j)</span>
-<span class="c1"># |q=1⟩ : (0.5+0j)</span>
-<span class="c1"># |q=2⟩ : (0.5+0j)</span>
-<span class="c1"># |q=3⟩ : (0.5+0j)</span>
-
-<span class="c1"># 再次应用 = 撤销（自伴）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># 回到单基态</span>
-</pre></div>
-</div>
-<p>---</p>
 </section>
-<section id="hadamard-bool">
-<h2><a class="toc-backref" href="#id13" role="doc-backlink">Hadamard_Bool</a><a class="headerlink" href="#hadamard-bool" title="链接到此标题。">¶</a></h2>
-<p><strong>操作</strong>: 单量子比特 Hadamard</p>
-<p><strong>矩阵</strong>:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[\begin{split}H = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 &amp; 1 \\ 1 &amp; -1 \end{pmatrix}\end{split}\]</div>
-</div>
-<p><strong>类型约束</strong>: <a href="#id3"><span class="problematic" id="id4">``</span></a>Boolean``（寄存器大小必须为 1）</p>
-<p><strong>位约束</strong>: 无（默认操作第 0 位）</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># 单量子比特寄存器</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;qubit&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 必须是 1 比特！</span>
-
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Bool</span><span class="p">(</span><span class="s2">&quot;qubit&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># [2 basis states]</span>
-<span class="c1"># |qubit=0⟩ : (0.707+0j)</span>
-<span class="c1"># |qubit=1⟩ : (0.707+0j)</span>
-</pre></div>
-</div>
-<p>---</p>
-</section>
-<section id="hadamard-partialqubit">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">Hadamard_PartialQubit</a><a class="headerlink" href="#hadamard-partialqubit" title="链接到此标题。">¶</a></h2>
-<p><strong>操作</strong>: 对寄存器中的指定量子比特应用 Hadamard</p>
-<p><strong>类型约束</strong>: 整数类型</p>
-<p><strong>位约束</strong>: 指定位置必须在寄存器范围内</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-
-<span class="c1"># 4 比特寄存器</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-
-<span class="c1"># 只对第 1 和第 3 位应用 Hadamard</span>
-<span class="n">positions</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_PartialQubit</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">positions</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 创建 2^2 = 4 个叠加状态（仅翻转位置 1 和 3）</span>
-</pre></div>
-</div>
-<p>---</p>
 </section>
 <section id="id5">
-<h2><a class="toc-backref" href="#id15" role="doc-backlink">使用场景</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">基态清理</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<section id="clearzero">
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">ClearZero（清除零振幅）</a><a class="headerlink" href="#clearzero" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 遍历所有基态，移除振幅绝对值低于阈值的项。</p>
+<p><strong>参数</strong>: <code class="docutils literal notranslate"><span class="pre">eps``（可选）—</span> <span class="pre">截断阈值，默认为</span> <span class="pre">``1e-12</span></code>。</p>
+<p><strong>用途</strong>: 经过多次运算后，某些基态的振幅可能因浮点误差变得极小但不为零。<code class="docutils literal notranslate"><span class="pre">ClearZero</span></code> 可清除这些数值噪声，保持稀疏态的紧凑性。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">ClearZero</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>       <span class="c1"># 使用默认阈值</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">ClearZero</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># 自定义阈值</span>
+</pre></div>
+</div>
+<p>---</p>
+</section>
+</section>
 <section id="id6">
-<h3><a class="toc-backref" href="#id16" role="doc-backlink">均匀叠加态</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
-<p>用于量子搜索、量子采样等算法：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建地址寄存器的均匀叠加</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 现在 addr 在所有可能值上均匀分布</span>
+<h2><a class="toc-backref" href="#id16" role="doc-backlink">基态拆分与合并</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<section id="split-systems">
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">split_systems（拆分基态）</a><a class="headerlink" href="#split-systems" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 根据 conditioned_by 条件将 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 中的基态分为满足条件和不满足条件两组。</p>
+<p><strong>参数</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> — 源 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nonzeros</span></code> / <code class="docutils literal notranslate"><span class="pre">all_ones</span></code> / <code class="docutils literal notranslate"><span class="pre">by_bit</span></code> / <code class="docutils literal notranslate"><span class="pre">by_value</span></code> — 条件参数</p></li>
+</ul>
+<p><strong>返回</strong>: <code class="docutils literal notranslate"><span class="pre">list[System]</span></code> — 满足条件的基态列表。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 拆分出 ctrl 寄存器非零的基态</span>
+<span class="n">matching</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">split_systems</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">nonzeros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ctrl&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
+<section id="combine-systems">
+<h3><a class="toc-backref" href="#id18" role="doc-backlink">combine_systems（合并基态）</a><a class="headerlink" href="#combine-systems" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 将拆分出的基态重新合并回 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code>。</p>
+<p><strong>参数</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">to</span></code> — 目标 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span></code> — 要合并的基态列表</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 合并回主状态</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">combine_systems</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">matching</span><span class="p">)</span>
+</pre></div>
+</div>
 <section id="id7">
-<h3><a class="toc-backref" href="#id17" role="doc-backlink">单个量子比特初始化</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
-<p>用于初始化控制比特：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;ctrl&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">Boolean</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Bool</span><span class="p">(</span><span class="s2">&quot;ctrl&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<h4><a class="toc-backref" href="#id19" role="doc-backlink">拆分-变换-合并模式</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">split_systems</span></code> / <code class="docutils literal notranslate"><span class="pre">combine_systems</span></code> 可用于实现手工条件操作：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. 拆分</span>
+<span class="n">matching</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">split_systems</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">nonzeros</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ctrl&quot;</span><span class="p">])</span>
 
-<span class="c1"># ctrl 处于 |+⟩ = (|0⟩ + |1⟩)/√2 状态</span>
+<span class="c1"># 2. 对匹配的基态执行操作</span>
+<span class="c1"># ...</span>
+
+<span class="c1"># 3. 合并</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">combine_systems</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">matching</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="id8">
-<h3><a class="toc-backref" href="#id18" role="doc-backlink">部分叠加态</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
-<p>用于选择性叠加：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 只叠加低 2 比特</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 或叠加特定位置</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_PartialQubit</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">})(</span><span class="n">state</span><span class="p">)</span>
-</pre></div>
-</div>
 </section>
 </section>
 </section>
@@ -533,23 +512,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="qft.html">
+          <a class="next-page" href="partial_trace.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">量子傅里叶变换 (QFT)</div>
+                <div class="title">部分追迹</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="gates.html">
+          <a class="prev-page" href="qram_ops.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">基本量子门</div>
+                <div class="title">QRAM 算子</div>
                 
               </div>
             </a>
@@ -583,16 +562,26 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Hadamard 操作</a><ul>
-<li><a class="reference internal" href="#id2">概述</a></li>
-<li><a class="reference internal" href="#hadamard-int">Hadamard_Int</a></li>
-<li><a class="reference internal" href="#hadamard-int-full">Hadamard_Int_Full</a></li>
-<li><a class="reference internal" href="#hadamard-bool">Hadamard_Bool</a></li>
-<li><a class="reference internal" href="#hadamard-partialqubit">Hadamard_PartialQubit</a></li>
-<li><a class="reference internal" href="#id5">使用场景</a><ul>
-<li><a class="reference internal" href="#id6">均匀叠加态</a></li>
-<li><a class="reference internal" href="#id7">单个量子比特初始化</a></li>
-<li><a class="reference internal" href="#id8">部分叠加态</a></li>
+<li><a class="reference internal" href="#">系统操作</a><ul>
+<li><a class="reference internal" href="#id3">概述</a></li>
+<li><a class="reference internal" href="#id4">寄存器栈管理</a><ul>
+<li><a class="reference internal" href="#push">Push（压栈）</a></li>
+<li><a class="reference internal" href="#pop">Pop（弹栈）</a><ul>
+<li><a class="reference internal" href="#push-pop">Push/Pop 模式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">基态清理</a><ul>
+<li><a class="reference internal" href="#clearzero">ClearZero（清除零振幅）</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">基态拆分与合并</a><ul>
+<li><a class="reference internal" href="#split-systems">split_systems（拆分基态）</a></li>
+<li><a class="reference internal" href="#combine-systems">combine_systems（合并基态）</a><ul>
+<li><a class="reference internal" href="#id7">拆分-变换-合并模式</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -614,8 +603,5 @@
     <script src="../_static/copybutton.js?v=08f3124f"></script>
     <script src="../_static/translations.js?v=540d3cec"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

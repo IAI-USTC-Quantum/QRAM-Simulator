@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="寄存器管理" href="register_management.html"><link rel="prev" title="System 类" href="system.html">
+<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="算子参考" href="../../operators/index.html"><link rel="prev" title="寄存器类型" href="register_types.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>SparseState 类 - PySparQ 文档</title>
+        <title>算子 - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -214,18 +214,18 @@
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="system.html">System 类</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">SparseState 类</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="register_management.html">寄存器管理</a></li>
 <li class="toctree-l2"><a class="reference internal" href="register_types.html">寄存器类型</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="operators.html">算子</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
@@ -294,12 +294,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/core_concepts/sparse_state.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/core_concepts/operators.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/core_concepts/sparse_state.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/core_concepts/operators.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -316,225 +316,205 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="sparsestate">
-<h1>SparseState 类<a class="headerlink" href="#sparsestate" title="链接到此标题。">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 类是 PySparQ 的核心数据结构，表示一个稀疏量子态。它内部托管了 <code class="docutils literal notranslate"><span class="pre">std::vector&lt;System&gt;</span></code>，只存储振幅非零的基态。</p>
-<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id1">
+          <section id="id1">
+<h1>算子<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<p>算子（Operator）是 SparQ 中对量子操作的核心抽象。与传统量子电路模拟器以门序列描述量子算法不同，SparQ 将一切变换抽象为 <a href="#id2"><span class="problematic" id="id3">**</span></a>可调用对象**（C++ functor），实现了算子定义与作用对象的分离。</p>
+<nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id4">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id2" id="id14">稀疏表示原理</a></p></li>
-<li><p><a class="reference internal" href="#id3" id="id15">唯一性规则</a></p></li>
-<li><p><a class="reference internal" href="#id4" id="id16">基本用法</a></p>
+<li><p><a class="reference internal" href="#id5" id="id17">两阶段模型</a></p></li>
+<li><p><a class="reference internal" href="#id6" id="id18">构造参数</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id5" id="id17">创建 SparseState</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id18">访问基态</a></p></li>
+<li><p><a class="reference internal" href="#id7" id="id19">寄存器标识</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id20">常量参数</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id21">超参数</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id22">位索引与角度</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id7" id="id19">状态演化示例</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id20">状态打印模式</a></p></li>
-<li><p><a class="reference internal" href="#id9" id="id21">清除接近零的振幅</a></p></li>
-<li><p><a class="reference internal" href="#id10" id="id22">合并重复基态</a></p></li>
-<li><p><a class="reference internal" href="#id11" id="id23">迭代器支持</a></p></li>
-<li><p><a class="reference internal" href="#api" id="id24">API 参考</a></p></li>
+<li><p><a class="reference internal" href="#id11" id="id23">作用方式</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id12" id="id24">直接作用</a></p></li>
+<li><p><a class="reference internal" href="#id13" id="id25">逆作用</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id26">条件作用</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#id15" id="id27">算子分类</a></p></li>
 </ul>
 </nav>
-<section id="id2">
-<h2><a class="toc-backref" href="#id14" role="doc-backlink">稀疏表示原理</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
-<p>传统全态矢量模拟器存储 <span class="math notranslate nohighlight">\(2^n\)</span> 个振幅（<span class="math notranslate nohighlight">\(n\)</span> 为量子比特数），无论大多数振幅是否为零。PySparQ 采用稀疏表示：</p>
+<section id="id5">
+<h2><a class="toc-backref" href="#id17" role="doc-backlink">两阶段模型</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<p>SparQ 的算子遵循 <strong>构造 → 作用</strong> 的两阶段模型：</p>
+<ol class="arabic simple">
+<li><p><strong>构造阶段</strong> — 指定算子作用于哪些寄存器以及相关参数。此阶段不涉及任何量子态。</p></li>
+<li><p><strong>作用阶段</strong> — 将已构造的算子施加到 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 上，完成量子态变换。</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
+
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
+
+<span class="c1"># 阶段 1：构造 — 指定寄存器和参数</span>
+<span class="n">add_op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
+
+<span class="c1"># 阶段 2：作用 — 施加到量子态</span>
+<span class="n">add_op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>这种分离带来的好处：</p>
 <ul class="simple">
-<li><p>只存储 <code class="docutils literal notranslate"><span class="pre">amplitude</span> <span class="pre">≠</span> <span class="pre">0</span></code> 的基态</p></li>
-<li><p>每个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 代表一个计算基态</p></li>
-<li><p>叠加态数量有限时，存储复杂度为多项式级</p></li>
+<li><p><strong>复用</strong>：同一个算子对象可以反复作用于不同的量子态，无需重新构造</p></li>
+<li><p><strong>组合</strong>：算子可以附加条件（conditioned_by），在构造后灵活调整控制逻辑</p></li>
+<li><p><strong>可逆</strong>：构造好的算子支持 <code class="docutils literal notranslate"><span class="pre">dag()</span></code> 方法执行逆操作</p></li>
 </ul>
 </section>
-<section id="id3">
-<h2><a class="toc-backref" href="#id15" role="doc-backlink">唯一性规则</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 中的一个核心不变量是：<strong>所有 ``System`` 的寄存器值组合必须唯一</strong>。</p>
-<p>如果对 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 中的基态进行操作后产生了两个具有相同寄存器值的 <code class="docutils literal notranslate"><span class="pre">System</span></code>，这意味着发生了量子干涉——此时两个 <code class="docutils literal notranslate"><span class="pre">System</span></code> 的振幅应当相加，合并为一个 <code class="docutils literal notranslate"><span class="pre">System</span></code>。这一过程通常由算子内部的 <code class="docutils literal notranslate"><span class="pre">sort-merge-unique</span></code> 机制自动完成。</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
-
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># SparseState() 默认构造：创建单个 |q=0⟩ 基态</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># 1</span>
-
-<span class="c1"># 施加 Hadamard 创建 2^2 = 4 个基态</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># 4</span>
-</pre></div>
-</div>
-</section>
-<section id="id4">
-<h2><a class="toc-backref" href="#id16" role="doc-backlink">基本用法</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
-<section id="id5">
-<h3><a class="toc-backref" href="#id17" role="doc-backlink">创建 SparseState</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h3>
-<div class="admonition important">
-<p class="admonition-title">重要</p>
-<p><code class="docutils literal notranslate"><span class="pre">SparseState()</span></code> 的默认构造函数会自动创建一个 <code class="docutils literal notranslate"><span class="pre">|0...0⟩</span></code> 的初态（即一个所有寄存器值为 0、振幅为 1 的 <code class="docutils literal notranslate"><span class="pre">System</span></code>）。通常**不需要**手动构造 <code class="docutils literal notranslate"><span class="pre">System</span></code> 对象来创建 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code>。</p>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
-
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># 默认构造：创建单个 |q=0⟩ 基态（振幅为 1）</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-</pre></div>
-</div>
-</section>
 <section id="id6">
-<h3><a class="toc-backref" href="#id18" role="doc-backlink">访问基态</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 获取基态列表</span>
-<span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;振幅: </span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="n">amplitude</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># 按索引访问</span>
-<span class="n">first</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">last</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="c1"># 获取基态数量</span>
-<span class="n">n</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-
-<span class="c1"># 检查是否为空</span>
-<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;状态为空&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">构造参数</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<p>构造参数决定了算子的行为，通常包括以下几类：</p>
 <section id="id7">
-<h2><a class="toc-backref" href="#id19" role="doc-backlink">状态演化示例</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
-<p>下面的示例展示 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 如何随算子操作演化：</p>
-<div class="literal-block-wrapper docutils container" id="id12">
-<div class="code-block-caption"><span class="caption-text">示例：Hadamard 创建叠加态</span><a class="headerlink" href="#id12" title="链接到此段代码">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
+<h3><a class="toc-backref" href="#id19" role="doc-backlink">寄存器标识</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<p>几乎所有算子都需要指定目标寄存器。可以用名称字符串或下标整数：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用名称（推荐）</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
 
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># SparseState 默认创建 |q=0⟩ 初态</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># 输出:</span>
-<span class="c1"># [1 basis state]</span>
-<span class="c1"># |q=0⟩ : (1+0j)</span>
-
-<span class="c1"># 施加 Hadamard</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Hadamard 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># 输出:</span>
-<span class="c1"># [2 basis states]</span>
-<span class="c1"># |q=0⟩ : (0.707+0j)</span>
-<span class="c1"># |q=2⟩ : (0.707+0j)</span>
-
-<span class="c1"># 完整 Hadamard（所有输出状态）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">完整 Hadamard 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-<span class="c1"># 输出:</span>
-<span class="c1"># [4 basis states]</span>
-<span class="c1"># |q=0⟩ : (0.5+0j)</span>
-<span class="c1"># |q=1⟩ : (0.5+0j)</span>
-<span class="c1"># |q=2⟩ : (0.5+0j)</span>
-<span class="c1"># |q=3⟩ : (0.5+0j)</span>
+<span class="c1"># 使用下标</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
-</div>
 </div>
 </section>
 <section id="id8">
-<h2><a class="toc-backref" href="#id20" role="doc-backlink">状态打印模式</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">StatePrint</span></code> 算子支持多种显示模式：</p>
-<div class="table-wrapper docutils container" id="id13">
-<table class="docutils align-default" id="id13">
-<caption><span class="caption-text">StatePrintDisplay 枚举</span><a class="headerlink" href="#id13" title="链接到此表格。">¶</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>模式</p></th>
-<th class="head"><p>值</p></th>
-<th class="head"><p>说明</p></th>
-<th class="head"><p>示例输出</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Default</span></code></p></td>
-<td><p>0</p></td>
-<td><p>默认模式，十进制值</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">|q=5⟩</span> <span class="pre">:</span> <span class="pre">(0.5+0j)</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Detail</span></code></p></td>
-<td><p>1</p></td>
-<td><p>详细振幅显示</p></td>
-<td><p>显示实部/虚部分量</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Binary</span></code></p></td>
-<td><p>2</p></td>
-<td><p>二进制表示</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">|q=101⟩</span> <span class="pre">:</span> <span class="pre">(0.5+0j)</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Prob</span></code></p></td>
-<td><p>4</p></td>
-<td><p>概率视图</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">|q=5⟩</span> <span class="pre">:</span> <span class="pre">P=0.25</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 不同显示模式</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Default</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Binary</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Prob</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">常量参数</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<p>部分算子接受经典常量作为参数，例如加法中的常数、乘法中的乘数：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 常量加法：指定常数 7</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_ConstUInt</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
 
-<span class="c1"># 指定精度</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Default</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 常量乘法：指定乘数 3</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Mult_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="id9">
-<h2><a class="toc-backref" href="#id21" role="doc-backlink">清除接近零的振幅</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 清除 |amplitude|² &lt; epsilon 的基态</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">ClearZero</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># 归一化状态</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Normalize</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
-</pre></div>
-</div>
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">超参数</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
+<p>一些高级算子需要算法层面的超参数，例如哈密顿量模拟中的 <span class="math notranslate nohighlight">\(\kappa`（条件数）、:math:\)</span>epsilon`（精度），或 QDA 中的步长参数 <span class="math notranslate nohighlight">\(s\)</span>。</p>
 </section>
 <section id="id10">
-<h2><a class="toc-backref" href="#id22" role="doc-backlink">合并重复基态</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
-<p>当多个基态具有相同的寄存器值时，它们的振幅会自动合并：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># merge_system 函数：合并两个相同基态的振幅</span>
-<span class="c1"># 通常由算子内部自动调用</span>
+<h3><a class="toc-backref" href="#id22" role="doc-backlink">位索引与角度</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<p>单量子比特门需要指定作用在寄存器中的哪一位，旋转门需要指定旋转角度：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 在寄存器 &quot;q&quot; 的第 0 位作用 X 门</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Xgate_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># 绕 X 轴旋转 π/4</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">RXgate_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
 </section>
 <section id="id11">
-<h2><a class="toc-backref" href="#id23" role="doc-backlink">迭代器支持</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 支持标准 Python 迭代器协议：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 正向迭代</span>
-<span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span>
-
-<span class="c1"># 反向迭代</span>
-<span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">amplitude</span><span class="p">)</span>
-
-<span class="c1"># 索引访问</span>
-<span class="n">first</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">last</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="c1"># 切片</span>
-<span class="n">first_three</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">basis_states</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">作用方式</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h2>
+<section id="id12">
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">直接作用</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
+<p>构造后通过函数调用语法 <code class="docutils literal notranslate"><span class="pre">op(state)</span></code> 将算子施加到 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code>：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="api">
-<h2><a class="toc-backref" href="#id24" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
+<section id="id13">
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">逆作用</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
+<p>对于 <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> 派生的算子，使用 <code class="docutils literal notranslate"><span class="pre">dag()</span></code> 执行逆变换：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>       <span class="c1"># 左移 2 位</span>
+<span class="n">op</span><span class="o">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># 右移 2 位（撤销）</span>
+</pre></div>
+</div>
+<p>对于 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code>，再次调用 <code class="docutils literal notranslate"><span class="pre">op(state)</span></code> 即为逆操作（<span class="math notranslate nohighlight">\(U^\dagger = U\)</span>）。</p>
+</section>
+<section id="id14">
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">条件作用</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<p>所有算子支持链式条件方法，实现受控操作：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
+
+<span class="c1"># 当 &quot;ctrl&quot; 非零时才执行</span>
+<span class="n">op</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">(</span><span class="s2">&quot;ctrl&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># 多条件叠加</span>
+<span class="n">op</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">([</span><span class="s2">&quot;ctrl1&quot;</span><span class="p">,</span> <span class="s2">&quot;ctrl2&quot;</span><span class="p">])(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id15">
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">算子分类</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<p>SparQ 的算子按功能分为以下几大类：</p>
+<div class="table-wrapper docutils container" id="id16">
+<table class="docutils align-default" id="id16">
+<caption><span class="caption-text">算子分类概览</span><a class="headerlink" href="#id16" title="链接到此表格。">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>分类</p></th>
+<th class="head"><p>说明</p></th>
+<th class="head"><p>对应头文件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>量子算术</p></td>
+<td><p>加法、乘法、移位、比较等寄存器级运算</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">quantum_arithmetic.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>基本量子门</p></td>
+<td><p>Pauli 门、相位门、旋转门、通用门</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">basic_gates.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Hadamard 操作</p></td>
+<td><p>整数/布尔/部分量子比特的 Hadamard 变换</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hadamard.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>QFT</p></td>
+<td><p>量子傅里叶变换及其逆变换</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">qft.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>QRAM 算子</p></td>
+<td><p>量子随机存取存储器的加载操作</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">qram.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>条件旋转</p></td>
+<td><p>基于寄存器值控制量子比特旋转</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">condrot.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>相位与反射</p></td>
+<td><p>条件相位翻转、全局相位、Grover 反射</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">parallel_phase_operations.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>旋转与态制备</p></td>
+<td><p>任意维幺正旋转、量子态制备</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rot.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>系统操作</p></td>
+<td><p>寄存器栈管理、零振幅清理、系统拆分/合并</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">system_operations.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>部分追迹</p></td>
+<td><p>测量、选择性坍缩、范围坍缩</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">partial_trace.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>排序</p></td>
+<td><p>按键值、振幅等维度排序基态</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sort_state.h</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>黑魔法操作</p></td>
+<td><p>直接修改量子态的不安全操作</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dark_magic.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>调试工具</p></td>
+<td><p>归一化检查、NaN 检测、状态打印</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">debugger.h</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>各类算子的详细 API 和用法请参阅 <span class="xref std std-ref">算子参考</span> 章节。</p>
 </section>
 </section>
 
@@ -543,23 +523,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="register_management.html">
+          <a class="next-page" href="../../operators/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">寄存器管理</div>
+                <div class="title">算子参考</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="system.html">
+          <a class="prev-page" href="register_types.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">System 类</div>
+                <div class="title">寄存器类型</div>
                 
               </div>
             </a>
@@ -593,20 +573,22 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">SparseState 类</a><ul>
-<li><a class="reference internal" href="#id2">稀疏表示原理</a></li>
-<li><a class="reference internal" href="#id3">唯一性规则</a></li>
-<li><a class="reference internal" href="#id4">基本用法</a><ul>
-<li><a class="reference internal" href="#id5">创建 SparseState</a></li>
-<li><a class="reference internal" href="#id6">访问基态</a></li>
+<li><a class="reference internal" href="#">算子</a><ul>
+<li><a class="reference internal" href="#id5">两阶段模型</a></li>
+<li><a class="reference internal" href="#id6">构造参数</a><ul>
+<li><a class="reference internal" href="#id7">寄存器标识</a></li>
+<li><a class="reference internal" href="#id8">常量参数</a></li>
+<li><a class="reference internal" href="#id9">超参数</a></li>
+<li><a class="reference internal" href="#id10">位索引与角度</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id7">状态演化示例</a></li>
-<li><a class="reference internal" href="#id8">状态打印模式</a></li>
-<li><a class="reference internal" href="#id9">清除接近零的振幅</a></li>
-<li><a class="reference internal" href="#id10">合并重复基态</a></li>
-<li><a class="reference internal" href="#id11">迭代器支持</a></li>
-<li><a class="reference internal" href="#api">API 参考</a></li>
+<li><a class="reference internal" href="#id11">作用方式</a><ul>
+<li><a class="reference internal" href="#id12">直接作用</a></li>
+<li><a class="reference internal" href="#id13">逆作用</a></li>
+<li><a class="reference internal" href="#id14">条件作用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id15">算子分类</a></li>
 </ul>
 </li>
 </ul>
