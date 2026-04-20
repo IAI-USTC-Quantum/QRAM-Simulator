@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
@@ -320,38 +316,38 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id1" id="id26">概述</a></p></li>
-<li><p><a class="reference internal" href="#id2" id="id27">数学背景</a></p>
+<li><p><a class="reference internal" href="#id1" id="id22">概述</a></p></li>
+<li><p><a class="reference internal" href="#id2" id="id23">数学背景</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id3" id="id28">算法原理</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id29">振幅放大</a></p></li>
+<li><p><a class="reference internal" href="#id3" id="id24">算法原理</a></p></li>
+<li><p><a class="reference internal" href="#id6" id="id25">振幅放大</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id9" id="id30">实现步骤</a></p>
+<li><p><a class="reference internal" href="#id7" id="id26">实现步骤</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id10" id="id31">步骤 1：导入和设置</a></p></li>
-<li><p><a class="reference internal" href="#qram" id="id32">步骤 2：创建 QRAM 内存</a></p></li>
-<li><p><a class="reference internal" href="#id11" id="id33">步骤 3：初始化量子态</a></p></li>
-<li><p><a class="reference internal" href="#id12" id="id34">步骤 4：构建预言机</a></p></li>
-<li><p><a class="reference internal" href="#id19" id="id35">步骤 5：构建扩散算子</a></p></li>
-<li><p><a class="reference internal" href="#id22" id="id36">步骤 6：执行 Grover 迭代</a></p></li>
-<li><p><a class="reference internal" href="#id23" id="id37">步骤 7：测量结果</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id27">步骤 1：导入和设置</a></p></li>
+<li><p><a class="reference internal" href="#qram" id="id28">步骤 2：创建 QRAM 内存</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id29">步骤 3：初始化量子态</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id30">步骤 4：构建预言机</a></p></li>
+<li><p><a class="reference internal" href="#id17" id="id31">步骤 5：构建扩散算子</a></p></li>
+<li><p><a class="reference internal" href="#id18" id="id32">步骤 6：执行 Grover 迭代</a></p></li>
+<li><p><a class="reference internal" href="#id19" id="id33">步骤 7：测量结果</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id24" id="id38">完整示例</a></p></li>
-<li><p><a class="reference internal" href="#id25" id="id39">量子计数</a></p></li>
-<li><p><a class="reference internal" href="#api" id="id40">API 参考</a></p></li>
+<li><p><a class="reference internal" href="#id20" id="id34">完整示例</a></p></li>
+<li><p><a class="reference internal" href="#id21" id="id35">量子计数</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id36">API 参考</a></p></li>
 </ul>
 </nav>
 <section id="id1">
-<h2><a class="toc-backref" href="#id26" role="doc-backlink">概述</a><a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id22" role="doc-backlink">概述</a><a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
 <p>Grover 算法为非结构化搜索问题提供二次加速。给定包含 N 个元素的数据库，算法在 O(√N) 次量子查询内找到目标元素，而经典查询需要 O(N) 次。</p>
 <p>本教程演示使用 PySparQ 的寄存器级编程范式实现该算法。</p>
 </section>
 <section id="id2">
-<h2><a class="toc-backref" href="#id27" role="doc-backlink">数学背景</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">数学背景</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
 <section id="id3">
-<h3><a class="toc-backref" href="#id28" role="doc-backlink">算法原理</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">算法原理</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
 <p>Grover 算法在两个量子寄存器上操作：</p>
 <ol class="arabic simple">
 <li><p><a href="#id4"><span class="problematic" id="id5">**</span></a>地址寄存器**（n 个量子比特）：编码索引 0 到 N-1，其中 N = 2^n</p></li>
@@ -379,15 +375,15 @@
 <div class="math notranslate nohighlight">
 \[D = 2|s\rangle\langle s| - I\]</div>
 </div>
-<p>其中 <a href="#id6"><span class="problematic" id="id7">|</span></a>s⟩ 是均匀叠加态。</p>
+<p>其中 <code class="docutils literal notranslate"><span class="pre">|s⟩</span></code> 是均匀叠加态。</p>
 </li>
 </ul>
 </li>
 <li><p><strong>测量</strong>：读出地址寄存器</p></li>
 </ol>
 </section>
-<section id="id8">
-<h3><a class="toc-backref" href="#id29" role="doc-backlink">振幅放大</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<section id="id6">
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">振幅放大</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
 <p>经过 k 次迭代后，标记状态的振幅为：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -401,10 +397,10 @@
 </div>
 </section>
 </section>
-<section id="id9">
-<h2><a class="toc-backref" href="#id30" role="doc-backlink">实现步骤</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
-<section id="id10">
-<h3><a class="toc-backref" href="#id31" role="doc-backlink">步骤 1：导入和设置</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<section id="id7">
+<h2><a class="toc-backref" href="#id26" role="doc-backlink">实现步骤</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
+<section id="id8">
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">步骤 1：导入和设置</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.grover</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroverOracle</span><span class="p">,</span> <span class="n">DiffusionOperator</span><span class="p">,</span> <span class="n">grover_search</span>
 
@@ -414,7 +410,7 @@
 </div>
 </section>
 <section id="qram">
-<h3><a class="toc-backref" href="#id32" role="doc-backlink">步骤 2：创建 QRAM 内存</a><a class="headerlink" href="#qram" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">步骤 2：创建 QRAM 内存</a><a class="headerlink" href="#qram" title="链接到此标题。">¶</a></h3>
 <p>QRAM 存储要搜索的数据。每个地址映射到一个数据值。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 定义要搜索的内存</span>
 <span class="n">memory</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
@@ -431,8 +427,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id11">
-<h3><a class="toc-backref" href="#id33" role="doc-backlink">步骤 3：初始化量子态</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
+<section id="id9">
+<h3><a class="toc-backref" href="#id29" role="doc-backlink">步骤 3：初始化量子态</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
 <p>创建量子态和必要的寄存器。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建量子态</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
@@ -450,8 +446,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id12">
-<h3><a class="toc-backref" href="#id34" role="doc-backlink">步骤 4：构建预言机</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
+<section id="id10">
+<h3><a class="toc-backref" href="#id30" role="doc-backlink">步骤 4：构建预言机</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
 <p>预言机标记数据匹配目标的量子态。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建预言机</span>
 <span class="n">oracle</span> <span class="o">=</span> <span class="n">GroverOracle</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;search&quot;</span><span class="p">)</span>
@@ -459,24 +455,24 @@
 </div>
 <p>预言机执行：</p>
 <ol class="arabic simple">
-<li><p>加载：<a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">|</span></a>addr⟩|0⟩ → <a href="#id17"><span class="problematic" id="id18">|</span></a>addr⟩|data[addr]⟩``（通过 QRAM）</p></li>
+<li><p>加载：<a href="#id11"><span class="problematic" id="id12">``</span></a><a href="#id13"><span class="problematic" id="id14">|</span></a>addr⟩|0⟩ → <a href="#id15"><span class="problematic" id="id16">|</span></a>addr⟩|data[addr]⟩``（通过 QRAM）</p></li>
 <li><p>比较：检查 <code class="docutils literal notranslate"><span class="pre">data</span> <span class="pre">==</span> <span class="pre">target</span></code></p></li>
 <li><p>相位翻转：对匹配状态应用 -1</p></li>
 <li><p>撤销：逆序执行比较和 QRAM 加载</p></li>
 </ol>
 </section>
-<section id="id19">
-<h3><a class="toc-backref" href="#id35" role="doc-backlink">步骤 5：构建扩散算子</a><a class="headerlink" href="#id19" title="链接到此标题。">¶</a></h3>
+<section id="id17">
+<h3><a class="toc-backref" href="#id31" role="doc-backlink">步骤 5：构建扩散算子</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h3>
 <p>扩散算子放大标记状态的振幅。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建扩散算子</span>
 <span class="n">diffusion</span> <span class="o">=</span> <span class="n">DiffusionOperator</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>扩散算子执行：H · P₀ · H</p>
-<p>其中 P₀ 对 <a href="#id20"><span class="problematic" id="id21">|</span></a>0⟩ 状态应用相位翻转。</p>
+<p>其中 P₀ 对 <code class="docutils literal notranslate"><span class="pre">|0⟩</span></code> 状态应用相位翻转。</p>
 </section>
-<section id="id22">
-<h3><a class="toc-backref" href="#id36" role="doc-backlink">步骤 6：执行 Grover 迭代</a><a class="headerlink" href="#id22" title="链接到此标题。">¶</a></h3>
+<section id="id18">
+<h3><a class="toc-backref" href="#id32" role="doc-backlink">步骤 6：执行 Grover 迭代</a><a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h3>
 <p>组合预言机和扩散算子进行振幅放大。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 计算最优迭代次数</span>
 <span class="n">n_iterations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">memory</span><span class="p">)))</span>
@@ -494,8 +490,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id23">
-<h3><a class="toc-backref" href="#id37" role="doc-backlink">步骤 7：测量结果</a><a class="headerlink" href="#id23" title="链接到此标题。">¶</a></h3>
+<section id="id19">
+<h3><a class="toc-backref" href="#id33" role="doc-backlink">步骤 7：测量结果</a><a class="headerlink" href="#id19" title="链接到此标题。">¶</a></h3>
 <p>通过部分迹提取地址。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 通过对数据和搜索寄存器取部分迹来测量</span>
 <span class="n">measured_results</span><span class="p">,</span> <span class="n">probability</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PartialTrace</span><span class="p">([</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;search&quot;</span><span class="p">])(</span><span class="n">state</span><span class="p">)</span>
@@ -507,8 +503,8 @@
 </div>
 </section>
 </section>
-<section id="id24">
-<h2><a class="toc-backref" href="#id38" role="doc-backlink">完整示例</a><a class="headerlink" href="#id24" title="链接到此标题。">¶</a></h2>
+<section id="id20">
+<h2><a class="toc-backref" href="#id34" role="doc-backlink">完整示例</a><a class="headerlink" href="#id20" title="链接到此标题。">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.grover</span><span class="w"> </span><span class="kn">import</span> <span class="n">grover_search</span>
 
@@ -534,8 +530,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id25">
-<h2><a class="toc-backref" href="#id39" role="doc-backlink">量子计数</a><a class="headerlink" href="#id25" title="链接到此标题。">¶</a></h2>
+<section id="id21">
+<h2><a class="toc-backref" href="#id35" role="doc-backlink">量子计数</a><a class="headerlink" href="#id21" title="链接到此标题。">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">grover_count</span></code> 函数使用相位估计来估计标记项的数量。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.grover</span><span class="w"> </span><span class="kn">import</span> <span class="n">grover_count</span>
 
@@ -549,7 +545,7 @@
 </div>
 </section>
 <section id="api">
-<h2><a class="toc-backref" href="#id40" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id36" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
 </section>
 </section>
 
@@ -612,21 +608,21 @@
 <li><a class="reference internal" href="#id1">概述</a></li>
 <li><a class="reference internal" href="#id2">数学背景</a><ul>
 <li><a class="reference internal" href="#id3">算法原理</a></li>
-<li><a class="reference internal" href="#id8">振幅放大</a></li>
+<li><a class="reference internal" href="#id6">振幅放大</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id9">实现步骤</a><ul>
-<li><a class="reference internal" href="#id10">步骤 1：导入和设置</a></li>
+<li><a class="reference internal" href="#id7">实现步骤</a><ul>
+<li><a class="reference internal" href="#id8">步骤 1：导入和设置</a></li>
 <li><a class="reference internal" href="#qram">步骤 2：创建 QRAM 内存</a></li>
-<li><a class="reference internal" href="#id11">步骤 3：初始化量子态</a></li>
-<li><a class="reference internal" href="#id12">步骤 4：构建预言机</a></li>
-<li><a class="reference internal" href="#id19">步骤 5：构建扩散算子</a></li>
-<li><a class="reference internal" href="#id22">步骤 6：执行 Grover 迭代</a></li>
-<li><a class="reference internal" href="#id23">步骤 7：测量结果</a></li>
+<li><a class="reference internal" href="#id9">步骤 3：初始化量子态</a></li>
+<li><a class="reference internal" href="#id10">步骤 4：构建预言机</a></li>
+<li><a class="reference internal" href="#id17">步骤 5：构建扩散算子</a></li>
+<li><a class="reference internal" href="#id18">步骤 6：执行 Grover 迭代</a></li>
+<li><a class="reference internal" href="#id19">步骤 7：测量结果</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id24">完整示例</a></li>
-<li><a class="reference internal" href="#id25">量子计数</a></li>
+<li><a class="reference internal" href="#id20">完整示例</a></li>
+<li><a class="reference internal" href="#id21">量子计数</a></li>
 <li><a class="reference internal" href="#api">API 参考</a></li>
 </ul>
 </li>

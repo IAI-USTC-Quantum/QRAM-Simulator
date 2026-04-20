@@ -20,7 +20,7 @@
      - 作用任意维幺正矩阵
      - BaseOperator
    * - ``Rot_GeneralStatePrep``
-     - 从 |0⟩ 制备目标量子态
+     - 从 ``|0⟩`` 制备目标量子态
      - BaseOperator
 
 ---

@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
@@ -320,56 +316,56 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id1" id="id26">概述</a></p></li>
-<li><p><a class="reference internal" href="#id2" id="id27">数学背景</a></p>
+<li><p><a class="reference internal" href="#id1" id="id18">概述</a></p></li>
+<li><p><a class="reference internal" href="#id2" id="id19">数学背景</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id3" id="id28">算法原理</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id29">量子游走</a></p></li>
-<li><p><a class="reference internal" href="#lcu" id="id30">LCU 构建</a></p></li>
+<li><p><a class="reference internal" href="#id3" id="id20">算法原理</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id21">量子游走</a></p></li>
+<li><p><a class="reference internal" href="#lcu" id="id22">LCU 构建</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id13" id="id31">实现步骤</a></p>
+<li><p><a class="reference internal" href="#id5" id="id23">实现步骤</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id14" id="id32">步骤 1：导入和设置</a></p></li>
-<li><p><a class="reference internal" href="#id15" id="id33">步骤 2：切比雪夫多项式系数</a></p></li>
-<li><p><a class="reference internal" href="#id16" id="id34">步骤 3：稀疏矩阵表示</a></p></li>
-<li><p><a class="reference internal" href="#id17" id="id35">步骤 4：初始化量子态</a></p></li>
-<li><p><a class="reference internal" href="#id18" id="id36">步骤 5：应用量子游走步数</a></p></li>
-<li><p><a class="reference internal" href="#id19" id="id37">步骤 6：LCU 构建</a></p></li>
-<li><p><a class="reference internal" href="#id20" id="id38">步骤 7：完整求解器</a></p></li>
+<li><p><a class="reference internal" href="#id6" id="id24">步骤 1：导入和设置</a></p></li>
+<li><p><a class="reference internal" href="#id7" id="id25">步骤 2：切比雪夫多项式系数</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id26">步骤 3：稀疏矩阵表示</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id27">步骤 4：初始化量子态</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id28">步骤 5：应用量子游走步数</a></p></li>
+<li><p><a class="reference internal" href="#id11" id="id29">步骤 6：LCU 构建</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id30">步骤 7：完整求解器</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id21" id="id39">完整示例</a></p></li>
-<li><p><a class="reference internal" href="#id22" id="id40">游走角度函数</a></p></li>
-<li><p><a class="reference internal" href="#id23" id="id41">复杂度分析</a></p>
+<li><p><a class="reference internal" href="#id13" id="id31">完整示例</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id32">游走角度函数</a></p></li>
+<li><p><a class="reference internal" href="#id15" id="id33">复杂度分析</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id24" id="id42">时间复杂度</a></p></li>
-<li><p><a class="reference internal" href="#id25" id="id43">空间复杂度</a></p></li>
+<li><p><a class="reference internal" href="#id16" id="id34">时间复杂度</a></p></li>
+<li><p><a class="reference internal" href="#id17" id="id35">空间复杂度</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#api" id="id44">API 参考</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id36">API 参考</a></p></li>
 </ul>
 </nav>
 <section id="id1">
-<h2><a class="toc-backref" href="#id26" role="doc-backlink">概述</a><a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">概述</a><a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
 <p>CKS（Childs-Kothari-Somma）算法求解线性系统 Ax = b，相比经典迭代方法具有指数级加速。它使用量子游走和酉组合（LCU）实现 κ 条件数矩阵的 O(κ log(κ/ε)) 复杂度。</p>
 <p>本教程演示使用 PySparQ 寄存器级编程范式的完整实现。</p>
 </section>
 <section id="id2">
-<h2><a class="toc-backref" href="#id27" role="doc-backlink">数学背景</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id19" role="doc-backlink">数学背景</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
 <section id="id3">
-<h3><a class="toc-backref" href="#id28" role="doc-backlink">算法原理</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">算法原理</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
 <p>CKS 算法的操作步骤：</p>
 <ol class="arabic simple">
 <li><p><strong>哈密顿量编码</strong>：通过块编码将矩阵 A 编码为哈密顿量</p></li>
 <li><p><strong>量子游走</strong>：实现游走算子 W = T† · R · T · Swap</p></li>
 <li><p><strong>LCU 构建</strong>：使用切比雪夫系数组合游走步数</p></li>
-<li><p><strong>解提取</strong>：对辅助量子比特后选择得到 <a href="#id4"><span class="problematic" id="id5">|</span></a>x⟩</p></li>
+<li><p><strong>解提取</strong>：对辅助量子比特后选择得到 <code class="docutils literal notranslate"><span class="pre">|x⟩</span></code></p></li>
 </ol>
-<p>关键洞察：解 <a href="#id6"><span class="problematic" id="id7">|</span></a>x⟩ ∝ A⁻¹|b⟩ 可以通过适当系数的量子游走迭代来表达。</p>
+<p>关键洞察：解 <code class="docutils literal notranslate"><span class="pre">|x⟩</span></code> ∝ A⁻¹``|b⟩`` 可以通过适当系数的量子游走迭代来表达。</p>
 </section>
-<section id="id8">
-<h3><a class="toc-backref" href="#id29" role="doc-backlink">量子游走</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<section id="id4">
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">量子游走</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
 <p>游走算子为：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -377,7 +373,7 @@
 </div>
 <p>其中：</p>
 <ul class="simple">
-<li><p><strong>T</strong>：态制备算子：<a href="#id9"><span class="problematic" id="id10">|</span></a>j⟩|0⟩ → <a href="#id11"><span class="problematic" id="id12">|</span></a>j⟩|ψⱼ⟩</p></li>
+<li><p><strong>T</strong>：态制备算子：<code class="docutils literal notranslate"><span class="pre">|j⟩|0⟩</span> <span class="pre">→</span> <span class="pre">|j⟩|ψⱼ⟩</span></code></p></li>
 <li><p><strong>R</strong>：对特定态的反射（相位翻转）</p></li>
 <li><p><strong>Swap</strong>：交换行和列寄存器</p></li>
 </ul>
@@ -388,7 +384,7 @@
 </div>
 </section>
 <section id="lcu">
-<h3><a class="toc-backref" href="#id30" role="doc-backlink">LCU 构建</a><a class="headerlink" href="#lcu" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id22" role="doc-backlink">LCU 构建</a><a class="headerlink" href="#lcu" title="链接到此标题。">¶</a></h3>
 <p>解构造为：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -397,10 +393,10 @@
 <p>其中 c_j 为切比雪夫多项式系数。</p>
 </section>
 </section>
-<section id="id13">
-<h2><a class="toc-backref" href="#id31" role="doc-backlink">实现步骤</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
-<section id="id14">
-<h3><a class="toc-backref" href="#id32" role="doc-backlink">步骤 1：导入和设置</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<section id="id5">
+<h2><a class="toc-backref" href="#id23" role="doc-backlink">实现步骤</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<section id="id6">
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">步骤 1：导入和设置</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.cks_solver</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -413,8 +409,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id15">
-<h3><a class="toc-backref" href="#id33" role="doc-backlink">步骤 2：切比雪夫多项式系数</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h3>
+<section id="id7">
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">步骤 2：切比雪夫多项式系数</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
 <p>系数决定游走迭代的权重：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 根据条件数和精度计算 b</span>
 <span class="n">kappa</span> <span class="o">=</span> <span class="mf">10.0</span>  <span class="c1"># 条件数</span>
@@ -438,8 +434,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id16">
-<h3><a class="toc-backref" href="#id34" role="doc-backlink">步骤 3：稀疏矩阵表示</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h3>
+<section id="id8">
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">步骤 3：稀疏矩阵表示</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
 <p>将稠密矩阵转换为 QRAM 兼容的稀疏格式：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建 2x2 矩阵</span>
 <span class="n">A_dense</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -454,8 +450,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id17">
-<h3><a class="toc-backref" href="#id35" role="doc-backlink">步骤 4：初始化量子态</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h3>
+<section id="id9">
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">步骤 4：初始化量子态</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
 <p>创建寄存器和初始状态：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
@@ -475,8 +471,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id18">
-<h3><a class="toc-backref" href="#id36" role="doc-backlink">步骤 5：应用量子游走步数</a><a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h3>
+<section id="id10">
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">步骤 5：应用量子游走步数</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
 <p>执行游走迭代：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 第一步（特殊初始化）</span>
 <span class="n">walk</span><span class="o">.</span><span class="n">first_step</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
@@ -490,8 +486,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id19">
-<h3><a class="toc-backref" href="#id37" role="doc-backlink">步骤 6：LCU 构建</a><a class="headerlink" href="#id19" title="链接到此标题。">¶</a></h3>
+<section id="id11">
+<h3><a class="toc-backref" href="#id29" role="doc-backlink">步骤 6：LCU 构建</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
 <p>用系数组合游走步数：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 创建 LCU 容器</span>
 <span class="n">kappa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">A_dense</span><span class="p">)</span>
@@ -511,8 +507,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id20">
-<h3><a class="toc-backref" href="#id38" role="doc-backlink">步骤 7：完整求解器</a><a class="headerlink" href="#id20" title="链接到此标题。">¶</a></h3>
+<section id="id12">
+<h3><a class="toc-backref" href="#id30" role="doc-backlink">步骤 7：完整求解器</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
 <p>使用高级求解器函数：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 定义问题</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -531,8 +527,8 @@
 </div>
 </section>
 </section>
-<section id="id21">
-<h2><a class="toc-backref" href="#id39" role="doc-backlink">完整示例</a><a class="headerlink" href="#id21" title="链接到此标题。">¶</a></h2>
+<section id="id13">
+<h2><a class="toc-backref" href="#id31" role="doc-backlink">完整示例</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.cks_solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">cks_solve</span>
 
@@ -571,8 +567,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id22">
-<h2><a class="toc-backref" href="#id40" role="doc-backlink">游走角度函数</a><a class="headerlink" href="#id22" title="链接到此标题。">¶</a></h2>
+<section id="id14">
+<h2><a class="toc-backref" href="#id32" role="doc-backlink">游走角度函数</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h2>
 <p>对于矩阵元素 A[j,k]，游走应用旋转：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.algorithms.cks_solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_coef_positive_only</span>
 
@@ -592,10 +588,10 @@
 </pre></div>
 </div>
 </section>
-<section id="id23">
-<h2><a class="toc-backref" href="#id41" role="doc-backlink">复杂度分析</a><a class="headerlink" href="#id23" title="链接到此标题。">¶</a></h2>
-<section id="id24">
-<h3><a class="toc-backref" href="#id42" role="doc-backlink">时间复杂度</a><a class="headerlink" href="#id24" title="链接到此标题。">¶</a></h3>
+<section id="id15">
+<h2><a class="toc-backref" href="#id33" role="doc-backlink">复杂度分析</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<section id="id16">
+<h3><a class="toc-backref" href="#id34" role="doc-backlink">时间复杂度</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h3>
 <p>CKS 算法实现：</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -603,13 +599,13 @@
 </div>
 <p>相比经典迭代方法的 O(κ² log(κ/ε))。</p>
 </section>
-<section id="id25">
-<h3><a class="toc-backref" href="#id43" role="doc-backlink">空间复杂度</a><a class="headerlink" href="#id25" title="链接到此标题。">¶</a></h3>
+<section id="id17">
+<h3><a class="toc-backref" href="#id35" role="doc-backlink">空间复杂度</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h3>
 <p>对于 n×n 矩阵需要 O(log n) 个量子比特，相比经典的 O(n) 实现指数级空间压缩。</p>
 </section>
 </section>
 <section id="api">
-<h2><a class="toc-backref" href="#id44" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id36" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
 </section>
 </section>
 
@@ -672,25 +668,25 @@
 <li><a class="reference internal" href="#id1">概述</a></li>
 <li><a class="reference internal" href="#id2">数学背景</a><ul>
 <li><a class="reference internal" href="#id3">算法原理</a></li>
-<li><a class="reference internal" href="#id8">量子游走</a></li>
+<li><a class="reference internal" href="#id4">量子游走</a></li>
 <li><a class="reference internal" href="#lcu">LCU 构建</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">实现步骤</a><ul>
-<li><a class="reference internal" href="#id14">步骤 1：导入和设置</a></li>
-<li><a class="reference internal" href="#id15">步骤 2：切比雪夫多项式系数</a></li>
-<li><a class="reference internal" href="#id16">步骤 3：稀疏矩阵表示</a></li>
-<li><a class="reference internal" href="#id17">步骤 4：初始化量子态</a></li>
-<li><a class="reference internal" href="#id18">步骤 5：应用量子游走步数</a></li>
-<li><a class="reference internal" href="#id19">步骤 6：LCU 构建</a></li>
-<li><a class="reference internal" href="#id20">步骤 7：完整求解器</a></li>
+<li><a class="reference internal" href="#id5">实现步骤</a><ul>
+<li><a class="reference internal" href="#id6">步骤 1：导入和设置</a></li>
+<li><a class="reference internal" href="#id7">步骤 2：切比雪夫多项式系数</a></li>
+<li><a class="reference internal" href="#id8">步骤 3：稀疏矩阵表示</a></li>
+<li><a class="reference internal" href="#id9">步骤 4：初始化量子态</a></li>
+<li><a class="reference internal" href="#id10">步骤 5：应用量子游走步数</a></li>
+<li><a class="reference internal" href="#id11">步骤 6：LCU 构建</a></li>
+<li><a class="reference internal" href="#id12">步骤 7：完整求解器</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id21">完整示例</a></li>
-<li><a class="reference internal" href="#id22">游走角度函数</a></li>
-<li><a class="reference internal" href="#id23">复杂度分析</a><ul>
-<li><a class="reference internal" href="#id24">时间复杂度</a></li>
-<li><a class="reference internal" href="#id25">空间复杂度</a></li>
+<li><a class="reference internal" href="#id13">完整示例</a></li>
+<li><a class="reference internal" href="#id14">游走角度函数</a></li>
+<li><a class="reference internal" href="#id15">复杂度分析</a><ul>
+<li><a class="reference internal" href="#id16">时间复杂度</a></li>
+<li><a class="reference internal" href="#id17">空间复杂度</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#api">API 参考</a></li>

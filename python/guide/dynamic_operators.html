@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
@@ -320,58 +316,58 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id3" id="id29">概述</a></p>
+<li><p><a class="reference internal" href="#id3" id="id27">概述</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id4" id="id30">适用场景</a></p></li>
-<li><p><a class="reference internal" href="#id5" id="id31">前置条件</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id28">适用场景</a></p></li>
+<li><p><a class="reference internal" href="#id5" id="id29">前置条件</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id6" id="id32">架构概述</a></p>
+<li><p><a class="reference internal" href="#id6" id="id30">架构概述</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id7" id="id33">工厂函数</a></p></li>
+<li><p><a class="reference internal" href="#id7" id="id31">工厂函数</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id8" id="id34">基类选择</a></p>
+<li><p><a class="reference internal" href="#id8" id="id32">基类选择</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id9" id="id35">对比</a></p></li>
-<li><p><a class="reference internal" href="#selfadjointoperator" id="id36">SelfAdjointOperator</a></p></li>
-<li><p><a class="reference internal" href="#baseoperator" id="id37">BaseOperator</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id33">对比</a></p></li>
+<li><p><a class="reference internal" href="#selfadjointoperator" id="id34">SelfAdjointOperator</a></p></li>
+<li><p><a class="reference internal" href="#baseoperator" id="id35">BaseOperator</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id10" id="id38">基本用法</a></p>
+<li><p><a class="reference internal" href="#id10" id="id36">基本用法</a></p>
 <ul>
-<li><p><a class="reference internal" href="#c" id="id39">步骤 1：编写 C++ 算子代码</a></p></li>
-<li><p><a class="reference internal" href="#id11" id="id40">步骤 2：编译算子</a></p></li>
-<li><p><a class="reference internal" href="#id12" id="id41">步骤 3：使用算子</a></p></li>
+<li><p><a class="reference internal" href="#c" id="id37">步骤 1：编写 C++ 算子代码</a></p></li>
+<li><p><a class="reference internal" href="#id11" id="id38">步骤 2：编译算子</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id39">步骤 3：使用算子</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id13" id="id42">量子计算示例</a></p>
+<li><p><a class="reference internal" href="#id13" id="id40">量子计算示例</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id14" id="id43">示例 1：受控相位门</a></p></li>
-<li><p><a class="reference internal" href="#id17" id="id44">示例 2：量子游走算子</a></p></li>
-<li><p><a class="reference internal" href="#grover-oracle" id="id45">示例 3：Grover 搜索 Oracle</a></p></li>
-<li><p><a class="reference internal" href="#id18" id="id46">示例 4：哈密顿量演化</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id41">示例 1：受控相位门</a></p></li>
+<li><p><a class="reference internal" href="#id15" id="id42">示例 2：量子游走算子</a></p></li>
+<li><p><a class="reference internal" href="#grover-oracle" id="id43">示例 3：Grover 搜索 Oracle</a></p></li>
+<li><p><a class="reference internal" href="#id16" id="id44">示例 4：哈密顿量演化</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id19" id="id47">高级功能</a></p>
+<li><p><a class="reference internal" href="#id17" id="id45">高级功能</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id20" id="id48">构造函数参数</a></p></li>
-<li><p><a class="reference internal" href="#id21" id="id49">编译缓存</a></p></li>
-<li><p><a class="reference internal" href="#id22" id="id50">性能优化</a></p></li>
+<li><p><a class="reference internal" href="#id18" id="id46">构造函数参数</a></p></li>
+<li><p><a class="reference internal" href="#id19" id="id47">编译缓存</a></p></li>
+<li><p><a class="reference internal" href="#id20" id="id48">性能优化</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id23" id="id51">故障排除</a></p>
+<li><p><a class="reference internal" href="#id21" id="id49">故障排除</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id24" id="id52">常见编译错误</a></p></li>
-<li><p><a class="reference internal" href="#id25" id="id53">库加载错误</a></p></li>
-<li><p><a class="reference internal" href="#id26" id="id54">参数错误</a></p></li>
+<li><p><a class="reference internal" href="#id22" id="id50">常见编译错误</a></p></li>
+<li><p><a class="reference internal" href="#id23" id="id51">库加载错误</a></p></li>
+<li><p><a class="reference internal" href="#id24" id="id52">参数错误</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#api" id="id55">API 参考</a></p></li>
+<li><p><a class="reference internal" href="#api" id="id53">API 参考</a></p></li>
 </ul>
 </nav>
 <section id="id3">
-<h2><a class="toc-backref" href="#id29" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
 <p>动态算子扩展功能允许您在运行时编写自定义 C++ 量子算子，编译为共享库，并通过 Python 直接使用。这使得以下场景成为可能：</p>
 <ul class="simple">
 <li><p><strong>性能优化</strong>：C++ 编译的算子比纯 Python 实现更快</p></li>
@@ -380,7 +376,7 @@
 <li><p><strong>算法专用优化</strong>：为特定算法创建定制化的算子</p></li>
 </ul>
 <section id="id4">
-<h3><a class="toc-backref" href="#id30" role="doc-backlink">适用场景</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">适用场景</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
 <p>动态算子最适合以下场景：</p>
 <ol class="arabic simple">
 <li><p><strong>性能关键操作</strong>：需要 C++ 级别性能的复杂量子操作</p></li>
@@ -390,7 +386,7 @@
 </ol>
 </section>
 <section id="id5">
-<h3><a class="toc-backref" href="#id31" role="doc-backlink">前置条件</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id29" role="doc-backlink">前置条件</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h3>
 <p>使用动态算子前，请确保：</p>
 <ul class="simple">
 <li><p>已安装 g++ 或 clang++ 编译器</p></li>
@@ -400,7 +396,7 @@
 </section>
 </section>
 <section id="id6">
-<h2><a class="toc-backref" href="#id32" role="doc-backlink">架构概述</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id30" role="doc-backlink">架构概述</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
 <p>动态算子的工作流程如下：</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Python 层                         C++ 层
 +-------------------+              +-------------------+
@@ -421,7 +417,7 @@
 </pre></div>
 </div>
 <section id="id7">
-<h3><a class="toc-backref" href="#id33" role="doc-backlink">工厂函数</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id31" role="doc-backlink">工厂函数</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
 <p>编译生成的共享库导出以下 C 风格工厂函数：</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// 创建算子实例</span>
 <span class="k">extern</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="w"> </span><span class="n">BaseOperator</span><span class="o">*</span><span class="w"> </span><span class="n">create_operator</span><span class="p">(...);</span>
@@ -443,13 +439,13 @@
 </section>
 </section>
 <section id="id8">
-<h2><a class="toc-backref" href="#id34" role="doc-backlink">基类选择</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id32" role="doc-backlink">基类选择</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
 <p>动态算子支持两种基类：<code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> 和 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code>。</p>
 <section id="id9">
-<h3><a class="toc-backref" href="#id35" role="doc-backlink">对比</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
-<div class="table-wrapper docutils container" id="id27">
-<table class="docutils align-default" id="id27">
-<caption><span class="caption-text">基类对比</span><a class="headerlink" href="#id27" title="链接到此表格。">¶</a></caption>
+<h3><a class="toc-backref" href="#id33" role="doc-backlink">对比</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
+<div class="table-wrapper docutils container" id="id25">
+<table class="docutils align-default" id="id25">
+<caption><span class="caption-text">基类对比</span><a class="headerlink" href="#id25" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>特性</p></th>
 <th class="head"><p>SelfAdjointOperator</p></th>
@@ -478,7 +474,7 @@
 </div>
 </section>
 <section id="selfadjointoperator">
-<h3><a class="toc-backref" href="#id36" role="doc-backlink">SelfAdjointOperator</a><a class="headerlink" href="#selfadjointoperator" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id34" role="doc-backlink">SelfAdjointOperator</a><a class="headerlink" href="#selfadjointoperator" title="链接到此标题。">¶</a></h3>
 <p>当算子满足以下条件时使用 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code>：</p>
 <ul class="simple">
 <li><p>算子是厄米的（等于其共轭转置）</p></li>
@@ -502,7 +498,7 @@
 </div>
 </section>
 <section id="baseoperator">
-<h3><a class="toc-backref" href="#id37" role="doc-backlink">BaseOperator</a><a class="headerlink" href="#baseoperator" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id35" role="doc-backlink">BaseOperator</a><a class="headerlink" href="#baseoperator" title="链接到此标题。">¶</a></h3>
 <p>当算子满足以下条件时使用 <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code>：</p>
 <ul class="simple">
 <li><p>算子不是厄米的</p></li>
@@ -533,9 +529,9 @@
 </section>
 </section>
 <section id="id10">
-<h2><a class="toc-backref" href="#id38" role="doc-backlink">基本用法</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id36" role="doc-backlink">基本用法</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
 <section id="c">
-<h3><a class="toc-backref" href="#id39" role="doc-backlink">步骤 1：编写 C++ 算子代码</a><a class="headerlink" href="#c" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id37" role="doc-backlink">步骤 1：编写 C++ 算子代码</a><a class="headerlink" href="#c" title="链接到此标题。">¶</a></h3>
 <p>编写继承自 <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code> 的 C++ 类：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpp_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">class MyFlipOp : public SelfAdjointOperator {</span>
@@ -553,7 +549,7 @@
 </div>
 </section>
 <section id="id11">
-<h3><a class="toc-backref" href="#id40" role="doc-backlink">步骤 2：编译算子</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id38" role="doc-backlink">步骤 2：编译算子</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
 <p>使用 <code class="docutils literal notranslate"><span class="pre">compile_operator()</span></code> 编译并创建 Python 类：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.dynamic_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_operator</span>
 
@@ -567,7 +563,7 @@
 </div>
 </section>
 <section id="id12">
-<h3><a class="toc-backref" href="#id41" role="doc-backlink">步骤 3：使用算子</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id39" role="doc-backlink">步骤 3：使用算子</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
 <p>像使用原生 PySparQ 算子一样使用动态算子：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
@@ -582,10 +578,10 @@
 </section>
 </section>
 <section id="id13">
-<h2><a class="toc-backref" href="#id42" role="doc-backlink">量子计算示例</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id40" role="doc-backlink">量子计算示例</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h2>
 <section id="id14">
-<h3><a class="toc-backref" href="#id43" role="doc-backlink">示例 1：受控相位门</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
-<p>实现一个受控相位门，当控制位和目标位都为 <a href="#id15"><span class="problematic" id="id16">|</span></a>1⟩ 时应用相位：</p>
+<h3><a class="toc-backref" href="#id41" role="doc-backlink">示例 1：受控相位门</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<p>实现一个受控相位门，当控制位和目标位都为 <code class="docutils literal notranslate"><span class="pre">|1⟩</span></code> 时应用相位：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.dynamic_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
@@ -648,8 +644,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id17">
-<h3><a class="toc-backref" href="#id44" role="doc-backlink">示例 2：量子游走算子</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h3>
+<section id="id15">
+<h3><a class="toc-backref" href="#id42" role="doc-backlink">示例 2：量子游走算子</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h3>
 <p>实现量子游走的移动算子：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 量子游走移动算子</span>
 <span class="n">quantum_walk_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -691,7 +687,7 @@
 </div>
 </section>
 <section id="grover-oracle">
-<h3><a class="toc-backref" href="#id45" role="doc-backlink">示例 3：Grover 搜索 Oracle</a><a class="headerlink" href="#grover-oracle" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id43" role="doc-backlink">示例 3：Grover 搜索 Oracle</a><a class="headerlink" href="#grover-oracle" title="链接到此标题。">¶</a></h3>
 <p>实现一个自定义的 Grover 搜索 Oracle：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 自定义标记 Oracle</span>
 <span class="n">oracle_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -723,8 +719,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id18">
-<h3><a class="toc-backref" href="#id46" role="doc-backlink">示例 4：哈密顿量演化</a><a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h3>
+<section id="id16">
+<h3><a class="toc-backref" href="#id44" role="doc-backlink">示例 4：哈密顿量演化</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h3>
 <p>实现时间演化算子：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 哈密顿量演化算子</span>
 <span class="n">hamiltonian_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -768,14 +764,14 @@
 </div>
 </section>
 </section>
-<section id="id19">
-<h2><a class="toc-backref" href="#id47" role="doc-backlink">高级功能</a><a class="headerlink" href="#id19" title="链接到此标题。">¶</a></h2>
-<section id="id20">
-<h3><a class="toc-backref" href="#id48" role="doc-backlink">构造函数参数</a><a class="headerlink" href="#id20" title="链接到此标题。">¶</a></h3>
+<section id="id17">
+<h2><a class="toc-backref" href="#id45" role="doc-backlink">高级功能</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h2>
+<section id="id18">
+<h3><a class="toc-backref" href="#id46" role="doc-backlink">构造函数参数</a><a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">constructor_args</span></code> 支持以下类型：</p>
-<div class="table-wrapper docutils container" id="id28">
-<table class="docutils align-default" id="id28">
-<caption><span class="caption-text">支持的参数类型</span><a class="headerlink" href="#id28" title="链接到此表格。">¶</a></caption>
+<div class="table-wrapper docutils container" id="id26">
+<table class="docutils align-default" id="id26">
+<caption><span class="caption-text">支持的参数类型</span><a class="headerlink" href="#id26" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>C++ 类型</p></th>
 <th class="head"><p>Python 类型</p></th>
@@ -816,8 +812,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id21">
-<h3><a class="toc-backref" href="#id49" role="doc-backlink">编译缓存</a><a class="headerlink" href="#id21" title="链接到此标题。">¶</a></h3>
+<section id="id19">
+<h3><a class="toc-backref" href="#id47" role="doc-backlink">编译缓存</a><a class="headerlink" href="#id19" title="链接到此标题。">¶</a></h3>
 <p>动态算子使用基于代码哈希的缓存机制，避免重复编译：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.dynamic_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cache_info</span><span class="p">,</span> <span class="n">clear_cache</span>
 
@@ -833,8 +829,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id22">
-<h3><a class="toc-backref" href="#id50" role="doc-backlink">性能优化</a><a class="headerlink" href="#id22" title="链接到此标题。">¶</a></h3>
+<section id="id20">
+<h3><a class="toc-backref" href="#id48" role="doc-backlink">性能优化</a><a class="headerlink" href="#id20" title="链接到此标题。">¶</a></h3>
 <p>提高算子性能的技巧：</p>
 <ol class="arabic simple">
 <li><p><strong>选择正确的基类</strong>：对于厄米算子，使用 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code> 可简化实现</p></li>
@@ -844,10 +840,10 @@
 </ol>
 </section>
 </section>
-<section id="id23">
-<h2><a class="toc-backref" href="#id51" role="doc-backlink">故障排除</a><a class="headerlink" href="#id23" title="链接到此标题。">¶</a></h2>
-<section id="id24">
-<h3><a class="toc-backref" href="#id52" role="doc-backlink">常见编译错误</a><a class="headerlink" href="#id24" title="链接到此标题。">¶</a></h3>
+<section id="id21">
+<h2><a class="toc-backref" href="#id49" role="doc-backlink">故障排除</a><a class="headerlink" href="#id21" title="链接到此标题。">¶</a></h2>
+<section id="id22">
+<h3><a class="toc-backref" href="#id50" role="doc-backlink">常见编译错误</a><a class="headerlink" href="#id22" title="链接到此标题。">¶</a></h3>
 <p><strong>头文件找不到</strong></p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>error: &#39;basic_components.h&#39; file not found
 </pre></div>
@@ -861,8 +857,8 @@
 <p><strong>Windows ABI 兼容性问题</strong></p>
 <p>解决方案：Windows 上使用 MSVC 编译主库时，动态算子可能存在 ABI 兼容性问题。建议使用一致的编译器。</p>
 </section>
-<section id="id25">
-<h3><a class="toc-backref" href="#id53" role="doc-backlink">库加载错误</a><a class="headerlink" href="#id25" title="链接到此标题。">¶</a></h3>
+<section id="id23">
+<h3><a class="toc-backref" href="#id51" role="doc-backlink">库加载错误</a><a class="headerlink" href="#id23" title="链接到此标题。">¶</a></h3>
 <p><strong>库文件不存在</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DynamicOperatorLoadError</span><span class="p">:</span> <span class="n">Dynamic</span> <span class="n">library</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">exist</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">lib</span><span class="o">.</span><span class="n">so</span>
 </pre></div>
@@ -874,8 +870,8 @@
 </div>
 <p>解决方案：确保代码中定义了 <code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">&quot;C&quot;</span></code> 导出的工厂函数。</p>
 </section>
-<section id="id26">
-<h3><a class="toc-backref" href="#id54" role="doc-backlink">参数错误</a><a class="headerlink" href="#id26" title="链接到此标题。">¶</a></h3>
+<section id="id24">
+<h3><a class="toc-backref" href="#id52" role="doc-backlink">参数错误</a><a class="headerlink" href="#id24" title="链接到此标题。">¶</a></h3>
 <p><strong>无效的基类</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ne">ValueError</span><span class="p">:</span> <span class="n">base_class</span> <span class="n">必须是</span> <span class="p">[</span><span class="s1">&#39;BaseOperator&#39;</span><span class="p">,</span> <span class="s1">&#39;SelfAdjointOperator&#39;</span><span class="p">]</span> <span class="n">之一</span>
 </pre></div>
@@ -889,7 +885,7 @@
 </section>
 </section>
 <section id="api">
-<h2><a class="toc-backref" href="#id55" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id53" role="doc-backlink">API 参考</a><a class="headerlink" href="#api" title="链接到此标题。">¶</a></h2>
 <p>详细 API 文档请参考 <a class="reference internal" href="../api/dynamic_operator.html"><span class="doc">动态算子 API 参考</span></a>。</p>
 </section>
 </section>
@@ -973,21 +969,21 @@
 </li>
 <li><a class="reference internal" href="#id13">量子计算示例</a><ul>
 <li><a class="reference internal" href="#id14">示例 1：受控相位门</a></li>
-<li><a class="reference internal" href="#id17">示例 2：量子游走算子</a></li>
+<li><a class="reference internal" href="#id15">示例 2：量子游走算子</a></li>
 <li><a class="reference internal" href="#grover-oracle">示例 3：Grover 搜索 Oracle</a></li>
-<li><a class="reference internal" href="#id18">示例 4：哈密顿量演化</a></li>
+<li><a class="reference internal" href="#id16">示例 4：哈密顿量演化</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id19">高级功能</a><ul>
-<li><a class="reference internal" href="#id20">构造函数参数</a></li>
-<li><a class="reference internal" href="#id21">编译缓存</a></li>
-<li><a class="reference internal" href="#id22">性能优化</a></li>
+<li><a class="reference internal" href="#id17">高级功能</a><ul>
+<li><a class="reference internal" href="#id18">构造函数参数</a></li>
+<li><a class="reference internal" href="#id19">编译缓存</a></li>
+<li><a class="reference internal" href="#id20">性能优化</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id23">故障排除</a><ul>
-<li><a class="reference internal" href="#id24">常见编译错误</a></li>
-<li><a class="reference internal" href="#id25">库加载错误</a></li>
-<li><a class="reference internal" href="#id26">参数错误</a></li>
+<li><a class="reference internal" href="#id21">故障排除</a><ul>
+<li><a class="reference internal" href="#id22">常见编译错误</a></li>
+<li><a class="reference internal" href="#id23">库加载错误</a></li>
+<li><a class="reference internal" href="#id24">参数错误</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#api">API 参考</a></li>

@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul class="current">
@@ -321,49 +317,49 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id3" id="id20">概述</a></p></li>
-<li><p><a class="reference internal" href="#id4" id="id21">类型约束</a></p></li>
-<li><p><a class="reference internal" href="#pauli" id="id22">Pauli 门</a></p>
+<li><p><a class="reference internal" href="#id3" id="id12">概述</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id13">类型约束</a></p></li>
+<li><p><a class="reference internal" href="#pauli" id="id14">Pauli 门</a></p>
 <ul>
-<li><p><a class="reference internal" href="#xgate-bool-pauli-x-not" id="id23">Xgate_Bool（Pauli-X / NOT）</a></p></li>
-<li><p><a class="reference internal" href="#ygate-bool-pauli-y" id="id24">Ygate_Bool（Pauli-Y）</a></p></li>
-<li><p><a class="reference internal" href="#zgate-bool-pauli-z" id="id25">Zgate_Bool（Pauli-Z）</a></p></li>
+<li><p><a class="reference internal" href="#xgate-bool-pauli-x-not" id="id15">Xgate_Bool（Pauli-X / NOT）</a></p></li>
+<li><p><a class="reference internal" href="#ygate-bool-pauli-y" id="id16">Ygate_Bool（Pauli-Y）</a></p></li>
+<li><p><a class="reference internal" href="#zgate-bool-pauli-z" id="id17">Zgate_Bool（Pauli-Z）</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id15" id="id26">相位门</a></p>
+<li><p><a class="reference internal" href="#id7" id="id18">相位门</a></p>
 <ul>
-<li><p><a class="reference internal" href="#sgate-bool-s" id="id27">Sgate_Bool（S 门）</a></p></li>
-<li><p><a class="reference internal" href="#tgate-bool-t" id="id28">Tgate_Bool（T 门）</a></p></li>
-<li><p><a class="reference internal" href="#phase-bool" id="id29">Phase_Bool（任意相位）</a></p></li>
+<li><p><a class="reference internal" href="#sgate-bool-s" id="id19">Sgate_Bool（S 门）</a></p></li>
+<li><p><a class="reference internal" href="#tgate-bool-t" id="id20">Tgate_Bool（T 门）</a></p></li>
+<li><p><a class="reference internal" href="#phase-bool" id="id21">Phase_Bool（任意相位）</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id16" id="id30">旋转门</a></p>
+<li><p><a class="reference internal" href="#id8" id="id22">旋转门</a></p>
 <ul>
-<li><p><a class="reference internal" href="#rxgate-bool-x" id="id31">RXgate_Bool（X 轴旋转）</a></p></li>
-<li><p><a class="reference internal" href="#rygate-bool-y" id="id32">RYgate_Bool（Y 轴旋转）</a></p></li>
-<li><p><a class="reference internal" href="#rzgate-bool-z" id="id33">RZgate_Bool（Z 轴旋转）</a></p></li>
-<li><p><a class="reference internal" href="#sxgate-bool-x" id="id34">SXgate_Bool（√X 门）</a></p></li>
+<li><p><a class="reference internal" href="#rxgate-bool-x" id="id23">RXgate_Bool（X 轴旋转）</a></p></li>
+<li><p><a class="reference internal" href="#rygate-bool-y" id="id24">RYgate_Bool（Y 轴旋转）</a></p></li>
+<li><p><a class="reference internal" href="#rzgate-bool-z" id="id25">RZgate_Bool（Z 轴旋转）</a></p></li>
+<li><p><a class="reference internal" href="#sxgate-bool-x" id="id26">SXgate_Bool（√X 门）</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id17" id="id35">通用门</a></p>
+<li><p><a class="reference internal" href="#id9" id="id27">通用门</a></p>
 <ul>
-<li><p><a class="reference internal" href="#u2gate-bool-2" id="id36">U2gate_Bool（2 参数通用门）</a></p></li>
-<li><p><a class="reference internal" href="#u3gate-bool-3" id="id37">U3gate_Bool（3 参数通用门）</a></p></li>
+<li><p><a class="reference internal" href="#u2gate-bool-2" id="id28">U2gate_Bool（2 参数通用门）</a></p></li>
+<li><p><a class="reference internal" href="#u3gate-bool-3" id="id29">U3gate_Bool（3 参数通用门）</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id18" id="id38">其他门</a></p>
+<li><p><a class="reference internal" href="#id10" id="id30">其他门</a></p>
 <ul>
-<li><p><a class="reference internal" href="#rot-bool" id="id39">Rot_Bool（通用旋转）</a></p></li>
-<li><p><a class="reference internal" href="#reflection-bool" id="id40">Reflection_Bool（反射门）</a></p></li>
+<li><p><a class="reference internal" href="#rot-bool" id="id31">Rot_Bool（通用旋转）</a></p></li>
+<li><p><a class="reference internal" href="#reflection-bool" id="id32">Reflection_Bool（反射门）</a></p></li>
 </ul>
 </li>
 </ul>
 </nav>
 <section id="id3">
-<h2><a class="toc-backref" href="#id20" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
-<div class="table-wrapper docutils container" id="id19">
-<table class="docutils align-default" id="id19">
-<caption><span class="caption-text">基本量子门总览</span><a class="headerlink" href="#id19" title="链接到此表格。">¶</a></caption>
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id11">
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-text">基本量子门总览</span><a class="headerlink" href="#id11" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>算子</p></th>
 <th class="head"><p>操作</p></th>
@@ -424,7 +420,7 @@
 </div>
 </section>
 <section id="id4">
-<h2><a class="toc-backref" href="#id21" role="doc-backlink">类型约束</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">类型约束</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
 <p>所有量子门要求：</p>
 <ul class="simple">
 <li><p>寄存器类型：<a href="#id5"><span class="problematic" id="id6">``</span></a>Boolean``（单量子比特门）</p></li>
@@ -441,10 +437,10 @@
 <p>---</p>
 </section>
 <section id="pauli">
-<h2><a class="toc-backref" href="#id22" role="doc-backlink">Pauli 门</a><a class="headerlink" href="#pauli" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Pauli 门</a><a class="headerlink" href="#pauli" title="链接到此标题。">¶</a></h2>
 <section id="xgate-bool-pauli-x-not">
-<h3><a class="toc-backref" href="#id23" role="doc-backlink">Xgate_Bool（Pauli-X / NOT）</a><a class="headerlink" href="#xgate-bool-pauli-x-not" title="链接到此标题。">¶</a></h3>
-<p><strong>操作</strong>: 比特翻转 <a href="#id7"><span class="problematic" id="id8">|</span></a>0⟩ ↔ <a href="#id9"><span class="problematic" id="id10">|</span></a>1⟩</p>
+<h3><a class="toc-backref" href="#id15" role="doc-backlink">Xgate_Bool（Pauli-X / NOT）</a><a class="headerlink" href="#xgate-bool-pauli-x-not" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 比特翻转 <code class="docutils literal notranslate"><span class="pre">|0⟩</span> <span class="pre">↔</span> <span class="pre">|1⟩</span></code></p>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -468,7 +464,7 @@
 </div>
 </section>
 <section id="ygate-bool-pauli-y">
-<h3><a class="toc-backref" href="#id24" role="doc-backlink">Ygate_Bool（Pauli-Y）</a><a class="headerlink" href="#ygate-bool-pauli-y" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id16" role="doc-backlink">Ygate_Bool（Pauli-Y）</a><a class="headerlink" href="#ygate-bool-pauli-y" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -479,8 +475,8 @@
 </div>
 </section>
 <section id="zgate-bool-pauli-z">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">Zgate_Bool（Pauli-Z）</a><a class="headerlink" href="#zgate-bool-pauli-z" title="链接到此标题。">¶</a></h3>
-<p><strong>操作</strong>: 相位翻转 <a href="#id11"><span class="problematic" id="id12">|</span></a>1⟩ → -<a href="#id13"><span class="problematic" id="id14">|</span></a>1⟩</p>
+<h3><a class="toc-backref" href="#id17" role="doc-backlink">Zgate_Bool（Pauli-Z）</a><a class="headerlink" href="#zgate-bool-pauli-z" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 相位翻转 <code class="docutils literal notranslate"><span class="pre">|1⟩</span> <span class="pre">→</span> <span class="pre">-|1⟩</span></code></p>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -492,10 +488,10 @@
 <p>---</p>
 </section>
 </section>
-<section id="id15">
-<h2><a class="toc-backref" href="#id26" role="doc-backlink">相位门</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<section id="id7">
+<h2><a class="toc-backref" href="#id18" role="doc-backlink">相位门</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
 <section id="sgate-bool-s">
-<h3><a class="toc-backref" href="#id27" role="doc-backlink">Sgate_Bool（S 门）</a><a class="headerlink" href="#sgate-bool-s" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id19" role="doc-backlink">Sgate_Bool（S 门）</a><a class="headerlink" href="#sgate-bool-s" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 相位旋转 π/2</p>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
@@ -507,7 +503,7 @@
 </div>
 </section>
 <section id="tgate-bool-t">
-<h3><a class="toc-backref" href="#id28" role="doc-backlink">Tgate_Bool（T 门）</a><a class="headerlink" href="#tgate-bool-t" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id20" role="doc-backlink">Tgate_Bool（T 门）</a><a class="headerlink" href="#tgate-bool-t" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 相位旋转 π/4</p>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
@@ -519,7 +515,7 @@
 </div>
 </section>
 <section id="phase-bool">
-<h3><a class="toc-backref" href="#id29" role="doc-backlink">Phase_Bool（任意相位）</a><a class="headerlink" href="#phase-bool" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id21" role="doc-backlink">Phase_Bool（任意相位）</a><a class="headerlink" href="#phase-bool" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 相位旋转 e^{iλ}</p>
 <p><strong>Dagger</strong>: 相位旋转 e^{-iλ}</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 相位旋转 π/3</span>
@@ -533,10 +529,10 @@
 <p>---</p>
 </section>
 </section>
-<section id="id16">
-<h2><a class="toc-backref" href="#id30" role="doc-backlink">旋转门</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h2>
+<section id="id8">
+<h2><a class="toc-backref" href="#id22" role="doc-backlink">旋转门</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h2>
 <section id="rxgate-bool-x">
-<h3><a class="toc-backref" href="#id31" role="doc-backlink">RXgate_Bool（X 轴旋转）</a><a class="headerlink" href="#rxgate-bool-x" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id23" role="doc-backlink">RXgate_Bool（X 轴旋转）</a><a class="headerlink" href="#rxgate-bool-x" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -550,7 +546,7 @@
 </div>
 </section>
 <section id="rygate-bool-y">
-<h3><a class="toc-backref" href="#id32" role="doc-backlink">RYgate_Bool（Y 轴旋转）</a><a class="headerlink" href="#rygate-bool-y" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id24" role="doc-backlink">RYgate_Bool（Y 轴旋转）</a><a class="headerlink" href="#rygate-bool-y" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -561,7 +557,7 @@
 </div>
 </section>
 <section id="rzgate-bool-z">
-<h3><a class="toc-backref" href="#id33" role="doc-backlink">RZgate_Bool（Z 轴旋转）</a><a class="headerlink" href="#rzgate-bool-z" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id25" role="doc-backlink">RZgate_Bool（Z 轴旋转）</a><a class="headerlink" href="#rzgate-bool-z" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -572,7 +568,7 @@
 </div>
 </section>
 <section id="sxgate-bool-x">
-<h3><a class="toc-backref" href="#id34" role="doc-backlink">SXgate_Bool（√X 门）</a><a class="headerlink" href="#sxgate-bool-x" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">SXgate_Bool（√X 门）</a><a class="headerlink" href="#sxgate-bool-x" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: X^{1/2}</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">SXgate_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
@@ -580,10 +576,10 @@
 <p>---</p>
 </section>
 </section>
-<section id="id17">
-<h2><a class="toc-backref" href="#id35" role="doc-backlink">通用门</a><a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h2>
+<section id="id9">
+<h2><a class="toc-backref" href="#id27" role="doc-backlink">通用门</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
 <section id="u2gate-bool-2">
-<h3><a class="toc-backref" href="#id36" role="doc-backlink">U2gate_Bool（2 参数通用门）</a><a class="headerlink" href="#u2gate-bool-2" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">U2gate_Bool（2 参数通用门）</a><a class="headerlink" href="#u2gate-bool-2" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -591,7 +587,7 @@
 </div>
 </section>
 <section id="u3gate-bool-3">
-<h3><a class="toc-backref" href="#id37" role="doc-backlink">U3gate_Bool（3 参数通用门）</a><a class="headerlink" href="#u3gate-bool-3" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id29" role="doc-backlink">U3gate_Bool（3 参数通用门）</a><a class="headerlink" href="#u3gate-bool-3" title="链接到此标题。">¶</a></h3>
 <p><strong>矩阵</strong>:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
@@ -609,10 +605,10 @@
 <p>---</p>
 </section>
 </section>
-<section id="id18">
-<h2><a class="toc-backref" href="#id38" role="doc-backlink">其他门</a><a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h2>
+<section id="id10">
+<h2><a class="toc-backref" href="#id30" role="doc-backlink">其他门</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
 <section id="rot-bool">
-<h3><a class="toc-backref" href="#id39" role="doc-backlink">Rot_Bool（通用旋转）</a><a class="headerlink" href="#rot-bool" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id31" role="doc-backlink">Rot_Bool（通用旋转）</a><a class="headerlink" href="#rot-bool" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 应用任意 2×2 幺正矩阵</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -627,7 +623,7 @@
 </div>
 </section>
 <section id="reflection-bool">
-<h3><a class="toc-backref" href="#id40" role="doc-backlink">Reflection_Bool（反射门）</a><a class="headerlink" href="#reflection-bool" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id32" role="doc-backlink">Reflection_Bool（反射门）</a><a class="headerlink" href="#reflection-bool" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 反射操作（Grover 算法中的扩散算子）</p>
 </section>
 </section>
@@ -697,25 +693,25 @@
 <li><a class="reference internal" href="#zgate-bool-pauli-z">Zgate_Bool（Pauli-Z）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id15">相位门</a><ul>
+<li><a class="reference internal" href="#id7">相位门</a><ul>
 <li><a class="reference internal" href="#sgate-bool-s">Sgate_Bool（S 门）</a></li>
 <li><a class="reference internal" href="#tgate-bool-t">Tgate_Bool（T 门）</a></li>
 <li><a class="reference internal" href="#phase-bool">Phase_Bool（任意相位）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id16">旋转门</a><ul>
+<li><a class="reference internal" href="#id8">旋转门</a><ul>
 <li><a class="reference internal" href="#rxgate-bool-x">RXgate_Bool（X 轴旋转）</a></li>
 <li><a class="reference internal" href="#rygate-bool-y">RYgate_Bool（Y 轴旋转）</a></li>
 <li><a class="reference internal" href="#rzgate-bool-z">RZgate_Bool（Z 轴旋转）</a></li>
 <li><a class="reference internal" href="#sxgate-bool-x">SXgate_Bool（√X 门）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id17">通用门</a><ul>
+<li><a class="reference internal" href="#id9">通用门</a><ul>
 <li><a class="reference internal" href="#u2gate-bool-2">U2gate_Bool（2 参数通用门）</a></li>
 <li><a class="reference internal" href="#u3gate-bool-3">U3gate_Bool（3 参数通用门）</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id18">其他门</a><ul>
+<li><a class="reference internal" href="#id10">其他门</a><ul>
 <li><a class="reference internal" href="#rot-bool">Rot_Bool（通用旋转）</a></li>
 <li><a class="reference internal" href="#reflection-bool">Reflection_Bool（反射门）</a></li>
 </ul>

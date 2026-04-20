@@ -20,7 +20,7 @@
      - 指定寄存器全为零时翻转相位
      - SelfAdjoint
    * - ``Reflection_Bool``
-     - 关于 |0⟩ 态的反射（Grover 扩散）
+     - 关于 ``|0⟩`` 态的反射（Grover 扩散）
      - SelfAdjoint
    * - ``GlobalPhase_Int``
      - 全局相位乘以复数因子

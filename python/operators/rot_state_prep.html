@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul class="current">
@@ -321,21 +317,21 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id2">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id3" id="id8">概述</a></p></li>
-<li><p><a class="reference internal" href="#rot-generalunitary" id="id9">Rot_GeneralUnitary（通用幺正旋转）</a></p></li>
-<li><p><a class="reference internal" href="#rot-generalstateprep" id="id10">Rot_GeneralStatePrep（量子态制备）</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id11">辅助函数</a></p>
+<li><p><a class="reference internal" href="#id3" id="id6">概述</a></p></li>
+<li><p><a class="reference internal" href="#rot-generalunitary" id="id7">Rot_GeneralUnitary（通用幺正旋转）</a></p></li>
+<li><p><a class="reference internal" href="#rot-generalstateprep" id="id8">Rot_GeneralStatePrep（量子态制备）</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id9">辅助函数</a></p>
 <ul>
-<li><p><a class="reference internal" href="#stateprep-unitary-build-schmidt" id="id12">stateprep_unitary_build_schmidt</a></p></li>
+<li><p><a class="reference internal" href="#stateprep-unitary-build-schmidt" id="id10">stateprep_unitary_build_schmidt</a></p></li>
 </ul>
 </li>
 </ul>
 </nav>
 <section id="id3">
-<h2><a class="toc-backref" href="#id8" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
-<div class="table-wrapper docutils container" id="id7">
-<table class="docutils align-default" id="id7">
-<caption><span class="caption-text">旋转与态制备算子总览</span><a class="headerlink" href="#id7" title="链接到此表格。">¶</a></caption>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">概述</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper docutils container" id="id5">
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">旋转与态制备算子总览</span><a class="headerlink" href="#id5" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>算子</p></th>
 <th class="head"><p>操作</p></th>
@@ -348,7 +344,7 @@
 <td><p>BaseOperator</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Rot_GeneralStatePrep</span></code></p></td>
-<td><p>从 <a href="#id4"><span class="problematic" id="id5">|</span></a>0⟩ 制备目标量子态</p></td>
+<td><p>从 <code class="docutils literal notranslate"><span class="pre">|0⟩</span></code> 制备目标量子态</p></td>
 <td><p>BaseOperator</p></td>
 </tr>
 </tbody>
@@ -357,7 +353,7 @@
 <p>---</p>
 </section>
 <section id="rot-generalunitary">
-<h2><a class="toc-backref" href="#id9" role="doc-backlink">Rot_GeneralUnitary（通用幺正旋转）</a><a class="headerlink" href="#rot-generalunitary" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Rot_GeneralUnitary（通用幺正旋转）</a><a class="headerlink" href="#rot-generalunitary" title="链接到此标题。">¶</a></h2>
 <p><strong>操作</strong>: 对寄存器作用一个任意 <span class="math notranslate nohighlight">\(2^n \times 2^n\)</span> 幺正矩阵。</p>
 <p><strong>参数</strong>:</p>
 <ul class="simple">
@@ -395,7 +391,7 @@
 <p>---</p>
 </section>
 <section id="rot-generalstateprep">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Rot_GeneralStatePrep（量子态制备）</a><a class="headerlink" href="#rot-generalstateprep" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Rot_GeneralStatePrep（量子态制备）</a><a class="headerlink" href="#rot-generalstateprep" title="链接到此标题。">¶</a></h2>
 <p><strong>操作</strong>: 将寄存器从 <code class="docutils literal notranslate"><span class="pre">|0⟩</span></code> 态制备为目标量子态。</p>
 <p><strong>参数</strong>:</p>
 <ul class="simple">
@@ -430,10 +426,10 @@
 </pre></div>
 </div>
 </section>
-<section id="id6">
-<h2><a class="toc-backref" href="#id11" role="doc-backlink">辅助函数</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<section id="id4">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">辅助函数</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
 <section id="stateprep-unitary-build-schmidt">
-<h3><a class="toc-backref" href="#id12" role="doc-backlink">stateprep_unitary_build_schmidt</a><a class="headerlink" href="#stateprep-unitary-build-schmidt" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">stateprep_unitary_build_schmidt</a><a class="headerlink" href="#stateprep-unitary-build-schmidt" title="链接到此标题。">¶</a></h3>
 <p><strong>操作</strong>: 使用 Schmidt 分解构造态制备所需的幺正矩阵。</p>
 <p><strong>用途</strong>: 当需要手动构建或检查 <code class="docutils literal notranslate"><span class="pre">Rot_GeneralStatePrep</span></code> 的内部矩阵时使用。</p>
 </section>
@@ -499,7 +495,7 @@
 <li><a class="reference internal" href="#id3">概述</a></li>
 <li><a class="reference internal" href="#rot-generalunitary">Rot_GeneralUnitary（通用幺正旋转）</a></li>
 <li><a class="reference internal" href="#rot-generalstateprep">Rot_GeneralStatePrep（量子态制备）</a></li>
-<li><a class="reference internal" href="#id6">辅助函数</a><ul>
+<li><a class="reference internal" href="#id4">辅助函数</a><ul>
 <li><a class="reference internal" href="#stateprep-unitary-build-schmidt">stateprep_unitary_build_schmidt</a></li>
 </ul>
 </li>

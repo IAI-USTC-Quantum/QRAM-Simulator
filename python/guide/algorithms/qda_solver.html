@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="量子态与寄存器表示" href="../core_concepts/index.html"><link rel="prev" title="CKS 线性系统求解器" href="cks_solver.html">
+<link rel="index" title="索引" href="../../genindex.html"><link rel="search" title="搜索" href="../../search.html"><link rel="next" title="核心概念" href="../core_concepts/index.html"><link rel="prev" title="CKS 线性系统求解器" href="cks_solver.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
         <title>QDA 线性系统求解器 - PySparQ 文档</title>
@@ -213,9 +213,9 @@
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">量子态与寄存器表示</span></p>
+<p class="caption" role="heading"><span class="caption-text">核心概念</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">量子态与寄存器表示</a><input aria-label="Toggle navigation of 量子态与寄存器表示" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../core_concepts/index.html">核心概念</a><input aria-label="Toggle navigation of 核心概念" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/system.html">System 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/sparse_state.html">SparseState 类</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/register_management.html">寄存器管理</a></li>
@@ -223,10 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">算子</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../core_concepts/operators.html">算子</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
@@ -324,7 +320,7 @@
 <li><p><a class="reference internal" href="#id2" id="id25">数学背景</a></p>
 <ul>
 <li><p><a class="reference internal" href="#id3" id="id26">离散绝热定理</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id27">插值哈密顿量</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id27">插值哈密顿量</a></p></li>
 <li><p><a class="reference internal" href="#id9" id="id28">块编码</a></p></li>
 <li><p><a class="reference internal" href="#id10" id="id29">量子游走</a></p></li>
 </ul>
@@ -368,14 +364,14 @@
 <h2><a class="toc-backref" href="#id25" role="doc-backlink">数学背景</a><a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
 <section id="id3">
 <h3><a class="toc-backref" href="#id26" role="doc-backlink">离散绝热定理</a><a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h3>
-<p>算法使用离散绝热演化来制备解态 <a href="#id4"><span class="problematic" id="id5">|</span></a>x⟩ ∝ A⁻¹|b⟩。关键洞察是插值哈密顿量 H(s) 的基态从易于制备的初始态平滑演化到期望的解。</p>
+<p>算法使用离散绝热演化来制备解态 <code class="docutils literal notranslate"><span class="pre">|x⟩</span></code> ∝ A⁻¹``|b⟩``。关键洞察是插值哈密顿量 H(s) 的基态从易于制备的初始态平滑演化到期望的解。</p>
 </section>
-<section id="id6">
-<h3><a class="toc-backref" href="#id27" role="doc-backlink">插值哈密顿量</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
+<section id="id4">
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">插值哈密顿量</a><a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
 <p>定义 H(s) = (1 - f(s))H₀ + f(s)H₁，其中：</p>
 <ul class="simple">
 <li><p><strong>H₀</strong> = σ_z ⊗ I（初始哈密顿量，易于制备基态）</p></li>
-<li><p><strong>H₁</strong> = A ⊗ <a href="#id7"><span class="problematic" id="id8">|</span></a>b⟩⟨b|（问题哈密顿量）</p></li>
+<li><p><strong>H₁</strong> = A ⊗ <a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">|</span></a>b⟩⟨b|``（问题哈密顿量）</p></li>
 <li><p><strong>f(s)</strong> = κ/(κ-1) × (1 - (1 + s(κ^(p-1) - 1))^(1/(1-p)))</p></li>
 </ul>
 <p>插值函数 f(s)（公式 69）的选择是为了实现最优缩放。</p>
@@ -677,7 +673,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">量子态与寄存器表示</div>
+                <div class="title">核心概念</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -726,7 +722,7 @@
 <li><a class="reference internal" href="#id1">概述</a></li>
 <li><a class="reference internal" href="#id2">数学背景</a><ul>
 <li><a class="reference internal" href="#id3">离散绝热定理</a></li>
-<li><a class="reference internal" href="#id6">插值哈密顿量</a></li>
+<li><a class="reference internal" href="#id4">插值哈密顿量</a></li>
 <li><a class="reference internal" href="#id9">块编码</a></li>
 <li><a class="reference internal" href="#id10">量子游走</a></li>
 </ul>
