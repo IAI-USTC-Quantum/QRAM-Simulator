@@ -1,4 +1,4 @@
-量子算子
+算子参考
 ========
 
 算子是 PySparQ 中量子操作的构建模块。所有操作都以算子对象的形式实现，它们接受 ``SparseState`` 并对其进行变换。
@@ -9,14 +9,41 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: 算子分类
+   :caption: 量子算术
 
    arithmetic
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 量子门与变换
+
    gates
    hadamard
-   qram_ops
-   condrot
    qft
+   condrot
+   phase_ops
+   rot_state_prep
+
+.. toctree::
+   :maxdepth: 2
+   :caption: QRAM 操作
+
+   qram_ops
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 系统操作
+
+   system_ops
+   partial_trace
+   sort_ops
+
+.. toctree::
+   :maxdepth: 2
+   :caption: 辅助工具
+
+   dark_magic
+   debug
 
 什么是算子？
 ------------
