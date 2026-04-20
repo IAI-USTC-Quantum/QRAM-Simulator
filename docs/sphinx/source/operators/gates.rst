@@ -82,7 +82,7 @@ Xgate_Bool（Pauli-X / NOT）
    :members:
    :undoc-members:
 
-**操作**: 比特翻转 |0⟩ ↔ |1⟩
+**操作**: 比特翻转 ``|0⟩ ↔ |1⟩``
 
 **矩阵**:
 
@@ -131,7 +131,7 @@ Zgate_Bool（Pauli-Z）
    :members:
    :undoc-members:
 
-**操作**: 相位翻转 |1⟩ → -|1⟩
+**操作**: 相位翻转 ``|1⟩ → -|1⟩``
 
 **矩阵**:
 
