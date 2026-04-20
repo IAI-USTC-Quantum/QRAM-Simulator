@@ -47,6 +47,19 @@ PySparQ 是一个稀疏态量子电路模拟器，具有原生 QRAM 支持和寄
    :caption: 算子参考
 
    operators/index
+   operators/arithmetic
+   operators/gates
+   operators/hadamard
+   operators/qft
+   operators/condrot
+   operators/phase_ops
+   operators/rot_state_prep
+   operators/qram_ops
+   operators/system_ops
+   operators/partial_trace
+   operators/sort_ops
+   operators/dark_magic
+   operators/debug
 
 .. toctree::
    :maxdepth: 2
