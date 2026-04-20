@@ -10,6 +10,11 @@ Available Algorithms:
     - shor: Shor's integer factorization algorithm
     - cks_solver: CKS (Childs-Kothari-Somma) linear system solver
     - qda_solver: QDA (Quantum Discrete Adiabatic) linear system solver
+    - state_preparation: QRAM-based state preparation
+    - block_encoding: Block encoding (tridiagonal and via QRAM)
+
+Utilities:
+    - qram_utils: Classical helpers for QRAM data construction
 
 Note:
     These algorithms are not exported from the main pysparq module.

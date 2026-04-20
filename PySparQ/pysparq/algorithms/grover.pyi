@@ -1,86 +1,100 @@
 """
-Grover 量子搜索算法实现
+Grover's Quantum Search Algorithm Implementation
 """
-
-from typing import List, Optional, Tuple, Union
 
 import pysparq as ps
 
 
 class GroverOracle:
-    """Grover 搜索预言机，用于标记目标值。"""
+    """Oracle for Grover's search that marks target values."""
 
     qram: ps.QRAMCircuit_qutrit
-    addr_reg: Union[str, int]
-    data_reg: Union[str, int]
-    search_reg: Union[str, int]
+    addr_reg: str | int
+    data_reg: str | int
+    search_reg: str | int
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
         qram: ps.QRAMCircuit_qutrit,
-        addr_reg: Union[str, int],
-        data_reg: Union[str, int],
-        search_reg: Union[str, int],
+        addr_reg: str | int,
+        data_reg: str | int,
+        search_reg: str | int,
     ) -> None: ...
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "GroverOracle": ...
+    def conditioned_by_all_ones(self, conds: str | int | list[str | int]) -> "GroverOracle": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOracle": ...
     def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
 
 
 class DiffusionOperator:
-    """HPH（Hadamard-相位-Hadamard）扩散算子。"""
+    """HPH (Hadamard-Phase-Hadamard) diffusion operator."""
 
-    addr_reg: Union[str, int]
+    addr_reg: str | int
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
-    def __init__(self, addr_reg: Union[str, int]) -> None: ...
+    def __init__(self, addr_reg: str | int) -> None: ...
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "DiffusionOperator": ...
+    def conditioned_by_all_ones(self, conds: str | int | list[str | int]) -> "DiffusionOperator": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "DiffusionOperator": ...
     def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
 
 
 class GroverOperator:
-    """组合 Grover 算子：预言机后接扩散。"""
+    """Combined Grover operator: Oracle followed by Diffusion."""
 
     oracle: GroverOracle
     diffusion: DiffusionOperator
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
         qram: ps.QRAMCircuit_qutrit,
-        addr_reg: Union[str, int],
-        data_reg: Union[str, int],
-        search_reg: Union[str, int],
+        addr_reg: str | int,
+        data_reg: str | int,
+        search_reg: str | int,
     ) -> None: ...
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "GroverOperator": ...
+    def conditioned_by_all_ones(self, conds: str | int | list[str | int]) -> "GroverOperator": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOperator": ...
+    def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
 
 
 def grover_search(
-    memory: List[int],
+    memory: list[int],
     target: int,
-    n_iterations: Optional[int] = ...,
+    n_iterations: int | None = ...,
     data_size: int = ...,
-) -> Tuple[int, float]:
-    """执行 Grover 搜索以在内存中找到目标值。"""
+) -> tuple[int, float]:
+    """Execute Grover's search to find target in memory."""
     ...
 
 
 def grover_count(
-    memory: List[int],
+    memory: list[int],
     target: int,
     precision_bits: int = ...,
     data_size: int = ...,
-) -> Tuple[int, float]:
-    """Grover 算法的量子计数变体。"""
+) -> tuple[int, float]:
+    """Quantum counting variant of Grover's algorithm."""
     ...
 
 
 def create_grover_demo() -> str:
-    """生成 Grover 算法的演示脚本。"""
+    """Generate a demo script for Grover's algorithm."""
     ...

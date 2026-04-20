@@ -24,7 +24,6 @@ Reference:
 from __future__ import annotations
 
 import math
-from typing import List, Optional, Tuple, Union
 
 import pysparq as ps
 
@@ -54,19 +53,20 @@ class GroverOracle:
     def __init__(
         self,
         qram: ps.QRAMCircuit_qutrit,
-        addr_reg: Union[str, int],
-        data_reg: Union[str, int],
-        search_reg: Union[str, int],
+        addr_reg: str | int,
+        data_reg: str | int,
+        search_reg: str | int,
     ):
         self.qram = qram
         self.addr_reg = addr_reg
         self.data_reg = data_reg
         self.search_reg = search_reg
 
-        self._condition_regs: List[Union[str, int]] = []
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
 
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "GroverOracle":
         """Set condition registers for conditional execution."""
         if isinstance(cond, list):
@@ -75,9 +75,24 @@ class GroverOracle:
             self._condition_regs = [cond]
         return self
 
+    def conditioned_by_all_ones(self, conds) -> "GroverOracle":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOracle":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
     def clear_conditions(self) -> None:
         """Clear all conditions."""
         self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply the inverse oracle (self-inverse reflection)."""
+        self(state)
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply the oracle operation to the quantum state."""
@@ -136,12 +151,13 @@ class DiffusionOperator:
         >>> diffusion(state)  # Apply diffusion operator
     """
 
-    def __init__(self, addr_reg: Union[str, int]):
+    def __init__(self, addr_reg: str | int):
         self.addr_reg = addr_reg
-        self._condition_regs: List[Union[str, int]] = []
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
 
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "DiffusionOperator":
         """Set condition registers for conditional execution."""
         if isinstance(cond, list):
@@ -150,9 +166,24 @@ class DiffusionOperator:
             self._condition_regs = [cond]
         return self
 
+    def conditioned_by_all_ones(self, conds) -> "DiffusionOperator":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "DiffusionOperator":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
     def clear_conditions(self) -> None:
         """Clear all conditions."""
         self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply the inverse diffusion (self-inverse H-P-PhaseFlip-P-H)."""
+        self(state)
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply the diffusion operator."""
@@ -192,16 +223,17 @@ class GroverOperator:
     def __init__(
         self,
         qram: ps.QRAMCircuit_qutrit,
-        addr_reg: Union[str, int],
-        data_reg: Union[str, int],
-        search_reg: Union[str, int],
+        addr_reg: str | int,
+        data_reg: str | int,
+        search_reg: str | int,
     ):
         self.oracle = GroverOracle(qram, addr_reg, data_reg, search_reg)
         self.diffusion = DiffusionOperator(addr_reg)
-        self._condition_regs: List[Union[str, int]] = []
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
 
     def conditioned_by_nonzeros(
-        self, cond: Union[str, int, List[Union[str, int]]]
+        self, cond: str | int | list[str | int]
     ) -> "GroverOperator":
         """Set condition registers for conditional execution."""
         if isinstance(cond, list):
@@ -209,6 +241,29 @@ class GroverOperator:
         else:
             self._condition_regs = [cond]
         return self
+
+    def conditioned_by_all_ones(self, conds) -> "GroverOperator":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOperator":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply the inverse Grover operator (delegates to sub-operators' dag)."""
+        if self._condition_regs:
+            self.diffusion.conditioned_by_nonzeros(self._condition_regs)
+            self.oracle.conditioned_by_nonzeros(self._condition_regs)
+        self.diffusion.dag(state)
+        self.oracle.dag(state)
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply one complete Grover iteration."""
@@ -222,11 +277,11 @@ class GroverOperator:
 
 
 def grover_search(
-    memory: List[int],
+    memory: list[int],
     target: int,
-    n_iterations: Optional[int] = None,
+    n_iterations: int | None = None,
     data_size: int = 64,
-) -> Tuple[int, float]:
+) -> tuple[int, float]:
     """Execute Grover's search to find target in memory.
 
     Args:
@@ -292,18 +347,15 @@ def grover_search(
     grover_op = GroverOperator(qram, "addr", "data", "search")
 
     # Apply Grover iterations
-    add_data = ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)
-    remove_data = ps.RemoveRegister("data_temp")
-
     for _ in range(n_iterations):
         # Add temporary data register for this iteration
-        data_id = add_data(state)
+        data_id = ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)(state)
 
         # Apply Grover operator
         grover_op(state)
 
         # Remove temporary data register
-        remove_data(state)
+        ps.RemoveRegister("data_temp")(state)
 
     # Measure: apply partial trace to get address
     measured_results, prob = ps.PartialTrace(["data", "search"])(state)
@@ -312,11 +364,11 @@ def grover_search(
 
 
 def grover_count(
-    memory: List[int],
+    memory: list[int],
     target: int,
     precision_bits: int = 8,
     data_size: int = 64,
-) -> Tuple[int, float]:
+) -> tuple[int, float]:
     """Quantum counting variant of Grover's algorithm.
 
     Uses phase estimation to estimate the number of marked items (M)

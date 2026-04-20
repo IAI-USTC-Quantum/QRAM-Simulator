@@ -1,16 +1,15 @@
 """
-CKS（Childs-Kothari-Somma）线性系统求解器实现
+CKS (Childs-Kothari-Somma) Linear System Solver Implementation
 """
 
-from dataclasses import dataclass
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 import numpy as np
 import pysparq as ps
 
 
 class ChebyshevPolynomialCoefficient:
-    """计算量子游走的切比雪夫多项式系数。"""
+    """Computes Chebyshev polynomial coefficients for quantum walk."""
 
     b: int
 
@@ -23,43 +22,31 @@ class ChebyshevPolynomialCoefficient:
 
 def get_coef_positive_only(
     mat_data_size: int, v: int, row: int, col: int
-) -> List[complex]:
-    """获取仅正矩阵元素的旋转矩阵系数。"""
+) -> list[complex]:
+    """Get rotation matrix coefficients for positive-only matrix elements."""
     ...
 
 
 def get_coef_common(
     mat_data_size: int, v: int, row: int, col: int
-) -> List[complex]:
-    """获取一般（带符号）矩阵元素的旋转矩阵系数。"""
+) -> list[complex]:
+    """Get rotation matrix coefficients for general (signed) matrix elements."""
     ...
 
 
 def make_walk_angle_func(
     mat_data_size: int, positive_only: bool
-) -> Callable[[int, int, int], List[complex]]:
-    """为矩阵创建游走角度函数。"""
+) -> Callable[[int, int, int], list[complex]]:
+    """Create walk angle function for a matrix."""
     ...
 
 
-@dataclass
 class SparseMatrixData:
-    """量子模拟的稀疏矩阵数据。"""
+    """Sparse matrix data for quantum simulation."""
 
     n_row: int
     nnz_col: int
-    data: List[int]
-    data_size: int
-    positive_only: bool
-    sparsity_offset: int
-
-
-class SparseMatrix:
-    """CKS 算法的稀疏矩阵表示。"""
-
-    n_row: int
-    nnz_col: int
-    data: List[int]
+    data: list[int]
     data_size: int
     positive_only: bool
     sparsity_offset: int
@@ -68,7 +55,28 @@ class SparseMatrix:
         self,
         n_row: int,
         nnz_col: int,
-        data: List[int],
+        data: list[int],
+        data_size: int,
+        positive_only: bool = ...,
+        sparsity_offset: int = ...,
+    ) -> None: ...
+
+
+class SparseMatrix:
+    """Sparse matrix representation for CKS algorithm."""
+
+    n_row: int
+    nnz_col: int
+    data: list[int]
+    data_size: int
+    positive_only: bool
+    sparsity_offset: int
+
+    def __init__(
+        self,
+        n_row: int,
+        nnz_col: int,
+        data: list[int],
         data_size: int,
         positive_only: bool = ...,
     ) -> None: ...
@@ -79,13 +87,13 @@ class SparseMatrix:
         data_size: int = ...,
         positive_only: Optional[bool] = ...,
     ) -> "SparseMatrix": ...
-    def get_data(self) -> List[int]: ...
+    def get_data(self) -> list[int]: ...
     def get_sparsity_offset(self) -> int: ...
-    def get_walk_angle_func(self) -> Callable[[int, int, int], List[complex]]: ...
+    def get_walk_angle_func(self) -> Callable[[int, int, int], list[complex]]: ...
 
 
 class QuantumBinarySearch:
-    """用于稀疏矩阵访问的量子二分搜索。"""
+    """Quantum binary search for sparse matrix access."""
 
     qram: ps.QRAMCircuit_qutrit
     address_offset_reg: str
@@ -93,6 +101,8 @@ class QuantumBinarySearch:
     target_reg: str
     result_reg: str
     max_step: int
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -102,17 +112,28 @@ class QuantumBinarySearch:
         target_reg: str,
         result_reg: str,
     ) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumBinarySearch": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumBinarySearch": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumBinarySearch": ...
+    def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
 
 
 class CondRotQW:
-    """量子游走的条件旋转。"""
+    """Conditional rotation for quantum walk."""
 
     j_reg: str
     k_reg: str
     data_reg: str
     output_reg: str
     mat: SparseMatrix
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -122,12 +143,20 @@ class CondRotQW:
         output_reg: str,
         mat: SparseMatrix,
     ) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "CondRotQW": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "CondRotQW": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "CondRotQW": ...
+    def clear_conditions(self) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class TOperator:
-    """CKS 算法的 T 算子。"""
+    """T operator for CKS algorithm."""
 
     qram: ps.QRAMCircuit_qutrit
     data_offset_reg: str
@@ -140,6 +169,8 @@ class TOperator:
     nnz_col: int
     data_size: int
     mat: SparseMatrix
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -155,12 +186,20 @@ class TOperator:
         data_size: int,
         mat: SparseMatrix,
     ) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "TOperator": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "TOperator": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "TOperator": ...
+    def clear_conditions(self) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class QuantumWalk:
-    """CKS 算法的量子游走算子。"""
+    """Quantum walk operator for CKS algorithm."""
 
     qram: ps.QRAMCircuit_qutrit
     j_reg: str
@@ -172,6 +211,8 @@ class QuantumWalk:
     data_offset_reg: str
     sparse_offset_reg: str
     mat: SparseMatrix
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -186,12 +227,20 @@ class QuantumWalk:
         sparse_offset_reg: str,
         mat: SparseMatrix,
     ) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumWalk": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumWalk": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumWalk": ...
+    def clear_conditions(self) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class QuantumWalkNSteps:
-    """CKS 算法的多步量子游走。"""
+    """Multiple quantum walk steps for CKS algorithm."""
 
     mat: SparseMatrix
     qram: ps.QRAMCircuit_qutrit
@@ -208,11 +257,22 @@ class QuantumWalkNSteps:
     b2: str
     j_comp: str
     k_comp: str
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self, mat: SparseMatrix, qram: Optional[ps.QRAMCircuit_qutrit] = ...
     ) -> None: ...
-    def init_environment(self) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumWalkNSteps": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumWalkNSteps": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumWalkNSteps": ...
+    def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
+    def init_environment(self, state: ps.SparseState) -> None: ...
     def create_state(self) -> ps.SparseState: ...
     def first_step(self, state: ps.SparseState) -> None: ...
     def step(self, state: ps.SparseState) -> None: ...
@@ -220,7 +280,7 @@ class QuantumWalkNSteps:
 
 
 class LCUContainer:
-    """CKS 的酉组合（LCU）容器。"""
+    """LCU (Linear Combination of Unitaries) container for CKS."""
 
     kappa: float
     eps: float
@@ -230,6 +290,8 @@ class LCUContainer:
     walk: QuantumWalkNSteps
     current_state: Optional[ps.SparseState]
     step_state: Optional[ps.SparseState]
+    _condition_regs: list[str | int]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -238,6 +300,15 @@ class LCUContainer:
         eps: float,
         qram: Optional[ps.QRAMCircuit_qutrit] = ...,
     ) -> None: ...
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "LCUContainer": ...
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "LCUContainer": ...
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "LCUContainer": ...
+    def clear_conditions(self) -> None: ...
+    def dag(self, state: ps.SparseState) -> None: ...
     def get_input_reg(self) -> str: ...
     def initialize(self) -> None: ...
     def external_input(self, init_op: Callable[[ps.SparseState], None]) -> None: ...
@@ -251,10 +322,10 @@ def cks_solve(
     eps: float = ...,
     data_size: int = ...,
 ) -> np.ndarray:
-    """使用 CKS 量子线性求解器求解 Ax = b。"""
+    """Solve Ax = b using CKS quantum linear solver."""
     ...
 
 
 def create_cks_demo() -> str:
-    """生成 CKS 求解器的演示脚本。"""
+    """Generate a demo script for CKS solver."""
     ...
