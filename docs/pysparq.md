@@ -247,9 +247,9 @@ ps.GetMid_UInt_UInt("low", "high", "mid")(state)
 
 ```python
 # Pauli gates
-ps.Xgate_Bool("qubit")(state)           # X gate (bit flip)
-ps.Ygate_Bool("qubit")(state)           # Y gate
-ps.Zgate_Bool("qubit")(state)           # Z gate (phase flip)
+ps.Xgate_Bool("qubit", 0)(state)        # X gate (bit flip) - digit parameter required
+ps.Ygate_Bool("qubit")(state)           # Y gate - digit defaults to 0
+ps.Zgate_Bool("qubit")(state)           # Z gate (phase flip) - digit defaults to 0
 
 # Phase gates
 ps.Sgate_Bool("qubit")(state)           # S gate (phase by i)
@@ -303,9 +303,10 @@ add_op.conditioned_by_value("mode_reg", 1)(state)
 ### QRAM Operations
 
 ```python
-# Create QRAM circuit
-qram = ps.QRAMCircuit_qutrit(addr_size=4, data_size=8)
-qram.set_memory(memory_tree)
+# Create QRAM circuit with memory data
+# Note: memory must be passed at construction time
+memory_tree = [0, 1, 2, 3, ...]  # your memory data
+qram = ps.QRAMCircuit_qutrit(addr_size=4, data_size=8, memory=memory_tree)
 
 # Load data from QRAM
 ps.QRAMLoad(qram, "addr_reg", "data_reg")(state)
@@ -463,12 +464,10 @@ import pysparq as ps
 ps.System.clear()
 
 # Create QRAM with 4-bit addresses, 8-bit data
-qram = ps.QRAMCircuit_qutrit(4, 8)
-
-# Set memory content (simplified)
+# Note: memory must be passed at construction time
 memory_data = [0] * 16  # 16 addresses
 memory_data[5] = 42     # Address 5 contains 42
-# ... load memory into qram ...
+qram = ps.QRAMCircuit_qutrit(4, 8, memory_data)
 
 # Registers
 addr = ps.System.add_register("addr", ps.UnsignedInteger, 4)
