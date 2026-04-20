@@ -1,7 +1,7 @@
 SparseState 类
 ==============
 
-``SparseState`` 类是 PySparQ 的核心数据结构，表示一个稀疏量子态。它封装了 ``System`` 对象的列表，只存储振幅非零的基态。
+``SparseState`` 类是 PySparQ 的核心数据结构，表示一个稀疏量子态。它内部托管了 ``std::vector<System>``，只存储振幅非零的基态。
 
 .. contents:: 目录
    :local:
@@ -16,22 +16,27 @@ SparseState 类
 - 每个 ``System`` 代表一个计算基态
 - 叠加态数量有限时，存储复杂度为多项式级
 
+唯一性规则
+----------
+
+``SparseState`` 中的一个核心不变量是：**所有 ``System`` 的寄存器值组合必须唯一**。
+
+如果对 ``SparseState`` 中的基态进行操作后产生了两个具有相同寄存器值的 ``System``，这意味着发生了量子干涉——此时两个 ``System`` 的振幅应当相加，合并为一个 ``System``。这一过程通常由算子内部的 ``sort-merge-unique`` 机制自动完成。
+
 .. code-block:: python
 
    import pysparq as ps
 
    ps.System.clear()
+   ps.System.add_register("q", ps.UnsignedInteger, 2)
 
-   # 添加一个 10 比特的寄存器
-   ps.System.add_register("q", ps.UnsignedInteger, 10)
-
-   # 初始状态：只有一个基态 |q=0⟩
+   # SparseState() 默认构造：创建单个 |q=0⟩ 基态
    state = ps.SparseState()
    print(f"基态数量: {state.size()}")  # 1
 
-   # 施加 Hadamard 创建 2^10 = 1024 个基态
+   # 施加 Hadamard 创建 2^2 = 4 个基态
    ps.Hadamard_Int_Full("q")(state)
-   print(f"基态数量: {state.size()}")  # 1024
+   print(f"基态数量: {state.size()}")  # 4
 
 基本用法
 --------
@@ -39,21 +44,19 @@ SparseState 类
 创建 SparseState
 ^^^^^^^^^^^^^^^^
 
+.. important::
+
+   ``SparseState()`` 的默认构造函数会自动创建一个 ``|0...0⟩`` 的初态（即一个所有寄存器值为 0、振幅为 1 的 ``System``）。通常**不需要**手动构造 ``System`` 对象来创建 ``SparseState``。
+
 .. code-block:: python
 
    import pysparq as ps
 
    ps.System.clear()
+   ps.System.add_register("q", ps.UnsignedInteger, 10)
 
-   # 默认构造：创建单个 |0...0⟩ 基态
+   # 默认构造：创建单个 |q=0⟩ 基态（振幅为 1）
    state = ps.SparseState()
-
-   # 指定初始基态数量
-   state = ps.SparseState(size=4)
-
-   # 从 System 列表构造
-   systems = [ps.System(), ps.System()]
-   state = ps.SparseState(systems)
 
 访问基态
 ^^^^^^^^
@@ -86,11 +89,9 @@ SparseState 类
    import pysparq as ps
 
    ps.System.clear()
-
-   # 创建 2 比特寄存器
    ps.System.add_register("q", ps.UnsignedInteger, 2)
 
-   # 初始状态
+   # SparseState 默认创建 |q=0⟩ 初态
    state = ps.SparseState()
 
    print("初始状态:")
@@ -160,32 +161,8 @@ SparseState 类
    # 指定精度
    ps.StatePrint(ps.Default, precision=4)(state)
 
-状态操作函数
-------------
-
-拆分与合并寄存器
-^^^^^^^^^^^^^^^^
-
-.. code-block:: python
-
-   ps.System.clear()
-
-   # 创建 8 比特寄存器
-   ps.System.add_register("full", ps.UnsignedInteger, 8)
-
-   state = ps.SparseState()
-   ps.Init_Unsafe("full", 0b10110011)(state)
-
-   # 拆分为两个 4 比特寄存器
-   ps.SplitRegister("high", "low", 4)(state)
-   # "high" = 0b1011, "low" = 0b0011
-
-   # 合并两个寄存器
-   ps.CombineRegister("combined", "high", "low")(state)
-   # "combined" = 0b10110011
-
 清除接近零的振幅
-^^^^^^^^^^^^^^^^
+----------------
 
 .. code-block:: python
 
@@ -196,7 +173,7 @@ SparseState 类
    ps.Normalize()(state)
 
 合并重复基态
-^^^^^^^^^^^^
+------------
 
 当多个基态具有相同的寄存器值时，它们的振幅会自动合并：
 
@@ -204,19 +181,6 @@ SparseState 类
 
    # merge_system 函数：合并两个相同基态的振幅
    # 通常由算子内部自动调用
-
-寄存器栈操作
-^^^^^^^^^^^^
-
-.. code-block:: python
-
-   # Push：添加临时寄存器
-   ps.Push("temp", ps.UnsignedInteger, 4)(state)
-
-   # 使用临时寄存器...
-
-   # Pop：删除最后一个寄存器
-   ps.Pop()(state)
 
 迭代器支持
 ----------
