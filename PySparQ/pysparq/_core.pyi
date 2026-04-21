@@ -5172,11 +5172,7 @@ class Phase_Bool(BaseOperator):
     def condition_variable_nonzeros(self) -> list[int]:
         ...
 class PlusOneAndOverflow(BaseOperator):
-    @typing.overload
     def __init__(self, main_reg: str, overflow: str) -> None:
-        ...
-    @typing.overload
-    def __init__(self, main_reg: typing.SupportsInt | typing.SupportsIndex, overflow: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
     def clear_control_all_ones(self) -> None:
         """
@@ -5198,11 +5194,11 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_all_ones(self, cond: str) -> PlusOneAndOverflow:
         """
         Condition this operation on registers where all bits are 1.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5210,11 +5206,11 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers where all bits are 1.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5222,11 +5218,11 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on registers where all bits are 1.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5234,11 +5230,11 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers where all bits are 1.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5246,12 +5242,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on a specific bit position.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Bit position to check (0-indexed).
             conds: List of (register, position) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5259,12 +5255,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> PlusOneAndOverflow:
         """
         Condition this operation on a specific bit position.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Bit position to check (0-indexed).
             conds: List of (register, position) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5272,12 +5268,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on a specific bit position.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Bit position to check (0-indexed).
             conds: List of (register, position) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5285,12 +5281,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> PlusOneAndOverflow:
         """
         Condition this operation on a specific bit position.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Bit position to check (0-indexed).
             conds: List of (register, position) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5298,14 +5294,14 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_nonzeros(self, cond: str) -> PlusOneAndOverflow:
         """
         Condition this operation on registers with nonzero values.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
-
+        
         Example:
             op.conditioned_by_nonzeros('control_reg')(state)
         """
@@ -5313,14 +5309,14 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers with nonzero values.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
-
+        
         Example:
             op.conditioned_by_nonzeros('control_reg')(state)
         """
@@ -5328,14 +5324,14 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on registers with nonzero values.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
-
+        
         Example:
             op.conditioned_by_nonzeros('control_reg')(state)
         """
@@ -5343,14 +5339,14 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers with nonzero values.
-
+        
         Args:
             cond: Register name (str) or ID (int) to condition on.
             conds: List of register names or IDs for multi-condition.
-
+        
         Returns:
             Self, for method chaining.
-
+        
         Example:
             op.conditioned_by_nonzeros('control_reg')(state)
         """
@@ -5358,12 +5354,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on registers holding a specific value.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Value to match.
             conds: List of (register, value) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5371,12 +5367,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers holding a specific value.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Value to match.
             conds: List of (register, value) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5384,12 +5380,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> PlusOneAndOverflow:
         """
         Condition this operation on registers holding a specific value.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Value to match.
             conds: List of (register, value) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
@@ -5397,12 +5393,12 @@ class PlusOneAndOverflow(BaseOperator):
     def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> PlusOneAndOverflow:
         """
         Condition this operation on registers holding a specific value.
-
+        
         Args:
             cond: Register name (str) or ID (int).
             pos: Value to match.
             conds: List of (register, value) pairs.
-
+        
         Returns:
             Self, for method chaining.
         """
