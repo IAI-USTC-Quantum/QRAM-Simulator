@@ -242,6 +242,16 @@ auto result = measure(state);
     --seed 123456 --version normal
 ```
 
+## 开发量子算法
+
+详细的量子算法开发指南见 [docs/sphinx/source/guide/development/](docs/sphinx/source/guide/development/)，包括：
+
+- Register Level Programming 核心概念
+- C++/Python 开发模板
+- 添加新实验的步骤
+- 测试验证清单
+- 代码规范
+
 ## 论文与引用
 
 本仓库由两篇论文分别驱动，各自贡献了不同的核心能力：
