@@ -1,73 +1,76 @@
 """
-QDA（量子离散绝热）线性系统求解器实现
+QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation
 """
 
-from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable
 
 import numpy as np
 import pysparq as ps
 
 
 def compute_fs(s: float, kappa: float, p: float) -> float:
-    """计算插值参数 f(s)。"""
+    """Compute the interpolation parameter f(s)."""
     ...
 
 
-def compute_rotation_matrix(fs: float) -> List[complex]:
-    """计算块编码的旋转矩阵 R_s。"""
+def compute_rotation_matrix(fs: float) -> list[complex]:
+    """Compute the rotation matrix R_s for block encoding."""
     ...
 
 
 def chebyshev_T(n: int, x: float) -> float:
-    """计算切比雪夫多项式 T_n(x)。"""
+    """Compute Chebyshev polynomial T_n(x)."""
     ...
 
 
 def dolph_chebyshev(epsilon: float, l: int, phi: float) -> float:
-    """计算 Dolph-Chebyshev 窗函数。"""
+    """Compute Dolph-Chebyshev window function."""
     ...
 
 
-def compute_fourier_coeffs(epsilon: float, l: int) -> List[float]:
-    """计算 Dolph-Chebyshev 滤波器的傅里叶系数。"""
+def compute_fourier_coeffs(epsilon: float, l: int) -> list[float]:
+    """Compute Fourier coefficients for Dolph-Chebyshev filter."""
     ...
 
 
-def calculate_angles(coeffs: List[float]) -> List[float]:
-    """从系数计算态制备的旋转角度。"""
+def calculate_angles(coeffs: list[float]) -> list[float]:
+    """Calculate rotation angles from coefficients for state preparation."""
     ...
 
 
 class BlockEncoding:
-    """块编码实现的占位符。"""
+    """Placeholder for block encoding implementation."""
 
     A: np.ndarray
     data_size: int
+    _condition_regs: list[str]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(self, A: np.ndarray, data_size: int = ...) -> None: ...
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "BlockEncoding": ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class StatePreparation:
-    """态制备实现的占位符。"""
+    """Placeholder for state preparation implementation."""
 
     b: np.ndarray
+    _condition_regs: list[str]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(self, b: np.ndarray) -> None: ...
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "StatePreparation": ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class BlockEncodingHs:
-    """插值哈密顿量 H(s) 的块编码。"""
+    """Block encoding of the interpolating Hamiltonian H(s)."""
 
     enc_A: BlockEncoding
     enc_b: StatePreparation
@@ -78,7 +81,9 @@ class BlockEncodingHs:
     anc_3: str
     anc_4: str
     fs: float
-    R_s: List[complex]
+    R_s: list[complex]
+    _condition_regs: list[str]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -93,14 +98,14 @@ class BlockEncodingHs:
         fs: float,
     ) -> None: ...
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "BlockEncodingHs": ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class BlockEncodingHsPD:
-    """块编码 H(s) 的正定版本。"""
+    """Positive-definite version of block encoding H(s)."""
 
     enc_A: BlockEncoding
     enc_b: StatePreparation
@@ -111,7 +116,7 @@ class BlockEncodingHsPD:
     anc_3: str
     anc_4: str
     fs: float
-    R_s: List[complex]
+    R_s: list[complex]
 
     def __init__(
         self,
@@ -129,7 +134,7 @@ class BlockEncodingHsPD:
 
 
 class WalkS:
-    """参数 s 处的量子游走算子。"""
+    """Quantum walk operator at parameter s."""
 
     main_reg: str
     anc_UA: str
@@ -143,7 +148,9 @@ class WalkS:
     is_positive_definite: bool
     fs: float
     phase: complex
-    enc_Hs: BlockEncodingHs
+    enc_Hs: BlockEncodingHs | BlockEncodingHsPD
+    _condition_regs: list[str]
+    _condition_bits: list[tuple[str | int, int]]
 
     def __init__(
         self,
@@ -161,16 +168,16 @@ class WalkS:
         is_positive_definite: bool = ...,
     ) -> None: ...
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "WalkS": ...
     def conditioned_by_bit(self, reg: str, pos: int) -> "WalkS": ...
-    def clear_control_by_bit(self) -> None: ...
+    def clear_conditions(self) -> None: ...
     def __call__(self, state: ps.SparseState) -> None: ...
     def dag(self, state: ps.SparseState) -> None: ...
 
 
 class LCU:
-    """QDA 的酉组合（LCU）。"""
+    """Linear Combination of Unitaries for QDA."""
 
     walk: WalkS
     index_reg: str
@@ -183,14 +190,14 @@ class LCU:
 
 
 class Filtering:
-    """QDA 的 Dolph-Chebyshev 滤波。"""
+    """Dolph-Chebyshev filtering for QDA."""
 
     walk: WalkS
     index_reg: str
     anc_h: str
     epsilon: float
     l: int
-    coeffs: List[float]
+    coeffs: list[float]
 
     def __init__(
         self,
@@ -205,23 +212,23 @@ class Filtering:
 
 def classical_to_quantum(
     A: np.ndarray, b: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], np.ndarray]]:
-    """将经典线性系统转换为量子兼容形式。"""
+) -> tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], np.ndarray]]:
+    """Convert classical linear system to quantum-compatible form."""
     ...
 
 
 def qda_solve(
     A: np.ndarray,
     b: np.ndarray,
-    kappa: Optional[float] = ...,
+    kappa: float | None = ...,
     p: float = ...,
     eps: float = ...,
     step_rate: float = ...,
 ) -> np.ndarray:
-    """使用 QDA 算法求解 Ax = b。"""
+    """Solve Ax = b using QDA algorithm."""
     ...
 
 
 def create_qda_demo() -> str:
-    """生成 QDA 求解器的演示脚本。"""
+    """Generate a demo script for QDA solver."""
     ...

@@ -23,19 +23,12 @@ Reference:
 
 from __future__ import annotations
 
-import cmath
 import math
-from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, Optional
 
 import numpy as np
 
 import pysparq as ps
-
-
-# ==============================================================================
-# Chebyshev Polynomial Coefficients
-# ==============================================================================
 
 
 class ChebyshevPolynomialCoefficient:
@@ -126,14 +119,9 @@ class ChebyshevPolynomialCoefficient:
         return 2 * j + 1
 
 
-# ==============================================================================
-# Walk Angle Functions
-# ==============================================================================
-
-
 def get_coef_positive_only(
     mat_data_size: int, v: int, row: int, col: int
-) -> List[complex]:
+) -> list[complex]:
     """Get rotation matrix coefficients for positive-only matrix elements.
 
     Computes the 2x2 unitary matrix for conditional rotation based on
@@ -158,7 +146,7 @@ def get_coef_positive_only(
 
 def get_coef_common(
     mat_data_size: int, v: int, row: int, col: int
-) -> List[complex]:
+) -> list[complex]:
     """Get rotation matrix coefficients for general (signed) matrix elements.
 
     Handles both positive and negative matrix elements with appropriate
@@ -199,7 +187,7 @@ def get_coef_common(
 
 def make_walk_angle_func(
     mat_data_size: int, positive_only: bool
-) -> Callable[[int, int, int], List[complex]]:
+) -> Callable[[int, int, int], list[complex]]:
     """Create walk angle function for a matrix.
 
     Args:
@@ -217,12 +205,6 @@ def make_walk_angle_func(
         return lambda v, row, col: get_coef_common(mat_data_size, v, row, col)
 
 
-# ==============================================================================
-# Sparse Matrix Representation
-# ==============================================================================
-
-
-@dataclass
 class SparseMatrixData:
     """Sparse matrix data for quantum simulation.
 
@@ -235,12 +217,21 @@ class SparseMatrixData:
         sparsity_offset: Offset in QRAM for sparsity data
     """
 
-    n_row: int
-    nnz_col: int
-    data: List[int]
-    data_size: int
-    positive_only: bool = True
-    sparsity_offset: int = 0
+    def __init__(
+        self,
+        n_row: int,
+        nnz_col: int,
+        data: list[int],
+        data_size: int,
+        positive_only: bool = True,
+        sparsity_offset: int = 0,
+    ):
+        self.n_row = n_row
+        self.nnz_col = nnz_col
+        self.data = data
+        self.data_size = data_size
+        self.positive_only = positive_only
+        self.sparsity_offset = sparsity_offset
 
 
 class SparseMatrix:
@@ -258,7 +249,7 @@ class SparseMatrix:
         self,
         n_row: int,
         nnz_col: int,
-        data: List[int],
+        data: list[int],
         data_size: int,
         positive_only: bool = True,
     ):
@@ -326,7 +317,7 @@ class SparseMatrix:
 
         return cls(n_row, nnz_col, int_data, data_size, positive_only)
 
-    def get_data(self) -> List[int]:
+    def get_data(self) -> list[int]:
         """Get matrix data."""
         return self.data
 
@@ -334,14 +325,9 @@ class SparseMatrix:
         """Get sparsity offset for QRAM."""
         return self.sparsity_offset
 
-    def get_walk_angle_func(self) -> Callable[[int, int, int], List[complex]]:
+    def get_walk_angle_func(self) -> Callable[[int, int, int], list[complex]]:
         """Get walk angle function."""
         return make_walk_angle_func(self.data_size, self.positive_only)
-
-
-# ==============================================================================
-# Quantum Binary Search
-# ==============================================================================
 
 
 class QuantumBinarySearch:
@@ -364,6 +350,42 @@ class QuantumBinarySearch:
         self.target_reg = target_reg
         self.result_reg = result_reg
         self.max_step = int(math.log2(total_length)) + 1
+
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumBinarySearch":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumBinarySearch":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumBinarySearch":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply inverse binary search (not implemented)."""
+        raise NotImplementedError("QuantumBinarySearch::dag not implemented")
 
     def __call__(self, state: ps.SparseState) -> None:
         """Execute quantum binary search."""
@@ -462,11 +484,6 @@ class QuantumBinarySearch:
         ps.RemoveRegister(flag)(state)
 
 
-# ==============================================================================
-# Conditional Rotation for Quantum Walk
-# ==============================================================================
-
-
 class CondRotQW:
     """Conditional rotation for quantum walk.
 
@@ -488,6 +505,38 @@ class CondRotQW:
         self.mat = mat
         self.angle_func = mat.get_walk_angle_func()
 
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "CondRotQW":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "CondRotQW":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "CondRotQW":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
+
     def __call__(self, state: ps.SparseState) -> None:
         """Apply conditional rotation."""
         # Sort by key for sparse state optimization
@@ -508,11 +557,6 @@ class CondRotQW:
         """Apply inverse rotation."""
         # For self-adjoint rotations, same as forward
         self(state)
-
-
-# ==============================================================================
-# T Operator (State Preparation)
-# ==============================================================================
 
 
 class TOperator:
@@ -551,6 +595,38 @@ class TOperator:
         self.nnz_col = nnz_col
         self.data_size = data_size
         self.mat = mat
+
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "TOperator":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "TOperator":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "TOperator":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply T operator (forward)."""
@@ -629,11 +705,6 @@ class TOperator:
         pass
 
 
-# ==============================================================================
-# Quantum Walk
-# ==============================================================================
-
-
 class QuantumWalk:
     """Quantum walk operator for CKS algorithm.
 
@@ -670,6 +741,38 @@ class QuantumWalk:
         self.addr_size = int(math.log2(len(mat.data))) if mat.data else 1
         self.data_size = mat.data_size
         self.nnz_col = mat.nnz_col
+
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumWalk":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumWalk":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumWalk":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply one quantum walk step."""
@@ -743,20 +846,57 @@ class QuantumWalkNSteps:
             self.qram = qram
             self._owns_qram = False
 
-    def init_environment(self) -> None:
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "QuantumWalkNSteps":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "QuantumWalkNSteps":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "QuantumWalkNSteps":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply inverse multi-step walk (not implemented)."""
+        raise NotImplementedError("QuantumWalkNSteps::dag not implemented")
+
+    def init_environment(self, state: ps.SparseState) -> None:
         """Initialize quantum registers."""
-        ps.System.add_register(self.data_offset, ps.UnsignedInteger, self.default_reg_size)
-        ps.System.add_register(self.sparse_offset, ps.UnsignedInteger, self.default_reg_size)
-        ps.System.add_register(self.j, ps.UnsignedInteger, self.default_reg_size)
-        ps.System.add_register(self.b1, ps.Boolean, 1)
-        ps.System.add_register(self.k, ps.UnsignedInteger, self.default_reg_size)
-        ps.System.add_register(self.b2, ps.Boolean, 1)
-        ps.System.add_register(self.j_comp, ps.UnsignedInteger, self.default_reg_size)
-        ps.System.add_register(self.k_comp, ps.UnsignedInteger, self.default_reg_size)
+        ps.AddRegister(self.data_offset, ps.UnsignedInteger, self.default_reg_size)(state)
+        ps.AddRegister(self.sparse_offset, ps.UnsignedInteger, self.default_reg_size)(state)
+        ps.AddRegister(self.j, ps.UnsignedInteger, self.default_reg_size)(state)
+        ps.AddRegister(self.b1, ps.Boolean, 1)(state)
+        ps.AddRegister(self.k, ps.UnsignedInteger, self.default_reg_size)(state)
+        ps.AddRegister(self.b2, ps.Boolean, 1)(state)
+        ps.AddRegister(self.j_comp, ps.UnsignedInteger, self.default_reg_size)(state)
+        ps.AddRegister(self.k_comp, ps.UnsignedInteger, self.default_reg_size)(state)
 
     def create_state(self) -> ps.SparseState:
         """Create initial quantum state."""
         state = ps.SparseState()
+        self.init_environment(state)
         ps.Init_Unsafe(self.sparse_offset, self.mat.sparsity_offset)(state)
         return state
 
@@ -835,11 +975,6 @@ class QuantumWalkNSteps:
         return state
 
 
-# ==============================================================================
-# LCU Container
-# ==============================================================================
-
-
 class LCUContainer:
     """LCU (Linear Combination of Unitaries) container for CKS.
 
@@ -872,12 +1007,45 @@ class LCUContainer:
         self.chebyshev = ChebyshevPolynomialCoefficient(self.b)
         self.walk = QuantumWalkNSteps(mat, qram)
 
-        # Initialize environment
-        self.walk.init_environment()
-
         # Current state
         self.current_state: Optional[ps.SparseState] = None
         self.step_state: Optional[ps.SparseState] = None
+
+        self._condition_regs: list[str | int] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
+
+    def conditioned_by_nonzeros(
+        self, cond: str | int | list[str | int]
+    ) -> "LCUContainer":
+        """Set condition registers for conditional execution."""
+        if isinstance(cond, list):
+            self._condition_regs = cond
+        else:
+            self._condition_regs = [cond]
+        return self
+
+    def conditioned_by_all_ones(
+        self, conds: str | int | list[str | int]
+    ) -> "LCUContainer":
+        """Set condition registers for conditional execution (all-ones alias)."""
+        self._condition_regs = (
+            [conds] if isinstance(conds, (str, int)) else list(conds)
+        )
+        return self
+
+    def conditioned_by_bit(self, reg: str | int, pos: int) -> "LCUContainer":
+        """Add a single-bit condition."""
+        self._condition_bits.append((reg, pos))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
+
+    def dag(self, state: ps.SparseState) -> None:
+        """Apply inverse LCU (not implemented)."""
+        raise NotImplementedError("LCUContainer::dag not implemented")
 
     def get_input_reg(self) -> str:
         """Get input register name."""
@@ -926,11 +1094,6 @@ class LCUContainer:
         # For now, store the reference state
         if self.current_state is None:
             self.current_state = state
-
-
-# ==============================================================================
-# Main Solver Functions
-# ==============================================================================
 
 
 def cks_solve(

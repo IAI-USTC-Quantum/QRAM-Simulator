@@ -24,8 +24,6 @@ from __future__ import annotations
 
 import math
 import random
-from fractions import Fraction
-from typing import List, Optional, Tuple
 
 import pysparq as ps
 
@@ -64,7 +62,7 @@ def general_expmod(a: int, x: int, N: int) -> int:
         return (half * half) % N
 
 
-def find_best_fraction(y: int, Q: int, N: int) -> Tuple[int, int]:
+def find_best_fraction(y: int, Q: int, N: int) -> tuple[int, int]:
     """Find the best fraction c/r approximating y/Q using Farey sequence.
 
     Uses the Farey sequence to find the fraction with smallest denominator
@@ -133,8 +131,7 @@ def compute_period(meas_result: int, size: int, N: int) -> int:
     y = meas_result
     r, c = find_best_fraction(y, Q, N)
 
-    if r > 0 and r < N:
-        print(f"Found period: {r}, c: {c}")
+    if 0 < r < N:
         return r
     else:
         raise ShorExecutionFailed("Failed to find a suitable period")
@@ -163,7 +160,7 @@ def check_period(period: int, a: int, N: int) -> None:
         raise ShorExecutionFailed(f"a^(r/2) = -1 mod N for r = {period}")
 
 
-def shor_postprocess(meas: int, size: int, a: int, N: int) -> Tuple[int, int]:
+def shor_postprocess(meas: int, size: int, a: int, N: int) -> tuple[int, int]:
     """Classical post-processing for Shor's algorithm.
 
     Args:
@@ -183,15 +180,12 @@ def shor_postprocess(meas: int, size: int, a: int, N: int) -> Tuple[int, int]:
         check_period(period, a, N)
 
         a_exp_r_half = general_expmod(a, period // 2, N)
-        print(f"a^(r/2) mod N = {a_exp_r_half}")
 
         p = math.gcd(a_exp_r_half + 1, N)
         q = math.gcd(a_exp_r_half - 1, N)
-        print(f"p = {p}, q = {q}, p * q = {p * q}")
 
         return (p, q)
-    except ShorExecutionFailed as e:
-        print(f"Shor failed: {e}")
+    except ShorExecutionFailed:
         return (1, 1)
 
 
@@ -216,12 +210,23 @@ class ModMul:
         self.x = x
         self.N = N
         self.opnum = general_expmod(a, 2**x, N)
-        self._condition_bit: Optional[Tuple[str, int]] = None
+        self._condition_bits: list[tuple[str | int, int]] = []
+        self._condition_regs: list[str | int] = []
 
     def conditioned_by_all_ones(self, cond: str) -> "ModMul":
         """Set condition for controlled operation."""
-        self._condition_bit = (cond, 0)
+        self._condition_bits.append((cond, 0))
         return self
+
+    def conditioned_by_nonzeros(self, cond: str | int) -> "ModMul":
+        """Set condition for nonzero-controlled operation."""
+        self._condition_bits.append((cond, 1))
+        return self
+
+    def clear_conditions(self) -> None:
+        """Clear all condition bits."""
+        self._condition_bits.clear()
+        self._condition_regs.clear()
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply modular multiplication to the state."""
@@ -231,11 +236,14 @@ class ModMul:
 
         op = ps.CustomArithmetic([self.reg], 64, 64, modmul_func)
 
-        if self._condition_bit:
-            cond_reg, _ = self._condition_bit
+        if self._condition_bits:
+            cond_reg, _ = self._condition_bits[-1]
             op.conditioned_by_all_ones(cond_reg)(state)
         else:
             op(state)
+
+    def dag(self, state: ps.SparseState) -> None:
+        raise NotImplementedError("ModMul dag not implemented")
 
 
 class SemiClassicalShor:
@@ -279,7 +287,7 @@ class SemiClassicalShor:
         self.p: int = 0
         self.q: int = 0
 
-    def run(self) -> Tuple[int, int]:
+    def run(self) -> tuple[int, int]:
         """Execute the quantum circuit and return factors.
 
         Returns:
@@ -292,7 +300,7 @@ class SemiClassicalShor:
         anc_reg = ps.AddRegister("anc_reg", ps.UnsignedInteger, self.n)(state)
         ps.Xgate_Bool("anc_reg", 0)(state)
 
-        results: List[int] = []
+        results: list[int] = []
 
         # Iterative phase estimation
         for x in range(self.size):
@@ -398,22 +406,18 @@ class Shor:
         """Execute the full quantum Shor circuit."""
         # Apply Hadamard to work register
         ps.Hadamard_Int_Full(self.work_reg)(state)
-        print("Hadamard finished.")
 
         # Apply modular exponentiation
         self.expmod(state)
-        print("ExpMod finished.")
 
         # Measure ancilla register
         ps.PartialTrace([self.ancilla_reg])(state)
-        print("PartialTrace finished.")
 
         # Apply inverse QFT
         ps.inverseQFT(self.work_reg)(state)
-        print("inverseQFT finished.")
 
 
-def factor(N: int, a: Optional[int] = None) -> Tuple[int, int]:
+def factor(N: int, a: int | None = None) -> tuple[int, int]:
     """Factor N using Shor's algorithm.
 
     This is the main entry point for Shor's factorization algorithm.
@@ -455,24 +459,19 @@ def factor(N: int, a: Optional[int] = None) -> Tuple[int, int]:
     # Check if a is already a factor
     g = math.gcd(a, N)
     if g != 1:
-        print(f"a = {a} and N = {N} are not coprime")
-        print(f"Found factor: {g}")
         return (g, N // g)
-
-    print(f"Factoring N = {N} with a = {a}")
 
     # Use semi-classical Shor (more practical)
     shor = SemiClassicalShor(a, N)
     p, q = shor.run()
 
     if p == 1 or q == 1:
-        print("Factoring failed, try with different 'a'")
         return (1, N)
 
     return (p, q)
 
 
-def factor_full_quantum(N: int, a: Optional[int] = None) -> Tuple[int, int]:
+def factor_full_quantum(N: int, a: int | None = None) -> tuple[int, int]:
     """Factor N using full quantum Shor's algorithm.
 
     This implements the textbook version with full quantum phase
@@ -503,10 +502,10 @@ def factor_full_quantum(N: int, a: Optional[int] = None) -> Tuple[int, int]:
 
     ps.System.clear()
 
-    work_reg = ps.AddRegister("work_reg", ps.UnsignedInteger, size)(None)
-    anc_reg = ps.AddRegister("anc_reg", ps.UnsignedInteger, n)(None)
-
     state = ps.SparseState()
+
+    work_reg = ps.AddRegister("work_reg", ps.UnsignedInteger, size)(state)
+    anc_reg = ps.AddRegister("anc_reg", ps.UnsignedInteger, n)(state)
 
     # Compute period classically for the full quantum version
     axmodn = [1]
@@ -517,7 +516,6 @@ def factor_full_quantum(N: int, a: Optional[int] = None) -> Tuple[int, int]:
         axmodn.append(next_val)
 
     period = len(axmodn)
-    print(f"Period r = {period} (N = {N}, n = {n}, a = {a})")
 
     shor = Shor(work_reg, anc_reg, a, N, period)
     shor(state)
