@@ -5,7 +5,7 @@ PySparQ.pysparq.algorithms.grover
 
 .. autoapi-nested-parse::
 
-   Grover 量子搜索算法实现
+   Grover's Quantum Search Algorithm Implementation
 
 
 
@@ -32,27 +32,48 @@ Functions
 Module Contents
 ---------------
 
-.. py:class:: DiffusionOperator(addr_reg: Union[str, int])
+.. py:class:: DiffusionOperator(addr_reg: str | int)
 
-   HPH（Hadamard-相位-Hadamard）扩散算子。
+   HPH (Hadamard-Phase-Hadamard) diffusion operator.
 
 
    .. py:method:: clear_conditions() -> None
 
 
-   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> DiffusionOperator
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> DiffusionOperator
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> DiffusionOperator
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> DiffusionOperator
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:attribute:: addr_reg
-      :type:  Union[str, int]
+      :type:  str | int
 
 
-.. py:class:: GroverOperator(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
+.. py:class:: GroverOperator(qram: pysparq.QRAMCircuit_qutrit, addr_reg: str | int, data_reg: str | int, search_reg: str | int)
 
-   组合 Grover 算子：预言机后接扩散。
+   Combined Grover operator: Oracle followed by Diffusion.
 
 
-   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> GroverOperator
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> GroverOperator
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> GroverOperator
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> GroverOperator
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:attribute:: diffusion
@@ -63,23 +84,32 @@ Module Contents
       :type:  GroverOracle
 
 
-.. py:class:: GroverOracle(qram: pysparq.QRAMCircuit_qutrit, addr_reg: Union[str, int], data_reg: Union[str, int], search_reg: Union[str, int])
+.. py:class:: GroverOracle(qram: pysparq.QRAMCircuit_qutrit, addr_reg: str | int, data_reg: str | int, search_reg: str | int)
 
-   Grover 搜索预言机，用于标记目标值。
+   Oracle for Grover's search that marks target values.
 
 
    .. py:method:: clear_conditions() -> None
 
 
-   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, List[Union[str, int]]]) -> GroverOracle
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> GroverOracle
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> GroverOracle
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> GroverOracle
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:attribute:: addr_reg
-      :type:  Union[str, int]
+      :type:  str | int
 
 
    .. py:attribute:: data_reg
-      :type:  Union[str, int]
+      :type:  str | int
 
 
    .. py:attribute:: qram
@@ -87,21 +117,21 @@ Module Contents
 
 
    .. py:attribute:: search_reg
-      :type:  Union[str, int]
+      :type:  str | int
 
 
 .. py:function:: create_grover_demo() -> str
 
-   生成 Grover 算法的演示脚本。
+   Generate a demo script for Grover's algorithm.
 
 
-.. py:function:: grover_count(memory: List[int], target: int, precision_bits: int = ..., data_size: int = ...) -> Tuple[int, float]
+.. py:function:: grover_count(memory: list[int], target: int, precision_bits: int = ..., data_size: int = ...) -> tuple[int, float]
 
-   Grover 算法的量子计数变体。
+   Quantum counting variant of Grover's algorithm.
 
 
-.. py:function:: grover_search(memory: List[int], target: int, n_iterations: Optional[int] = ..., data_size: int = ...) -> Tuple[int, float]
+.. py:function:: grover_search(memory: list[int], target: int, n_iterations: int | None = ..., data_size: int = ...) -> tuple[int, float]
 
-   执行 Grover 搜索以在内存中找到目标值。
+   Execute Grover's search to find target in memory.
 
 

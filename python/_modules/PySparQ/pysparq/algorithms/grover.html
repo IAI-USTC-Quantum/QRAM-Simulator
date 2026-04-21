@@ -289,10 +289,8 @@
         <article role="main" id="furo-main-content">
           <h1>PySparQ.pysparq.algorithms.grover 源代码</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Grover 量子搜索算法实现</span>
+<span class="sd">Grover&#39;s Quantum Search Algorithm Implementation</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
@@ -300,7 +298,7 @@
 <div class="viewcode-block" id="GroverOracle">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GroverOracle</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Grover 搜索预言机，用于标记目标值。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Oracle for Grover&#39;s search that marks target values.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GroverOracle.qram">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.qram">[文档]</a>
@@ -308,33 +306,47 @@
 
 <div class="viewcode-block" id="GroverOracle.addr_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.addr_reg">[文档]</a>
-    <span class="n">addr_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">addr_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span></div>
 
 <div class="viewcode-block" id="GroverOracle.data_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.data_reg">[文档]</a>
-    <span class="n">data_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">data_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span></div>
 
 <div class="viewcode-block" id="GroverOracle.search_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.search_reg">[文档]</a>
-    <span class="n">search_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">search_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">qram</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">,</span>
-        <span class="n">addr_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-        <span class="n">data_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-        <span class="n">search_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">addr_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">data_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">search_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="GroverOracle.conditioned_by_nonzeros">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.conditioned_by_nonzeros">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOracle&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOracle.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOracle&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOracle.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOracle&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
 <div class="viewcode-block" id="GroverOracle.clear_conditions">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.clear_conditions">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOracle.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOracle.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
@@ -343,23 +355,37 @@
 <div class="viewcode-block" id="DiffusionOperator">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DiffusionOperator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;HPH（Hadamard-相位-Hadamard）扩散算子。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;HPH (Hadamard-Phase-Hadamard) diffusion operator.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DiffusionOperator.addr_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.addr_reg">[文档]</a>
-    <span class="n">addr_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">addr_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="DiffusionOperator.conditioned_by_nonzeros">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.conditioned_by_nonzeros">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DiffusionOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="DiffusionOperator.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;DiffusionOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="DiffusionOperator.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DiffusionOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
 <div class="viewcode-block" id="DiffusionOperator.clear_conditions">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.clear_conditions">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="DiffusionOperator.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.DiffusionOperator.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
@@ -368,7 +394,7 @@
 <div class="viewcode-block" id="GroverOperator">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GroverOperator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;组合 Grover 算子：预言机后接扩散。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combined Grover operator: Oracle followed by Diffusion.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="GroverOperator.oracle">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.oracle">[文档]</a>
@@ -378,19 +404,37 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.diffusion">[文档]</a>
     <span class="n">diffusion</span><span class="p">:</span> <span class="n">DiffusionOperator</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">qram</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">,</span>
-        <span class="n">addr_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-        <span class="n">data_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-        <span class="n">search_reg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">addr_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">data_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">search_reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="GroverOperator.conditioned_by_nonzeros">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.conditioned_by_nonzeros">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOperator.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOperator.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroverOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOperator.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="GroverOperator.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.GroverOperator.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
@@ -399,12 +443,12 @@
 <div class="viewcode-block" id="grover_search">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.grover_search">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">grover_search</span><span class="p">(</span>
-    <span class="n">memory</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">memory</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">n_iterations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">n_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;执行 Grover 搜索以在内存中找到目标值。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute Grover&#39;s search to find target in memory.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -412,12 +456,12 @@
 <div class="viewcode-block" id="grover_count">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.grover_count">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">grover_count</span><span class="p">(</span>
-    <span class="n">memory</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">memory</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">precision_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Grover 算法的量子计数变体。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum counting variant of Grover&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -425,7 +469,7 @@
 <div class="viewcode-block" id="create_grover_demo">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/grover/index.html#PySparQ.pysparq.algorithms.grover.create_grover_demo">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_grover_demo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;生成 Grover 算法的演示脚本。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a demo script for Grover&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 </pre></div>

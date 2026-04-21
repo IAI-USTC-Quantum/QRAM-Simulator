@@ -289,11 +289,10 @@
         <article role="main" id="furo-main-content">
           <h1>PySparQ.pysparq.algorithms.cks_solver 源代码</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">CKS（Childs-Kothari-Somma）线性系统求解器实现</span>
+<span class="sd">CKS (Childs-Kothari-Somma) Linear System Solver Implementation</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
@@ -302,7 +301,7 @@
 <div class="viewcode-block" id="ChebyshevPolynomialCoefficient">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChebyshevPolynomialCoefficient</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算量子游走的切比雪夫多项式系数。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes Chebyshev polynomial coefficients for quantum walk.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ChebyshevPolynomialCoefficient.b">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.ChebyshevPolynomialCoefficient.b">[文档]</a>
@@ -333,8 +332,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.get_coef_positive_only">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_coef_positive_only</span><span class="p">(</span>
     <span class="n">mat_data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;获取仅正矩阵元素的旋转矩阵系数。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get rotation matrix coefficients for positive-only matrix elements.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -343,8 +342,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.get_coef_common">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_coef_common</span><span class="p">(</span>
     <span class="n">mat_data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;获取一般（带符号）矩阵元素的旋转矩阵系数。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get rotation matrix coefficients for general (signed) matrix elements.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -353,17 +352,16 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.make_walk_angle_func">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_walk_angle_func</span><span class="p">(</span>
     <span class="n">mat_data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">positive_only</span><span class="p">:</span> <span class="nb">bool</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;为矩阵创建游走角度函数。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create walk angle function for a matrix.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
-<span class="nd">@dataclass</span>
 <div class="viewcode-block" id="SparseMatrixData">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SparseMatrixData</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;量子模拟的稀疏矩阵数据。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sparse matrix data for quantum simulation.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SparseMatrixData.n_row">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData.n_row">[文档]</a>
@@ -375,7 +373,7 @@
 
 <div class="viewcode-block" id="SparseMatrixData.data">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData.data">[文档]</a>
-    <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SparseMatrixData.data_size">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData.data_size">[文档]</a>
@@ -388,14 +386,24 @@
 <div class="viewcode-block" id="SparseMatrixData.sparsity_offset">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrixData.sparsity_offset">[文档]</a>
     <span class="n">sparsity_offset</span><span class="p">:</span> <span class="nb">int</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">nnz_col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">positive_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">sparsity_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="SparseMatrix">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SparseMatrix</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CKS 算法的稀疏矩阵表示。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sparse matrix representation for CKS algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SparseMatrix.n_row">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.n_row">[文档]</a>
@@ -407,7 +415,7 @@
 
 <div class="viewcode-block" id="SparseMatrix.data">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.data">[文档]</a>
-    <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SparseMatrix.data_size">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.data_size">[文档]</a>
@@ -426,7 +434,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">nnz_col</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">positive_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
@@ -442,7 +450,7 @@
 
 <div class="viewcode-block" id="SparseMatrix.get_data">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.get_data">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span></div>
 
 <div class="viewcode-block" id="SparseMatrix.get_sparsity_offset">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.get_sparsity_offset">[文档]</a>
@@ -450,7 +458,7 @@
 
 <div class="viewcode-block" id="SparseMatrix.get_walk_angle_func">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.SparseMatrix.get_walk_angle_func">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_walk_angle_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span> <span class="o">...</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_walk_angle_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span> <span class="o">...</span></div>
 </div>
 
 
@@ -458,7 +466,7 @@
 <div class="viewcode-block" id="QuantumBinarySearch">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QuantumBinarySearch</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;用于稀疏矩阵访问的量子二分搜索。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum binary search for sparse matrix access.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="QuantumBinarySearch.qram">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.qram">[文档]</a>
@@ -484,6 +492,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.max_step">[文档]</a>
     <span class="n">max_step</span><span class="p">:</span> <span class="nb">int</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -493,6 +503,30 @@
         <span class="n">target_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">result_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="QuantumBinarySearch.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumBinarySearch&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumBinarySearch.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumBinarySearch&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumBinarySearch.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumBinarySearch&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumBinarySearch.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumBinarySearch.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumBinarySearch.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
 
@@ -500,7 +534,7 @@
 <div class="viewcode-block" id="CondRotQW">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CondRotQW</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;量子游走的条件旋转。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional rotation for quantum walk.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="CondRotQW.j_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.j_reg">[文档]</a>
@@ -522,6 +556,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.mat">[文档]</a>
     <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -531,6 +567,26 @@
         <span class="n">output_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="CondRotQW.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondRotQW&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="CondRotQW.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondRotQW&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="CondRotQW.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CondRotQW&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="CondRotQW.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="CondRotQW.dag">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.CondRotQW.dag">[文档]</a>
@@ -542,7 +598,7 @@
 <div class="viewcode-block" id="TOperator">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TOperator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CKS 算法的 T 算子。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;T operator for CKS algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TOperator.qram">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.qram">[文档]</a>
@@ -588,6 +644,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.mat">[文档]</a>
     <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -603,6 +661,26 @@
         <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="TOperator.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="TOperator.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="TOperator.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TOperator&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="TOperator.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="TOperator.dag">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.TOperator.dag">[文档]</a>
@@ -614,7 +692,7 @@
 <div class="viewcode-block" id="QuantumWalk">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QuantumWalk</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CKS 算法的量子游走算子。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum walk operator for CKS algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="QuantumWalk.qram">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.qram">[文档]</a>
@@ -656,6 +734,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.mat">[文档]</a>
     <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -670,6 +750,26 @@
         <span class="n">sparse_offset_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="QuantumWalk.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalk&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalk.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalk&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalk.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalk&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalk.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="QuantumWalk.dag">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalk.dag">[文档]</a>
@@ -681,7 +781,7 @@
 <div class="viewcode-block" id="QuantumWalkNSteps">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QuantumWalkNSteps</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CKS 算法的多步量子游走。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiple quantum walk steps for CKS algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="QuantumWalkNSteps.mat">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.mat">[文档]</a>
@@ -743,13 +843,39 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.k_comp">[文档]</a>
     <span class="n">k_comp</span><span class="p">:</span> <span class="nb">str</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">:</span> <span class="n">SparseMatrix</span><span class="p">,</span> <span class="n">qram</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="QuantumWalkNSteps.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalkNSteps&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalkNSteps.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalkNSteps&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalkNSteps.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;QuantumWalkNSteps&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalkNSteps.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="QuantumWalkNSteps.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
 <div class="viewcode-block" id="QuantumWalkNSteps.init_environment">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.init_environment">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">init_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
 <div class="viewcode-block" id="QuantumWalkNSteps.create_state">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.QuantumWalkNSteps.create_state">[文档]</a>
@@ -773,7 +899,7 @@
 <div class="viewcode-block" id="LCUContainer">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LCUContainer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CKS 的酉组合（LCU）容器。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LCU (Linear Combination of Unitaries) container for CKS.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LCUContainer.kappa">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.kappa">[文档]</a>
@@ -807,6 +933,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.step_state">[文档]</a>
     <span class="n">step_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">]</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -815,6 +943,30 @@
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">qram</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="viewcode-block" id="LCUContainer.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LCUContainer&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="LCUContainer.conditioned_by_all_ones">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.conditioned_by_all_ones">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LCUContainer&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="LCUContainer.conditioned_by_bit">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.conditioned_by_bit">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LCUContainer&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="LCUContainer.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="LCUContainer.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
 <div class="viewcode-block" id="LCUContainer.get_input_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.LCUContainer.get_input_reg">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_input_reg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span></div>
@@ -843,7 +995,7 @@
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用 CKS 量子线性求解器求解 Ax = b。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using CKS quantum linear solver.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -851,7 +1003,7 @@
 <div class="viewcode-block" id="create_cks_demo">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/cks_solver/index.html#PySparQ.pysparq.algorithms.cks_solver.create_cks_demo">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_cks_demo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;生成 CKS 求解器的演示脚本。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a demo script for CKS solver.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 </pre></div>

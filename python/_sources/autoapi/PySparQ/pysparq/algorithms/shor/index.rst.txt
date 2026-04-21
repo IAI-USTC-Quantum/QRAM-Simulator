@@ -5,7 +5,7 @@ PySparQ.pysparq.algorithms.shor
 
 .. autoapi-nested-parse::
 
-   Shor 量子因式分解算法实现
+   Shor's Quantum Factorization Algorithm Implementation
 
 
 
@@ -51,14 +51,14 @@ Module Contents
    Bases: :py:obj:`Exception`
 
 
-   Shor 算法未能找到因子时抛出的异常。
+   Exception raised when Shor's algorithm fails to find factors.
 
    Initialize self.  See help(type(self)) for accurate signature.
 
 
 .. py:class:: ExpMod(input_reg: str, output_reg: str, a: int, N: int, period: int)
 
-   模幂运算。
+   Modular exponentiation operation.
 
 
    .. py:method:: dag(state: pysparq.SparseState) -> None
@@ -70,6 +70,10 @@ Module Contents
 
    .. py:attribute:: a
       :type:  int
+
+
+   .. py:attribute:: axmodn
+      :type:  list[int]
 
 
    .. py:attribute:: input_reg
@@ -86,10 +90,19 @@ Module Contents
 
 .. py:class:: ModMul(reg: str, a: int, x: int, N: int)
 
-   受控模乘运算。
+   Controlled modular multiplication operation.
+
+
+   .. py:method:: clear_conditions() -> None
 
 
    .. py:method:: conditioned_by_all_ones(cond: str) -> ModMul
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int) -> ModMul
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:attribute:: N
@@ -114,10 +127,10 @@ Module Contents
 
 .. py:class:: SemiClassicalShor(a: int, N: int)
 
-   Shor 算法的半经典实现。
+   Semi-classical implementation of Shor's algorithm.
 
 
-   .. py:method:: run() -> Tuple[int, int]
+   .. py:method:: run() -> tuple[int, int]
 
 
    .. py:attribute:: N
@@ -154,7 +167,7 @@ Module Contents
 
 .. py:class:: Shor(work_reg: str, ancilla_reg: str, a: int, N: int, period: int)
 
-   全量子 Shor 算法。
+   Full quantum Shor's algorithm.
 
 
    .. py:attribute:: ancilla_reg
@@ -171,41 +184,41 @@ Module Contents
 
 .. py:function:: check_period(period: int, a: int, N: int) -> None
 
-   检查周期是否对因式分解有效。
+   Check if period is valid for factoring.
 
 
 .. py:function:: compute_period(meas_result: int, size: int, N: int) -> int
 
-   从测量结果计算周期。
+   Compute the period from measurement result.
 
 
 .. py:function:: create_shor_demo() -> str
 
-   生成 Shor 算法的演示脚本。
+   Generate a demo script for Shor's algorithm.
 
 
-.. py:function:: factor(N: int, a: Optional[int] = ...) -> Tuple[int, int]
+.. py:function:: factor(N: int, a: int | None = ...) -> tuple[int, int]
 
-   使用 Shor 算法分解 N。
-
-
-.. py:function:: factor_full_quantum(N: int, a: Optional[int] = ...) -> Tuple[int, int]
-
-   使用全量子 Shor 算法分解 N。
+   Factor N using Shor's algorithm.
 
 
-.. py:function:: find_best_fraction(y: int, Q: int, N: int) -> Tuple[int, int]
+.. py:function:: factor_full_quantum(N: int, a: int | None = ...) -> tuple[int, int]
 
-   使用法里序列找到近似 y/Q 的最佳分数 c/r。
+   Factor N using full quantum Shor's algorithm.
+
+
+.. py:function:: find_best_fraction(y: int, Q: int, N: int) -> tuple[int, int]
+
+   Find the best fraction c/r approximating y/Q using Farey sequence.
 
 
 .. py:function:: general_expmod(a: int, x: int, N: int) -> int
 
-   使用平方-乘法高效计算 a^x mod N。
+   Compute a^x mod N efficiently using square-and-multiply.
 
 
-.. py:function:: shor_postprocess(meas: int, size: int, a: int, N: int) -> Tuple[int, int]
+.. py:function:: shor_postprocess(meas: int, size: int, a: int, N: int) -> tuple[int, int]
 
-   Shor 算法的经典后处理。
+   Classical post-processing for Shor's algorithm.
 
 

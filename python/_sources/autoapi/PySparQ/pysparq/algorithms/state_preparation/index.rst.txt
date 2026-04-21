@@ -1,0 +1,163 @@
+PySparQ.pysparq.algorithms.state_preparation
+============================================
+
+.. py:module:: PySparQ.pysparq.algorithms.state_preparation
+
+.. autoapi-nested-parse::
+
+   基于 QRAM 二叉树分解的量子态制备。
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.state_preparation.StatePrepViaQRAM
+   PySparQ.pysparq.algorithms.state_preparation.StatePreparation
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.state_preparation.create_state_preparation_demo
+
+
+Module Contents
+---------------
+
+.. py:class:: StatePrepViaQRAM(qram: object, work_qubit: str, data_size: int, rational_size: int)
+
+   基于 QRAM 二叉树分解的态制备量子算子。
+
+
+   .. py:method:: clear_conditions() -> StatePrepViaQRAM
+
+
+   .. py:method:: conditioned_by_all_ones(cond: Union[str, int, list[Union[str, int]]]) -> StatePrepViaQRAM
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], bit: int) -> StatePrepViaQRAM
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: Union[str, int, list[Union[str, int]]]) -> StatePrepViaQRAM
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: addr_size
+      :type:  int
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  object
+
+
+   .. py:attribute:: rational_size
+      :type:  int
+
+
+   .. py:attribute:: work_qubit
+      :type:  str
+
+
+.. py:class:: StatePreparation(qubit_number: int, data_size: int, data_range: int)
+
+   管理完整态制备流水线的高级封装。
+
+
+   .. py:method:: get_fidelity() -> float
+
+      计算制备态与目标态之间的保真度。
+
+
+
+   .. py:method:: get_real_dist() -> list[float]
+
+      返回归一化振幅分布的浮点数列表。
+
+
+
+   .. py:method:: make_qram() -> None
+
+      创建适合树数据大小的 QRAM 电路。
+
+
+
+   .. py:method:: make_tree() -> None
+
+      从当前分布构建二叉树。
+
+
+
+   .. py:method:: random_distribution() -> None
+
+      生成随机振幅分布。
+
+
+
+   .. py:method:: run() -> None
+
+      执行完整的态制备流水线。
+
+
+
+   .. py:method:: set_qram() -> None
+
+      将二叉树数据加载到 QRAM 电路中。
+
+
+
+   .. py:method:: show_distribution() -> None
+
+      打印分布的原始值和归一化振幅。
+
+
+
+   .. py:method:: show_tree() -> None
+
+      逐层打印二叉树。
+
+
+
+   .. py:attribute:: data_range
+      :type:  int
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: dist
+      :type:  list[int]
+
+
+   .. py:attribute:: qram
+      :type:  Union[object, None]
+
+
+   .. py:attribute:: qubit_number
+      :type:  int
+
+
+   .. py:attribute:: rational_size
+      :type:  int
+
+
+   .. py:attribute:: tree
+      :type:  list[int]
+
+
+.. py:function:: create_state_preparation_demo() -> str
+
+   返回态制备的演示脚本字符串。
+
+

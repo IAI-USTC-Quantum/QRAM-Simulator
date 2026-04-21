@@ -5,7 +5,7 @@ PySparQ.pysparq.algorithms.cks_solver
 
 .. autoapi-nested-parse::
 
-   CKS（Childs-Kothari-Somma）线性系统求解器实现
+   CKS (Childs-Kothari-Somma) Linear System Solver Implementation
 
 
 
@@ -42,7 +42,7 @@ Module Contents
 
 .. py:class:: ChebyshevPolynomialCoefficient(b: int)
 
-   计算量子游走的切比雪夫多项式系数。
+   Computes Chebyshev polynomial coefficients for quantum walk.
 
 
    .. py:method:: C(Big: int, Small: int) -> float
@@ -63,7 +63,19 @@ Module Contents
 
 .. py:class:: CondRotQW(j_reg: str, k_reg: str, data_reg: str, output_reg: str, mat: SparseMatrix)
 
-   量子游走的条件旋转。
+   Conditional rotation for quantum walk.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> CondRotQW
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> CondRotQW
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> CondRotQW
 
 
    .. py:method:: dag(state: pysparq.SparseState) -> None
@@ -91,7 +103,22 @@ Module Contents
 
 .. py:class:: LCUContainer(mat: SparseMatrix, kappa: float, eps: float, qram: Optional[pysparq.QRAMCircuit_qutrit] = ...)
 
-   CKS 的酉组合（LCU）容器。
+   LCU (Linear Combination of Unitaries) container for CKS.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> LCUContainer
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> LCUContainer
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> LCUContainer
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:method:: external_input(init_op: Callable[[pysparq.SparseState], None]) -> None
@@ -140,7 +167,22 @@ Module Contents
 
 .. py:class:: QuantumBinarySearch(qram: pysparq.QRAMCircuit_qutrit, address_offset_reg: str, total_length: int, target_reg: str, result_reg: str)
 
-   用于稀疏矩阵访问的量子二分搜索。
+   Quantum binary search for sparse matrix access.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> QuantumBinarySearch
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> QuantumBinarySearch
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> QuantumBinarySearch
+
+
+   .. py:method:: dag(state: pysparq.SparseState) -> None
 
 
    .. py:attribute:: address_offset_reg
@@ -169,7 +211,19 @@ Module Contents
 
 .. py:class:: QuantumWalk(qram: pysparq.QRAMCircuit_qutrit, j_reg: str, b1_reg: str, k_reg: str, b2_reg: str, j_comp_reg: str, k_comp_reg: str, data_offset_reg: str, sparse_offset_reg: str, mat: SparseMatrix)
 
-   CKS 算法的量子游走算子。
+   Quantum walk operator for CKS algorithm.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> QuantumWalk
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> QuantumWalk
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> QuantumWalk
 
 
    .. py:method:: dag(state: pysparq.SparseState) -> None
@@ -217,16 +271,31 @@ Module Contents
 
 .. py:class:: QuantumWalkNSteps(mat: SparseMatrix, qram: Optional[pysparq.QRAMCircuit_qutrit] = ...)
 
-   CKS 算法的多步量子游走。
+   Multiple quantum walk steps for CKS algorithm.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> QuantumWalkNSteps
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> QuantumWalkNSteps
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> QuantumWalkNSteps
 
 
    .. py:method:: create_state() -> pysparq.SparseState
 
 
+   .. py:method:: dag(state: pysparq.SparseState) -> None
+
+
    .. py:method:: first_step(state: pysparq.SparseState) -> None
 
 
-   .. py:method:: init_environment() -> None
+   .. py:method:: init_environment(state: pysparq.SparseState) -> None
 
 
    .. py:method:: make_n_step_state(n_steps: int) -> pysparq.SparseState
@@ -295,9 +364,9 @@ Module Contents
       :type:  str
 
 
-.. py:class:: SparseMatrix(n_row: int, nnz_col: int, data: List[int], data_size: int, positive_only: bool = ...)
+.. py:class:: SparseMatrix(n_row: int, nnz_col: int, data: list[int], data_size: int, positive_only: bool = ...)
 
-   CKS 算法的稀疏矩阵表示。
+   Sparse matrix representation for CKS algorithm.
 
 
    .. py:method:: from_dense(matrix: numpy.ndarray, data_size: int = ..., positive_only: Optional[bool] = ...) -> SparseMatrix
@@ -305,17 +374,17 @@ Module Contents
 
 
 
-   .. py:method:: get_data() -> List[int]
+   .. py:method:: get_data() -> list[int]
 
 
    .. py:method:: get_sparsity_offset() -> int
 
 
-   .. py:method:: get_walk_angle_func() -> Callable[[int, int, int], List[complex]]
+   .. py:method:: get_walk_angle_func() -> Callable[[int, int, int], list[complex]]
 
 
    .. py:attribute:: data
-      :type:  List[int]
+      :type:  list[int]
 
 
    .. py:attribute:: data_size
@@ -338,13 +407,13 @@ Module Contents
       :type:  int
 
 
-.. py:class:: SparseMatrixData
+.. py:class:: SparseMatrixData(n_row: int, nnz_col: int, data: list[int], data_size: int, positive_only: bool = ..., sparsity_offset: int = ...)
 
-   量子模拟的稀疏矩阵数据。
+   Sparse matrix data for quantum simulation.
 
 
    .. py:attribute:: data
-      :type:  List[int]
+      :type:  list[int]
 
 
    .. py:attribute:: data_size
@@ -369,7 +438,19 @@ Module Contents
 
 .. py:class:: TOperator(qram: pysparq.QRAMCircuit_qutrit, data_offset_reg: str, sparse_offset_reg: str, j_reg: str, b1_reg: str, k_reg: str, b2_reg: str, search_result_reg: str, nnz_col: int, data_size: int, mat: SparseMatrix)
 
-   CKS 算法的 T 算子。
+   T operator for CKS algorithm.
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: str | int | list[str | int]) -> TOperator
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> TOperator
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list[str | int]) -> TOperator
 
 
    .. py:method:: dag(state: pysparq.SparseState) -> None
@@ -421,26 +502,26 @@ Module Contents
 
 .. py:function:: cks_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: Optional[float] = ..., eps: float = ..., data_size: int = ...) -> numpy.ndarray
 
-   使用 CKS 量子线性求解器求解 Ax = b。
+   Solve Ax = b using CKS quantum linear solver.
 
 
 .. py:function:: create_cks_demo() -> str
 
-   生成 CKS 求解器的演示脚本。
+   Generate a demo script for CKS solver.
 
 
-.. py:function:: get_coef_common(mat_data_size: int, v: int, row: int, col: int) -> List[complex]
+.. py:function:: get_coef_common(mat_data_size: int, v: int, row: int, col: int) -> list[complex]
 
-   获取一般（带符号）矩阵元素的旋转矩阵系数。
-
-
-.. py:function:: get_coef_positive_only(mat_data_size: int, v: int, row: int, col: int) -> List[complex]
-
-   获取仅正矩阵元素的旋转矩阵系数。
+   Get rotation matrix coefficients for general (signed) matrix elements.
 
 
-.. py:function:: make_walk_angle_func(mat_data_size: int, positive_only: bool) -> Callable[[int, int, int], List[complex]]
+.. py:function:: get_coef_positive_only(mat_data_size: int, v: int, row: int, col: int) -> list[complex]
 
-   为矩阵创建游走角度函数。
+   Get rotation matrix coefficients for positive-only matrix elements.
+
+
+.. py:function:: make_walk_angle_func(mat_data_size: int, positive_only: bool) -> Callable[[int, int, int], list[complex]]
+
+   Create walk angle function for a matrix.
 
 

@@ -289,11 +289,10 @@
         <article role="main" id="furo-main-content">
           <h1>PySparQ.pysparq.algorithms.qda_solver 源代码</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">QDA（量子离散绝热）线性系统求解器实现</span>
+<span class="sd">QDA (Quantum Discrete Adiabatic) Linear System Solver Implementation</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
@@ -302,15 +301,15 @@
 <div class="viewcode-block" id="compute_fs">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.compute_fs">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_fs</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算插值参数 f(s)。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the interpolation parameter f(s).&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="compute_rotation_matrix">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.compute_rotation_matrix">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_rotation_matrix</span><span class="p">(</span><span class="n">fs</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算块编码的旋转矩阵 R_s。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_rotation_matrix</span><span class="p">(</span><span class="n">fs</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the rotation matrix R_s for block encoding.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -318,7 +317,7 @@
 <div class="viewcode-block" id="chebyshev_T">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.chebyshev_T">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">chebyshev_T</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算切比雪夫多项式 T_n(x)。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Chebyshev polynomial T_n(x).&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -326,23 +325,23 @@
 <div class="viewcode-block" id="dolph_chebyshev">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dolph_chebyshev</span><span class="p">(</span><span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算 Dolph-Chebyshev 窗函数。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Dolph-Chebyshev window function.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="compute_fourier_coeffs">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.compute_fourier_coeffs">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_fourier_coeffs</span><span class="p">(</span><span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;计算 Dolph-Chebyshev 滤波器的傅里叶系数。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_fourier_coeffs</span><span class="p">(</span><span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Fourier coefficients for Dolph-Chebyshev filter.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="calculate_angles">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.calculate_angles">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">calculate_angles</span><span class="p">(</span><span class="n">coeffs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;从系数计算态制备的旋转角度。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_angles</span><span class="p">(</span><span class="n">coeffs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate rotation angles from coefficients for state preparation.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -350,7 +349,7 @@
 <div class="viewcode-block" id="BlockEncoding">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BlockEncoding</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;块编码实现的占位符。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Placeholder for block encoding implementation.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BlockEncoding.A">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.A">[文档]</a>
@@ -360,12 +359,14 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.data_size">[文档]</a>
     <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="BlockEncoding.conditioned_by_all_ones">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncoding.conditioned_by_all_ones">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockEncoding&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
@@ -379,18 +380,20 @@
 <div class="viewcode-block" id="StatePreparation">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.StatePreparation">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StatePreparation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;态制备实现的占位符。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Placeholder for state preparation implementation.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="StatePreparation.b">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.b">[文档]</a>
     <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="StatePreparation.conditioned_by_all_ones">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.StatePreparation.conditioned_by_all_ones">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;StatePreparation&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
@@ -404,7 +407,7 @@
 <div class="viewcode-block" id="BlockEncodingHs">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BlockEncodingHs</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;插值哈密顿量 H(s) 的块编码。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Block encoding of the interpolating Hamiltonian H(s).&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BlockEncodingHs.enc_A">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.enc_A">[文档]</a>
@@ -444,8 +447,10 @@
 
 <div class="viewcode-block" id="BlockEncodingHs.R_s">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.R_s">[文档]</a>
-    <span class="n">R_s</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span></div>
+    <span class="n">R_s</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -462,7 +467,7 @@
 <div class="viewcode-block" id="BlockEncodingHs.conditioned_by_all_ones">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHs.conditioned_by_all_ones">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockEncodingHs&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
@@ -476,7 +481,7 @@
 <div class="viewcode-block" id="BlockEncodingHsPD">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BlockEncodingHsPD</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;块编码 H(s) 的正定版本。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Positive-definite version of block encoding H(s).&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BlockEncodingHsPD.enc_A">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.enc_A">[文档]</a>
@@ -516,7 +521,7 @@
 
 <div class="viewcode-block" id="BlockEncodingHsPD.R_s">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.BlockEncodingHsPD.R_s">[文档]</a>
-    <span class="n">R_s</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span></div>
+    <span class="n">R_s</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -538,7 +543,7 @@
 <div class="viewcode-block" id="WalkS">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">WalkS</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;参数 s 处的量子游走算子。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum walk operator at parameter s.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="WalkS.main_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.main_reg">[文档]</a>
@@ -590,8 +595,10 @@
 
 <div class="viewcode-block" id="WalkS.enc_Hs">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.enc_Hs">[文档]</a>
-    <span class="n">enc_Hs</span><span class="p">:</span> <span class="n">BlockEncodingHs</span></div>
+    <span class="n">enc_Hs</span><span class="p">:</span> <span class="n">BlockEncodingHs</span> <span class="o">|</span> <span class="n">BlockEncodingHsPD</span></div>
 
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -611,16 +618,16 @@
 <div class="viewcode-block" id="WalkS.conditioned_by_all_ones">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_all_ones">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WalkS&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
 <div class="viewcode-block" id="WalkS.conditioned_by_bit">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.conditioned_by_bit">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WalkS&quot;</span><span class="p">:</span> <span class="o">...</span></div>
 
-<div class="viewcode-block" id="WalkS.clear_control_by_bit">
-<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.clear_control_by_bit">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">clear_control_by_bit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+<div class="viewcode-block" id="WalkS.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.WalkS.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="WalkS.dag">
@@ -633,7 +640,7 @@
 <div class="viewcode-block" id="LCU">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.LCU">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LCU</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;QDA 的酉组合（LCU）。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linear Combination of Unitaries for QDA.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LCU.walk">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.LCU.walk">[文档]</a>
@@ -664,7 +671,7 @@
 <div class="viewcode-block" id="Filtering">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.Filtering">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Filtering</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;QDA 的 Dolph-Chebyshev 滤波。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dolph-Chebyshev filtering for QDA.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Filtering.walk">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.Filtering.walk">[文档]</a>
@@ -688,7 +695,7 @@
 
 <div class="viewcode-block" id="Filtering.coeffs">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.Filtering.coeffs">[文档]</a>
-    <span class="n">coeffs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
+    <span class="n">coeffs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -707,8 +714,8 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.classical_to_quantum">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">classical_to_quantum</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;将经典线性系统转换为量子兼容形式。&quot;&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert classical linear system to quantum-compatible form.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -718,12 +725,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">qda_solve</span><span class="p">(</span>
     <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">kappa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">step_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用 QDA 算法求解 Ax = b。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using QDA algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -731,7 +738,7 @@
 <div class="viewcode-block" id="create_qda_demo">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.create_qda_demo">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_qda_demo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;生成 QDA 求解器的演示脚本。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a demo script for QDA solver.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 </pre></div>

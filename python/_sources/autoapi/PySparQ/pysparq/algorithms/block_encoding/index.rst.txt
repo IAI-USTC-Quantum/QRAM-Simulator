@@ -1,0 +1,252 @@
+PySparQ.pysparq.algorithms.block_encoding
+=========================================
+
+.. py:module:: PySparQ.pysparq.algorithms.block_encoding
+
+.. autoapi-nested-parse::
+
+   矩阵块编码算法（三对角和基于 QRAM）。
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.block_encoding.BlockEncodingTridiagonal
+   PySparQ.pysparq.algorithms.block_encoding.BlockEncodingViaQRAM
+   PySparQ.pysparq.algorithms.block_encoding.PlusOneAndOverflow
+   PySparQ.pysparq.algorithms.block_encoding.UL
+   PySparQ.pysparq.algorithms.block_encoding.UR
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.algorithms.block_encoding.create_block_encoding_demo
+   PySparQ.pysparq.algorithms.block_encoding.get_tridiagonal_matrix
+   PySparQ.pysparq.algorithms.block_encoding.get_u_minus
+   PySparQ.pysparq.algorithms.block_encoding.get_u_plus
+
+
+Module Contents
+---------------
+
+.. py:class:: BlockEncodingTridiagonal(main_reg: str, anc_UA: str, alpha: float, beta: float)
+
+   三对角矩阵 alpha*I + beta*T 的块编码。
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, list[str]]) -> BlockEncodingTridiagonal
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], pos: int) -> BlockEncodingTridiagonal
+
+
+   .. py:method:: conditioned_by_nonzeros(conds: Union[str, list[str]]) -> BlockEncodingTridiagonal
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: alpha
+      :type:  float
+
+
+   .. py:attribute:: anc_UA
+      :type:  str
+
+
+   .. py:attribute:: beta
+      :type:  float
+
+
+   .. py:attribute:: main_reg
+      :type:  str
+
+
+   .. py:attribute:: prep_state
+      :type:  list[complex]
+
+
+.. py:class:: BlockEncodingViaQRAM(qram: QRAMCircuit_qutrit, column_index: str, row_index: str, data_size: int, rational_size: int)
+
+   通过 QRAM 对任意矩阵进行块编码。
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, list[str]]) -> BlockEncodingViaQRAM
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], pos: int) -> BlockEncodingViaQRAM
+
+
+   .. py:method:: conditioned_by_nonzeros(conds: Union[str, list[str]]) -> BlockEncodingViaQRAM
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: column_index
+      :type:  str
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  QRAMCircuit_qutrit
+
+
+   .. py:attribute:: rational_size
+      :type:  int
+
+
+   .. py:attribute:: row_index
+      :type:  str
+
+
+.. py:class:: PlusOneAndOverflow(main_reg: str, overflow: str)
+
+   将寄存器加 1 并跟踪溢出。
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, list[str]]) -> PlusOneAndOverflow
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], pos: int) -> PlusOneAndOverflow
+
+
+   .. py:method:: conditioned_by_nonzeros(conds: Union[str, list[str]]) -> PlusOneAndOverflow
+
+
+   .. py:method:: conditioned_by_value(reg: Union[str, int], value: int) -> PlusOneAndOverflow
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: main_reg
+      :type:  str
+
+
+   .. py:attribute:: overflow
+      :type:  str
+
+
+.. py:class:: UL(qram: QRAMCircuit_qutrit, row_index: str, column_index: str, data_size: int, rational_size: int)
+
+   基于 QRAM 块编码的左乘算子。
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, list[str]]) -> UL
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], pos: int) -> UL
+
+
+   .. py:method:: conditioned_by_nonzeros(conds: Union[str, list[str]]) -> UL
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: addr_size
+      :type:  int
+
+
+   .. py:attribute:: column_index
+      :type:  str
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  QRAMCircuit_qutrit
+
+
+   .. py:attribute:: rational_size
+      :type:  int
+
+
+   .. py:attribute:: row_index
+      :type:  str
+
+
+.. py:class:: UR(qram: QRAMCircuit_qutrit, column_index: str, data_size: int, rational_size: int)
+
+   基于 QRAM 块编码的右乘算子。
+
+
+   .. py:method:: clear_conditions() -> None
+
+
+   .. py:method:: conditioned_by_all_ones(conds: Union[str, list[str]]) -> UR
+
+
+   .. py:method:: conditioned_by_bit(reg: Union[str, int], pos: int) -> UR
+
+
+   .. py:method:: conditioned_by_nonzeros(conds: Union[str, list[str]]) -> UR
+
+
+   .. py:method:: dag(state: SparseState) -> None
+
+
+   .. py:attribute:: addr_size
+      :type:  int
+
+
+   .. py:attribute:: column_index
+      :type:  str
+
+
+   .. py:attribute:: data_size
+      :type:  int
+
+
+   .. py:attribute:: qram
+      :type:  QRAMCircuit_qutrit
+
+
+   .. py:attribute:: rational_size
+      :type:  int
+
+
+.. py:function:: create_block_encoding_demo() -> str
+
+   返回块编码用法的演示脚本字符串。
+
+
+.. py:function:: get_tridiagonal_matrix(alpha: float, beta: float, dim: int) -> numpy.ndarray
+
+   返回 dim x dim 的三对角矩阵 alpha*I + beta*T。
+
+
+.. py:function:: get_u_minus(size: int) -> numpy.ndarray
+
+   返回 size x size 的上移（超对角线）矩阵。
+
+
+.. py:function:: get_u_plus(size: int) -> numpy.ndarray
+
+   返回 size x size 的下移（次对角线）矩阵。
+
+

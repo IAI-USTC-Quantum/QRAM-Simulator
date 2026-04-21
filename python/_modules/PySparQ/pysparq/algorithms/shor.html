@@ -289,10 +289,8 @@
         <article role="main" id="furo-main-content">
           <h1>PySparQ.pysparq.algorithms.shor 源代码</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Shor 量子因式分解算法实现</span>
+<span class="sd">Shor&#39;s Quantum Factorization Algorithm Implementation</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
 
@@ -300,7 +298,7 @@
 <div class="viewcode-block" id="ShorExecutionFailed">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ShorExecutionFailed">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ShorExecutionFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shor 算法未能找到因子时抛出的异常。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised when Shor&#39;s algorithm fails to find factors.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -308,15 +306,15 @@
 <div class="viewcode-block" id="general_expmod">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.general_expmod">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">general_expmod</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用平方-乘法高效计算 a^x mod N。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a^x mod N efficiently using square-and-multiply.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="find_best_fraction">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.find_best_fraction">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">find_best_fraction</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用法里序列找到近似 y/Q 的最佳分数 c/r。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_best_fraction</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the best fraction c/r approximating y/Q using Farey sequence.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -324,7 +322,7 @@
 <div class="viewcode-block" id="compute_period">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.compute_period">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_period</span><span class="p">(</span><span class="n">meas_result</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;从测量结果计算周期。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the period from measurement result.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -332,15 +330,15 @@
 <div class="viewcode-block" id="check_period">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.check_period">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_period</span><span class="p">(</span><span class="n">period</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;检查周期是否对因式分解有效。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if period is valid for factoring.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="shor_postprocess">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.shor_postprocess">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">shor_postprocess</span><span class="p">(</span><span class="n">meas</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shor 算法的经典后处理。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shor_postprocess</span><span class="p">(</span><span class="n">meas</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classical post-processing for Shor&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -348,7 +346,7 @@
 <div class="viewcode-block" id="ModMul">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ModMul</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;受控模乘运算。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controlled modular multiplication operation.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ModMul.reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.reg">[文档]</a>
@@ -370,11 +368,25 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.opnum">[文档]</a>
     <span class="n">opnum</span><span class="p">:</span> <span class="nb">int</span></div>
 
+    <span class="n">_condition_bits</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+    <span class="n">_condition_regs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="ModMul.conditioned_by_all_ones">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.conditioned_by_all_ones">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_all_ones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ModMul&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="ModMul.conditioned_by_nonzeros">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.conditioned_by_nonzeros">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditioned_by_nonzeros</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ModMul&quot;</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="ModMul.clear_conditions">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.clear_conditions">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
+
+<div class="viewcode-block" id="ModMul.dag">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ModMul.dag">[文档]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 
@@ -383,7 +395,7 @@
 <div class="viewcode-block" id="SemiClassicalShor">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.SemiClassicalShor">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SemiClassicalShor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shor 算法的半经典实现。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Semi-classical implementation of Shor&#39;s algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SemiClassicalShor.a">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.SemiClassicalShor.a">[文档]</a>
@@ -421,7 +433,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 <div class="viewcode-block" id="SemiClassicalShor.run">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.SemiClassicalShor.run">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span> <span class="o">...</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span> <span class="o">...</span></div>
 </div>
 
 
@@ -429,7 +441,7 @@
 <div class="viewcode-block" id="ExpMod">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ExpMod">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpMod</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;模幂运算。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modular exponentiation operation.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ExpMod.input_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ExpMod.input_reg">[文档]</a>
@@ -451,6 +463,10 @@
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ExpMod.period">[文档]</a>
     <span class="n">period</span><span class="p">:</span> <span class="nb">int</span></div>
 
+<div class="viewcode-block" id="ExpMod.axmodn">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.ExpMod.axmodn">[文档]</a>
+    <span class="n">axmodn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_reg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">int</span>
@@ -466,7 +482,7 @@
 <div class="viewcode-block" id="Shor">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.Shor">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Shor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;全量子 Shor 算法。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Full quantum Shor&#39;s algorithm.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Shor.work_reg">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.Shor.work_reg">[文档]</a>
@@ -495,16 +511,16 @@
 
 <div class="viewcode-block" id="factor">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.factor">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用 Shor 算法分解 N。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factor N using Shor&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
 
 <div class="viewcode-block" id="factor_full_quantum">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.factor_full_quantum">[文档]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">factor_full_quantum</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;使用全量子 Shor 算法分解 N。&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">factor_full_quantum</span><span class="p">(</span><span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factor N using full quantum Shor&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 
@@ -512,7 +528,7 @@
 <div class="viewcode-block" id="create_shor_demo">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/shor/index.html#PySparQ.pysparq.algorithms.shor.create_shor_demo">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_shor_demo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;生成 Shor 算法的演示脚本。&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a demo script for Shor&#39;s algorithm.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 </pre></div>

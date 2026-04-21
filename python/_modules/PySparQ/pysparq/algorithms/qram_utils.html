@@ -2,11 +2,10 @@
 <html class="no-js" lang="zh-CN" data-content_root="../../../../">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="索引" href="../../../../genindex.html"><link rel="search" title="搜索" href="../../../../search.html">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="索引" href="../../../../genindex.html"><link rel="search" title="搜索" href="../../../../search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>PySparQ.pysparq.algorithms - PySparQ 文档</title>
+        <title>PySparQ.pysparq.algorithms.qram_utils - PySparQ 文档</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -180,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -253,7 +252,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../api/dynamic_operator.html">动态算子 API 参考</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
 </ul>
 </li>
 </ul>
@@ -275,17 +274,7 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/autoapi/PySparQ/pysparq/algorithms/index.rst?plain=true" title="View this page">
-    <svg><use href="#svg-eye"></use></svg>
-    <span class="visually-hidden">View this page</span>
-  </a>
-</div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/autoapi/PySparQ/pysparq/algorithms/index.rst" rel="edit" title="Edit this page">
-    <svg><use href="#svg-pencil"></use></svg>
-    <span class="visually-hidden">Edit this page</span>
-  </a>
-</div><div class="theme-toggle-container theme-toggle-content">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -293,46 +282,103 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-PySparQ.pysparq.algorithms">
-<span id="pysparq-pysparq-algorithms"></span><h1>PySparQ.pysparq.algorithms<a class="headerlink" href="#module-PySparQ.pysparq.algorithms" title="链接到此标题。">¶</a></h1>
-<p>PySparQ 算法示例</p>
-<p>本包包含使用 PySparQ 寄存器级编程范式的量子算法教学实现。</p>
-<dl class="simple">
-<dt>可用算法:</dt><dd><ul class="simple">
-<li><p>grover: Grover 量子搜索算法</p></li>
-<li><p>shor: Shor 整数分解算法</p></li>
-<li><p>cks_solver: CKS 线性系统求解器</p></li>
-<li><p>qda_solver: QDA 线性系统求解器</p></li>
-<li><p>state_preparation: 基于 QRAM 的态制备</p></li>
-<li><p>block_encoding: 块编码（三对角和基于 QRAM）</p></li>
-</ul>
-</dd>
-<dt>工具:</dt><dd><ul class="simple">
-<li><p>qram_utils: QRAM 数据构建的经典辅助函数</p></li>
-</ul>
-</dd>
-</dl>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="链接到此标题。">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="block_encoding/index.html">PySparQ.pysparq.algorithms.block_encoding</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cks_solver/index.html">PySparQ.pysparq.algorithms.cks_solver</a></li>
-<li class="toctree-l1"><a class="reference internal" href="grover/index.html">PySparQ.pysparq.algorithms.grover</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qda_solver/index.html">PySparQ.pysparq.algorithms.qda_solver</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qram_utils/index.html">PySparQ.pysparq.algorithms.qram_utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="shor/index.html">PySparQ.pysparq.algorithms.shor</a></li>
-<li class="toctree-l1"><a class="reference internal" href="state_preparation/index.html">PySparQ.pysparq.algorithms.state_preparation</a></li>
-</ul>
-</div>
-</section>
-</section>
+          <h1>PySparQ.pysparq.algorithms.qram_utils 源代码</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;QRAM 电路构建的经典辅助函数。&quot;&quot;&quot;</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="PI">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.PI">[文档]</a>
+<span class="n">PI</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<span class="sd">&quot;&quot;&quot;与 C++ ``constexpr double pi`` 匹配的 Pi 常量。&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="pow2">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.pow2">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pow2</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;通过左移返回 ``2**n``，匹配 ``basic.h`` 语义。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="make_complement">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.make_complement">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_complement</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_sz</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;将有符号整数转换为其二进制补码表示。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="get_complement">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.get_complement">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_complement</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_sz</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;反向二进制补码：将无符号值符号扩展为有符号整数。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="column_flatten">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.column_flatten">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">column_flatten</span><span class="p">(</span><span class="n">row_vec</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;将行优先方阵转置为列优先表示。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="scale_and_convert_vector">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.scale_and_convert_vector">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_and_convert_vector</span><span class="p">(</span>
+    <span class="n">input_vec</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">exponent</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">from_matrix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;缩放浮点值并转换为二进制补码整数。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="make_vector_tree">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.make_vector_tree">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_vector_tree</span><span class="p">(</span><span class="n">dist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">data_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从叶分布数据构建用于 QRAM 电路的二叉树。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="make_func">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.make_func">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_func</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_digit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从有理寄存器值计算 2x2 旋转矩阵。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="make_func_inv">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.make_func_inv">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_func_inv</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_digit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">complex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;从有理寄存器值计算逆 2x2 旋转矩阵。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="create_qram_utils_demo">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qram_utils/index.html#PySparQ.pysparq.algorithms.qram_utils.create_qram_utils_demo">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_qram_utils_demo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;返回展示本模块典型用法的演示脚本字符串。&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+</pre></div>
         </article>
       </div>
       <footer>
@@ -358,27 +404,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">PySparQ.pysparq.algorithms</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
