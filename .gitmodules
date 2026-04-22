@@ -1,4 +1,0 @@
-[submodule "ThirdParty/pybind11"]
-	path = ThirdParty/pybind11
-	url = git@github.com:pybind/pybind11.git
-	update = checkout

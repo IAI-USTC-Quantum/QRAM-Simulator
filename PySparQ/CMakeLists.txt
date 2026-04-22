@@ -9,8 +9,7 @@ project(
   VERSION ${SKBUILD_PROJECT_VERSION}
   LANGUAGES CXX)
 
-# pybind11 is provided by ThirdParty/CMakeLists.txt (add_subdirectory)
-# pybind11_add_module is available without find_package here
+# pybind11 is provided by ThirdParty/CMakeLists.txt (find_package)
 
 pybind11_add_module(_core core.cpp)
 target_link_libraries(_core PRIVATE SparQ)
