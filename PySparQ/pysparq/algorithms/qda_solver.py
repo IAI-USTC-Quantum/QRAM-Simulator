@@ -619,62 +619,20 @@ def classical_to_quantum(
     return A_padded, b_padded, recover
 
 
-class BlockEncoding:
-    """Placeholder for block encoding implementation.
+# ==============================================================================
+# Block Encoding - Import from modules
+# ==============================================================================
 
-    In a full implementation, this would wrap the actual block encoding
-    operations for the specific matrix structure.
-    """
+# Import factory function from __init__.py
+from . import BlockEncoding
 
-    def __init__(self, A: np.ndarray, data_size: int = 32):
-        self.A = A
-        self.data_size = data_size
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> "BlockEncoding":
-        """Set condition registers."""
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def __call__(self, state: ps.SparseState) -> None:
-        """Apply block encoding."""
-        raise NotImplementedError
-
-    def dag(self, state: ps.SparseState) -> None:
-        """Apply inverse block encoding."""
-        raise NotImplementedError
+# Import StatePreparation from state_preparation module
+from .state_preparation import StatePreparation
 
 
-class StatePreparation:
-    """Placeholder for state preparation implementation."""
-
-    def __init__(self, b: np.ndarray):
-        self.b = b
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> "StatePreparation":
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def __call__(self, state: ps.SparseState) -> None:
-        """Prepare state |b>."""
-        raise NotImplementedError
-
-    def dag(self, state: ps.SparseState) -> None:
-        """Uncompute state |b>."""
-        raise NotImplementedError
+# ==============================================================================
+# Main Solver
+# ==============================================================================
 
 
 def qda_solve(
