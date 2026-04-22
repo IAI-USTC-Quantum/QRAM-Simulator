@@ -238,6 +238,9 @@ class SparseMatrix:
     """Sparse matrix representation for CKS algorithm.
 
     Stores matrix in QRAM-compatible format with row-compressed sparse storage.
+    The QRAM data format is: [elements, sparsity] concatenated.
+    - elements: quantized matrix values, stored row by row (nnz_col values per row)
+    - sparsity: column indices for each element (nnz_col indices per row)
 
     Example:
         >>> # Create 2x2 matrix [[1, 2], [2, 1]]
@@ -252,29 +255,35 @@ class SparseMatrix:
         data: list[int],
         data_size: int,
         positive_only: bool = True,
+        sparsity_offset: int = 0,
     ):
         """
         Initialize sparse matrix.
 
         Args:
             n_row: Number of rows
-            nnz_col: Non-zeros per column
-            data: Flattened matrix data
+            nnz_col: Non-zeros per column (fixed per row)
+            data: QRAM data = elements + sparsity concatenated
             data_size: Bit size for data elements
             positive_only: Whether all elements are positive
+            sparsity_offset: Index where sparsity data starts in data array
         """
         self.n_row = n_row
         self.nnz_col = nnz_col
         self.data = data
         self.data_size = data_size
         self.positive_only = positive_only
-        self.sparsity_offset = 0
+        self.sparsity_offset = sparsity_offset
 
     @classmethod
     def from_dense(
         cls, matrix: np.ndarray, data_size: int = 32, positive_only: bool = None
     ) -> "SparseMatrix":
         """Create sparse matrix from dense numpy array.
+
+        Converts dense matrix to sparse format compatible with C++ SparseMatrix:
+        - Each row has exactly nnz_col elements (padded with zeros if needed)
+        - Sparsity stores column indices for each element
 
         Args:
             matrix: 2D numpy array
@@ -291,38 +300,97 @@ class SparseMatrix:
         if positive_only is None:
             positive_only = np.all(matrix >= 0)
 
-        # Quantize to integer range
-        Amax = 2 ** (data_size - 1) - 1
+        # Compute nnz_col: count non-zeros per row, take max, round up to power of 2
+        nnz_per_row = np.sum(matrix != 0, axis=1)
+        max_nnz = int(np.max(nnz_per_row)) if len(nnz_per_row) > 0 else 1
+
+        # Round nnz_col up to power of 2 (C++ behavior)
+        if max_nnz > 1:
+            nnz_col = 1 << (int(math.log2(max_nnz)) + 1) if (max_nnz & (max_nnz - 1)) else max_nnz
+        else:
+            nnz_col = max_nnz
+
+        # Ensure nnz_col <= n_row
+        if nnz_col > n_row:
+            nnz_col = n_row
+
+        # Build elements and sparsity arrays
+        elements = []
+        sparsity = []
+
+        # Quantization factor
+        if positive_only:
+            Amax = 2**data_size - 1
+        else:
+            Amax = 2 ** (data_size - 1) - 1
+
         max_val = np.max(np.abs(matrix))
         if max_val > 0:
-            scaled = matrix / max_val * Amax
+            scale = Amax / max_val
         else:
-            scaled = np.zeros_like(matrix)
+            scale = 1.0
 
-        # Convert to integers
-        if positive_only:
-            int_data = scaled.astype(int).flatten().tolist()
-        else:
-            # Two's complement encoding
-            int_data = []
-            for val in scaled.flatten():
-                if val >= 0:
-                    int_data.append(int(val))
+        for i in range(n_row):
+            row = matrix[i, :]
+            # Get non-zero indices and values for this row
+            nonzero_indices = np.where(row != 0)[0]
+            nonzero_values = row[nonzero_indices]
+
+            # Sort by column index (required for quantum binary search)
+            sorted_order = np.argsort(nonzero_indices)
+            nonzero_indices = nonzero_indices[sorted_order]
+            nonzero_values = nonzero_values[sorted_order]
+
+            # Pad to nnz_col
+            num_nnz = len(nonzero_indices)
+
+            # Quantize elements
+            for j in range(nnz_col):
+                if j < num_nnz:
+                    val = nonzero_values[j] * scale
+                    if positive_only:
+                        elements.append(int(val))
+                    else:
+                        int_val = int(val)
+                        if int_val >= 0:
+                            elements.append(int_val)
+                        else:
+                            # Two's complement
+                            elements.append(int_val + 2**data_size)
+                    sparsity.append(int(nonzero_indices[j]))
                 else:
-                    int_data.append(int(val) + 2**data_size)
+                    # Padding: element = 0, sparsity = last column index
+                    elements.append(0)
+                    # Use n_row - 1 as padding column (out of range or edge)
+                    sparsity.append(n_row - 1 if n_row > 0 else 0)
 
-        # Compute nnz_col (max non-zeros per row)
-        nnz_per_row = np.sum(matrix != 0, axis=1)
-        nnz_col = int(np.max(nnz_per_row)) if len(nnz_per_row) > 0 else 1
+        # Concatenate elements and sparsity
+        data = elements + sparsity
+        sparsity_offset = len(elements)
 
-        return cls(n_row, nnz_col, int_data, data_size, positive_only)
+        # Pad data to power of 2 for QRAM compatibility
+        original_len = len(data)
+        if original_len > 0:
+            addr_size = int(math.ceil(math.log2(original_len)))
+            padded_len = 2**addr_size
+            # Pad with zeros at the end
+            data = data + [0] * (padded_len - original_len)
+        else:
+            addr_size = 1
+            data = [0, 0]
+            padded_len = 2
+
+        instance = cls(n_row, nnz_col, data, data_size, positive_only, sparsity_offset)
+        instance.addr_size = addr_size
+
+        return instance
 
     def get_data(self) -> list[int]:
-        """Get matrix data."""
+        """Get QRAM data (elements + sparsity concatenated)."""
         return self.data
 
     def get_sparsity_offset(self) -> int:
-        """Get sparsity offset for QRAM."""
+        """Get index where sparsity data starts in QRAM."""
         return self.sparsity_offset
 
     def get_walk_angle_func(self) -> Callable[[int, int, int], list[complex]]:
@@ -343,6 +411,7 @@ class QuantumBinarySearch:
         total_length: int,
         target_reg: str,
         result_reg: str,
+        addr_size: int = 0,
     ):
         self.qram = qram
         self.address_offset_reg = address_offset_reg
@@ -350,6 +419,7 @@ class QuantumBinarySearch:
         self.target_reg = target_reg
         self.result_reg = result_reg
         self.max_step = int(math.log2(total_length)) + 1
+        self.addr_size = addr_size
 
         self._condition_regs: list[str | int] = []
         self._condition_bits: list[tuple[str | int, int]] = []
@@ -389,99 +459,84 @@ class QuantumBinarySearch:
 
     def __call__(self, state: ps.SparseState) -> None:
         """Execute quantum binary search."""
-        # Create flag register
-        flag = ps.AddRegister("qbs_flag", ps.Boolean, 1)(state)
-        ps.Xgate_Bool(flag, 0)(state)
+        # Create registers using string names for consistent API usage
+        ps.AddRegister("qbs_flag", ps.Boolean, 1)(state)
+        ps.Xgate_Bool("qbs_flag", 0)(state)
 
-        # Create comparison registers
-        compare_less = ps.AddRegister("compare_less", ps.Boolean, 1)(state)
-        compare_equal = ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
-        left_reg = ps.AddRegister(
-            "left_reg", ps.UnsignedInteger, self.qram.address_size + 1
-        )(state)
-        right_reg = ps.AddRegister(
-            "right_reg", ps.UnsignedInteger, self.qram.address_size + 1
-        )(state)
-        mid_reg = ps.AddRegister(
-            "mid_reg", ps.UnsignedInteger, self.qram.address_size + 1
-        )(state)
-        midval_reg = ps.AddRegister(
-            "midval_reg", ps.UnsignedInteger, self.qram.data_size
-        )(state)
+        ps.AddRegister("compare_less", ps.Boolean, 1)(state)
+        ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
+        ps.AddRegister("left_reg", ps.UnsignedInteger, self.addr_size + 1)(state)
+        ps.AddRegister("right_reg", ps.UnsignedInteger, self.addr_size + 1)(state)
+        ps.AddRegister("mid_reg", ps.UnsignedInteger, self.addr_size + 1)(state)
+        ps.AddRegister("midval_reg", ps.UnsignedInteger, self.addr_size)(state)
 
         # Initialize bounds
-        ps.Assign(self.address_offset_reg, left_reg)(state)
-        ps.Add_UInt_ConstUInt(left_reg, self.total_length, right_reg)(state)
+        ps.Assign(self.address_offset_reg, "left_reg")(state)
+        ps.Add_UInt_ConstUInt("left_reg", self.total_length, "right_reg")(state)
 
         # Binary search iterations
         for iteration in range(self.max_step):
-            # Compute mid
-            ps.GetMid_UInt_UInt(left_reg, right_reg, mid_reg).conditioned_by_nonzeros(
-                flag
+            ps.GetMid_UInt_UInt("left_reg", "right_reg", "mid_reg").conditioned_by_nonzeros(
+                "qbs_flag"
             )(state)
 
-            # Load mid value
-            ps.QRAMLoad(self.qram, mid_reg, midval_reg).conditioned_by_nonzeros(flag)(
+            ps.QRAMLoad(self.qram, "mid_reg", "midval_reg").conditioned_by_nonzeros("qbs_flag")(
                 state
             )
 
-            # Compare with target
             ps.Compare_UInt_UInt(
-                midval_reg, self.target_reg, compare_less, compare_equal
-            ).conditioned_by_nonzeros(flag)(state)
+                "midval_reg", self.target_reg, "compare_less", "compare_equal"
+            ).conditioned_by_nonzeros("qbs_flag")(state)
 
-            # If found, copy to result
-            ps.Assign(mid_reg, self.result_reg).conditioned_by_nonzeros(
-                [compare_equal, flag]
+            ps.Assign("mid_reg", self.result_reg).conditioned_by_nonzeros(
+                ["compare_equal", "qbs_flag"]
             )(state)
 
             if iteration != self.max_step - 1:
-                # Update flag
-                ps.Assign(compare_equal, flag)(state)
+                ps.Assign("compare_equal", "qbs_flag")(state)
 
-                # Update bounds
-                ps.Swap_General_General(left_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool(compare_less, 0)(state)
-                ps.Swap_General_General(right_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
 
         # Uncompute
         for iteration in range(self.max_step - 1, -1, -1):
             if iteration != self.max_step - 1:
-                ps.Swap_General_General(right_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool(compare_less, 0)(state)
-                ps.Swap_General_General(left_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Assign(compare_equal, flag)(state)
+                ps.Assign("compare_equal", "qbs_flag")(state)
 
             ps.Compare_UInt_UInt(
-                midval_reg, self.target_reg, compare_less, compare_equal
-            ).conditioned_by_nonzeros(flag)(state)
-            ps.QRAMLoad(self.qram, mid_reg, midval_reg).conditioned_by_nonzeros(flag)(
+                "midval_reg", self.target_reg, "compare_less", "compare_equal"
+            ).conditioned_by_nonzeros("qbs_flag")(state)
+            ps.QRAMLoad(self.qram, "mid_reg", "midval_reg").conditioned_by_nonzeros("qbs_flag")(
                 state
             )
-            ps.GetMid_UInt_UInt(left_reg, right_reg, mid_reg).conditioned_by_nonzeros(
-                flag
+            ps.GetMid_UInt_UInt("left_reg", "right_reg", "mid_reg").conditioned_by_nonzeros(
+                "qbs_flag"
             )(state)
 
         # Cleanup
-        ps.Add_UInt_ConstUInt(left_reg, self.total_length, right_reg)(state)
-        ps.Assign(self.address_offset_reg, left_reg)(state)
-        ps.Xgate_Bool(flag, 0)(state)
+        ps.Add_UInt_ConstUInt("left_reg", self.total_length, "right_reg")(state)
+        ps.Assign(self.address_offset_reg, "left_reg")(state)
+        ps.Xgate_Bool("qbs_flag", 0)(state)
 
-        ps.RemoveRegister(compare_less)(state)
-        ps.RemoveRegister(compare_equal)(state)
-        ps.RemoveRegister(left_reg)(state)
-        ps.RemoveRegister(right_reg)(state)
-        ps.RemoveRegister(mid_reg)(state)
-        ps.RemoveRegister(midval_reg)(state)
-        ps.RemoveRegister(flag)(state)
+        ps.RemoveRegister("compare_less")(state)
+        ps.RemoveRegister("compare_equal")(state)
+        ps.RemoveRegister("left_reg")(state)
+        ps.RemoveRegister("right_reg")(state)
+        ps.RemoveRegister("mid_reg")(state)
+        ps.RemoveRegister("midval_reg")(state)
+        ps.RemoveRegister("qbs_flag")(state)
 
 
 class CondRotQW:
@@ -540,32 +595,28 @@ class CondRotQW:
     def __call__(self, state: ps.SparseState) -> None:
         """Apply conditional rotation based on matrix element values.
 
-        For positive-only matrices, the rotation depends only on the data value.
-        For signed matrices, the rotation also depends on row/column indices.
+        Uses C++ CondRot_Rational_Bool_Func for the rotation.
         """
         ps.SortExceptKey(self.output_reg)(state)
 
         if self.mat.positive_only:
-            # Rotation depends only on data value
             def angle_func(v: int) -> list:
                 return get_coef_positive_only(self.mat.data_size, v, 0, 0)
-
-            ps.CondRot_Rational_Bool(self.data_reg, self.output_reg, angle_func)(state)
+            ps.CondRot_Rational_Bool_Func(self.data_reg, self.output_reg, angle_func)(state)
         else:
-            # For signed matrices, need row/col info for phase
             self._apply_signed_rotation(state)
 
         ps.ClearZero()(state)
 
     def _apply_signed_rotation(self, state: ps.SparseState) -> None:
-        """Apply rotation for signed matrix elements by iterating sparse states."""
-        j_id = ps.System.get_id(self.j_reg)
-        k_id = ps.System.get_id(self.k_reg)
+        """Apply rotation by iterating sparse states."""
         data_id = ps.System.get_id(self.data_reg)
         out_id = ps.System.get_id(self.output_reg)
+        j_id = ps.System.get_id(self.j_reg)
+        k_id = ps.System.get_id(self.k_reg)
 
         # Group basis states by all registers except output_reg
-        groups = {}
+        groups: dict[tuple, list[int]] = {}
         for idx, basis in enumerate(state.basis_states):
             key = []
             for reg_id in range(len(basis.registers)):
@@ -645,6 +696,7 @@ class TOperator:
         nnz_col: int,
         data_size: int,
         mat: SparseMatrix,
+        addr_size: int = 0,
     ):
         self.qram = qram
         self.data_offset_reg = data_offset_reg
@@ -657,6 +709,7 @@ class TOperator:
         self.nnz_col = nnz_col
         self.data_size = data_size
         self.mat = mat
+        self.addr_size = addr_size if addr_size > 0 else int(math.log2(len(mat.get_data()))) if mat.get_data() else 1
 
         self._condition_regs: list[str | int] = []
         self._condition_bits: list[tuple[str | int, int]] = []
@@ -691,39 +744,45 @@ class TOperator:
         self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply T operator (forward)."""
-        # Add data register
-        data_reg = ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
+        """Apply T operator (forward).
 
-        # Hadamard on column index register
+        Sequence (matching C++ T::impl):
+          1. Hadamard on k (superpose over sparse positions)
+          2. Oracle1 (load matrix data)
+          3. Oracle2.dag (sparse_pos -> column_idx)
+          4. CondRot
+          5. Oracle2 (column_idx -> sparse_pos)
+          6. Oracle1 (uncompute data)
+          7. Oracle2.dag (sparse_pos -> column_idx)
+        """
+        ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
+
         n_bits = int(math.log2(self.nnz_col)) + 1
         ps.Hadamard_Int(self.k_reg, n_bits)(state)
 
-        # Load matrix element via oracle
-        # SparseMatrixOracle1 equivalent
         self._load_matrix_element(state)
-
-        # SparseMatrixOracle2 equivalent - find column position
-        self._find_column_position(state, inverse=False)
-
-        # Conditional rotation
-        CondRotQW(self.j_reg, self.k_reg, data_reg, self.b2_reg, self.mat)(state)
-
-        # Uncompute
         self._find_column_position(state, inverse=True)
-        self._load_matrix_element(state)
+        CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat)(state)
         self._find_column_position(state, inverse=False)
+        self._load_matrix_element(state)
 
         ps.RemoveRegister("data")(state)
-
-        # Second oracle pass
         self._find_column_position(state, inverse=True)
-
         ps.CheckNan()(state)
 
     def dag(self, state: ps.SparseState) -> None:
-        """Apply T operator (inverse)."""
-        data_reg = ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
+        """Apply T operator (inverse).
+
+        Sequence (matching C++ T::impl_dag):
+          1. Oracle2 (column_idx -> sparse_pos)
+          2. Oracle1 (load data)
+          3. Oracle2 (sparse_pos -> column_idx again for CondRot)
+          4. CondRot.dag
+          5. Oracle2.dag (column_idx -> sparse_pos)
+          6. Oracle1 (uncompute data)
+          7. Hadamard (self-inverse)
+        """
+        ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
 
         self._find_column_position(state, inverse=False)
         ps.CheckNan()(state)
@@ -731,7 +790,7 @@ class TOperator:
         self._load_matrix_element(state)
         self._find_column_position(state, inverse=False)
 
-        CondRotQW(self.j_reg, self.k_reg, data_reg, self.b2_reg, self.mat).dag(state)
+        CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat).dag(state)
         ps.ClearZero()(state)
 
         self._find_column_position(state, inverse=True)
@@ -748,89 +807,86 @@ class TOperator:
     def _load_matrix_element(self, state: ps.SparseState) -> None:
         """Load matrix element from QRAM (SparseMatrixOracle1).
 
-        Computes data_addr = data_offset + j * nnz_col + k,
-        loads from QRAM, then uncomputes the address.
+        Uses C++ GetDataAddr (XOR-based, self-adjoint) for address computation.
         """
-        data_addr = ps.AddRegister("data_addr", ps.UnsignedInteger, self.qram.address_size)(state)
+        ps.AddRegister("data_addr", ps.UnsignedInteger, self.addr_size)(state)
 
-        # Compute address and load
-        self._get_data_addr(state)
+        # GetDataAddr: data_addr ^= data_offset + j * nnz_col + k (self-adjoint)
+        ps.GetDataAddr(self.data_offset_reg, self.j_reg, self.k_reg,
+                       self.nnz_col, "data_addr")(state)
         ps.QRAMLoad(self.qram, "data_addr", "data")(state)
-        self._get_data_addr(state)
+        ps.GetDataAddr(self.data_offset_reg, self.j_reg, self.k_reg,
+                       self.nnz_col, "data_addr")(state)
 
         ps.RemoveRegister("data_addr")(state)
-
-    def _get_data_addr(self, state: ps.SparseState) -> None:
-        """Compute data address for matrix element.
-
-        Implements GetDataAddr: data_addr = data_offset + j * nnz_col + k
-        This is self-adjoint (calling twice returns to original state).
-        """
-        # Step 1: data_addr = j * nnz_col
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, "data_addr")(state)
-
-        # Step 2: data_addr = data_offset + data_addr
-        ps.Add_UInt_UInt(self.data_offset_reg, "data_addr", "data_addr")(state)
-
-        # Step 3: data_addr += k (using AddAssign which is self-adjoint)
-        ps.AddAssign_AnyInt_AnyInt(self.k_reg, "data_addr")(state)
 
     def _find_column_position(self, state: ps.SparseState, inverse: bool = False) -> None:
         """Find column position in sparse storage (SparseMatrixOracle2).
 
-        Maps |j>|k>|0> -> |j>|s_j>|search_result>
-        where s_j is the position of column k in row j's sparse storage.
+        Forward (inverse=False): |j>|k>|0> -> |j>|s_j>|0>
+        Inverse (inverse=True): |j>|s_j>|0> -> |j>|k>|0>
 
-        This uses quantum binary search within the row's column list.
+        Uses XOR-based GetRowAddr for self-adjoint row address computation.
         """
-        # Create row_addr register for the row's starting address
-        row_addr = ps.AddRegister("row_addr", ps.UnsignedInteger, self.qram.address_size)(state)
+        ps.AddRegister("row_addr", ps.UnsignedInteger, self.addr_size)(state)
 
-        # Compute row_addr = sparse_offset + j * nnz_col
-        # Step 1: row_addr = j * nnz_col
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
-        # Step 2: row_addr = sparse_offset + row_addr
-        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+        # GetRowAddr: row_addr ^= sparse_offset + j * nnz_col (self-adjoint)
+        ps.GetRowAddr(self.sparse_offset_reg, self.j_reg, self.nnz_col, "row_addr")(state)
 
         if not inverse:
-            # Forward: |j>|k>|0> -> |j>|s_j>|search_result>
-            # Use quantum binary search to find k in the row's sorted column list
-            # The search finds the position s_j such that columns[s_j] = k
+            # Forward: |j>|k>|0> -> |j>|s_j>|0>
             qbs = QuantumBinarySearch(
-                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
+                addr_size=self.addr_size
             )
             qbs(state)
-
-            # Load the column value at the found position
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
-
-            # Swap k and search_result
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
-
-            # Uncompute: k += row_addr (which was added to get full address)
-            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr).dag(state)
+            # k -= row_addr (convert absolute addr to relative sparse pos)
+            ps.AddAssign_AnyInt_AnyInt(self.k_reg, "row_addr").dag(state)
         else:
-            # Inverse: uncompute the operations
-            # Re-compute row_addr
-            ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
-            ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
-
-            # Inverse of the swap and load operations
-            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr)(state)
+            # Inverse: |j>|s_j>|0> -> |j>|k>|0>
+            # k += row_addr (convert relative pos to absolute addr)
+            ps.AddAssign_AnyInt_AnyInt(self.k_reg, "row_addr")(state)
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
-
-            # Inverse binary search
             qbs = QuantumBinarySearch(
-                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
+                addr_size=self.addr_size
             )
             qbs(state)
 
-        # Uncompute row_addr
-        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+        # GetRowAddr inverse (XOR again = cancel)
+        ps.GetRowAddr(self.sparse_offset_reg, self.j_reg, self.nnz_col, "row_addr")(state)
 
-        ps.RemoveRegister(row_addr)(state)
+        ps.RemoveRegister("row_addr")(state)
+
+    def _xor_row_addr(self, state: ps.SparseState) -> None:
+        """XOR row_addr with (sparse_offset + j * nnz_col). Self-inverse."""
+        j_id = ps.System.get_id(self.j_reg)
+        offset_id = ps.System.get_id(self.sparse_offset_reg)
+        row_addr_id = ps.System.get_id("row_addr")
+
+        for basis in state.basis_states:
+            val = basis.get(offset_id).value + basis.get(j_id).value * self.nnz_col
+            basis.get(row_addr_id).value ^= val
+
+    @staticmethod
+    def _xor_sub_assign(state: ps.SparseState, src_reg: str, dst_reg: str) -> None:
+        """dst -= src via XOR trick: dst ^= src is NOT subtraction.
+        Use direct subtraction on register values instead."""
+        src_id = ps.System.get_id(src_reg)
+        dst_id = ps.System.get_id(dst_reg)
+        for basis in state.basis_states:
+            basis.get(dst_id).value -= basis.get(src_id).value
+
+    @staticmethod
+    def _xor_add_assign(state: ps.SparseState, src_reg: str, dst_reg: str) -> None:
+        """dst += src via direct addition on register values."""
+        src_id = ps.System.get_id(src_reg)
+        dst_id = ps.System.get_id(dst_reg)
+        for basis in state.basis_states:
+            basis.get(dst_id).value += basis.get(src_id).value
 
 
 class QuantumWalk:
@@ -866,7 +922,8 @@ class QuantumWalk:
         self.sparse_offset_reg = sparse_offset_reg
         self.mat = mat
 
-        self.addr_size = int(math.log2(len(mat.data))) if mat.data else 1
+        # addr_size is the bit width needed to address the QRAM data
+        self.addr_size = int(math.log2(len(mat.get_data()))) if mat.get_data() else 1
         self.data_size = mat.data_size
         self.nnz_col = mat.nnz_col
 
@@ -917,6 +974,7 @@ class QuantumWalk:
             self.nnz_col,
             max(self.addr_size, self.data_size),
             self.mat,
+            addr_size=self.addr_size,
         )
 
         # T†
@@ -948,7 +1006,10 @@ class QuantumWalkNSteps:
 
     def __init__(self, mat: SparseMatrix, qram: Optional[ps.QRAMCircuit_qutrit] = None):
         self.mat = mat
-        self.addr_size = int(math.log2(len(mat.data))) if mat.data else 1
+        # addr_size is the bit width needed to address the QRAM data array
+        # Must be log2(len(data)) where data.size() is a power of 2
+        data = mat.get_data()
+        self.addr_size = int(math.log2(len(data))) if len(data) > 0 else 1
         self.data_size = mat.data_size
         self.nnz_col = mat.nnz_col
         self.n_row = mat.n_row
@@ -967,7 +1028,7 @@ class QuantumWalkNSteps:
         # Create QRAM if not provided
         if qram is None:
             self.qram = ps.QRAMCircuit_qutrit(
-                self.addr_size, self.data_size, mat.data
+                self.addr_size, self.data_size, data
             )
             self._owns_qram = True
         else:
@@ -1025,7 +1086,7 @@ class QuantumWalkNSteps:
         """Create initial quantum state."""
         state = ps.SparseState()
         self.init_environment(state)
-        ps.Init_Unsafe(self.sparse_offset, self.mat.sparsity_offset)(state)
+        ps.Init_Unsafe(self.sparse_offset, self.mat.get_sparsity_offset())(state)
         return state
 
     def first_step(self, state: ps.SparseState) -> None:
@@ -1042,6 +1103,7 @@ class QuantumWalkNSteps:
             self.nnz_col,
             self.default_reg_size,
             self.mat,
+            addr_size=self.addr_size,
         )
 
         t_op(state)
@@ -1069,6 +1131,7 @@ class QuantumWalkNSteps:
             self.nnz_col,
             self.default_reg_size,
             self.mat,
+            addr_size=self.addr_size,
         )
 
         ps.ZeroConditionalPhaseFlip([self.j_comp, self.k_comp, self.b1, self.k, self.b2])(state)
@@ -1101,6 +1164,19 @@ class QuantumWalkNSteps:
             self.step(state)
 
         return state
+
+    def extract_row_amplitudes(self, state: ps.SparseState) -> dict[int, complex]:
+        """Extract amplitudes keyed by row index, marginalizing over other registers.
+
+        Returns:
+            Dictionary mapping row index to total amplitude for that row.
+        """
+        j_id = ps.System.get_id(self.j)
+        amps: dict[int, complex] = {}
+        for basis in state.basis_states:
+            j_val = basis.get(j_id).value
+            amps[j_val] = amps.get(j_val, complex(0, 0)) + basis.amplitude
+        return amps
 
 
 class LCUContainer:

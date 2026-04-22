@@ -5,6 +5,7 @@
 
 #include "BindUtils.h"
 #include "BlockEncoding/block_encoding_tridiagonal.h"
+#include "hamiltonian_simulation.h"
 
 PYBIND11_MODULE(_core, m)
 {
@@ -150,22 +151,26 @@ Attributes:
 
     using CondRot_Rational_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
 
-    BIND_BASE_OPERATOR_SUBNAME(CondRot_Rational_Bool_Cpp, "CondRot_Rational_Bool")
-        .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
+    auto py_to_u22 = [](py::function py_func, size_t x) -> u22_t {
+        py::object result = py_func(x);
+        auto arr = result.cast<std::array<std::complex<double>, 4>>();
+        return u22_t(arr);
+    };
+
+    BIND_BASE_OPERATOR_SUBNAME(CondRot_Rational_Bool_Cpp, CondRot_Rational_Bool_Func)
+        .def(py::init([py_to_u22](std::string_view reg_in, std::string_view reg_out, py::function py_func)
                       {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					return result.cast<u22_t>();
-					};
-				return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
+                auto cpp_func = [py_func, py_to_u22](size_t x) -> u22_t {
+                    return py_to_u22(py_func, x);
+                };
+                return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
              py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
-        .def(py::init([](size_t reg_in, size_t reg_out, py::function py_func)
+        .def(py::init([py_to_u22](size_t reg_in, size_t reg_out, py::function py_func)
                       {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					return result.cast<u22_t>();
-					};
-				return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
+                auto cpp_func = [py_func, py_to_u22](size_t x) -> u22_t {
+                    return py_to_u22(py_func, x);
+                };
+                return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
              py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
 
         //.def_static("_is_diagonal", &CondRot_Rational_Bool_Cpp::_is_diagonal)
@@ -395,7 +400,23 @@ Args:
     py::class_<qram_qutrit::QRAMCircuit>(m, "QRAMCircuit_qutrit")
         .def(py::init<size_t, size_t>(), py::arg("addr_size"), py::arg("data_size"))
         .def(py::init<size_t, size_t, const memory_t &>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
-        .def(py::init<size_t, size_t, memory_t &&>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"));
+        .def(py::init<size_t, size_t, memory_t &&>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
+        .def_readonly("address_size", &qram_qutrit::QRAMCircuit::address_size)
+        .def_readonly("data_size", &qram_qutrit::QRAMCircuit::data_size);
+
+    /* hamiltonian_simulation.h - XOR-based self-adjoint address operators */
+    using namespace CKS;
+    BIND_SELF_ADJOINT_OPERATOR(GetRowAddr)
+        .def(py::init<std::string_view, std::string_view, size_t, std::string_view>(),
+             py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"))
+        .def(py::init<size_t, size_t, size_t, size_t>(),
+             py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"));
+
+    BIND_SELF_ADJOINT_OPERATOR(GetDataAddr)
+        .def(py::init<std::string_view, std::string_view, std::string_view, size_t, std::string_view>(),
+             py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col"), py::arg("row_size"), py::arg("reg_data_offset"))
+        .def(py::init<size_t, size_t, size_t, size_t, size_t>(),
+             py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col"), py::arg("row_size"), py::arg("reg_data_offset"));
 
     // 绑定QRAMLoad
     BIND_SELF_ADJOINT_OPERATOR(QRAMLoad, R"doc(
