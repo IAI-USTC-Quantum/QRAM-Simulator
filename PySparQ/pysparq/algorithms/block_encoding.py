@@ -97,133 +97,6 @@ def get_u_minus(size: int) -> np.ndarray:
 
 
 # ==============================================================================
-# PlusOneAndOverflow (Python re-implementation of the C++ operator)
-# ==============================================================================
-
-
-class PlusOneAndOverflow:
-    """Increment a register by 1, with overflow tracking.
-
-    When the main register value equals ``2^n - 1`` (its maximum), the
-    increment wraps to zero and the overflow bit is flipped.  Otherwise
-    the value is simply incremented.
-
-    Implementation note:
-        The C++ version (``block_encoding_tridiagonal.h:15-31``) modifies
-        quantum state values directly.  Since the Python bindings expose
-        ``StateStorage.value`` as read-only, this Python re-implementation
-        uses ``ps.Add_ConstUInt`` for the modular increment and a
-        ``CustomArithmetic`` operator for the overflow XOR.  Together they
-        reproduce the C++ semantics faithfully: the main register wraps at
-        ``2^n`` and the overflow bit is flipped exactly when the wrap
-        occurs.
-    """
-
-    def __init__(self, main_reg: str, overflow: str):
-        self.main_reg = main_reg
-        self.overflow = overflow
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-        self._n = ps.System.size_of(main_reg)
-
-    # -- conditioning helpers --------------------------------------------------
-
-    def conditioned_by_nonzeros(
-        self, conds: str | list[str]
-    ) -> PlusOneAndOverflow:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> PlusOneAndOverflow:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(
-        self, reg: str | int, pos: int
-    ) -> PlusOneAndOverflow:
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def conditioned_by_value(
-        self, reg: str | int, value: int
-    ) -> PlusOneAndOverflow:
-        self._condition_bits = [(reg, value)]
-        return self
-
-    def clear_conditions(self) -> None:
-        self._condition_regs = []
-        self._condition_bits = []
-
-    # -- internal helpers ------------------------------------------------------
-
-    def _apply_condition(self, op):
-        """Apply condition registers/bits to a C++ bound operator."""
-        if self._condition_bits:
-            reg, val = self._condition_bits[0]
-            op = op.conditioned_by_value(reg, val)
-        if self._condition_regs:
-            op = op.conditioned_by_all_ones(self._condition_regs)
-        return op
-
-    def _overflow_xor_forward(self, inputs: list) -> list:
-        """CustomArithmetic function: XOR overflow when wrap occurred.
-
-        By the time this runs, main_reg has already been incremented by 1.
-        The original value was at max iff the new value is 0.
-        """
-        main_val = inputs[0]
-        return [1 if main_val == 0 else 0]
-
-    def _overflow_xor_dag(self, inputs: list) -> list:
-        """CustomArithmetic function for dagger: XOR overflow when wrap occurred.
-
-        By the time this runs, main_reg has been decremented by 1 (via
-        adding 2^n - 1).  The original value was 0 iff the new value is max.
-        """
-        main_val = inputs[0]
-        max_val = pow2(self._n) - 1
-        return [1 if main_val == max_val else 0]
-
-    # -- forward / dagger ------------------------------------------------------
-
-    def __call__(self, state: ps.SparseState) -> None:
-        # Increment the main register by 1 (modular wrap via Add_ConstUInt).
-        add_op = ps.Add_ConstUInt(self.main_reg, 1)
-        add_op = self._apply_condition(add_op)
-        add_op(state)
-
-        # Flip the overflow bit when the original value was at maximum.
-        # CustomArithmetic reads main_reg as input and XORs overflow as output.
-        # Because it is SelfAdjoint, applying it twice restores the overflow bit.
-        overflow_op = ps.CustomArithmetic(
-            [self.main_reg, self.overflow], 1, 1, self._overflow_xor_forward
-        )
-        overflow_op = self._apply_condition(overflow_op)
-        overflow_op(state)
-
-    def dag(self, state: ps.SparseState) -> None:
-        # Decrement the main register by 1 (modular wrap via Add_ConstUInt).
-        sub_op = ps.Add_ConstUInt(self.main_reg, pow2(self._n) - 1)
-        sub_op = self._apply_condition(sub_op)
-        sub_op(state)
-
-        # Flip the overflow bit when the original value was 0.
-        overflow_op = ps.CustomArithmetic(
-            [self.main_reg, self.overflow], 1, 1, self._overflow_xor_dag
-        )
-        overflow_op = self._apply_condition(overflow_op)
-        overflow_op(state)
-
-
-# ==============================================================================
 # BlockEncodingTridiagonal
 # ==============================================================================
 
@@ -323,7 +196,7 @@ class BlockEncodingTridiagonal:
         stateprep = ps.Rot_GeneralStatePrep(self.anc_UA, self.prep_state)
         stateprep(state)
 
-        PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
+        ps.PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
             self.anc_UA, 1
         )(state)
 
@@ -335,7 +208,7 @@ class BlockEncodingTridiagonal:
                 self.anc_UA, 2
             )(state)
 
-        PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
+        ps.PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
             self.anc_UA, 2
         ).dag(state)
 
@@ -357,7 +230,7 @@ class BlockEncodingTridiagonal:
         stateprep = ps.Rot_GeneralStatePrep(self.anc_UA, self.prep_state)
         stateprep(state)
 
-        PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
+        ps.PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
             self.anc_UA, 2
         )(state)
 
@@ -369,7 +242,7 @@ class BlockEncodingTridiagonal:
                 self.anc_UA, 1
             )(state)
 
-        PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
+        ps.PlusOneAndOverflow(self.main_reg, "overflow").conditioned_by_value(
             self.anc_UA, 1
         ).dag(state)
 

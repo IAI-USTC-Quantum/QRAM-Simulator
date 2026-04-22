@@ -171,12 +171,12 @@ def get_coef_common(
         v_real = v
 
     if v_real >= 0:
-        x = math.sqrt(v_real / Amax_real)
-        y = math.sqrt(1 - v_real / Amax_real)
+        x = math.sqrt(max(0, v_real / Amax_real))
+        y = math.sqrt(max(0, 1 - v_real / Amax_real))
         return [complex(x, 0), complex(-y, 0), complex(y, 0), complex(x, 0)]
     else:
-        x = math.sqrt(-v_real / Amax_real)
-        y = math.sqrt(1 + v_real / Amax_real)
+        x = math.sqrt(max(0, -v_real / Amax_real))
+        y = math.sqrt(max(0, 1 + v_real / Amax_real))
         if row > col:
             # [[i*x, y], [y, i*x]]
             return [complex(0, x), complex(y, 0), complex(y, 0), complex(0, x)]
