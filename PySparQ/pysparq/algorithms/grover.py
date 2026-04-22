@@ -100,16 +100,16 @@ class GroverOracle:
         ps.QRAMLoad(self.qram, self.addr_reg, self.data_reg)(state)
 
         # Step 2: Create comparison flag registers
-        compare_less = ps.AddRegister("compare_less", ps.Boolean, 1)(state)
-        compare_equal = ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
+        ps.AddRegister("compare_less", ps.Boolean, 1)(state)
+        ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
 
         # Step 3: Compare loaded data with search target value
         ps.Compare_UInt_UInt(
-            self.data_reg, self.search_reg, compare_less, compare_equal
+            self.data_reg, self.search_reg, "compare_less", "compare_equal"
         )(state)
 
         # Step 4: Apply phase flip on match (marked states)
-        phase_flip = ps.ZeroConditionalPhaseFlip([compare_equal])
+        phase_flip = ps.ZeroConditionalPhaseFlip(["compare_equal"])
         if self._condition_regs:
             phase_flip.conditioned_by_nonzeros(self._condition_regs)(state)
         else:
@@ -117,12 +117,12 @@ class GroverOracle:
 
         # Step 5: Uncompute comparison (reverse comparison)
         ps.Compare_UInt_UInt(
-            self.data_reg, self.search_reg, compare_less, compare_equal
+            self.data_reg, self.search_reg, "compare_less", "compare_equal"
         )(state)
 
         # Step 6: Remove temporary registers
-        ps.RemoveRegister(compare_equal)(state)
-        ps.RemoveRegister(compare_less)(state)
+        ps.RemoveRegister("compare_equal")(state)
+        ps.RemoveRegister("compare_less")(state)
 
         # Step 7: Uncompute QRAM load (self-adjoint, same operation)
         ps.QRAMLoad(self.qram, self.addr_reg, self.data_reg)(state)
@@ -280,7 +280,7 @@ def grover_search(
     memory: list[int],
     target: int,
     n_iterations: int | None = None,
-    data_size: int = 64,
+    data_size: int | None = None,
 ) -> tuple[int, float]:
     """Execute Grover's search to find target in memory.
 
@@ -288,7 +288,7 @@ def grover_search(
         memory: List of integers to search through
         target: Value to search for
         n_iterations: Number of Grover iterations (auto-computed if None)
-        data_size: Bit size for data register (default 64)
+        data_size: Bit size for data register (auto-computed if None)
 
     Returns:
         Tuple of (index, probability) where memory[index] matches target
@@ -300,17 +300,13 @@ def grover_search(
         >>> memory = [5, 12, 3, 8, 15, 7, 2, 9]
         >>> idx, prob = grover_search(memory, 8)
         >>> print(f"Found {memory[idx]} at index {idx} with prob {prob:.4f}")
-
-    Note:
-        The probability distribution peaks at marked states.
-        Multiple runs may be needed to find the correct index.
     """
     # Clear previous state
     ps.System.clear()
 
     # Compute address register size
     n = len(memory)
-    n_bits = int(math.log2(n)) + 1 if n > 0 else 1
+    n_bits = max(1, (n - 1).bit_length())
 
     # Ensure n is power of 2 for QRAM
     actual_n = 2**n_bits
@@ -320,6 +316,12 @@ def grover_search(
             target + i + 1 for i in range(actual_n - n)
         ]
         memory = extended_memory
+
+    # Auto-compute data_size from max value
+    if data_size is None:
+        max_val = max(max(memory), target)
+        data_size = max(1, (max_val).bit_length())
+        data_size = max(data_size, 4)  # minimum 4 bits for reliable compare
 
     # Auto-compute optimal iterations
     # For single target: k = pi/4 * sqrt(N)
@@ -348,26 +350,26 @@ def grover_search(
 
     # Apply Grover iterations
     for _ in range(n_iterations):
-        # Add temporary data register for this iteration
-        data_id = ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)(state)
-
-        # Apply Grover operator
         grover_op(state)
 
-        # Remove temporary data register
-        ps.RemoveRegister("data_temp")(state)
+    # Extract addr probability distribution from the state
+    addr_id = ps.System.get_id("addr")
+    addr_probs: dict[int, float] = {}
+    for basis in state.basis_states:
+        addr_val = basis.get(addr_id).value
+        prob = abs(basis.amplitude) ** 2
+        addr_probs[addr_val] = addr_probs.get(addr_val, 0) + prob
 
-    # Measure: apply partial trace to get address
-    measured_results, prob = ps.PartialTrace(["data", "search"])(state)
-
-    return measured_results[0], prob
+    best_addr = max(addr_probs, key=addr_probs.get)  # type: ignore[arg-type]
+    best_prob = addr_probs[best_addr]
+    return best_addr, best_prob
 
 
 def grover_count(
     memory: list[int],
     target: int,
     precision_bits: int = 8,
-    data_size: int = 64,
+    data_size: int | None = None,
 ) -> tuple[int, float]:
     """Quantum counting variant of Grover's algorithm.
 
@@ -391,13 +393,19 @@ def grover_count(
     ps.System.clear()
 
     n = len(memory)
-    n_bits = int(math.log2(n)) + 1 if n > 0 else 1
+    n_bits = max(1, (n - 1).bit_length())
 
     # Ensure power of 2
     actual_n = 2**n_bits
     if actual_n != n:
         extended_memory = memory + [target + i + 100 for i in range(actual_n - n)]
         memory = extended_memory
+
+    # Auto-compute data_size from max value
+    if data_size is None:
+        max_val = max(max(memory), target)
+        data_size = max(1, (max_val).bit_length())
+        data_size = max(data_size, 4)
 
     # Create QRAM
     qram = ps.QRAMCircuit_qutrit(n_bits, data_size, memory)

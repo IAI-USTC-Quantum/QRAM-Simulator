@@ -668,7 +668,8 @@ Example:
 				};
 
 				return new CustomArithmetic(input_ids, input_size.cast<size_t>(), output_size.cast<size_t>(), func_cpp); }),
-             py::arg("input_registers"), py::arg("input_size"), py::arg("output_size"), py::arg("func"));
+             py::arg("input_registers"), py::arg("input_size"), py::arg("output_size"), py::arg("func"))
+	    BIND_CONTROLLABLE_METHODS(CustomArithmetic);
 
     /* quantum_interfere_basic.h */
     // 哈希函数对象绑定

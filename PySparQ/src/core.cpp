@@ -314,10 +314,12 @@ PYBIND11_MODULE(_core, m)
 					  {
 			// 将Eigen列向量拷贝到std::vector<uint64_t>
 			memory_t mem(eigen_vec.data(), eigen_vec.data() + eigen_vec.size());
-	
+
 			// 调用原有构造函数
 			return new qram_qutrit::QRAMCircuit(addr_size, data_size, std::move(mem)); }),
-			 py::arg("addr_size"), py::arg("data_size"), py::arg("memory"));
+			 py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
+		.def_readonly("address_size", &qram_qutrit::QRAMCircuit::address_size)
+		.def_readonly("data_size", &qram_qutrit::QRAMCircuit::data_size);
 
 	{
 		using namespace state_prep;

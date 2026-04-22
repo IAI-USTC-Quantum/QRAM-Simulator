@@ -215,12 +215,12 @@ class ModMul:
 
     def conditioned_by_all_ones(self, cond: str) -> "ModMul":
         """Set condition for controlled operation."""
-        self._condition_bits.append((cond, 0))
+        self._condition_regs = [cond] if isinstance(cond, (str, int)) else list(cond)
         return self
 
     def conditioned_by_nonzeros(self, cond: str | int) -> "ModMul":
         """Set condition for nonzero-controlled operation."""
-        self._condition_bits.append((cond, 1))
+        self._condition_regs = [cond] if isinstance(cond, (str, int)) else list(cond)
         return self
 
     def clear_conditions(self) -> None:
@@ -236,8 +236,8 @@ class ModMul:
 
         op = ps.CustomArithmetic([self.reg], 64, 64, modmul_func)
 
-        if self._condition_bits:
-            cond_reg, _ = self._condition_bits[-1]
+        if self._condition_regs:
+            cond_reg = self._condition_regs[-1]
             op.conditioned_by_all_ones(cond_reg)(state)
         else:
             op(state)

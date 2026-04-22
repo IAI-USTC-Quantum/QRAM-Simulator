@@ -118,7 +118,9 @@ class StatePrepViaQRAM:
 
         for k in range(self.addr_size):
             ps.SplitRegister(self.work_qubit, "rotation", 1)(state)
-            ps.System.name_register_map[ps.System.get("rotation")][1] = ps.Boolean
+            rotation_id = ps.System.get_id("rotation")
+            entry = ps.System.name_register_map[rotation_id]
+            ps.System.name_register_map[rotation_id] = (entry[0], ps.Boolean, entry[2], entry[3])
 
             ps.Add_ConstUInt("addr_parent", pow2(k) - 1)(state)
             ps.Add_UInt_UInt_InPlace(self.work_qubit, "addr_parent")(state)
@@ -199,7 +201,9 @@ class StatePrepViaQRAM:
         for k in range(self.addr_size):
             ps.ShiftRight(self.work_qubit, 1)(state)
             ps.SplitRegister(self.work_qubit, "rotation", 1)(state)
-            ps.System.name_register_map[ps.System.get("rotation")][1] = ps.Boolean
+            rotation_id = ps.System.get_id("rotation")
+            entry = ps.System.name_register_map[rotation_id]
+            ps.System.name_register_map[rotation_id] = (entry[0], ps.Boolean, entry[2], entry[3])
 
             idx = self.addr_size - 1 - k
             ps.Add_ConstUInt("addr_parent", pow2(idx) - 1)(state)
