@@ -538,24 +538,86 @@ class CondRotQW:
         self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply conditional rotation."""
-        # Sort by key for sparse state optimization
+        """Apply conditional rotation based on matrix element values.
+
+        For positive-only matrices, the rotation depends only on the data value.
+        For signed matrices, the rotation also depends on row/column indices.
+        """
         ps.SortExceptKey(self.output_reg)(state)
 
-        # For each computational basis state, apply rotation
-        # based on the data register value
-        # Note: This is a simplified version; full implementation
-        # would iterate through sparse states
+        if self.mat.positive_only:
+            # Rotation depends only on data value
+            def angle_func(v: int) -> list:
+                return get_coef_positive_only(self.mat.data_size, v, 0, 0)
 
-        # Apply rotation using CondRot_Rational_Bool if available
-        # Otherwise use a simpler approach
+            ps.CondRot_Rational_Bool(self.data_reg, self.output_reg, angle_func)(state)
+        else:
+            # For signed matrices, need row/col info for phase
+            self._apply_signed_rotation(state)
 
-        # Clear near-zero amplitudes
         ps.ClearZero()(state)
+
+    def _apply_signed_rotation(self, state: ps.SparseState) -> None:
+        """Apply rotation for signed matrix elements by iterating sparse states."""
+        j_id = ps.System.get_id(self.j_reg)
+        k_id = ps.System.get_id(self.k_reg)
+        data_id = ps.System.get_id(self.data_reg)
+        out_id = ps.System.get_id(self.output_reg)
+
+        # Group basis states by all registers except output_reg
+        groups = {}
+        for idx, basis in enumerate(state.basis_states):
+            key = []
+            for reg_id in range(len(basis.registers)):
+                if reg_id != out_id:
+                    key.append(basis.get(reg_id).value)
+            key = tuple(key)
+            if key not in groups:
+                groups[key] = []
+            groups[key].append(idx)
+
+        # For each group, apply the 2x2 rotation
+        for key, indices in groups.items():
+            if len(indices) == 2:
+                i0, i1 = indices
+                b0 = state.basis_states[i0]
+                b1 = state.basis_states[i1]
+
+                v = b0.get(data_id).value
+                row = b0.get(j_id).value
+                col = b0.get(k_id).value
+                mat = self.angle_func(v, row, col)
+
+                a, b = b0.amplitude, b1.amplitude
+                state.basis_states[i0].amplitude = a * mat[0] + b * mat[1]
+                state.basis_states[i1].amplitude = a * mat[2] + b * mat[3]
+            elif len(indices) == 1:
+                idx = indices[0]
+                basis = state.basis_states[idx]
+                v = basis.get(data_id).value
+                row = basis.get(j_id).value
+                col = basis.get(k_id).value
+                mat = self.angle_func(v, row, col)
+
+                is_one = basis.get(out_id).value != 0
+                if is_one:
+                    new_amp = basis.amplitude * mat[1]
+                    old_amp = basis.amplitude * mat[3]
+                else:
+                    old_amp = basis.amplitude * mat[0]
+                    new_amp = basis.amplitude * mat[2]
+
+                state.basis_states[idx].amplitude = old_amp
+
+                if abs(new_amp) > 1e-15:
+                    new_basis = basis.copy()
+                    new_basis.amplitude = new_amp
+                    new_basis.get(out_id).value = 1 if not is_one else 0
+                    state.basis_states.append(new_basis)
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply inverse rotation."""
-        # For self-adjoint rotations, same as forward
+        # CondRot_Rational_Bool is self-adjoint; signed rotation is also self-adjoint
         self(state)
 
 
@@ -684,7 +746,11 @@ class TOperator:
         ps.RemoveRegister("data")(state)
 
     def _load_matrix_element(self, state: ps.SparseState) -> None:
-        """Load matrix element from QRAM (SparseMatrixOracle1)."""
+        """Load matrix element from QRAM (SparseMatrixOracle1).
+
+        Computes data_addr = data_offset + j * nnz_col + k,
+        loads from QRAM, then uncomputes the address.
+        """
         data_addr = ps.AddRegister("data_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
         # Compute address and load
@@ -695,14 +761,76 @@ class TOperator:
         ps.RemoveRegister("data_addr")(state)
 
     def _get_data_addr(self, state: ps.SparseState) -> None:
-        """Compute data address for matrix element."""
-        # Simplified address computation
-        pass
+        """Compute data address for matrix element.
+
+        Implements GetDataAddr: data_addr = data_offset + j * nnz_col + k
+        This is self-adjoint (calling twice returns to original state).
+        """
+        # Step 1: data_addr = j * nnz_col
+        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, "data_addr")(state)
+
+        # Step 2: data_addr = data_offset + data_addr
+        ps.Add_UInt_UInt(self.data_offset_reg, "data_addr", "data_addr")(state)
+
+        # Step 3: data_addr += k (using AddAssign which is self-adjoint)
+        ps.AddAssign_AnyInt_AnyInt(self.k_reg, "data_addr")(state)
 
     def _find_column_position(self, state: ps.SparseState, inverse: bool = False) -> None:
-        """Find column position in sparse storage (SparseMatrixOracle2)."""
-        # Simplified implementation
-        pass
+        """Find column position in sparse storage (SparseMatrixOracle2).
+
+        Maps |j>|k>|0> -> |j>|s_j>|search_result>
+        where s_j is the position of column k in row j's sparse storage.
+
+        This uses quantum binary search within the row's column list.
+        """
+        # Create row_addr register for the row's starting address
+        row_addr = ps.AddRegister("row_addr", ps.UnsignedInteger, self.qram.address_size)(state)
+
+        # Compute row_addr = sparse_offset + j * nnz_col
+        # Step 1: row_addr = j * nnz_col
+        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+        # Step 2: row_addr = sparse_offset + row_addr
+        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+
+        if not inverse:
+            # Forward: |j>|k>|0> -> |j>|s_j>|search_result>
+            # Use quantum binary search to find k in the row's sorted column list
+            # The search finds the position s_j such that columns[s_j] = k
+            qbs = QuantumBinarySearch(
+                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg
+            )
+            qbs(state)
+
+            # Load the column value at the found position
+            ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
+
+            # Swap k and search_result
+            ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
+
+            # Uncompute: k += row_addr (which was added to get full address)
+            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr).dag(state)
+        else:
+            # Inverse: uncompute the operations
+            # Re-compute row_addr
+            ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+            ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+
+            # Inverse of the swap and load operations
+            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr)(state)
+            ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
+            ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
+
+            # Inverse binary search
+            qbs = QuantumBinarySearch(
+                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg
+            )
+            qbs(state)
+
+        # Uncompute row_addr
+        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+
+        ps.RemoveRegister(row_addr)(state)
 
 
 class QuantumWalk:
