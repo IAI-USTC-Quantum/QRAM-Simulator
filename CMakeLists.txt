@@ -10,7 +10,6 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/include
                     ${PROJECT_SOURCE_DIR}/ThirdParty/argparse
                     ${PROJECT_SOURCE_DIR}/ThirdParty/fmt/include
                     ${PROJECT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
-                    ${PROJECT_SOURCE_DIR}/Thirdparty/pybind11
                     )
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
@@ -88,6 +87,15 @@ endif(UNIX)
 # endif()
 
 
+# pybind11 - find it early so ThirdParty/CMakeLists.txt can use the result
+# When building wheels via scikit-build-core, pybind11 is installed via pyproject.toml
+find_package(pybind11 CONFIG QUIET)
+if(pybind11_FOUND)
+    message(STATUS "Found pybind11: ${pybind11_VERSION}")
+else()
+    message(STATUS "pybind11 not found - Python bindings will not be built")
+endif()
+
 add_subdirectory(Common)
 add_subdirectory(QRAM)
 add_subdirectory(SparQ)
@@ -96,7 +104,11 @@ add_subdirectory(SparQ_Algorithm)
 add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
 add_subdirectory(test)
 add_subdirectory(Experiments)
-add_subdirectory(PySparQ)
+
+# PySparQ requires pybind11
+if(pybind11_FOUND)
+    add_subdirectory(PySparQ)
+endif()
 
 # --- Install rules ---
 include(GNUInstallDirs)
