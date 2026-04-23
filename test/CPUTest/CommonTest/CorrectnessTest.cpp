@@ -79,11 +79,11 @@ int main()
 		fmt::print("Runtime error: {}\n", e.what());
 		return 2;
 	}
-	//catch (const std::exception& e)
-	//{
-	//	fmt::print("Error: {}\n", e.what());
-	//	return 3;
-	//}
+	catch (const std::exception& e)
+	{
+		fmt::print("Error: {}\n", e.what());
+		return 3;
+	}
 
 	return 0;
 }

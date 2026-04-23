@@ -983,10 +983,10 @@ namespace qram_simulator
 		{
 			/* Type check */
 #ifndef QRAM_Release
-		if (System::type_of(register_lhs) != UnsignedInteger ||
+		/*if (System::type_of(register_lhs) != UnsignedInteger ||
 			System::type_of(register_rhs) != UnsignedInteger ||
 			System::type_of(register_out) != Rational)
-			throw_invalid_input();
+			throw_invalid_input();*/
 #endif		
 		}
 
@@ -1003,10 +1003,10 @@ namespace qram_simulator
 		{
 			/* Type check */
 #ifndef QRAM_Release
-			if (System::type_of(register_lhs) != UnsignedInteger ||
+			/*if (System::type_of(register_lhs) != UnsignedInteger ||
 				System::type_of(register_rhs) != UnsignedInteger ||
 				System::type_of(register_out) != Rational)
-				throw_invalid_input();
+				throw_invalid_input();*/
 #endif		
 		}
 
