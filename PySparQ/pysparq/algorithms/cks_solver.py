@@ -595,14 +595,14 @@ class CondRotQW:
     def __call__(self, state: ps.SparseState) -> None:
         """Apply conditional rotation based on matrix element values.
 
-        Uses C++ CondRot_Rational_Bool_Func for the rotation.
+        Uses C++ CondRot_General_Bool for the rotation.
         """
         ps.SortExceptKey(self.output_reg)(state)
 
         if self.mat.positive_only:
             def angle_func(v: int) -> list:
                 return get_coef_positive_only(self.mat.data_size, v, 0, 0)
-            ps.CondRot_Rational_Bool_Func(self.data_reg, self.output_reg, angle_func)(state)
+            ps.CondRot_General_Bool(self.data_reg, self.output_reg, angle_func)(state)
         else:
             self._apply_signed_rotation(state)
 

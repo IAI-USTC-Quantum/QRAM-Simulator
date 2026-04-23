@@ -89,7 +89,12 @@ PYBIND11_MODULE(_core, m)
 		.def("__str__", (std::string (System::*)() const) & System::to_string)
 		.def("to_string", (std::string (System::*)() const) & System::to_string)
 		.def("to_string", (std::string (System::*)(int precision) const) & System::to_string)
-		.def("get_as_uint64", (uint64_t (System::*)(size_t) const) & System::get_as<uint64_t>);
+		.def("get_as_uint64", (uint64_t (System::*)(size_t) const) & System::get_as<uint64_t>)
+		.def_static("set_register_type", [](size_t reg_id, StateStorageType type) {
+			if (reg_id >= System::name_register_map.size())
+				throw py::value_error("Invalid register ID");
+			std::get<1>(System::name_register_map[reg_id]) = type;
+		}, py::arg("reg_id"), py::arg("type"));
 
 	m.def("merge_system", &merge_system);
 	m.def("remove_system", &remove_system);

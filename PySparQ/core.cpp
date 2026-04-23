@@ -162,7 +162,7 @@ Attributes:
         return u22_t(arr);
     };
 
-    BIND_BASE_OPERATOR_SUBNAME(CondRot_Rational_Bool_Cpp, CondRot_Rational_Bool_Func)
+    BIND_BASE_OPERATOR_SUBNAME(CondRot_Rational_Bool_Cpp, CondRot_General_Bool)
         .def(py::init([py_to_u22](std::string_view reg_in, std::string_view reg_out, py::function py_func)
                       {
                 auto cpp_func = [py_func, py_to_u22](size_t x) -> u22_t {

@@ -386,11 +386,11 @@ class StatePreparation:
         )
         norm = math.sqrt(total)
 
-        addr_reg = ps.System.get("addr_parent")
+        addr_id = ps.System.get_id("main_reg")
         fid = complex(0, 0)
 
         for basis in self._state.basis_states:
-            idx = basis.get(addr_reg).value
+            idx = basis.get(addr_id).value & (pow2(self.qubit_number) - 1)
             target_amp = get_complement(self.dist[idx], self.data_size) / norm
             prepared_amp = basis.amplitude
             fid += target_amp * prepared_amp
@@ -408,17 +408,12 @@ class StatePreparation:
         ps.System.clear()
 
         addr_sz = self.qubit_number + 1
-        ps.System.add_register("addr_parent", ps.UnsignedInteger, addr_sz)
-        ps.System.add_register("addr_child", ps.UnsignedInteger, addr_sz)
-        ps.System.add_register("data_parent", ps.SignedInteger, self.data_size)
-        ps.System.add_register("data_child", ps.SignedInteger, self.data_size)
-        ps.System.add_register("temp_bit", ps.Boolean, 1)
-        ps.System.add_register("div_result", ps.Rational, self.rational_size)
+        ps.System.add_register("main_reg", ps.UnsignedInteger, addr_sz)
 
         self._state = ps.SparseState()
 
         state_prep_op = StatePrepViaQRAM(
-            self.qram, "addr_parent", self.data_size, self.rational_size
+            self.qram, "main_reg", self.data_size, self.rational_size
         )
         state_prep_op(self._state)
 
