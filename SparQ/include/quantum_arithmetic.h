@@ -679,7 +679,7 @@ namespace qram_simulator
 		 * @brief 构造函数（名称版本）
 		 * @param lhs_ 左操作数寄存器名称（加数）
 		 * @param rhs_ 右操作数寄存器名称（被加数，结果存储于此）
-		 * @throws 当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常
+		 * @throws 当寄存器类型不是UnsignedInteger或lhs大小超过rhs时抛出异常
 		 */
 		Add_UInt_UInt_InPlace(std::string_view lhs_, std::string_view rhs_)
 			:lhs(System::get(lhs_)), rhs(System::get(rhs_))
@@ -689,8 +689,8 @@ namespace qram_simulator
 			if (System::type_of(lhs) != UnsignedInteger ||
 				System::type_of(rhs) != UnsignedInteger)
 				throw_invalid_input();
-			/* Size check - warn if sizes don't match */
-			if (System::size_of(lhs) != System::size_of(rhs))
+			/* Size check - lhs must not exceed rhs (zero-extended add is safe) */
+			if (System::size_of(lhs) > System::size_of(rhs))
 				throw_invalid_input();
 #endif
 		}
@@ -699,7 +699,7 @@ namespace qram_simulator
 		 * @brief 构造函数（ID 版本）
 		 * @param lhs_ 左操作数寄存器 ID（加数）
 		 * @param rhs_ 右操作数寄存器 ID（被加数，结果存储于此）
-		 * @throws 当寄存器类型不是UnsignedInteger或大小不匹配时抛出异常
+		 * @throws 当寄存器类型不是UnsignedInteger或lhs大小超过rhs时抛出异常
 		 */
 		Add_UInt_UInt_InPlace(size_t lhs_, size_t rhs_)
 			: lhs(lhs_), rhs(rhs_)
@@ -709,8 +709,8 @@ namespace qram_simulator
 			if (System::type_of(lhs) != UnsignedInteger ||
 				System::type_of(rhs) != UnsignedInteger)
 				throw_invalid_input();
-			/* Size check - warn if sizes don't match */
-			if (System::size_of(lhs) != System::size_of(rhs))
+			/* Size check - lhs must not exceed rhs (zero-extended add is safe) */
+			if (System::size_of(lhs) > System::size_of(rhs))
 				throw_invalid_input();
 #endif
 		}

@@ -113,6 +113,11 @@ Attributes:
         .def_static("size_of", (size_t (*)(size_t))&System::size_of)
         .def_static("status_of", (bool (*)(std::string_view))&System::status_of)
         .def_static("status_of", (bool (*)(size_t))&System::status_of)
+        .def_static("set_register_type", [](size_t reg_id, StateStorageType type) {
+            if (reg_id >= System::name_register_map.size())
+                throw py::value_error("Invalid register ID");
+            std::get<1>(System::name_register_map[reg_id]) = type;
+        }, py::arg("reg_id"), py::arg("type"))
         .def_static("add_register", &System::add_register)
         .def_static("add_register_synchronous", (size_t (*)(std::string_view, StateStorageType, size_t, SparseState &))&System::add_register_synchronous)
         .def_static("add_register_synchronous", (size_t (*)(std::string_view, StateStorageType, size_t, std::vector<System> &))&System::add_register_synchronous)
