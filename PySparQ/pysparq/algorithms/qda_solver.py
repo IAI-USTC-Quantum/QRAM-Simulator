@@ -230,9 +230,10 @@ class BlockEncodingHs:
         return self
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply block encoding of H(s)."""
-        # Simplified implementation of the circuit from C++ code
-        # Full implementation would use SPLIT_BY_CONDITIONS pattern
+        """Apply block encoding of H(s).
+
+        Corresponds to C++ Block_Encoding_Hs::impl (lines 63-96).
+        """
 
         # Hadamard on anc_3
         ps.Hadamard_Bool(self.anc_3)(state)
@@ -434,12 +435,12 @@ class WalkS:
         self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply walk operator."""
-        # Apply block encoding
-        if self._condition_regs:
-            self.enc_Hs.conditioned_by_all_ones(self._condition_regs)(state)
-        else:
-            self.enc_Hs(state)
+        """Apply walk operator.
+
+        Matches C++ Walk_s::impl behavior: EncHs is called unconditionally.
+        """
+        # Apply block encoding (unconditional, matching C++ line 267)
+        self.enc_Hs(state)
 
         # Apply reflection
         if not self.is_positive_definite:
@@ -451,7 +452,10 @@ class WalkS:
         ps.GlobalPhase_Int(self.phase)(state)
 
     def dag(self, state: ps.SparseState) -> None:
-        """Apply inverse walk operator."""
+        """Apply inverse walk operator.
+
+        Matches C++ Walk_s::impl_dag behavior: EncHs.dag is called unconditionally.
+        """
         # Inverse global phase
         ps.GlobalPhase_Int(-self.phase)(state)
 
@@ -461,7 +465,7 @@ class WalkS:
         else:
             ps.Reflection_Bool([self.anc_UA, self.anc_1, self.anc_2], False)(state)
 
-        # Inverse block encoding
+        # Inverse block encoding (unconditional, matching C++ line 296)
         self.enc_Hs.dag(state)
 
 
