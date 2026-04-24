@@ -4,6 +4,7 @@
 #endif
 
 #include "BindUtils.h"
+#include "BlockEncoding/block_encoding_tridiagonal.h"
 
 PYBIND11_MODULE(_core, m)
 {
@@ -936,44 +937,16 @@ Example:
              py::arg("reg"), py::arg("theta"), py::arg("phi"), py::arg("lambda_"))
         .def(py::init<size_t, double, double, double>(),
              py::arg("reg_id"), py::arg("theta"), py::arg("phi"), py::arg("lambda_"));
-    // {
-    //      using namespace block_encoding;
-    //      {
-    //           using namespace block_encoding_tridiagonal;
-    //           BIND_BASE_OPERATOR(PlusOneAndOverflow)
-    //               .def(py::init<std::string_view, std::string_view>(),
-    //                    py::arg("main_reg"), py::arg("overflow"))
-    //                   BIND_CONTROLLABLE_METHODS(PlusOneAndOverflow);
-
-    //           BIND_BASE_OPERATOR(Block_Encoding_Tridiagonal)
-    //               .def(py::init<std::string_view, std::string_view, double, double>(),
-    //                    py::arg("main_reg"), py::arg("overflow"), py::arg("alpha_"), py::arg("beta_"))
-    //                   BIND_CONTROLLABLE_METHODS(Block_Encoding_Tridiagonal);
-    //      }
-    //      {
-    //           using namespace block_encoding_via_QRAM;
-    //           BIND_BASE_OPERATOR_SUBNAME(U_R, Block_Encoding_via_QRAM_U_R)
-    //               .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, size_t>(),
-    //                    py::arg("qram"), py::arg("column_index"), py::arg("data_size"), py::arg("rational_size"));
-
-    //           BIND_BASE_OPERATOR_SUBNAME(U_L, Block_Encoding_via_QRAM_U_L)
-    //               .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, std::string_view, size_t, size_t>(),
-    //                    py::arg("qram"), py::arg("row_index"), py::arg("column_index"), py::arg("data_size"), py::arg("rational_size"));
-
-    //           BIND_BASE_OPERATOR(Block_Encoding_via_QRAM)
-    //               .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, std::string_view, size_t, size_t>(),
-    //                    py::arg("qram"), py::arg("row_index"), py::arg("column_index"), py::arg("data_size"), py::arg("rational_size"));
-    //      }
-
-    //      m.def("scale_and_convert_vector", [](const DenseVector<double> &input_vec, int exponenet, size_t data_size) -> py::array_t<double>
-    //            { return py::array_t<double>(scaleAndConvertVector(input_vec, exponenet, data_size)); }, py::arg("input_vec"), py::arg("exponent"), py::arg("data_size"));
-
-    //      m.def("scale_and_convert_matrix", [](const DenseMatrix<double> &input_vec, int exponenet, size_t data_size) -> py::array_t<double>
-    //            { return py::array_t<double>(scaleAndConvertVector(input_vec, exponenet, data_size)); }, py::arg("input_mat"), py::arg("exponent"), py::arg("data_size"));
-
-    //      m.def("make_vector_tree", [](const std::vector<size_t> &dist, size_t data_size) -> py::array_t<double>
-    //            { return py::array_t<double>(make_vector_tree(dist, data_size)); }, py::arg("dist"), py::arg("data_size"));
-    // }
+    {
+         using namespace block_encoding;
+         {
+              using namespace block_encoding_tridiagonal;
+              BIND_BASE_OPERATOR(PlusOneAndOverflow)
+                  .def(py::init<std::string_view, std::string_view>(),
+                       py::arg("main_reg"), py::arg("overflow"))
+                      BIND_CONTROLLABLE_METHODS(PlusOneAndOverflow);
+         }
+    }
 
     // {
     //      using namespace CKS;

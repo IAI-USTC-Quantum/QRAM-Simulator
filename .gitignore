@@ -49,3 +49,5 @@ PySparQ/pysparq/_version.py
 
 # Sphinx documentation build
 docs/sphinx/build/
+docs/sphinx/_build/
+docs/sphinx/.venv/

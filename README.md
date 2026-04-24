@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="QRAM-Simulator Banner" width="100%">
+</p>
+
 # QRAM-Simulator & PySparQ
 
 [![arXiv:QRAM](https://img.shields.io/badge/QRAM_Simulator-arXiv%3A2503%2E13832-b31b1b.svg)](https://arxiv.org/abs/2503.13832)
@@ -144,9 +148,8 @@ print("After QRAM Load:", ps.StatePrint(state))
 ps.Add_ConstUInt("data", 5)(state)
 print("After Add:", ps.StatePrint(state))
 
-# 7. 测量 - 获取某个寄存器的概率分布
-prob_data = ps.Prob(state, data_id)
-print("Data register probabilities:", prob_data)
+# 7. 测量 - 打印状态概率分布
+ps.StatePrint(ps.Prob)(state)
 ```
 
 ### Register Level 特性的关键 API
@@ -239,6 +242,16 @@ auto result = measure(state);
     --seed 123456 --version normal
 ```
 
+## 开发量子算法
+
+详细的量子算法开发指南见 [docs/sphinx/source/guide/development/](docs/sphinx/source/guide/development/)，包括：
+
+- Register Level Programming 核心概念
+- C++/Python 开发模板
+- 添加新实验的步骤
+- 测试验证清单
+- 代码规范
+
 ## 论文与引用
 
 本仓库由两篇论文分别驱动，各自贡献了不同的核心能力：
@@ -249,7 +262,7 @@ auto result = measure(state);
 
 面向 QRAM 模拟的稀疏态量子模拟器，提出了 **Register Level Programming** 范式。主要贡献：
 
-- **QRAM 电路模拟**：Qutrit-based 与 Qubit-based 两种 QRAM 实现，支持退极化和振幅阻尼噪声模型
+- **QRAM 电路模拟**：Qutrit-based 与 Qubit-based 两种 QRAM 实现（C++ API），支持退极化和振幅阻尼噪声模型。PySparQ 仅提供 qutrit 版本。
 - **Register Level Programming**：以 `uint64_t` 寄存器直接存储替代逐门构建，支持自顶向下的量子算法开发
 - **稀疏态优化**：仅存储非零振幅，可实现 64+ 量子比特的结构化算法模拟
 - **错误过滤**：针对含噪 QRAM 的错误过滤方案

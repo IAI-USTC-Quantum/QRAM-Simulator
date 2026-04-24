@@ -27,7 +27,7 @@
    AddRegister("eigenstate", pysparq.Boolean, 1)(state)
 
    # 准备本征态 |1>
-   pysparq.Xgate_Bool("eigenstate")(state)
+   pysparq.Xgate_Bool("eigenstate", 0)(state)
 
    # 对精度寄存器应用 Hadamard
    Hadamard_Int("precision")(state)

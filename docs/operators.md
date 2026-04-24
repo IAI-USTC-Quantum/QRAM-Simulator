@@ -109,6 +109,8 @@ op.dag(state);
 
 **Unitary 保证**: 循环移位是双射，ShiftLeft 和 ShiftRight 互为 dagger。
 
+**注意（PySparQ）**: 在 Python 绑定中，`.dag()` 方法未实现。如需撤销，请使用对应的逆向操作（如 `ShiftRight` 撤销 `ShiftLeft`）。
+
 **约束条件**:
 - 寄存器必须是 UnsignedInteger 或 SignedInteger 类型
 - 移位量必须 ≤ 寄存器大小

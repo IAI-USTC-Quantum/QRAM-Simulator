@@ -95,11 +95,13 @@ Doxygen documentation is auto-deployed on push to `main`:
 
 ## Git Workflow
 
-**IMPORTANT: Never push directly to `upstream/main`. Always work on fork and submit PRs.**
+**IMPORTANT: Never push directly to the upstream repo. Always work on fork and submit PRs.**
 
-Remote configuration:
+Repository role:
 - `origin` → personal fork (`Agony5757/QRAM-Simulator`), active development
-- `upstream` → organization repo (`IAI-USTC-Quantum/QRAM-Simulator`), PR target
+- Upstream (`IAI-USTC-Quantum/QRAM-Simulator`) — PR target, accessed via `gh` CLI (no `upstream` git remote configured)
+
+Cross-repo operations (sync, PR) rely on `gh` CLI rather than a git upstream remote.
 
 ### CI Verification Before Submitting to Upstream
 
@@ -113,6 +115,11 @@ Remote configuration:
 ### Typical Workflow
 
 ```bash
+# Sync fork with upstream first
+gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
+git fetch origin
+git rebase origin/main
+
 # Create feature branch from origin (fork)
 git checkout -b feature/my-feature origin/main
 
@@ -134,6 +141,7 @@ gh pr create --repo IAI-USTC-Quantum/QRAM-Simulator \
 ```bash
 gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
 git fetch origin
+git rebase origin/main
 ```
 
 ### CI Jobs

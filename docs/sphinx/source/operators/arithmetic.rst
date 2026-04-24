@@ -322,7 +322,7 @@ ShiftLeft（循环左移）
 
 **操作**: 循环左移 ``digit`` 位
 
-**Dagger**: ``ShiftRight(reg, digit)`` 或 ``ShiftLeft(reg, n - digit)``
+**Dagger**: ShiftLeft 和 ShiftRight 在概念上互为逆，但 ``.dag()`` 方法未实现。使用 ``ShiftRight(reg, digit)`` 撤销。
 
 **类型约束**: ``UnsignedInteger`` 或 ``SignedInteger``。
 
@@ -340,8 +340,8 @@ ShiftLeft（循环左移）
    ps.ShiftLeft("reg", 1)(state)
    # reg = 0b0101 = 5
 
-   # 撤销
-   ps.ShiftLeft("reg", 1).dag(state)
+   # 撤销（使用 ShiftRight，因为 ShiftLeft.dag() 未实现）
+   ps.ShiftRight("reg", 1)(state)
    # reg = 0b1010 = 10
 
 ShiftRight（循环右移）

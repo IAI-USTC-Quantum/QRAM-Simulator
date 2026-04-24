@@ -62,11 +62,10 @@ QRAMLoad
    # 创建 QRAM 电路（qutrit 版本）
    addr_size = 4  # 4 位地址 → 16 个存储单元
    data_size = 8  # 8 位数据
-   qram = ps.QRAMCircuit_qutrit(addr_size, data_size)
 
-   # 设置存储内容
+   # 设置存储内容（memory 需在构造时传入）
    memory = [i * 10 for i in range(16)]  # 0, 10, 20, ..., 150
-   qram.set_memory(memory)
+   qram = ps.QRAMCircuit_qutrit(addr_size, data_size, memory)
 
    # 创建寄存器
    ps.System.add_register("addr", ps.UnsignedInteger, addr_size)
@@ -115,6 +114,10 @@ PySparQ 提供 ``QRAMCircuit_qutrit`` 类用于配置 QRAM：
    :members:
    :undoc-members:
 
+.. note::
+
+   ``QRAMCircuit_qubit``（C++ API 中的 qubit 版本 QRAM）在 PySparQ 中**不可用**。PySparQ 仅提供 qutrit 版本。
+
 创建和配置 QRAM 电路
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -125,16 +128,14 @@ PySparQ 提供 ``QRAMCircuit_qutrit`` 类用于配置 QRAM：
    # 创建 QRAM 电路
    addr_bits = 4   # 地址位数
    data_bits = 8   # 数据位数
-   qram = ps.QRAMCircuit_qutrit(addr_bits, data_bits)
 
-   # 设置存储内容
-   # 方式 1: 直接设置列表
+   # 设置存储内容（memory 需在构造时传入）
    memory_list = [0, 10, 20, 30, 40, 50, 60, 70,
                   80, 90, 100, 110, 120, 130, 140, 150]
-   qram.set_memory(memory_list)
+   qram = ps.QRAMCircuit_qutrit(addr_bits, data_bits, memory_list)
 
-   # 方式 2: 使用树结构（高级）
-   # qram.set_memory_tree(tree_data)
+   # 注意：set_memory() 方法在 PySparQ 中不可用
+   # memory 必须在构造 QRAMCircuit_qutrit 时传入
 
    # 查询信息
    print(f"地址大小: {qram.addr_size}")
@@ -165,7 +166,9 @@ QRAM 加载支持条件执行：
 
    # 数据库内容
    database = [42, 17, 99, 5, ...]
-   qram.set_memory(database)
+
+   # 创建 QRAM（memory 在构造时传入）
+   qram = ps.QRAMCircuit_qutrit(addr_bits, data_bits, database)
 
    # 地址叠加态
    ps.Hadamard_Int_Full("addr")(state)
@@ -180,8 +183,8 @@ QRAM 加载支持条件执行：
 
 .. code-block:: python
 
-   # 加载训练数据
-   qram.set_memory(training_data)
+   # 加载训练数据（memory 在构造时传入）
+   qram = ps.QRAMCircuit_qutrit(addr_bits, data_bits, training_data)
    ps.Hadamard_Int_Full("sample_id")(state)
    ps.QRAMLoad(qram, "sample_id", "sample_data")(state)
 

@@ -23,19 +23,12 @@ Reference:
 
 from __future__ import annotations
 
-import cmath
 import math
-from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable
 
 import numpy as np
 
 import pysparq as ps
-
-
-# ==============================================================================
-# Utility Functions
-# ==============================================================================
 
 
 def compute_fs(s: float, kappa: float, p: float) -> float:
@@ -71,7 +64,7 @@ def compute_fs(s: float, kappa: float, p: float) -> float:
     return max(0.0, min(1.0, result))
 
 
-def compute_rotation_matrix(fs: float) -> List[complex]:
+def compute_rotation_matrix(fs: float) -> list[complex]:
     """Compute the rotation matrix R_s for block encoding.
 
     The rotation matrix normalizes the linear interpolation:
@@ -92,11 +85,6 @@ def compute_rotation_matrix(fs: float) -> List[complex]:
     u10 = sqrt_N * fs
     u11 = sqrt_N * (fs - 1)
     return [complex(u00, 0), complex(u01, 0), complex(u10, 0), complex(u11, 0)]
-
-
-# ==============================================================================
-# Dolph-Chebyshev Filtering
-# ==============================================================================
 
 
 def chebyshev_T(n: int, x: float) -> float:
@@ -136,7 +124,7 @@ def dolph_chebyshev(epsilon: float, l: int, phi: float) -> float:
     return epsilon * chebyshev_T(l, beta * math.cos(phi))
 
 
-def compute_fourier_coeffs(epsilon: float, l: int) -> List[float]:
+def compute_fourier_coeffs(epsilon: float, l: int) -> list[float]:
     """Compute Fourier coefficients for Dolph-Chebyshev filter.
 
     Args:
@@ -166,7 +154,7 @@ def compute_fourier_coeffs(epsilon: float, l: int) -> List[float]:
     return coeffs
 
 
-def calculate_angles(coeffs: List[float]) -> List[float]:
+def calculate_angles(coeffs: list[float]) -> list[float]:
     """Calculate rotation angles from coefficients for state preparation.
 
     Args:
@@ -186,11 +174,6 @@ def calculate_angles(coeffs: List[float]) -> List[float]:
         else:
             angles.append(0.0)
     return angles
-
-
-# ==============================================================================
-# Block Encoding of H(s)
-# ==============================================================================
 
 
 class BlockEncodingHs:
@@ -233,10 +216,11 @@ class BlockEncodingHs:
         self.anc_4 = anc_4
         self.fs = fs
         self.R_s = compute_rotation_matrix(fs)
-        self._condition_regs: List[str] = []
+        self._condition_regs: list[str] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
 
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "BlockEncodingHs":
         """Set condition registers."""
         if isinstance(conds, list):
@@ -373,11 +357,6 @@ class BlockEncodingHsPD:
         ps.Hadamard_Bool(self.anc_2)(state)
 
 
-# ==============================================================================
-# Walk Operator
-# ==============================================================================
-
-
 class WalkS:
     """Quantum walk operator at parameter s.
 
@@ -431,11 +410,11 @@ class WalkS:
                 enc_A, enc_b, main_reg, anc_UA, anc_1, anc_2, anc_3, anc_4, self.fs
             )
 
-        self._condition_regs: List[str] = []
-        self._condition_bit: Optional[Tuple[str, int]] = None
+        self._condition_regs: list[str] = []
+        self._condition_bits: list[tuple[str | int, int]] = []
 
     def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
+        self, conds: str | list[str]
     ) -> "WalkS":
         """Set condition registers."""
         if isinstance(conds, list):
@@ -446,12 +425,13 @@ class WalkS:
 
     def conditioned_by_bit(self, reg: str, pos: int) -> "WalkS":
         """Set bit condition."""
-        self._condition_bit = (reg, pos)
+        self._condition_bits = [(reg, pos)]
         return self
 
-    def clear_control_by_bit(self) -> None:
-        """Clear bit condition."""
-        self._condition_bit = None
+    def clear_conditions(self) -> None:
+        """Clear all conditions."""
+        self._condition_regs = []
+        self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply walk operator."""
@@ -485,11 +465,6 @@ class WalkS:
         self.enc_Hs.dag(state)
 
 
-# ==============================================================================
-# LCU Construction
-# ==============================================================================
-
-
 class LCU:
     """Linear Combination of Unitaries for QDA.
 
@@ -514,7 +489,7 @@ class LCU:
             print(f"LCU step {i} / {self.index_size}")
 
             # Get conditioned walk
-            self.walk.clear_control_by_bit()
+            self.walk.clear_conditions()
             walk_cond = self.walk.conditioned_by_bit(self.index_reg, i)
 
             if self.walk._condition_regs:
@@ -531,7 +506,7 @@ class LCU:
         for i in range(self.index_size):
             print(f"LCUdag step {i} / {self.index_size}")
 
-            self.walk.clear_control_by_bit()
+            self.walk.clear_conditions()
             walk_cond = self.walk.conditioned_by_bit(self.index_reg, i)
 
             if self.walk._condition_regs:
@@ -541,11 +516,6 @@ class LCU:
 
             for _ in range(2 ** (i + 1)):
                 walk_cond.dag(state)
-
-
-# ==============================================================================
-# Filtering
-# ==============================================================================
 
 
 class Filtering:
@@ -594,14 +564,9 @@ class Filtering:
         return 1.0
 
 
-# ==============================================================================
-# Classical to Quantum Conversion
-# ==============================================================================
-
-
 def classical_to_quantum(
     A: np.ndarray, b: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], np.ndarray]]:
+) -> tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], np.ndarray]]:
     """Convert classical linear system to quantum-compatible form.
 
     Args:
@@ -655,65 +620,14 @@ def classical_to_quantum(
 
 
 # ==============================================================================
-# Block Encoding Placeholder
+# Block Encoding - Import from modules
 # ==============================================================================
 
+# Import factory function from __init__.py
+from . import BlockEncoding
 
-class BlockEncoding:
-    """Placeholder for block encoding implementation.
-
-    In a full implementation, this would wrap the actual block encoding
-    operations for the specific matrix structure.
-    """
-
-    def __init__(self, A: np.ndarray, data_size: int = 32):
-        self.A = A
-        self.data_size = data_size
-        self._condition_regs: List[str] = []
-
-    def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
-    ) -> "BlockEncoding":
-        """Set condition registers."""
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def __call__(self, state: ps.SparseState) -> None:
-        """Apply block encoding."""
-        # Placeholder - would implement actual block encoding
-        pass
-
-    def dag(self, state: ps.SparseState) -> None:
-        """Apply inverse block encoding."""
-        pass
-
-
-class StatePreparation:
-    """Placeholder for state preparation implementation."""
-
-    def __init__(self, b: np.ndarray):
-        self.b = b
-        self._condition_regs: List[str] = []
-
-    def conditioned_by_all_ones(
-        self, conds: Union[str, List[str]]
-    ) -> "StatePreparation":
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def __call__(self, state: ps.SparseState) -> None:
-        """Prepare state |b>."""
-        pass
-
-    def dag(self, state: ps.SparseState) -> None:
-        """Uncompute state |b>."""
-        pass
+# Import StatePreparation from state_preparation module
+from .state_preparation import StatePreparation
 
 
 # ==============================================================================
@@ -724,7 +638,7 @@ class StatePreparation:
 def qda_solve(
     A: np.ndarray,
     b: np.ndarray,
-    kappa: Optional[float] = None,
+    kappa: float | None = None,
     p: float = 0.5,
     eps: float = 0.01,
     step_rate: float = 1.0,
@@ -793,12 +707,12 @@ def qda_solve(
     anc_UA = "anc_UA"
     anc_1, anc_2, anc_3, anc_4 = "anc_1", "anc_2", "anc_3", "anc_4"
 
-    ps.System.add_register(main_reg, ps.UnsignedInteger, n_bits)
-    ps.System.add_register(anc_UA, ps.UnsignedInteger, n_bits)
-    ps.System.add_register(anc_1, ps.Boolean, 1)
-    ps.System.add_register(anc_2, ps.Boolean, 1)
-    ps.System.add_register(anc_3, ps.Boolean, 1)
-    ps.System.add_register(anc_4, ps.Boolean, 1)
+    ps.AddRegister(main_reg, ps.UnsignedInteger, n_bits)(state)
+    ps.AddRegister(anc_UA, ps.UnsignedInteger, n_bits)(state)
+    ps.AddRegister(anc_1, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_2, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_3, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_4, ps.Boolean, 1)(state)
 
     # Initialize state with |b>
     # ... state preparation ...
@@ -812,6 +726,14 @@ def qda_solve(
             s, kappa, p
         )
         # walk(state)  # Would apply walk in full implementation
+
+    # Clean up registers
+    ps.RemoveRegister(anc_4)(state)
+    ps.RemoveRegister(anc_3)(state)
+    ps.RemoveRegister(anc_2)(state)
+    ps.RemoveRegister(anc_1)(state)
+    ps.RemoveRegister(anc_UA)(state)
+    ps.RemoveRegister(main_reg)(state)
 
     # Extract solution via measurement
     # For now, return classical solution as reference
@@ -830,7 +752,7 @@ from pysparq.algorithms.qda_solver import (
     qda_solve,
     compute_fs,
     compute_rotation_matrix,
-    ChebyshevT,
+    chebyshev_T,
     dolph_chebyshev,
 )
 

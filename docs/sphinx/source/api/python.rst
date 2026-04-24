@@ -16,14 +16,6 @@ PySparQ 通过 :mod:`pysparq` 模块将所有量子操作暴露为 Python 类和
    :members:
    :show-inheritance:
 
-.. autoclass:: pysparq._core.BaseOperator
-   :members:
-   :show-inheritance:
-
-.. autoclass:: pysparq._core.SelfAdjointOperator
-   :members:
-   :show-inheritance:
-
 量子算术算子
 ------------
 
@@ -83,4 +75,4 @@ QRAM 操作
 完整 API 文档
 -------------
 
-完整的 API 文档（所有类、函数和方法），请参见 :doc:`API 参考 </autoapi/PySparQ/pysparq/index>`。
+完整的 API 文档（所有类、函数和方法），请参见 :ref:`modindex`。
