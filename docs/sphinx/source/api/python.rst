@@ -35,6 +35,8 @@ PySparQ 通过 :mod:`pysparq` 模块将所有量子操作暴露为 Python 类和
 
 .. autofunction:: pysparq._core.Mult_UInt_ConstUInt
 
+.. autofunction:: pysparq._core.Mod_Mult_UInt_ConstUInt
+
 .. autofunction:: pysparq._core.AddAssign_AnyInt_AnyInt
 
 量子门

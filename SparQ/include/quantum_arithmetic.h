@@ -544,6 +544,95 @@ namespace qram_simulator
 	};
 
 	/**
+	 * @brief 模乘运算
+	 * @details 计算 |y⟩ → |y * a^(2^x) mod N⟩
+	 *
+	 * 当 a 和 N 互质时，Mod_Mult_UInt_ConstUInt 是酉操作。
+	 *
+	 * @section Mod_Mult_unitary Mod_Mult_UInt_ConstUInt 幺正性说明
+	 *
+	 * Mod_Mult_UInt_ConstUInt 的幺正性条件：
+	 * 1. a 和 N 必须互质（gcd(a, N) = 1）
+	 * 2. 当满足条件时，逆操作为 y * a^(2^x*(N-2)) mod N（费马小定理）
+	 *
+	 * @section Mod_Mult_usage 使用示例
+	 *
+	 * @code
+	 * auto reg = System::add_register("y", UnsignedInteger, 4);
+	 * auto cond = System::add_register("ctrl", Boolean, 1);
+	 * Mod_Mult_UInt_ConstUInt(reg, 7, 2, 15).conditioned_by_all_ones(cond)(state);
+	 * // 计算: y = y * 7^4 mod 15 = y * 4 mod 15
+	 * @endcode
+	 */
+	struct Mod_Mult_UInt_ConstUInt : BaseOperator {
+		using BaseOperator::operator();
+		using BaseOperator::dag;
+
+		/** @brief 操作数寄存器 ID */
+		size_t reg;
+
+		/** @brief 底数 */
+		uint64_t a;
+
+		/** @brief 指数位（计算 a^(2^x)） */
+		uint64_t x;
+
+		/** @brief 模数 */
+		uint64_t N;
+
+		/** @brief 预计算的操作数 opnum = a^(2^x) mod N */
+		uint64_t opnum;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_name 操作数寄存器名称
+		 * @param a 底数
+		 * @param x 指数位
+		 * @param N 模数
+		 * @throws 当 a 和 N 不互质时抛出异常
+		 */
+		Mod_Mult_UInt_ConstUInt(std::string_view reg_name, uint64_t a, uint64_t x, uint64_t N);
+
+		/**
+		 * @brief 构造函数（ID版本）
+		 * @param reg_id 操作数寄存器 ID
+		 * @param a 底数
+		 * @param x 指数位
+		 * @param N 模数
+		 * @throws 当 a 和 N 不互质时抛出异常
+		 */
+		Mod_Mult_UInt_ConstUInt(size_t reg_id, uint64_t a, uint64_t x, uint64_t N);
+
+		/**
+		 * @brief 执行模乘运算
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+		/**
+		 * @brief 执行模乘的逆运算
+		 * @param state 系统状态向量
+		 */
+		void dag(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 执行模乘运算
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+
+		/**
+		 * @brief CUDA 执行模乘的逆运算
+		 * @param state CUDA 稀疏状态
+		 */
+		void dag(CuSparseState& state) const;
+#endif
+	};
+
+	/**
 	 * @brief 无符号整数加法操作（Out-of-place）
 	 * @details 实现 out-of-place 加法：res ^= lhs + rhs
 	 *

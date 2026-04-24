@@ -216,24 +216,19 @@ class ModMul:
         self.x = x
         self.N = N
         self.opnum = general_expmod(a, 2**x, N)
-        self._condition_bit: Optional[Tuple[str, int]] = None
+        self._condition_reg: Optional[str] = None
 
     def conditioned_by_all_ones(self, cond: str) -> "ModMul":
         """Set condition for controlled operation."""
-        self._condition_bit = (cond, 0)
+        self._condition_reg = cond
         return self
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply modular multiplication to the state."""
-        # Use CustomArithmetic for the modular multiplication
-        def modmul_func(val: int) -> int:
-            return (val * self.opnum) % self.N
+        op = ps.Mod_Mult_UInt_ConstUInt(self.reg, self.a, self.x, self.N)
 
-        op = ps.CustomArithmetic([self.reg], 64, 64, modmul_func)
-
-        if self._condition_bit:
-            cond_reg, _ = self._condition_bit
-            op.conditioned_by_all_ones(cond_reg)(state)
+        if self._condition_reg:
+            op.conditioned_by_all_ones(self._condition_reg)(state)
         else:
             op(state)
 

@@ -45,6 +45,7 @@ class ModMul:
     x: int
     N: int
     opnum: int
+    _condition_reg: Optional[str]
 
     def __init__(self, reg: str, a: int, x: int, N: int) -> None: ...
     def conditioned_by_all_ones(self, cond: str) -> "ModMul": ...

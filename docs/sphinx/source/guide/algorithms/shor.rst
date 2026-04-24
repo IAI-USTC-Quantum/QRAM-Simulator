@@ -162,11 +162,7 @@ U 的本征值为 e^(2πik/r)，给出周期。
                )(state)
 
                # 受控模乘
-               opnum = general_expmod(self.a, 2**(self.size - 1 - x), self.N)
-
-               modmul = ps.CustomArithmetic(["anc_reg"], 64, 64,
-                   lambda v: (v * opnum) % self.N
-               )
+               modmul = ps.Mod_Mult_UInt_ConstUInt("anc_reg", self.a, self.size - 1 - x, self.N)
                modmul.conditioned_by_all_ones("work_reg")(state)
 
                # 来自之前测量的相位修正

@@ -32,22 +32,6 @@ namespace qram_simulator {
 			void operator()(std::vector<System>& state) const;
 		};
 
-		/* compute y -> y*a^(2^x) mod N */
-		/* When a and y are coprime, ModMul is garunteed to be unitary */
-		struct ModMul : BaseOperator
-		{
-			size_t reg;
-			uint64_t a;
-			uint64_t x;
-			uint64_t N;
-			uint64_t opnum; /* opnum = a^(2^x) mod N*/
-
-			ClassControllable
-
-			ModMul(size_t reg_, size_t a_, size_t x_, size_t N_);
-			void operator()(std::vector<System>& state) const;
-		};
-
 		/* Seems good */
 		struct SemiClassicalShor
 		{

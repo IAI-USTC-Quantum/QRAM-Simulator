@@ -498,3 +498,88 @@ TEST(QuantumArithmeticTest, CompareUIntUIntUnitarity)
     }
     System::clear();
 }
+// Test Mod_Mult_UInt_ConstUInt - modular multiplication: y -> y * a^(2^x) mod N
+TEST(QuantumArithmeticTest, ModMultUIntConstUInt)
+{
+    auto reg = System::add_register("reg", UnsignedInteger, 4);
+    std::vector<System> state;
+    state.emplace_back();
+
+    // Initialize reg = 3
+    Init_Unsafe(reg, 3)(state);
+
+    // Apply Mod_Mult_UInt_ConstUInt(reg, 7, 0, 15)
+    // x=0 means opnum = 7^1 mod 15 = 7
+    // So y = 3 * 7 mod 15 = 21 mod 15 = 6
+    Mod_Mult_UInt_ConstUInt("reg", 7, 0, 15)(state);
+
+    ASSERT_EQ(state.size(), 1);
+    uint64_t val = getRegValue(state[0], reg, 4);
+    EXPECT_EQ(val, 6);  // 3 * 7 mod 15 = 21 mod 15 = 6
+}
+
+// Test Mod_Mult_UInt_ConstUInt with x > 0
+TEST(QuantumArithmeticTest, ModMultUIntConstUIntWithShift)
+{
+    auto reg = System::add_register("reg", UnsignedInteger, 4);
+    std::vector<System> state;
+    state.emplace_back();
+
+    // Initialize reg = 1
+    Init_Unsafe(reg, 1)(state);
+
+    // Apply Mod_Mult_UInt_ConstUInt(reg, 7, 2, 15)
+    // x=2 means opnum = 7^4 mod 15
+    // 7^2 = 49 mod 15 = 4
+    // 7^4 = 4^2 mod 15 = 16 mod 15 = 1
+    // So y = 1 * 1 mod 15 = 1
+    Mod_Mult_UInt_ConstUInt("reg", 7, 2, 15)(state);
+
+    ASSERT_EQ(state.size(), 1);
+    uint64_t val = getRegValue(state[0], reg, 4);
+    EXPECT_EQ(val, 1);  // 7^4 mod 15 = 1
+}
+
+// Test Mod_Mult_UInt_ConstUInt controlled operation
+TEST(QuantumArithmeticTest, ModMultUIntConstUIntControlled)
+{
+    auto reg = System::add_register("reg", UnsignedInteger, 4);
+    auto ctrl = System::add_register("ctrl", Boolean, 1);
+    std::vector<System> state;
+    state.emplace_back();
+
+    // Initialize reg = 3, ctrl = 1 (condition satisfied)
+    Init_Unsafe(reg, 3)(state);
+    Xgate_Bool("ctrl", 0)(state);
+
+    // Apply controlled Mod_Mult_UInt_ConstUInt
+    Mod_Mult_UInt_ConstUInt("reg", 7, 0, 15).conditioned_by_all_ones("ctrl")(state);
+
+    ASSERT_EQ(state.size(), 1);
+    uint64_t val = getRegValue(state[0], reg, 4);
+    EXPECT_EQ(val, 6);  // 3 * 7 mod 15 = 6
+}
+
+// Test Mod_Mult_UInt_ConstUInt unitarity (in-place with explicit dagger)
+TEST(QuantumArithmeticTest, ModMultUIntConstUIntUnitarity)
+{
+    System::clear();
+    constexpr size_t MOD_BITS = 4;  // N=15 requires 4 bits
+    auto reg = System::add_register("reg", UnsignedInteger, MOD_BITS);
+    Mod_Mult_UInt_ConstUInt op("reg", 7, 0, 15);  // a=7, x=0, N=15
+
+    for (size_t v = 0; v < 15; ++v) {
+        std::vector<System> state;
+        state.emplace_back();
+        state[0].get(reg).value = v;
+        // Apply forward
+        op(state);
+        uint64_t after_forward = state[0].get(reg).value;
+        // Apply dag
+        op.dag(state);
+        uint64_t after_dag = state[0].get(reg).value;
+        ASSERT_EQ(state.size(), 1);
+        EXPECT_EQ(after_dag, v) << "v=" << v << ", after_forward=" << after_forward;
+    }
+    System::clear();
+}

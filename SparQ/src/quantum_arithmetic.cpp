@@ -173,6 +173,93 @@ namespace qram_simulator
 	}
 
 
+	Mod_Mult_UInt_ConstUInt::Mod_Mult_UInt_ConstUInt(std::string_view reg_name, uint64_t a_, uint64_t x_, uint64_t N_)
+		: reg(System::get(reg_name)), a(a_), x(x_), N(N_)
+	{
+		if (std::gcd(a, N) > 1)
+			throw std::invalid_argument("a and N must be coprime");
+
+		opnum = a % N;
+		for (size_t i = 0; i < x; ++i)
+			opnum = (opnum * opnum) % N;
+	}
+
+	Mod_Mult_UInt_ConstUInt::Mod_Mult_UInt_ConstUInt(size_t reg_id, uint64_t a_, uint64_t x_, uint64_t N_)
+		: reg(reg_id), a(a_), x(x_), N(N_)
+	{
+		if (std::gcd(a, N) > 1)
+			throw std::invalid_argument("a and N must be coprime");
+
+		opnum = a % N;
+		for (size_t i = 0; i < x; ++i)
+			opnum = (opnum * opnum) % N;
+	}
+
+	void Mod_Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	{
+		profiler _("Mod_Mult_UInt_ConstUInt");
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t val = s.GetAs(reg, uint64_t);
+			val = (val * opnum) % N;
+			s.get(reg).value = val;
+		}
+	}
+
+	void Mod_Mult_UInt_ConstUInt::dag(std::vector<System>& state) const
+	{
+		profiler _("Mod_Mult_UInt_ConstUInt_dag");
+		// Compute modular inverse using extended Euclidean algorithm
+		int64_t t = 0, new_t = 1;
+		int64_t r_gcd = (int64_t)N, new_r_gcd = (int64_t)opnum;
+		while (new_r_gcd != 0) {
+			int64_t quotient = r_gcd / new_r_gcd;
+			int64_t temp_t = t - quotient * new_t;
+			int64_t temp_r = r_gcd - quotient * new_r_gcd;
+			t = new_t;
+			r_gcd = new_r_gcd;
+			new_t = temp_t;
+			new_r_gcd = temp_r;
+		}
+		uint64_t inverse_opnum;
+		if (r_gcd == 1) {
+			int64_t t_normalized = t % (int64_t)N;
+			if (t_normalized < 0) t_normalized += (int64_t)N;
+			inverse_opnum = (uint64_t)t_normalized;
+		} else {
+			inverse_opnum = 1;
+		}
+
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			uint64_t val = s.GetAs(reg, uint64_t);
+			val = (val * inverse_opnum) % N;
+			s.get(reg).value = val;
+		}
+	}
+
+
 	void Add_UInt_UInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD

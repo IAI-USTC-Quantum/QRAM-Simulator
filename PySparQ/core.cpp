@@ -496,6 +496,25 @@ Note:
             BIND_DAG_METHODS(Add_Mult_UInt_ConstUInt)
                 BIND_CONTROLLABLE_METHODS(Add_Mult_UInt_ConstUInt);
 
+    BIND_BASE_OPERATOR(Mod_Mult_UInt_ConstUInt)
+        .def(py::init<std::string_view, uint64_t, uint64_t, uint64_t>(),
+             py::arg("reg"), py::arg("a"), py::arg("x"), py::arg("N"),
+             R"doc(
+             Create a modular multiplication operator.
+
+             Computes: |y⟩ → |y * a^(2^x) mod N⟩
+
+             Args:
+                 reg: Name of the operand register
+                 a: Base for exponentiation
+                 x: Power of 2 exponent (computes a^(2^x))
+                 N: Modulus
+             )doc")
+        .def(py::init<size_t, uint64_t, uint64_t, uint64_t>(),
+             py::arg("reg_id"), py::arg("a"), py::arg("x"), py::arg("N"))
+            BIND_DAG_METHODS(Mod_Mult_UInt_ConstUInt)
+                BIND_CONTROLLABLE_METHODS(Mod_Mult_UInt_ConstUInt);
+
     BIND_SELF_ADJOINT_OPERATOR(Add_UInt_UInt, R"doc(
 Add two unsigned integer registers.
 
@@ -646,7 +665,8 @@ Example:
 				};
 
 				return new CustomArithmetic(input_ids, input_size.cast<size_t>(), output_size.cast<size_t>(), func_cpp); }),
-             py::arg("input_registers"), py::arg("input_size"), py::arg("output_size"), py::arg("func"));
+             py::arg("input_registers"), py::arg("input_size"), py::arg("output_size"), py::arg("func"))
+	    BIND_CONTROLLABLE_METHODS(CustomArithmetic);
 
     /* quantum_interfere_basic.h */
     // 哈希函数对象绑定

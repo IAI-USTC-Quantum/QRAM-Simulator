@@ -41,6 +41,10 @@
      - ``res += lhs * const``
      - In-place
      - BaseOperator
+   * - ``Mod_Mult_UInt_ConstUInt``
+     - ``y = y * a^(2^x) mod N``
+     - In-place
+     - BaseOperator
    * - ``ShiftLeft``
      - 循环左移
      - In-place
@@ -266,6 +270,42 @@ Add_Mult_UInt_ConstUInt（累加乘法）
    op(state)
 
    # 撤销
+   op.dag(state)
+
+---
+
+模乘算子
+--------
+
+Mod_Mult_UInt_ConstUInt（模乘算子）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: pysparq.Mod_Mult_UInt_ConstUInt
+   :members:
+   :undoc-members:
+
+**操作**: ``y → y * a^(2^x) mod N``（原地模乘）
+
+**Dagger**: ``y → y * a^(-2^x) mod N``（使用扩展欧几里得算法求模逆）
+
+**类型约束**: ``UnsignedInteger``，寄存器大小需 ≥ ⌈log₂(N)⌉。
+
+**条件**: ``a`` 和 ``N`` 必须互质（gcd(a, N) = 1），否则构造时抛出异常。
+
+.. code-block:: python
+
+   import pysparq as ps
+
+   ps.System.clear()
+   reg = ps.System.add_register("y", ps.UnsignedInteger, 4)
+   state = ps.SparseState()
+   ps.Init_Unsafe("y", 3)(state)
+
+   # y = 3 * 7 mod 15 = 6
+   op = ps.Mod_Mult_UInt_ConstUInt("y", 7, 0, 15)
+   op(state)
+
+   # 撤销: y = 6 * 13 mod 15 = 3
    op.dag(state)
 
 ---
