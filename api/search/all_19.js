@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['类型安全说明_0',['类型安全说明',['../quantum__arithmetic_8h.html#type_safety_notes',1,'']]]
+  ['使用示例_0',['使用示例',['../structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html#Mod_Mult_usage',1,'']]]
 ];

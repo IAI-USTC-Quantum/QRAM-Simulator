@@ -483,11 +483,7 @@
             <span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
             <span class="c1"># 受控模乘</span>
-            <span class="n">opnum</span> <span class="o">=</span> <span class="n">general_expmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
-
-            <span class="n">modmul</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">CustomArithmetic</span><span class="p">([</span><span class="s2">&quot;anc_reg&quot;</span><span class="p">],</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span>
-                <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">opnum</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
-            <span class="p">)</span>
+            <span class="n">modmul</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Mod_Mult_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;anc_reg&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
             <span class="n">modmul</span><span class="o">.</span><span class="n">conditioned_by_all_ones</span><span class="p">(</span><span class="s2">&quot;work_reg&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
             <span class="c1"># 来自之前测量的相位修正</span>

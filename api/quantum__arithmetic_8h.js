@@ -6,6 +6,7 @@ var quantum__arithmetic_8h =
     [ "qram_simulator::ShiftRight", "structqram__simulator_1_1ShiftRight.html", "structqram__simulator_1_1ShiftRight" ],
     [ "qram_simulator::Mult_UInt_ConstUInt", "structqram__simulator_1_1Mult__UInt__ConstUInt.html", "structqram__simulator_1_1Mult__UInt__ConstUInt" ],
     [ "qram_simulator::Add_Mult_UInt_ConstUInt", "structqram__simulator_1_1Add__Mult__UInt__ConstUInt.html", "structqram__simulator_1_1Add__Mult__UInt__ConstUInt" ],
+    [ "qram_simulator::Mod_Mult_UInt_ConstUInt", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt" ],
     [ "qram_simulator::Add_UInt_UInt", "structqram__simulator_1_1Add__UInt__UInt.html", "structqram__simulator_1_1Add__UInt__UInt" ],
     [ "qram_simulator::Add_UInt_UInt_InPlace", "structqram__simulator_1_1Add__UInt__UInt__InPlace.html", "structqram__simulator_1_1Add__UInt__UInt__InPlace" ],
     [ "qram_simulator::Add_UInt_ConstUInt", "structqram__simulator_1_1Add__UInt__ConstUInt.html", "structqram__simulator_1_1Add__UInt__ConstUInt" ],

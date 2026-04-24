@@ -10,6 +10,7 @@ var hierarchy =
       [ "qram_simulator::CondRot_General_Bool< Callable >", "structqram__simulator_1_1CondRot__General__Bool.html", null ],
       [ "qram_simulator::CondRot_Rational_Bool", "structqram__simulator_1_1CondRot__Rational__Bool.html", null ],
       [ "qram_simulator::GlobalPhase_Int", "structqram__simulator_1_1GlobalPhase__Int.html", null ],
+      [ "qram_simulator::Mod_Mult_UInt_ConstUInt", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html", null ],
       [ "qram_simulator::ModuleInheritance_Test", "structqram__simulator_1_1ModuleInheritance__Test.html", null ],
       [ "qram_simulator::Phase_Bool", "structqram__simulator_1_1Phase__Bool.html", [
         [ "qram_simulator::Sgate_Bool", "structqram__simulator_1_1Sgate__Bool.html", null ],

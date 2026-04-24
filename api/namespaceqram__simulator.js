@@ -36,6 +36,7 @@ var namespaceqram__simulator =
     [ "Init_Unsafe", "structqram__simulator_1_1Init__Unsafe.html", "structqram__simulator_1_1Init__Unsafe" ],
     [ "inverseQFT", "structqram__simulator_1_1inverseQFT.html", "structqram__simulator_1_1inverseQFT" ],
     [ "Less_UInt_UInt", "structqram__simulator_1_1Less__UInt__UInt.html", "structqram__simulator_1_1Less__UInt__UInt" ],
+    [ "Mod_Mult_UInt_ConstUInt", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt" ],
     [ "ModuleInheritance_Test", "structqram__simulator_1_1ModuleInheritance__Test.html", "structqram__simulator_1_1ModuleInheritance__Test" ],
     [ "ModuleInheritance_Test_SelfAdjoint", "structqram__simulator_1_1ModuleInheritance__Test__SelfAdjoint.html", "structqram__simulator_1_1ModuleInheritance__Test__SelfAdjoint" ],
     [ "MoveBackRegister", "structqram__simulator_1_1MoveBackRegister.html", "structqram__simulator_1_1MoveBackRegister" ],
