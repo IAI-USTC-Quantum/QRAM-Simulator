@@ -1500,5 +1500,138 @@ namespace qram_simulator {
 			}
 	}
 
+	// Mod_Mult_UInt_ConstUInt CUDA implementations
+	struct Mod_Mult_UInt_ConstUInt_Functor {
+		size_t reg_id;
+		uint64_t opnum;
+		uint64_t N;
+		size_t reg_size;
+
+		Mod_Mult_UInt_ConstUInt_Functor(size_t reg_id_, uint64_t opnum_, uint64_t N_, size_t reg_size_)
+			: reg_id(reg_id_), opnum(opnum_), N(N_), reg_size(reg_size_) {}
+
+		__host__ __device__ void operator()(System& s) const {
+			uint64_t val = CuGetAsUint64(s, reg_id, reg_size);
+			val = (val * opnum) % N;
+			CuGet(s, reg_id).value = val;
+		}
+	};
+
+	struct Mod_Mult_UInt_ConstUInt_Functor_Control {
+		size_t reg_id;
+		uint64_t opnum;
+		uint64_t N;
+		size_t reg_size;
+
+		CuCondition_Functor
+
+		Mod_Mult_UInt_ConstUInt_Functor_Control(size_t reg_id_, uint64_t opnum_, uint64_t N_, size_t reg_size_, CuCondition_Params)
+			: reg_id(reg_id_), opnum(opnum_), N(N_), reg_size(reg_size_), CuCondition_Init {}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				uint64_t val = CuGetAsUint64(s, reg_id, reg_size);
+				val = (val * opnum) % N;
+				CuGet(s, reg_id).value = val;
+			}
+		}
+	};
+
+	struct Mod_Mult_UInt_ConstUInt_Functor_Dag {
+		size_t reg_id;
+		uint64_t inverse_opnum;
+		uint64_t N;
+		size_t reg_size;
+
+		Mod_Mult_UInt_ConstUInt_Functor_Dag(size_t reg_id_, uint64_t inverse_opnum_, uint64_t N_, size_t reg_size_)
+			: reg_id(reg_id_), inverse_opnum(inverse_opnum_), N(N_), reg_size(reg_size_) {}
+
+		__host__ __device__ void operator()(System& s) const {
+			uint64_t val = CuGetAsUint64(s, reg_id, reg_size);
+			val = (val * inverse_opnum) % N;
+			CuGet(s, reg_id).value = val;
+		}
+	};
+
+	struct Mod_Mult_UInt_ConstUInt_Functor_Control_Dag {
+		size_t reg_id;
+		uint64_t inverse_opnum;
+		uint64_t N;
+		size_t reg_size;
+
+		CuCondition_Functor
+
+		Mod_Mult_UInt_ConstUInt_Functor_Control_Dag(size_t reg_id_, uint64_t inverse_opnum_, uint64_t N_, size_t reg_size_, CuCondition_Params)
+			: reg_id(reg_id_), inverse_opnum(inverse_opnum_), N(N_), reg_size(reg_size_), CuCondition_Init {}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				uint64_t val = CuGetAsUint64(s, reg_id, reg_size);
+				val = (val * inverse_opnum) % N;
+				CuGet(s, reg_id).value = val;
+			}
+		}
+	};
+
+	// Extended Euclidean algorithm for modular inverse
+	__host__ __device__ static uint64_t compute_modular_inverse(uint64_t a, uint64_t n) {
+		int64_t t = 0, new_t = 1;
+		int64_t r_gcd = (int64_t)n;
+		int64_t new_r_gcd = (int64_t)a;
+
+		while (new_r_gcd != 0) {
+			int64_t quotient = r_gcd / new_r_gcd;
+			int64_t temp_t = t - quotient * new_t;
+			int64_t temp_r = r_gcd - quotient * new_r_gcd;
+			t = new_t;
+			r_gcd = new_r_gcd;
+			new_t = temp_t;
+			new_r_gcd = temp_r;
+		}
+
+		if (r_gcd == 1) {
+			int64_t t_normalized = t % (int64_t)n;
+			if (t_normalized < 0) t_normalized += (int64_t)n;
+			return (uint64_t)t_normalized;
+		}
+		return 1; // Should not happen if a and N are coprime
+	}
+
+	void Mod_Mult_UInt_ConstUInt::operator()(CuSparseState& state) const {
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+
+		if (!HasCondition) {
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Mod_Mult_UInt_ConstUInt_Functor(reg, opnum, N, reg_size)
+			);
+		} else {
+			CuCondition_Host_Prepare
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Mod_Mult_UInt_ConstUInt_Functor_Control(reg, opnum, N, reg_size, CuCondition_Args)
+			);
+		}
+	}
+
+	void Mod_Mult_UInt_ConstUInt::dag(CuSparseState& state) const {
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+		uint64_t inverse_opnum = compute_modular_inverse(opnum, N);
+
+		if (!HasCondition) {
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Mod_Mult_UInt_ConstUInt_Functor_Dag(reg, inverse_opnum, N, reg_size)
+			);
+		} else {
+			CuCondition_Host_Prepare
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Mod_Mult_UInt_ConstUInt_Functor_Control_Dag(reg, inverse_opnum, N, reg_size, CuCondition_Args)
+			);
+		}
+	}
 
 } // namespace qram_simulator
