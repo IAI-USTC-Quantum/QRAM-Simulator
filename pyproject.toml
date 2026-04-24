@@ -1,6 +1,10 @@
 [build-system]
-requires = ["scikit-build-core>=0.10", "pybind11>=2.13", "setuptools-scm>=8"]
-build-backend = "scikit_build_core.build"
+requires = [
+    "scikit-build-core>=0.10",
+    "pybind11>=2.13",
+    "setuptools-scm>=8",
+    "pybind11-stubgen",
+]
 
 [project]
 name = "pysparq"
@@ -22,6 +26,7 @@ minimum-version = "build-system.requires"
 cmake.version = ">=3.15"
 cmake.build-type = "Release"
 wheel.packages = ["PySparQ/pysparq"]
+wheel.install-hook = "pysparq._hooks"
 ninja.make-fallback = false
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 
