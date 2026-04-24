@@ -36,41 +36,6 @@ namespace qram_simulator
 			}
 		}
 
-		ModMul::ModMul(uint64_t reg_, uint64_t a_, uint64_t x_, uint64_t N_)
-			: reg(reg_), a(a_), x(x_), N(N_)
-		{
-			// a and N must be coprime
-			if (std::gcd(a, N) > 1)
-				throw std::invalid_argument("a and N must be coprime");
-
-			opnum = a % N;
-			for (size_t i = 0; i < x; ++i)
-			{
-				opnum = (opnum * opnum) % N;
-			}
-		}
-
-		void ModMul::operator()(std::vector<System>& state) const
-		{
-			profiler _("ControlModMul");
-
-#ifdef SINGLE_THREAD
-			for (auto& s : state)
-			{
-#else
-#pragma omp parallel for
-			for (int i = 0; i < state.size(); ++i)
-			{
-				auto& s = state[i];
-#endif
-				if (ConditionNotSatisfied(s)) continue;
-
-				uint64_t val = s.GetAs(reg, uint64_t);
-				val = (val * opnum) % N;
-				s.get(reg).value = val;
-			}
-		}
-
 		std::pair<size_t, size_t> find_best_fraction(size_t y, size_t Q, size_t N) {
 			double target = (double)y / Q;
 			double low = 0.0;
@@ -197,7 +162,7 @@ namespace qram_simulator
 			for (size_t x = 0; x < size; ++x)
 			{
 				size_t work_reg = AddRegisterWithHadamard("work_reg", UnsignedInteger, 1)(state);
-				ModMul(ancilla_reg, a, size - 1 - x, N).conditioned_by_all_ones(work_reg)(state);
+				Mod_Mult_UInt_ConstUInt(ancilla_reg, a, size - 1 - x, N).conditioned_by_all_ones(work_reg)(state);
 				for (size_t i = 0; i < res.size(); ++i)
 				{
 					if (res[res.size() - 1 - i] == 1)

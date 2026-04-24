@@ -23,7 +23,7 @@ Example:
 from __future__ import annotations
 import collections.abc
 import typing
-__all__: list[str] = ['AddAssign_AnyInt_AnyInt', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt', 'Add_Mult_UInt_ConstUInt', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_Int_Int', 'FlipBools', 'General', 'GetMid_UInt_UInt', 'GetRotateAngle_Int_Int', 'GlobalPhase_Int', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_PartialQubit', 'Init_Unsafe', 'Less_UInt_UInt', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'Mult_UInt_ConstUInt', 'Normalize', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'RXgate_Bool', 'RYgate_Bool', 'RZgate_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SXgate_Bool', 'SelfAdjointOperator', 'Sgate_Bool', 'ShiftLeft', 'ShiftRight', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_Int', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'Tgate_Bool', 'U2gate_Bool', 'U3gate_Bool', 'UnsignedInteger', 'ViewNormalization', 'Xgate_Bool', 'Ygate_Bool', 'ZeroConditionalPhaseFlip', 'Zgate_Bool', 'combine_systems', 'inverseQFT', 'merge_system', 'remove_system', 'split_systems', 'stateprep_unitary_build_schmidt']
+__all__: list[str] = ['AddAssign_AnyInt_AnyInt', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt', 'Add_Mult_UInt_ConstUInt', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_Int_Int', 'FlipBools', 'General', 'GetMid_UInt_UInt', 'GetRotateAngle_Int_Int', 'GlobalPhase_Int', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_PartialQubit', 'Init_Unsafe', 'Less_UInt_UInt', 'Mod_Mult_UInt_ConstUInt', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'Mult_UInt_ConstUInt', 'Normalize', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'RXgate_Bool', 'RYgate_Bool', 'RZgate_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SXgate_Bool', 'SelfAdjointOperator', 'Sgate_Bool', 'ShiftLeft', 'ShiftRight', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_Int', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'Tgate_Bool', 'U2gate_Bool', 'U3gate_Bool', 'UnsignedInteger', 'ViewNormalization', 'Xgate_Bool', 'Ygate_Bool', 'ZeroConditionalPhaseFlip', 'Zgate_Bool', 'combine_systems', 'inverseQFT', 'merge_system', 'remove_system', 'split_systems', 'stateprep_unitary_build_schmidt']
 class AddAssign_AnyInt_AnyInt(BaseOperator):
     @typing.overload
     def __init__(self, input_reg: str, output_reg: str) -> None:
@@ -2090,6 +2090,246 @@ class CondRot_Rational_Bool(BaseOperator):
         ...
 class CustomArithmetic(SelfAdjointOperator):
     def __init__(self, input_registers: list, input_size: int, output_size: int, func: collections.abc.Callable) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> CustomArithmetic:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> CustomArithmetic:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> CustomArithmetic:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> CustomArithmetic:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> CustomArithmetic:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> CustomArithmetic:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> CustomArithmetic:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> CustomArithmetic:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> CustomArithmetic:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> CustomArithmetic:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> CustomArithmetic:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
         ...
 class DenseMatrix_complex:
     @typing.overload
@@ -4593,6 +4833,272 @@ class Less_UInt_UInt(SelfAdjointOperator):
         
         Returns:
             Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Mod_Mult_UInt_ConstUInt(BaseOperator):
+    @typing.overload
+    def __init__(self, reg: str, a: typing.SupportsInt | typing.SupportsIndex, x: typing.SupportsInt | typing.SupportsIndex, N: typing.SupportsInt | typing.SupportsIndex) -> None:
+        """
+                     Create a modular multiplication operator.
+        
+                     Computes: |y⟩ → |y * a^(2^x) mod N⟩
+        
+                     Args:
+                         reg: Name of the operand register
+                         a: Base for exponentiation
+                         x: Power of 2 exponent (computes a^(2^x))
+                         N: Modulus
+        """
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, a: typing.SupportsInt | typing.SupportsIndex, x: typing.SupportsInt | typing.SupportsIndex, N: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers where all bits are 1.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on a specific bit position.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers with nonzero values.
+        
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+        
+        Returns:
+            Self, for method chaining.
+        
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+        """
+        Condition this operation on registers holding a specific value.
+        
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+        
+        Returns:
+            Self, for method chaining.
+        """
+    def dag(self, state: SparseState) -> None:
+        """
+        Apply the adjoint (inverse) of this operation.
+        
+        Args:
+            state: The quantum state to operate on.
+        
+        Note: Only available for self-adjoint operators.
         """
     @property
     def condition_variable_all_ones(self) -> list[int]:

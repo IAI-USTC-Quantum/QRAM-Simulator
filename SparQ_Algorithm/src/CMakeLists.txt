@@ -15,7 +15,7 @@ if (CUDA_FOUND)
     set_target_properties(${PROJECT_NAME}_cuda PROPERTIES
             CUDA_STANDARD 17
             CUDA_STANDARD_REQUIRED ON
-            CUDA_ARCHITECTURES "native" 
+            CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES} 
             CUDA_SEPARABLE_COMPILATION ON 
             CUDA_RESOLVE_DEVICE_SYMBOLS ON
         )

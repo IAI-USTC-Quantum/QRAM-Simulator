@@ -230,11 +230,7 @@ class ModMul:
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply modular multiplication to the state."""
-        # Use CustomArithmetic for the modular multiplication
-        def modmul_func(val: int) -> int:
-            return (val * self.opnum) % self.N
-
-        op = ps.CustomArithmetic([self.reg], 64, 64, modmul_func)
+        op = ps.Mod_Mult_UInt_ConstUInt(self.reg, self.a, self.x, self.N)
 
         if self._condition_bits:
             cond_reg, _ = self._condition_bits[-1]
@@ -243,7 +239,14 @@ class ModMul:
             op(state)
 
     def dag(self, state: ps.SparseState) -> None:
-        raise NotImplementedError("ModMul dag not implemented")
+        """Apply the dagger operation (inverse modular multiplication)."""
+        op = ps.Mod_Mult_UInt_ConstUInt(self.reg, self.a, self.x, self.N)
+
+        if self._condition_bits:
+            cond_reg, _ = self._condition_bits[-1]
+            op.conditioned_by_all_ones(cond_reg).dag(state)
+        else:
+            op.dag(state)
 
 
 class SemiClassicalShor:
