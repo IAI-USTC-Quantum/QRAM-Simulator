@@ -69,12 +69,12 @@ import pysparq as ps
 state = ps.SparseState()
 
 # 添加寄存器（返回寄存器 ID）
-a_id = ps.AddRegister("a", ps.StateStorageType.UnsignedInteger, 4)(state)
-b_id = ps.AddRegister("b", ps.StateStorageType.UnsignedInteger, 4)(state)
+a_id = ps.AddRegister("a", ps.UnsignedInteger, 4)(state)
+b_id = ps.AddRegister("b", ps.UnsignedInteger, 4)(state)
 
 # QAdder 直接操作寄存器值，无需编译成门序列
 # 将 a + b 存储到输出寄存器
-out_id = ps.AddRegister("out", ps.StateStorageType.UnsignedInteger, 5)(state)
+out_id = ps.AddRegister("out", ps.UnsignedInteger, 5)(state)
 ps.Add_UInt_UInt("a", "b", "out")(state)
 ```
 
@@ -121,35 +121,38 @@ pip install pysparq
 
 ```python
 import pysparq as ps
-import numpy as np
 
 # 1. 创建稀疏态
 state = ps.SparseState()
 
 # 2. 定义寄存器（Register Level Programming 的核心）
 # AddRegister 返回寄存器 ID，用于后续操作
-addr_id = ps.AddRegister("addr", ps.StateStorageType.UnsignedInteger, 4)(state)
-data_id = ps.AddRegister("data", ps.StateStorageType.UnsignedInteger, 8)(state)
+addr_id = ps.AddRegister("addr", ps.UnsignedInteger, 4)(state)
+data_id = ps.AddRegister("data", ps.UnsignedInteger, 8)(state)
 
 # 3. 初始化叠加态（所有地址等概率）- Register Level 特性
 ps.Hadamard_Int("addr", 4)(state)  # 对 4-bit 寄存器应用 Hadamard
-print("After Hadamard:", ps.StatePrint(state))
+ps.StatePrint(ps.Detail)(state)
+# 输出：16 个叠加态，每个 addr 等概率幅 0.25，数据寄存器均为 |0>
 
 # 4. 创建 QRAM 并加载数据
-memory = [i * 2 for i in range(16)]  # 16个地址，每个8-bit数据
+memory = [i * 2 for i in range(16)]  # 16 个地址，每个 8-bit 数据
 qram = ps.QRAMCircuit_qutrit(4, 8, memory)
 
 # 5. 执行 QRAM 加载：|addr⟩|0⟩ → |addr⟩|memory[addr]⟩
 ps.QRAMLoad(qram, "addr", "data")(state)
-print("After QRAM Load:", ps.StatePrint(state))
+ps.StatePrint(ps.Detail)(state)
+# 输出示例：addr=|0> data=|0>, addr=|1> data=|2>, addr=|2> data=|4>, ...
 
 # 6. 直接进行算术操作（无需编译成门！）
 # data = data + 5，使用寄存器级别加法
 ps.Add_ConstUInt("data", 5)(state)
-print("After Add:", ps.StatePrint(state))
+ps.StatePrint(ps.Detail)(state)
+# 输出示例：addr=|0> data=|5>, addr=|1> data=|7>, addr=|2> data=|9>, ...
 
 # 7. 测量 - 打印状态概率分布
 ps.StatePrint(ps.Prob)(state)
+# 输出：每个基态的概率 p = 0.0625（1/16）
 ```
 
 ### Register Level 特性的关键 API
@@ -202,23 +205,25 @@ make -j$(nproc)
 
 using namespace qram_simulator;
 
-// 1. 创建系统
-System sys;
+// 1. 创建稀疏态
+SparseState state;
 
 // 2. 声明寄存器
-auto addr_id = sys.create_register("addr", 4);  // 4-bit 地址
-auto data_id = sys.create_register("data", 8);  // 8-bit 数据
+auto addr_id = AddRegister("addr", UnsignedInteger, 4)(state);  // 4-bit 地址
+auto data_id = AddRegister("data", UnsignedInteger, 8)(state);  // 8-bit 数据
 
-// 3. 创建稀疏态
-std::vector<System> state;
-state.emplace_back(sys);
+// 3. 初始化寄存器（指定值）
+Init_Unsafe("addr", 3)(state);
+Init_Unsafe("data", 5)(state);
 
 // 4. 应用操作（Register Level!）
-Hadamard(addr_id)(state);           // 叠加态
-QAdder(data_id, addr_id)(state);    // 直接加法操作
+Hadamard_Int_Full(addr_id)(state);        // 叠加态：|3⟩ → (|0⟩+|1⟩+...+|15⟩)/√16
+(StatePrint(Detail))(state);
+// 输出：16 个叠加态，每个基态振幅 0.25
 
-// 5. 测量
-auto result = measure(state);
+Add_UInt_UInt(addr_id, data_id, addr_id)(state);  // addr = addr + data = 3+5 = 8
+(StatePrint(Detail))(state);
+// 输出：addr=|8>, data=|5>, 所有振幅 1.0
 ```
 
 ### 核心组件
