@@ -37,7 +37,7 @@
    ps.AddRegister("b", ps.UnsignedInteger, 4)(state)
 
    # state 中所有基态的 "b" 值为 0
-   ps.StatePrint()(state)
+   ps.print(state)
 
 ``AddRegister`` 会同时更新静态元数据（``name_register_map``）和所有现有基态的寄存器值。
 

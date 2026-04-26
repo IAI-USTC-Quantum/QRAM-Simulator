@@ -96,23 +96,25 @@ namespace qram_simulator {
 		return ret;
 	}
 
-	void StatePrint::operator()(std::vector<System>& state) const
+	std::string StatePrint::to_string(std::vector<System>& state) const
 	{
 		if (!on)
-			return;
+			return "";
 
-		fmt::print("StatePrint (mode={})\n", disp2str());
+		std::string out;
+		out += fmt::format("StatePrint (mode={})\n", disp2str());
+
 		if (display == Default)
 		{
 			for (auto& system_state : state) {
 				if (precision) {
-					fmt::print("{}\n", system_state.to_string(precision));
+					out += fmt::format("{}\n", system_state.to_string(precision));
 				}
 				else {
-					fmt::print("{}\n", system_state.to_string());
+					out += fmt::format("{}\n", system_state.to_string());
 				}
 			}
-			return;
+			return out;
 		}
 
 		if (display & Detail)
@@ -122,46 +124,51 @@ namespace qram_simulator {
 				auto& v = System::name_register_map[i];
 				if (get_status(v) == false)
 					continue;
-				fmt::print("|({}){} : {}{} | ", i, get_name(v),
+				out += fmt::format("|({}){} : {}{} | ", i, get_name(v),
 					get_type_str(get_type(v)),
 					std::get<2>(v));
 			}
-			fmt::print("\n");
+			out += "\n";
 		}
 
 		for (size_t i = 0; i < state.size(); ++i) {
 
 			if (i >= 64)
 			{
-				fmt::print("... (total {})\n", state.size());
+				out += fmt::format("... (total {})\n", state.size());
 				break;
 			}
 
 			auto& s = state[i];
-			fmt::print("{} ", s.amplitude);
+			out += fmt::format("{} ", s.amplitude);
 
 			if (display & Prob)
-				fmt::print("(p = {}) ", abs_sqr(s.amplitude));
+				out += fmt::format("(p = {}) ", abs_sqr(s.amplitude));
 
 			auto& regs = s.registers;
 			for (int id = 0; id < s.name_register_map.size(); ++id)
 			{
-				//Debug_CheckOverflow(id);
 				if (!System::status_of(id))
 					continue;
 				auto& reg = regs[id];
 				auto info = System::name_register_map[id];
 
 				if (display & Detail)
-					fmt::print(" {}=", get_name(System::name_register_map[id]));
+					out += fmt::format(" {}=", get_name(System::name_register_map[id]));
 
 				if (display & Binary)
-					fmt::print(reg.to_binary_string(info));
+					out += reg.to_binary_string(info);
 				else
-					fmt::print(reg.to_string(info));
+					out += reg.to_string(info);
 			}
-			fmt::print("\n");
+			out += "\n";
 		}
+		return out;
+	}
+
+	void StatePrint::operator()(std::vector<System>& state) const
+	{
+		fmt::print("{}", to_string(state));
 	}
 
 	TestRemovable::TestRemovable(std::string_view register_name_)

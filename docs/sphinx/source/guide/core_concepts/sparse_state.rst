@@ -95,7 +95,7 @@ SparseState 类
    state = ps.SparseState()
 
    print("初始状态:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # 输出:
    # [1 basis state]
    # |q=0⟩ : (1+0j)
@@ -104,7 +104,7 @@ SparseState 类
    ps.Hadamard_Int("q")(state)
 
    print("\nHadamard 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # 输出:
    # [2 basis states]
    # |q=0⟩ : (0.707+0j)
@@ -114,7 +114,7 @@ SparseState 类
    ps.Hadamard_Int_Full("q")(state)
 
    print("\n完整 Hadamard 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # 输出:
    # [4 basis states]
    # |q=0⟩ : (0.5+0j)
@@ -154,12 +154,12 @@ SparseState 类
 .. code-block:: python
 
    # 不同显示模式
-   ps.StatePrint(ps.Default)(state)
-   ps.StatePrint(ps.Binary)(state)
-   ps.StatePrint(ps.Prob)(state)
+   print(ps.StatePrint(ps.Default)(state))
+   print(ps.StatePrint(ps.Binary)(state))
+   print(ps.StatePrint(ps.Prob)(state))
 
    # 指定精度
-   ps.StatePrint(ps.Default, precision=4)(state)
+   print(ps.StatePrint(ps.Default, precision=4)(state))
 
 清除接近零的振幅
 ----------------

@@ -632,8 +632,18 @@ namespace qram_simulator
 		 * @return 是否为空
 		 */
 		bool empty() const { return basis_states.empty(); }
+
+		/**
+		 * @brief 将状态格式化为字符串
+		 * @param display 显示模式（见 StatePrintDisplay）
+		 * @param precision 精度（小数位数）
+		 * @return 格式化状态字符串
+		 */
+		std::string to_string(int32_t display = 0, int precision = 0) const;
 	};
 
+	// Forward declaration of StatePrint (defined in debugger.h)
+	struct StatePrint;
 
 	/** @brief 设备类型枚举 */
 	enum DeviceType { CPU, GPU, ANY };
