@@ -110,8 +110,17 @@ QRAM-Simulator/
 
 ### Qutrit-based vs Qubit-based QRAM
 
-- **Qutrit-based**：更自然的树结构表示，更高效的电路深度
-- **Qubit-based**：硬件兼容性更好，更成熟的理论
+两者的核心区别在于 **address 编码方式**，进而导致不同的 error scaling：
+
+- **Qutrit-based**（0/1/wait 三态编码）：address 存在关闭（wait）状态
+  - 经典信息以 **classical controlled X** 方式编码
+  - Z-basis 直接传下去，无需基变换
+  - Error scaling: ε ∈ O(L²)，L 为 layer number
+
+- **Qubit-based**（0/1 两态编码）：address 无关闭状态，默认常开（向左 routing）
+  - 无法直接将 data qubit 传下去，需要将 data 换到 **Pauli-X basis**
+  - 经典信息以 **classical controlled Z** 方式传入
+  - Error scaling: ε ∈ O(L³)，L 为 layer number
 
 ## 扩展性
 
