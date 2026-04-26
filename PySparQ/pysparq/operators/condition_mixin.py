@@ -14,7 +14,10 @@ storage, which in turn reads/writes the mixin's mangled names.
 
 from __future__ import annotations
 
-from typing import Self
+try:
+    from typing import Self  # Python 3.11+
+except ImportError:
+    from typing_extensions import Self  # Python 3.10
 
 
 class ControllableOperatorMixin:
