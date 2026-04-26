@@ -41,7 +41,17 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    # Exclude 03_算子示例.ipynb from nbsphinx execution: the new live cells added in
+    # this notebook invoke pysparq operations that cause the Jupyter kernel to die
+    # (DeadKernelError) in the docs CI environment.  nbsphinx_allow_errors does not
+    # suppress kernel-death failures, so we exclude the notebook from the build
+    # entirely.  It is still present in the repo as a reference document.
+    "notebooks/03_算子示例.ipynb",
+]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
