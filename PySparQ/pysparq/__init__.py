@@ -150,6 +150,7 @@ from pysparq._core import (
     U2gate_Bool,
     U3gate_Bool,
     CondRot_Rational_Bool,
+    CondRot_General_Bool,
     PlusOneAndOverflow,
     # Utilities
     split_systems,

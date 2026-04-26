@@ -310,7 +310,7 @@ def grover_search(
 
     # Compute address register size
     n = len(memory)
-    n_bits = int(math.log2(n)) + 1 if n > 0 else 1
+    n_bits = max(1, (n - 1).bit_length()) if n > 0 else 1
 
     # Ensure n is power of 2 for QRAM
     actual_n = 2**n_bits
@@ -348,14 +348,8 @@ def grover_search(
 
     # Apply Grover iterations
     for _ in range(n_iterations):
-        # Add temporary data register for this iteration
-        ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)(state)
-
         # Apply Grover operator
         grover_op(state)
-
-        # Remove temporary data register
-        ps.RemoveRegister("data_temp")(state)
 
     # Measure: apply partial trace to get address
     measured_results, prob = ps.PartialTrace(["data", "search"])(state)
@@ -391,7 +385,7 @@ def grover_count(
     ps.System.clear()
 
     n = len(memory)
-    n_bits = int(math.log2(n)) + 1 if n > 0 else 1
+    n_bits = max(1, (n - 1).bit_length()) if n > 0 else 1
 
     # Ensure power of 2
     actual_n = 2**n_bits
