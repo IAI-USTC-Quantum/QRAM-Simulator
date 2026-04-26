@@ -110,7 +110,7 @@ Rot_GeneralStatePrep（量子态制备）
    op = ps.Rot_GeneralStatePrep("q", target)
    op(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
    # |q=0⟩ : (0.5+0j)
    # |q=1⟩ : (0.5+0j)
    # |q=2⟩ : (0.5+0j)

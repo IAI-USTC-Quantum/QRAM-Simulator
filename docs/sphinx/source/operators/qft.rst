@@ -68,7 +68,7 @@ QFT
    ps.Init_Unsafe("q", 1)(state)
 
    print("初始状态:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # |q=1⟩ : (1+0j)
 
    # 应用 QFT
@@ -76,7 +76,7 @@ QFT
    op(state)
 
    print("\nQFT 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # 产生相位均匀分布的叠加态
 
    # 撤销（逆变换）
@@ -214,15 +214,15 @@ inverseQFT
    ps.Init_Unsafe("q", initial_value)(state)
 
    print("初始状态:")
-   ps.StatePrint()(state)
+   ps.print(state)
 
    # QFT
    ps.QFT("q")(state)
    print("\nQFT 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
 
    # inverseQFT
    ps.inverseQFT("q")(state)
    print("\ninverseQFT 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # 恢复到 |q=5⟩

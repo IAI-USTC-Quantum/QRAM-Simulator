@@ -43,15 +43,18 @@
 StatePrint（状态打印）
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.StatePrint
+.. autofunction:: pysparq.StatePrint
+.. autofunction:: pysparq.print
+.. autofunction:: pysparq.to_string
+.. autoclass:: pysparq.StatePrinter
    :members:
-   :undoc-members:
 
-**操作**: 以指定格式打印 ``SparseState`` 中所有基态的信息。
+**操作**: 以指定格式返回 ``SparseState`` 中所有基态的信息字符串。
 
 **参数**:
 
-- ``display`` — 显示模式（可选，默认 ``Default``）
+- ``state`` — SparseState 实例
+- ``mode`` — 显示模式（可选，默认 ``Detail``）
 - ``precision`` — 浮点精度（可选）
 
 **显示模式**:
@@ -74,17 +77,32 @@ StatePrint（状态打印）
 
    import pysparq as ps
 
-   # 默认格式
-   ps.StatePrint()(state)
+   # 打印到 stdout（Detail 模式）
+   ps.print(state)
+   # 输出：
+   # StatePrint (mode=Detail)
+   # |(0)addr : UInt4 | |(1)data : UInt8 |
+   # 0.250000+0.000000i  addr=|0> data=|0>
+   # 0.250000+0.000000i  addr=|1> data=|2>
+   # ...
 
-   # 概率格式
-   ps.StatePrint(ps.Prob)(state)
+   # 返回字符串（Detail 模式）
+   ps.StatePrint(state)
+   # 返回相同的 Detail 格式字符串
+
+   # 概率格式（返回字符串）
+   ps.StatePrint(state, mode=ps.StatePrintDisplay.Prob)
+   # 输出：
+   # StatePrint (mode=Prob)
+   # 0.250000+0.000000i (p = 0.0625) |0>|0>
+   # ...
 
    # 高精度
-   ps.StatePrint(ps.Default, 15)(state)
+   ps.StatePrint(state, mode=ps.StatePrintDisplay.Default, precision=15)
 
    # 二进制格式
-   ps.StatePrint(ps.Binary)(state)
+   ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary)
+   # 寄存器值以二进制显示
 
 ---
 

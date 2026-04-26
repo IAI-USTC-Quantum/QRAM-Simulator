@@ -81,7 +81,7 @@ CondRot_Rational_Bool
    op = ps.CondRot_Rational_Bool("angle", "target")
    op(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
    # target 状态被旋转角度 ≈ π/4
 
    # 撤销
@@ -135,7 +135,7 @@ CondRot_General_Bool
    ps.Init_Unsafe("input", 64)(state)  # θ = 64/256 * 2π = π/2
    op(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
 
    # 撤销（需要手动实现逆）
    def my_rotation_inv(value: int) -> np.ndarray:

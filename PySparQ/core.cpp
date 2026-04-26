@@ -141,7 +141,15 @@ Attributes:
 
     sparse_state.def_readonly("basis_states", &SparseState::basis_states)
         .def("size", &SparseState::size)
-        .def("empty", &SparseState::empty);
+        .def("empty", &SparseState::empty)
+        .def("to_string", &SparseState::to_string, py::arg("display") = 0,
+             py::arg("precision") = 0,
+             "Return a formatted string representation of the state.\n\n"
+             "Args:\n"
+             "    display: Display mode flags (StatePrintDisplay values).\n"
+             "    precision: Number of decimal places for floating-point numbers.")
+        .def("__str__",  [](const SparseState& self) { return self.to_string(1); })
+        .def("__repr__", [](const SparseState& self) { return self.to_string(1); });
 
     /* condrot.h */
     BIND_BASE_OPERATOR(CondRot_Rational_Bool)
@@ -239,7 +247,27 @@ Example:
         .def(py::init<int32_t>(), py::arg("disp") = 0)
         .def(py::init<int32_t, int>(), py::arg("disp"), py::arg("precision"))
         .def(py::init<StatePrintDisplay>(), py::arg("disp"))
-        .def_readwrite_static("on", &StatePrint::on);
+        .def_readwrite_static("on", &StatePrint::on)
+        .def("__call__", [](StatePrint& self, py::object state_obj) -> std::string {
+            py::list sys_list = state_obj.attr("basis_states").cast<py::list>();
+            std::vector<System> systems;
+            systems.reserve(py::len(sys_list));
+            for (py::handle item : sys_list) {
+                System& sys = item.cast<System&>();
+                systems.push_back(sys);
+            }
+            return self.to_string(systems);
+        }, py::arg("state"),
+            "Return formatted state string for the given SparseState.");
+
+    // ps.print() - convenience function that prints state to stdout
+    m.def("print", [](SparseState& state) {
+        std::string result = state.to_string(1);  // Detail mode
+        py::print(result, "end"_a = "");
+    }, py::arg("state"),
+        "Print a SparseState to stdout in detail mode.\n\n"
+        "Uses Detail display mode (shows register names and types).\n"
+        "Output is captured by Jupyter/IPython notebooks.");
 
     // TestRemovable 绑定
     BIND_SELF_ADJOINT_OPERATOR(TestRemovable)

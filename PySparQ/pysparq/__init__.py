@@ -10,15 +10,24 @@ Basic Usage:
     >>> ps.System.add_register("q", ps.UnsignedInteger, 4)
     >>> state = ps.SparseState()
     >>> ps.Init_Unsafe("q", 5)(state)
-    >>> ps.print(state)          # prints to stdout (Jupyter-friendly)
-    >>> print(state)             # uses __str__ (Detail mode)
-    >>> state.to_string(ps.StatePrintDisplay.Default)  # explicit mode
+    >>> ps.print(state)                          # print to stdout (Detail mode)
+    >>> str(state)                               # __str__ → Detail mode string
+    >>> repr(state)                              # __repr__ → Detail mode string
+    >>> ps.StatePrint(state)                     # returns Detail mode string
+    >>> ps.StatePrint(state, ps.StatePrintDisplay.Default)  # explicit mode
 
 Key Features:
     - Register Level Programming: Operate on named registers instead of individual qubits
     - Sparse State Simulation: Efficiently simulate states with few non-zero amplitudes
     - Native QRAM Support: Quantum Random Access Memory for efficient data loading
     - High Performance: C++ core with Python bindings
+
+Display Modes (StatePrintDisplay):
+    - Default (0):  Brief format — amplitude and register values only
+    - Detail  (1):  Register header + amplitude + named register values
+    - Binary  (2):  Register values shown in binary
+    - Prob    (4):  Amplitude + probability for each basis state
+    Modes can be OR'd together: Detail | Prob
 
 See Also:
     - Documentation: https://iai-ustc-quantum.github.io/QRAM-Simulator/
@@ -36,44 +45,250 @@ except ImportError:
     __version__ = "0.0.0.dev0"
     __version_tuple__ = (0, 0, 0, "dev0")
 
-from ._core import *
+# Import everything from _core, then shadow StatePrint/print with Python functions.
+# Using a targeted import + re-bind pattern (rather than "from ._core import *")
+# so that we can override StatePrint without name collision.
+import pysparq._core as _core
+from pysparq._core import (
+    SparseState,
+    System,
+    StateStorage,
+    StateStorageType,
+    # Expose StateStorageType values at module level for convenience
+    UnsignedInteger,
+    SignedInteger,
+    Boolean,
+    Rational,
+    General as StateStorageType_General,
+    SparseMatrix,
+    DenseMatrix_complex,
+    DenseMatrix_float64,
+    BaseOperator,
+    SelfAdjointOperator,
+    # Operators
+    AddRegister,
+    AddRegisterWithHadamard,
+    RemoveRegister,
+    MoveBackRegister,
+    SplitRegister,
+    CombineRegister,
+    Push,
+    Pop,
+    ClearZero,
+    Normalize,
+    Init_Unsafe,
+    ModuleInheritance_Test,
+    ModuleInheritance_Test_SelfAdjoint,
+    CheckNormalization,
+    CheckNan,
+    ViewNormalization,
+    TestRemovable,
+    CheckDuplicateKey,
+    Hadamard_Int,
+    Hadamard_Int_Full,
+    Hadamard_Bool,
+    Hadamard_PartialQubit,
+    ZeroConditionalPhaseFlip,
+    Reflection_Bool,
+    GlobalPhase_Int,
+    PartialTrace,
+    PartialTraceSelect,
+    PartialTraceSelectRange,
+    QFT,
+    inverseQFT,
+    QRAMCircuit_qutrit,
+    QRAMLoad,
+    QRAMLoadFast,
+    Xgate_Bool,
+    FlipBools,
+    Swap_Bool_Bool,
+    ShiftLeft,
+    ShiftRight,
+    Mult_UInt_ConstUInt,
+    Add_Mult_UInt_ConstUInt,
+    Mod_Mult_UInt_ConstUInt,
+    Add_UInt_UInt,
+    Add_UInt_UInt_InPlace,
+    Add_UInt_ConstUInt,
+    Add_ConstUInt,
+    Div_Sqrt_Arccos_Int_Int,
+    Sqrt_Div_Arccos_Int_Int,
+    GetRotateAngle_Int_Int,
+    AddAssign_AnyInt_AnyInt,
+    Assign,
+    Compare_UInt_UInt,
+    Less_UInt_UInt,
+    Swap_General_General,
+    GetMid_UInt_UInt,
+    CustomArithmetic,
+    StateHashExceptKey,
+    StateHashExceptQubits,
+    StateEqualExceptKey,
+    StateEqualExceptQubits,
+    StateLessExceptKey,
+    StateLessExceptQubits,
+    Rot_GeneralUnitary,
+    Rot_GeneralStatePrep,
+    stateprep_unitary_build_schmidt,
+    SortExceptKey,
+    SortByKey,
+    SortExceptBit,
+    SortExceptKeyHadamard,
+    SortUnconditional,
+    SortByAmplitude,
+    SortByKey2,
+    Phase_Bool,
+    Rot_Bool,
+    Ygate_Bool,
+    Zgate_Bool,
+    Sgate_Bool,
+    Tgate_Bool,
+    RXgate_Bool,
+    RYgate_Bool,
+    RZgate_Bool,
+    SXgate_Bool,
+    U2gate_Bool,
+    U3gate_Bool,
+    CondRot_Rational_Bool,
+    PlusOneAndOverflow,
+    # Utilities
+    split_systems,
+    combine_systems,
+    merge_system,
+    remove_system,
+    # Enums
+    StatePrintDisplay,
+    # Note: StatePrint (C++ class) is NOT imported here — we shadow it below
+)
 from .dynamic_operator import compile_operator, CompilationError, DynamicOperatorError
 
 
-class StatePrinter:
-    """Pythonic state printer with configurable display mode.
+# --------------------------------------------------------------------
+# State string formatting (shadows _core.StatePrint and _core.print)
+# --------------------------------------------------------------------
 
-    Wraps the C++ StatePrint and provides a clean Python API.
-    The ``__call__`` method returns a formatted string (not prints),
-    so output is properly captured by Jupyter/IPython.
+def StatePrint(
+    state: SparseState,
+    mode: int | StatePrintDisplay = 1,
+    precision: int = 0,
+) -> str:
+    """Return a formatted string representation of a SparseState.
+
+    This is the primary way to convert a SparseState to a string.
+    ``ps.StatePrint(state)`` is equivalent to ``str(state)`` but allows
+    explicit control over display mode and precision.
 
     Args:
-        mode: Display mode (int or StatePrintDisplay enum).
-              Defaults to Detail (shows register names and types).
+        state: The SparseState to format.
+        mode:  Display mode (int or StatePrintDisplay enum).
+               Defaults to Detail (1) — shows register names and types.
+               See ``StatePrintDisplay`` for available modes.
         precision: Number of decimal places for floating-point numbers.
-                   Defaults to 0 (uses the state default).
+                   Defaults to 0 (uses the state's default).
+
+    Returns:
+        A formatted string describing the quantum state.
 
     Example:
-        >>> printer = StatePrinter(StatePrintDisplay.Default)
-        >>> print(printer(state))       # Default mode
-        >>> printer(state, mode=StatePrintDisplay.Binary)  # binary values
+        >>> ps.System.clear()
+        >>> ps.AddRegister("q", ps.UnsignedInteger, 2)(ps.SparseState())
+        >>> ps.Init_Unsafe("q", 1)(ps.SparseState())
+        >>> state = ps.SparseState()
+        >>> ps.Hadamard_Int("q", 2)(state)
+        >>> ps.StatePrint(state)       # Detail mode (default)
+        >>> ps.StatePrint(state, mode=ps.StatePrintDisplay.Default)
+        >>> ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary)
+        >>> ps.StatePrint(state, mode=ps.StatePrintDisplay.Prob)
+    """
+    return state.to_string(int(mode), precision)
 
-        >>> printer = StatePrinter(StatePrintDisplay.Prob)
-        >>> print(printer(state))       # show probabilities
+
+def to_string(
+    state: SparseState,
+    mode: int | StatePrintDisplay = 1,
+    precision: int = 0,
+) -> str:
+    """Return a formatted string representation of a SparseState.
+
+    Alias for ``StatePrint(state, mode, precision)`` with Detail mode default.
+
+    Args:
+        state: The SparseState to format.
+        mode:  Display mode. Defaults to Detail (1).
+        precision: Decimal places for floating-point numbers.
+
+    Returns:
+        A formatted string describing the quantum state.
+    """
+    return state.to_string(int(mode), precision)
+
+
+def print(state: SparseState, mode: int | StatePrintDisplay = 1, precision: int = 0) -> None:
+    """Print a SparseState to stdout in the specified display mode.
+
+    This function prints directly to standard output, which is captured
+    correctly by Jupyter and IPython notebooks.
+
+    Args:
+        state: The SparseState to print.
+        mode: Display mode. Defaults to Detail (1).
+        precision: Decimal places for floating-point numbers.
+
+    Example:
+        >>> ps.System.clear()
+        >>> ps.AddRegister("q", ps.UnsignedInteger, 2)(ps.SparseState())
+        >>> state = ps.SparseState()
+        >>> ps.Hadamard_Int("q", 2)(state)
+        >>> ps.print(state)   # prints to stdout in Detail mode
+        >>> ps.print(state, mode=ps.StatePrintDisplay.Prob)   # Prob mode
+    """
+    result = state.to_string(int(mode), precision)
+    import sys
+    sys.stdout.write(result + '\n')
+
+
+class StatePrinter:
+    """Reusable state formatter with configurable default mode.
+
+    Provides a stateful formatter that holds a persistent mode and
+    precision setting. Useful when printing many states in the same
+    format.
+
+    Args:
+        mode: Default display mode. Defaults to Detail (1).
+        precision: Default decimal precision. Defaults to 0.
+
+    Example:
+        >>> printer = StatePrinter(ps.StatePrintDisplay.Prob)
+        >>> printer(state1)   # uses Prob mode
+        >>> printer(state2)   # uses Prob mode
+        >>> printer(state3, mode=ps.StatePrintDisplay.Binary)  # override
     """
 
     def __init__(
         self,
-        mode: int | "StatePrintDisplay" = 1,  # Detail by default
+        mode: int | StatePrintDisplay = 1,
         precision: int = 0,
     ):
-        self.mode = mode
+        self.mode = int(mode)
         self.precision = precision
-        self._cpp_printer = StatePrint(mode, precision)
 
-    def __call__(self, state: SparseState) -> str:
-        """Format a SparseState and return the string."""
-        return self._cpp_printer(state)
+    def __call__(
+        self,
+        state: SparseState,
+        mode: int | StatePrintDisplay | None = None,
+    ) -> str:
+        """Format a state using this printer's mode (or override it).
+
+        Args:
+            state: The SparseState to format.
+            mode: Optional mode override for this call.
+
+        Returns:
+            Formatted string representation.
+        """
+        effective_mode = int(mode) if mode is not None else self.mode
+        return state.to_string(effective_mode, self.precision)
 
     def __str__(self) -> str:
         return f"StatePrinter(mode={self.mode}, precision={self.precision})"
@@ -81,17 +296,10 @@ class StatePrinter:
     def __repr__(self) -> str:
         return self.__str__()
 
-    def to_string(self, state: SparseState, mode: int | None = None) -> str:
-        """Format a state with optional mode override.
 
-        Args:
-            state: The SparseState to format.
-            mode: Optional mode override (uses instance mode if None).
-        """
-        if mode is not None:
-            return StatePrint(mode, self.precision)(state)
-        return self(state)
-
+# --------------------------------------------------------------------
+# Test utilities
+# --------------------------------------------------------------------
 
 def test_import() -> None:
     """Test that PySparQ imports are working correctly.

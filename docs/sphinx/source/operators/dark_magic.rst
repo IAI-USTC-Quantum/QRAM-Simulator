@@ -91,7 +91,7 @@ Init_Unsafe（不安全初始化）
    ps.Init_Unsafe("a", 3)(state)
    ps.Init_Unsafe("b", 5)(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
    # |a=3,b=5⟩ : (1+0j)
 
 .. note::

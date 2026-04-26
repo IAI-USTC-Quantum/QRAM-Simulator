@@ -100,16 +100,16 @@ class GroverOracle:
         ps.QRAMLoad(self.qram, self.addr_reg, self.data_reg)(state)
 
         # Step 2: Create comparison flag registers
-        compare_less = ps.AddRegister("compare_less", ps.Boolean, 1)(state)
-        compare_equal = ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
+        ps.AddRegister("compare_less", ps.Boolean, 1)(state)
+        ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
 
         # Step 3: Compare loaded data with search target value
         ps.Compare_UInt_UInt(
-            self.data_reg, self.search_reg, compare_less, compare_equal
+            self.data_reg, self.search_reg, "compare_less", "compare_equal"
         )(state)
 
         # Step 4: Apply phase flip on match (marked states)
-        phase_flip = ps.ZeroConditionalPhaseFlip([compare_equal])
+        phase_flip = ps.ZeroConditionalPhaseFlip(["compare_equal"])
         if self._condition_regs:
             phase_flip.conditioned_by_nonzeros(self._condition_regs)(state)
         else:
@@ -117,12 +117,12 @@ class GroverOracle:
 
         # Step 5: Uncompute comparison (reverse comparison)
         ps.Compare_UInt_UInt(
-            self.data_reg, self.search_reg, compare_less, compare_equal
+            self.data_reg, self.search_reg, "compare_less", "compare_equal"
         )(state)
 
         # Step 6: Remove temporary registers
-        ps.RemoveRegister(compare_equal)(state)
-        ps.RemoveRegister(compare_less)(state)
+        ps.RemoveRegister("compare_equal")(state)
+        ps.RemoveRegister("compare_less")(state)
 
         # Step 7: Uncompute QRAM load (self-adjoint, same operation)
         ps.QRAMLoad(self.qram, self.addr_reg, self.data_reg)(state)
@@ -349,7 +349,7 @@ def grover_search(
     # Apply Grover iterations
     for _ in range(n_iterations):
         # Add temporary data register for this iteration
-        data_id = ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)(state)
+        ps.AddRegister("data_temp", ps.UnsignedInteger, data_size)(state)
 
         # Apply Grover operator
         grover_op(state)

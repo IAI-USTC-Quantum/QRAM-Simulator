@@ -132,8 +132,15 @@ data_id = ps.AddRegister("data", ps.UnsignedInteger, 8)(state)
 
 # 3. 初始化叠加态（所有地址等概率）- Register Level 特性
 ps.Hadamard_Int("addr", 4)(state)  # 对 4-bit 寄存器应用 Hadamard
-ps.StatePrint(ps.Detail)(state)
-# 输出：16 个叠加态，每个 addr 等概率幅 0.25，数据寄存器均为 |0>
+ps.print(state)  # Detail 模式：显示寄存器头和所有基态
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)addr : UInt4 | |(1)data : UInt8 |
+# 0.250000+0.000000i  addr=|0> data=|0>
+# 0.250000+0.000000i  addr=|1> data=|0>
+# ...
+# 0.250000+0.000000i  addr=|15> data=|0>
+# 每个基态振幅 0.25（等概率叠加 16 个地址），数据寄存器均为 |0>
 
 # 4. 创建 QRAM 并加载数据
 memory = [i * 2 for i in range(16)]  # 16 个地址，每个 8-bit 数据
@@ -141,17 +148,32 @@ qram = ps.QRAMCircuit_qutrit(4, 8, memory)
 
 # 5. 执行 QRAM 加载：|addr⟩|0⟩ → |addr⟩|memory[addr]⟩
 ps.QRAMLoad(qram, "addr", "data")(state)
-ps.StatePrint(ps.Detail)(state)
-# 输出示例：addr=|0> data=|0>, addr=|1> data=|2>, addr=|2> data=|4>, ...
+ps.print(state)
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)addr : UInt4 | |(1)data : UInt8 |
+# 0.250000+0.000000i  addr=|0> data=|0>
+# 0.250000+0.000000i  addr=|1> data=|2>
+# 0.250000+0.000000i  addr=|2> data=|4>
+# ...
+# 0.250000+0.000000i  addr=|15> data=|30>
+# 每个 addr 等概率幅 0.25，data = memory[addr] = addr × 2
 
 # 6. 直接进行算术操作（无需编译成门！）
 # data = data + 5，使用寄存器级别加法
 ps.Add_ConstUInt("data", 5)(state)
-ps.StatePrint(ps.Detail)(state)
-# 输出示例：addr=|0> data=|5>, addr=|1> data=|7>, addr=|2> data=|9>, ...
+ps.print(state)
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)addr : UInt4 | |(1)data : UInt8 |
+# 0.250000+0.000000i  addr=|0> data=|5>
+# 0.250000+0.000000i  addr=|1> data=|7>
+# 0.250000+0.000000i  addr=|2> data=|9>
+# ...
+# 0.250000+0.000000i  addr=|15> data=|35>
 
 # 7. 测量 - 打印状态概率分布
-ps.StatePrint(ps.Prob)(state)
+ps.print(state, mode=ps.StatePrintDisplay.Prob)
 # 输出：每个基态的概率 p = 0.0625（1/16）
 ```
 

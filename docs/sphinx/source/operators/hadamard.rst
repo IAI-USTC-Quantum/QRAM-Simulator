@@ -64,7 +64,7 @@ Hadamard_Int
 
    state = ps.SparseState()
    print("初始状态:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # [1 basis state]
    # |q=0⟩ : (1+0j)
 
@@ -72,7 +72,7 @@ Hadamard_Int
    ps.Hadamard_Int("q", 2)(state)
 
    print("\nHadamard 后:")
-   ps.StatePrint()(state)
+   ps.print(state)
    # [2 basis states]
    # |q=0⟩ : (0.707+0j)
    # |q=2⟩ : (0.707+0j)
@@ -110,7 +110,7 @@ Hadamard_Int_Full
    # 完整 Hadamard：创建 2^2 = 4 个状态
    ps.Hadamard_Int_Full("q")(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
    # [4 basis states]
    # |q=0⟩ : (0.5+0j)
    # |q=1⟩ : (0.5+0j)
@@ -153,7 +153,7 @@ Hadamard_Bool
 
    ps.Hadamard_Bool("qubit")(state)
 
-   ps.StatePrint()(state)
+   ps.print(state)
    # [2 basis states]
    # |qubit=0⟩ : (0.707+0j)
    # |qubit=1⟩ : (0.707+0j)
