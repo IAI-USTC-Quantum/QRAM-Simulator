@@ -10,3 +10,20 @@ from pysparq._core import __all__ as __all__
 def test_import() -> None:
     """测试 PySparQ 导入是否正常工作。"""
     ...
+
+
+class StatePrinter:
+    """Pythonic state printer with configurable display mode."""
+
+    def __init__(
+        self,
+        mode: int | "StatePrintDisplay" = 1,
+        precision: int = 0,
+    ) -> None:
+        ...
+    def __call__(self, state: SparseState) -> str: ...
+    def __str__(self) -> str: ...
+    def __repr__(self) -> str: ...
+    def to_string(self, state: SparseState, mode: int | None = None) -> str: ...
+    mode: int | StatePrintDisplay
+    precision: int

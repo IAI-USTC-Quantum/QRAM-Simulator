@@ -161,11 +161,16 @@ namespace qram_simulator {
 		fmt::print("Factor = {}\n", factor);
 	}
 
+	std::string StatePrint::to_string(CuSparseState& state) const
+	{
+		state.copy_to_cpu();
+		return to_string(state.sparse_state_cpu);
+	}
+
 	void StatePrint::operator()(CuSparseState& state) const
 	{
 		fmt::print("StatePrint CUDA\n");
-		state.copy_to_cpu();
-		(*this)(state.sparse_state_cpu);
+		fmt::print("{}", to_string(state));
 	}
 
 	struct TestRemovable_Functor {

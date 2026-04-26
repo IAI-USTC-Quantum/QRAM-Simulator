@@ -255,14 +255,28 @@ namespace qram_simulator
 		std::string disp2str() const;
 
 		/**
-		 * @brief 应用状态打印
+		 * @brief 应用状态打印，返回格式化字符串
+		 * @param state 系统状态向量
+		 * @return 格式化状态字符串
+		 */
+		std::string to_string(std::vector<System>& state) const;
+
+		/**
+		 * @brief 应用状态打印（打印到标准输出）
 		 * @param state 系统状态向量
 		 */
 		void operator()(std::vector<System>& state) const;
 
 #ifdef USE_CUDA
 		/**
-		 * @brief CUDA 应用状态打印
+		 * @brief CUDA 应用状态打印，返回格式化字符串
+		 * @param state CUDA 稀疏状态
+		 * @return 格式化状态字符串
+		 */
+		std::string to_string(CuSparseState& state) const;
+
+		/**
+		 * @brief CUDA 应用状态打印（打印到标准输出）
 		 * @param state CUDA 稀疏状态
 		 */
 		void operator()(CuSparseState& state) const;
