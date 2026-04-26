@@ -228,11 +228,11 @@ jobs:
 
     - name: Install Documentation Dependencies
       run: |
-        pip install -r docs/sphinx/requirements.txt
+        "$pythonLocation/bin/python" -m pip install -r docs/sphinx/requirements.txt
         sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1
 
     - name: Install pysparq for notebook execution
-      run: pip install --no-cache-dir .
+      run: "$pythonLocation/bin/python" -m pip install --no-cache-dir .
 
     - name: Generate Doxygen Documentation
       run: doxygen Doxyfile

@@ -41,7 +41,11 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -152,3 +156,8 @@ nbsphinx_allow_errors = True   # Continue building docs even if a notebook cell 
 nbsphinx_timeout = 60
 # Note: nbsphinx prolog/epilog templates use env.docname instead of docname
 # in newer versions. We omit prolog for simplicity.
+# Skip execution for 03_算子示例.ipynb: the new live cells trigger compile_operator
+# (runtime C++ compilation), which causes the Jupyter kernel to die (DeadKernelError)
+# in the docs CI environment.  nbsphinx_allow_errors does not suppress kernel-death
+# failures.  The notebook is still rendered as static content.
+nbsphinx_exclude_patterns = ["notebooks/03_算子示例.ipynb"]
