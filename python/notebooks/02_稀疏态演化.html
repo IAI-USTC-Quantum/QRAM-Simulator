@@ -317,7 +317,7 @@
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -327,11 +327,13 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[1]</span><span class="ansi-green-fg">, line 12</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+初始状态:
+StatePrint (mode=Detail)
+|(0)q : UInt2 |
+1.000000+0.000000i  q=|0&gt;
 
+
+基态数量: 1
 </pre></div></div>
 </div>
 <section id="Hadamard-变换">
@@ -345,7 +347,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hadamard_Int(q, 1) 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -355,11 +357,14 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[2]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Hadamard_Int(q, 1) 后:
+StatePrint (mode=Detail)
+|(0)q : UInt2 |
+0.707107+0.000000i  q=|0&gt;
+0.707107+0.000000i  q=|1&gt;
 
+
+基态数量: 2
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -370,7 +375,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hadamard_Int_Full(q) 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -380,11 +385,14 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[3]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Hadamard_Int_Full(q) 后:
+StatePrint (mode=Detail)
+|(0)q : UInt2 |
+0.707107+0.000000i  q=|0&gt;
+0.707107+0.000000i  q=|2&gt;
 
+
+基态数量: 2
 </pre></div></div>
 </div>
 </section>
@@ -400,26 +408,16 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Default 模式:
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[4]</span><span class="ansi-green-fg">, line 2</span>
-<span class="ansi-green-fg">      1</span> print(<span class="ansi-yellow-fg">&#34;Default 模式:&#34;</span>)
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">2</span> print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default))
+Default 模式:
+StatePrint (mode=Default)
+0.707107+0.000000i |0&gt;
+0.707107+0.000000i |2&gt;
 
-<span class="ansi-red-fg">NameError</span>: name &#39;ps&#39; is not defined
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -485,7 +483,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -494,10 +492,10 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[7]</span><span class="ansi-green-fg">, line 15</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+初始状态:
+StatePrint (mode=Detail)
+|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
+1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|0&gt;
 
 </pre></div></div>
 </div>
@@ -509,7 +507,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># sum = 0 ^ (1 + 2) = 3</span>
 </pre></div>
 </div>
@@ -519,10 +517,10 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[8]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Add_UInt_UInt 后:
+StatePrint (mode=Detail)
+|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
+1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|3&gt;
 
 </pre></div></div>
 </div>
@@ -534,7 +532,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;再次 Add_UInt_UInt 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># sum = 3 ^ 3 = 0</span>
 </pre></div>
 </div>
@@ -544,10 +542,10 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[9]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+再次 Add_UInt_UInt 后:
+StatePrint (mode=Detail)
+|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
+1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|0&gt;
 
 </pre></div></div>
 </div>
@@ -572,7 +570,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始叠加态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -581,10 +579,13 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[10]</span><span class="ansi-green-fg">, line 15</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+初始叠加态:
+StatePrint (mode=Detail)
+|(0)x : UInt2 | |(1)y : UInt2 |
+0.500000+0.000000i  x=|0&gt; y=|1&gt;
+0.500000+0.000000i  x=|1&gt; y=|1&gt;
+0.500000+0.000000i  x=|2&gt; y=|1&gt;
+0.500000+0.000000i  x=|3&gt; y=|1&gt;
 
 </pre></div></div>
 </div>
@@ -596,7 +597,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt_InPlace 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># 每个分支: y = 1 + x</span>
 </pre></div>
 </div>
@@ -606,10 +607,13 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[11]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Add_UInt_UInt_InPlace 后:
+StatePrint (mode=Detail)
+|(0)x : UInt2 | |(1)y : UInt2 |
+0.500000+0.000000i  x=|0&gt; y=|1&gt;
+0.500000+0.000000i  x=|1&gt; y=|2&gt;
+0.500000+0.000000i  x=|2&gt; y=|3&gt;
+0.500000+0.000000i  x=|3&gt; y=|0&gt;
 
 </pre></div></div>
 </div>
@@ -621,7 +625,7 @@ Default 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dagger 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -630,10 +634,13 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[12]</span><span class="ansi-green-fg">, line 5</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+dagger 后:
+StatePrint (mode=Detail)
+|(0)x : UInt2 | |(1)y : UInt2 |
+0.500000+0.000000i  x=|0&gt; y=|1&gt;
+0.500000+0.000000i  x=|1&gt; y=|1&gt;
+0.500000+0.000000i  x=|2&gt; y=|1&gt;
+0.500000+0.000000i  x=|3&gt; y=|1&gt;
 
 </pre></div></div>
 </div>
@@ -658,30 +665,16 @@ Default 模式:
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-遍历基态:
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[13]</span><span class="ansi-green-fg">, line 3</span>
-<span class="ansi-green-fg">      1</span> <span style="color: rgb(95,135,135)"># 遍历所有基态</span>
-<span class="ansi-green-fg">      2</span> print(<span class="ansi-yellow-fg">&#34;遍历基态:&#34;</span>)
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> i, system <span class="ansi-bold" style="color: rgb(0,135,0)">in</span> enumerate(state.basis_states):
-<span class="ansi-green-fg">      4</span>     x_id = ps.System.get_id(<span class="ansi-yellow-fg">&#34;x&#34;</span>)
-<span class="ansi-green-fg">      5</span>     y_id = ps.System.get_id(<span class="ansi-yellow-fg">&#34;y&#34;</span>)
-<span class="ansi-green-fg">      6</span>
-
-<span class="ansi-red-fg">NameError</span>: name &#39;state&#39; is not defined
+遍历基态:
+  基态 0: x=0, y=1, 振幅=(0.5+0j)
+  基态 1: x=1, y=1, 振幅=(0.5+0j)
+  基态 2: x=2, y=1, 振幅=(0.5+0j)
+  基态 3: x=3, y=1, 振幅=(0.5+0j)
 </pre></div></div>
 </div>
 </section>

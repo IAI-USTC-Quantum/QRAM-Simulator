@@ -338,7 +338,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 外置加法: result ^= a + b</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -347,10 +347,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[3]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Add_UInt_UInt:
+StatePrint (mode=Detail)
+|(0)a : UInt4 | |(1)b : UInt4 | |(2)result : UInt4 |
+1.000000+0.000000i  a=|7&gt; b=|10&gt; result=|1&gt;
 
 </pre></div></div>
 </div>
@@ -369,7 +369,7 @@
 <span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt_InPlace:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># b = (10 + 7) % 16 = 1</span>
 </pre></div>
 </div>
@@ -379,10 +379,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[4]</span><span class="ansi-green-fg">, line 12</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Add_UInt_UInt_InPlace:
+StatePrint (mode=Detail)
+|(0)a : UInt4 | |(1)b : UInt4 |
+1.000000+0.000000i  a=|7&gt; b=|1&gt;
 
 </pre></div></div>
 </div>
@@ -393,7 +393,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 撤销</span>
 <span class="n">op</span><span class="o">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dagger 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -402,10 +402,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[5]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+dagger 后:
+StatePrint (mode=Detail)
+|(0)a : UInt4 | |(1)b : UInt4 |
+1.000000+0.000000i  a=|7&gt; b=|10&gt;
 
 </pre></div></div>
 </div>
@@ -426,7 +426,7 @@
 <span class="c1"># 乘以奇数常量（保证双射）</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Mult_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;triple&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mult_UInt_ConstUInt(x, 3):&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -435,10 +435,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[6]</span><span class="ansi-green-fg">, line 11</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Mult_UInt_ConstUInt(x, 3):
+StatePrint (mode=Detail)
+|(0)x : UInt4 | |(1)triple : UInt4 |
+1.000000+0.000000i  x=|5&gt; triple=|15&gt;
 
 </pre></div></div>
 </div>
@@ -461,7 +461,7 @@
 
 <span class="n">ps</span><span class="o">.</span><span class="n">Compare_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;less&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compare_UInt_UInt:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -470,10 +470,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[7]</span><span class="ansi-green-fg">, line 13</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Compare_UInt_UInt:
+StatePrint (mode=Detail)
+|(0)a : UInt4 | |(1)b : UInt4 | |(2)less : Bool1 | |(3)equal : Bool1 |
+1.000000+0.000000i  a=|3&gt; b=|5&gt; less=|true&gt; equal=|false&gt;
 
 </pre></div></div>
 </div>
@@ -490,7 +490,7 @@
 
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -499,10 +499,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[8]</span><span class="ansi-green-fg">, line 6</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+初始:
+StatePrint (mode=Detail)
+|(0)q : Bool1 |
+1.000000+0.000000i  q=|false&gt;
 
 </pre></div></div>
 </div>
@@ -513,7 +513,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># X 门（NOT）</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Xgate_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X 门后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -522,10 +522,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[9]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+X 门后:
+StatePrint (mode=Detail)
+|(0)q : Bool1 |
+1.000000+0.000000i  q=|true&gt;
 
 </pre></div></div>
 </div>
@@ -536,7 +536,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hadamard</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hadamard 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -545,10 +545,11 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[10]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Hadamard 后:
+StatePrint (mode=Detail)
+|(0)q : Bool1 |
+-0.707107+-0.000000i  q=|true&gt;
+0.707107+0.000000i  q=|false&gt;
 
 </pre></div></div>
 </div>
@@ -559,7 +560,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 相位门</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Phase_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Phase(π/4) 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -568,10 +569,11 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[11]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+Phase(π/4) 后:
+StatePrint (mode=Detail)
+|(0)q : Bool1 |
+-0.500000-0.500000i  q=|true&gt;
+0.707107+0.000000i  q=|false&gt;
 
 </pre></div></div>
 </div>
@@ -589,7 +591,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -598,10 +600,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[12]</span><span class="ansi-green-fg">, line 8</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+初始:
+StatePrint (mode=Detail)
+|(0)q : UInt3 |
+1.000000+0.000000i  q=|1&gt;
 
 </pre></div></div>
 </div>
@@ -612,7 +614,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># QFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QFT</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;QFT 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -621,10 +623,17 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[13]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+QFT 后:
+StatePrint (mode=Detail)
+|(0)q : UInt3 |
+0.353553+0.000000i  q=|0&gt;
+0.250000+0.250000i  q=|1&gt;
+0.000000+0.353553i  q=|2&gt;
+-0.250000+0.250000i  q=|3&gt;
+-0.353553+0.000000i  q=|4&gt;
+-0.250000-0.250000i  q=|5&gt;
+-0.000000-0.353553i  q=|6&gt;
+0.250000-0.250000i  q=|7&gt;
 
 </pre></div></div>
 </div>
@@ -635,7 +644,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inverseQFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">inverseQFT</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inverseQFT 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -644,10 +653,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[14]</span><span class="ansi-green-fg">, line 4</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+inverseQFT 后:
+StatePrint (mode=Detail)
+|(0)q : UInt3 |
+1.000000+0.000000i  q=|1&gt;
 
 </pre></div></div>
 </div>
@@ -671,7 +680,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">(</span><span class="s2">&quot;ctrl&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;条件加法 (ctrl=1):&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -680,10 +689,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[15]</span><span class="ansi-green-fg">, line 14</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+条件加法 (ctrl=1):
+StatePrint (mode=Detail)
+|(0)x : UInt2 | |(1)result : UInt2 | |(2)ctrl : Bool1 |
+1.000000+0.000000i  x=|3&gt; result=|0&gt; ctrl=|true&gt;
 
 </pre></div></div>
 </div>
@@ -704,7 +713,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">conditioned_by_nonzeros</span><span class="p">(</span><span class="s2">&quot;ctrl&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;条件加法 (ctrl=0):&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># result 保持 0</span>
 </pre></div>
 </div>
@@ -714,10 +723,10 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[16]</span><span class="ansi-green-fg">, line 14</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
-                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+条件加法 (ctrl=0):
+StatePrint (mode=Detail)
+|(0)x : UInt2 | |(1)result : UInt2 | |(2)ctrl : Bool1 |
+1.000000+0.000000i  x=|3&gt; result=|0&gt; ctrl=|false&gt;
 
 </pre></div></div>
 </div>
