@@ -345,24 +345,46 @@
 <span class="c1"># 创建量子态</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)q : UInt4 |</span>
+<span class="c1"># 1.000000+0.000000i  q=|0&gt;</span>
 </pre></div>
 </div>
 <p>初始态为 <span class="math notranslate nohighlight">\(|0000\rangle\)</span>。通过 Hadamard 变换创建叠加态：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 对整个寄存器应用 Hadamard → 等价于对每个比特施 H</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 打印状态（稀疏格式：只显示非零振幅）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)q : UInt4 |</span>
+<span class="c1"># 0.250000+0.000000i  q=|0&gt;</span>
+<span class="c1"># 0.250000+0.000000i  q=|1&gt;</span>
+<span class="c1"># ...</span>
+<span class="c1"># 0.250000+0.000000i  q=|15&gt;</span>
+<span class="c1"># 16 个等概率幅叠加态（每个 0.25）</span>
 </pre></div>
 </div>
 <p>将某一基态设为特定值：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># 将寄存器初始化为 |0101⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)q : UInt4 |</span>
+<span class="c1"># 0.250000+0.000000i  q=|5&gt;   ← 16 个振幅都变为 |5⟩</span>
 </pre></div>
 </div>
 <p>通过加法算子驱动态演化（寄存器级编程的核心）：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Add_ConstUInt</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># |0101⟩ → |0110⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Add_ConstUInt</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># |q⟩ → |q+1⟩，所以 |5⟩ → |6⟩</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)q : UInt4 |</span>
+<span class="c1"># 0.250000+0.000000i  q=|6&gt;</span>
+<span class="c1"># 0.250000+0.000000i  q=|6&gt;</span>
+<span class="c1"># ...（16 个相同基态）</span>
 </pre></div>
 </div>
 </section>
@@ -380,17 +402,29 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># a = 3</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># b = 7</span>
 
-<span class="c1"># a ← a + b</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 10</span>
+<span class="c1"># a ← a + b（out_reg = a，即 in-place）</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 10</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)a : UInt4 | |(1)b : UInt4 |</span>
+<span class="c1"># 1.000000+0.000000i  a=|10&gt; b=|7&gt;</span>
 
 <span class="c1"># a ← a × 2</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Mult_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 20</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 20</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)a : UInt4 | |(1)b : UInt4 |</span>
+<span class="c1"># 1.000000+0.000000i  a=|20&gt; b=|7&gt;</span>
 
-<span class="c1"># a ← a &lt;&lt; 1（左移1位）</span>
+<span class="c1"># a ← a &lt;&lt; 1（左移1位，等价于乘2）</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 40</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 40</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)a : UInt4 | |(1)b : UInt4 |</span>
+<span class="c1"># 1.000000+0.000000i  a=|40&gt; b=|7&gt;</span>
 </pre></div>
 </div>
 </section>
@@ -410,14 +444,26 @@
 <span class="n">memory</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
 
 <span class="c1"># 对地址寄存器叠加 → 同时查询所有地址</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;addr&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># QRAM 加载：data = memory[addr]</span>
 <span class="n">qram</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">QRAMCircuit_qutrit</span><span class="p">(</span><span class="n">n_addr</span><span class="p">,</span> <span class="n">n_data</span><span class="p">,</span> <span class="n">memory</span><span class="p">)</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QRAMLoad</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 状态包含所有 (addr, memory[addr]) 对的振幅</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)addr : UInt3 | |(1)data : UInt4 |</span>
+<span class="c1"># 0.353553+0.000000i  addr=|0&gt; data=|1&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|1&gt; data=|3&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|2&gt; data=|5&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|3&gt; data=|7&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|4&gt; data=|2&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|5&gt; data=|4&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|6&gt; data=|6&gt;</span>
+<span class="c1"># 0.353553+0.000000i  addr=|7&gt; data=|8&gt;</span>
+<span class="c1"># 8 个叠加态，每个振幅 1/√8 ≈ 0.354</span>
 </pre></div>
 </div>
 </section>
@@ -431,7 +477,11 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QFT</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>        <span class="c1"># 应用 QFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">inverseQFT</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># 应用逆 QFT，恢复到 |5⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="c1"># 输出：</span>
+<span class="c1"># StatePrint (mode=Detail)</span>
+<span class="c1"># |(0)reg : UInt4 |</span>
+<span class="c1"># 1.000000+0.000000i  reg=|5&gt;   ← QFT 后再 inverseQFT 恢复到 |5⟩</span>
 </pre></div>
 </div>
 </section>

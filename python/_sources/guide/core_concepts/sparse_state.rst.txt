@@ -95,37 +95,40 @@ SparseState 类
    state = ps.SparseState()
 
    print("初始状态:")
-   ps.print(state)
-   # 输出:
-   # [1 basis state]
-   # |q=0⟩ : (1+0j)
+   ps.pprint(state)
+   # 输出：
+   # StatePrint (mode=Detail)
+   # |(0)q : UInt2 |
+   # 1.000000+0.000000i  q=|0>
 
-   # 施加 Hadamard
-   ps.Hadamard_Int("q")(state)
+   # 施加 Hadamard（部分叠加：对第 0 位施 H）
+   ps.Hadamard_Int("q", 1)(state)
 
    print("\nHadamard 后:")
-   ps.print(state)
-   # 输出:
-   # [2 basis states]
-   # |q=0⟩ : (0.707+0j)
-   # |q=2⟩ : (0.707+0j)
+   ps.pprint(state)
+   # 输出：
+   # StatePrint (mode=Detail)
+   # |(0)q : UInt2 |
+   # 0.707107+0.000000i  q=|0>
+   # 0.707107+0.000000i  q=|2>
 
    # 完整 Hadamard（所有输出状态）
    ps.Hadamard_Int_Full("q")(state)
 
    print("\n完整 Hadamard 后:")
-   ps.print(state)
-   # 输出:
-   # [4 basis states]
-   # |q=0⟩ : (0.5+0j)
-   # |q=1⟩ : (0.5+0j)
-   # |q=2⟩ : (0.5+0j)
-   # |q=3⟩ : (0.5+0j)
+   ps.pprint(state)
+   # 输出：
+   # StatePrint (mode=Detail)
+   # |(0)q : UInt2 |
+   # 0.500000+0.000000i  q=|0>
+   # 0.500000+0.000000i  q=|1>
+   # 0.500000+0.000000i  q=|2>
+   # 0.500000+0.000000i  q=|3>
 
 状态打印模式
 ------------
 
-``StatePrint`` 算子支持多种显示模式：
+``ps.StatePrint(state, mode)`` 和 ``ps.pprint(state, mode)`` 支持多种显示模式：
 
 .. list-table:: StatePrintDisplay 枚举
    :header-rows: 1
@@ -137,29 +140,31 @@ SparseState 类
    * - ``Default``
      - 0
      - 默认模式，十进制值
-     - ``|q=5⟩ : (0.5+0j)``
+     - ``0.5+0.000000i |5>``
    * - ``Detail``
      - 1
-     - 详细振幅显示
-     - 显示实部/虚部分量
+     - 详细模式，含寄存器头和振幅
+     - ``0.500000+0.000000i  q=|5>``
    * - ``Binary``
      - 2
      - 二进制表示
-     - ``|q=101⟩ : (0.5+0j)``
+     - ``0.5+0.000000i |0101>``
    * - ``Prob``
      - 4
      - 概率视图
-     - ``|q=5⟩ : P=0.25``
+     - ``0.5+0.000000i (p = 0.25) |5>``
 
 .. code-block:: python
 
    # 不同显示模式
-   print(ps.StatePrint(ps.Default)(state))
-   print(ps.StatePrint(ps.Binary)(state))
-   print(ps.StatePrint(ps.Prob)(state))
+   ps.pprint(state)                                                    # Detail（默认）
+   print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default))      # Default
+   print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary))       # Binary
+   print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Prob))         # Prob
 
    # 指定精度
-   print(ps.StatePrint(ps.Default, precision=4)(state))
+   print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default, precision=15))
+   print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default, precision=4))
 
 清除接近零的振幅
 ----------------

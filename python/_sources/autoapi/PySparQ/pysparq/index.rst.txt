@@ -32,30 +32,45 @@ Functions
 
 .. autoapisummary::
 
+   PySparQ.pysparq.StatePrint
+   PySparQ.pysparq.print
    PySparQ.pysparq.test_import
+   PySparQ.pysparq.to_string
 
 
 Package Contents
 ----------------
 
-.. py:class:: StatePrinter(mode: int | StatePrintDisplay = 1, precision: int = 0)
+.. py:class:: StatePrinter(mode: int | pysparq._core.StatePrintDisplay = 1, precision: int = 0)
 
-   Pythonic state printer with configurable display mode.
-
-
-   .. py:method:: to_string(state: SparseState, mode: int | None = None) -> str
+   Reusable state formatter with configurable default mode.
 
 
    .. py:attribute:: mode
-      :type:  int | StatePrintDisplay
+      :type:  int
 
 
    .. py:attribute:: precision
       :type:  int
 
 
+.. py:function:: StatePrint(state: pysparq._core.SparseState, mode: int | pysparq._core.StatePrintDisplay = 1, precision: int = 0) -> str
+
+   Return a formatted string representation of a SparseState.
+
+
+.. py:function:: print(state: pysparq._core.SparseState, mode: int | pysparq._core.StatePrintDisplay = 1, precision: int = 0) -> None
+
+   Print a SparseState to stdout in Detail mode.
+
+
 .. py:function:: test_import() -> None
 
    测试 PySparQ 导入是否正常工作。
+
+
+.. py:function:: to_string(state: pysparq._core.SparseState, mode: int | pysparq._core.StatePrintDisplay = 1, precision: int = 0) -> str
+
+   Return a formatted string representation of a SparseState (alias for StatePrint).
 
 

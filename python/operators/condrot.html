@@ -385,7 +385,7 @@
 <span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">CondRot_Rational_Bool</span><span class="p">(</span><span class="s2">&quot;angle&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">)</span>
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># target 状态被旋转角度 ≈ π/4</span>
 
 <span class="c1"># 撤销</span>
@@ -431,7 +431,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># θ = 64/256 * 2π = π/2</span>
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 撤销（需要手动实现逆）</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">my_rotation_inv</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>

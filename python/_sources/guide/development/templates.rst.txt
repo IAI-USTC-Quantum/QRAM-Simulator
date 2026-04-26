@@ -60,7 +60,7 @@ Python 开发模板
    ps.QRAMLoad(qram, "addr", "data")(state)
 
    # 5. 读取结果
-   ps.StatePrint()(state)
+   ps.pprint(state)
 
 Grover 搜索模板
 ---------------

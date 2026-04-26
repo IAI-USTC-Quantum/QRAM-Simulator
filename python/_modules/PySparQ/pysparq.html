@@ -291,12 +291,149 @@
 <span></span><span class="sd">&quot;&quot;&quot;PySparQ 类型存根 - 从 _core 模块重新导出所有公共 API。&quot;&quot;&quot;</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="c1"># Re-export all public API from the C++ extension module</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pysparq._core</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pysparq._core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_core</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pysparq._core</span><span class="w"> </span><span class="kn">import</span> <span class="n">__all__</span> <span class="k">as</span> <span class="n">__all__</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">pysparq._core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SparseState</span><span class="p">,</span>
+    <span class="n">System</span><span class="p">,</span>
+    <span class="n">StateStorage</span><span class="p">,</span>
+    <span class="n">StateStorageType</span><span class="p">,</span>
+    <span class="n">UnsignedInteger</span><span class="p">,</span>
+    <span class="n">SignedInteger</span><span class="p">,</span>
+    <span class="n">Boolean</span><span class="p">,</span>
+    <span class="n">Rational</span><span class="p">,</span>
+    <span class="n">SparseMatrix</span><span class="p">,</span>
+    <span class="n">DenseMatrix_complex</span><span class="p">,</span>
+    <span class="n">DenseMatrix_float64</span><span class="p">,</span>
+    <span class="n">BaseOperator</span><span class="p">,</span>
+    <span class="n">SelfAdjointOperator</span><span class="p">,</span>
+    <span class="n">AddRegister</span><span class="p">,</span>
+    <span class="n">AddRegisterWithHadamard</span><span class="p">,</span>
+    <span class="n">RemoveRegister</span><span class="p">,</span>
+    <span class="n">MoveBackRegister</span><span class="p">,</span>
+    <span class="n">SplitRegister</span><span class="p">,</span>
+    <span class="n">CombineRegister</span><span class="p">,</span>
+    <span class="n">Push</span><span class="p">,</span>
+    <span class="n">Pop</span><span class="p">,</span>
+    <span class="n">ClearZero</span><span class="p">,</span>
+    <span class="n">Normalize</span><span class="p">,</span>
+    <span class="n">Init_Unsafe</span><span class="p">,</span>
+    <span class="n">ModuleInheritance_Test</span><span class="p">,</span>
+    <span class="n">ModuleInheritance_Test_SelfAdjoint</span><span class="p">,</span>
+    <span class="n">CheckNormalization</span><span class="p">,</span>
+    <span class="n">CheckNan</span><span class="p">,</span>
+    <span class="n">ViewNormalization</span><span class="p">,</span>
+    <span class="n">TestRemovable</span><span class="p">,</span>
+    <span class="n">CheckDuplicateKey</span><span class="p">,</span>
+    <span class="n">Hadamard_Int</span><span class="p">,</span>
+    <span class="n">Hadamard_Int_Full</span><span class="p">,</span>
+    <span class="n">Hadamard_Bool</span><span class="p">,</span>
+    <span class="n">Hadamard_PartialQubit</span><span class="p">,</span>
+    <span class="n">ZeroConditionalPhaseFlip</span><span class="p">,</span>
+    <span class="n">Reflection_Bool</span><span class="p">,</span>
+    <span class="n">GlobalPhase_Int</span><span class="p">,</span>
+    <span class="n">PartialTrace</span><span class="p">,</span>
+    <span class="n">PartialTraceSelect</span><span class="p">,</span>
+    <span class="n">PartialTraceSelectRange</span><span class="p">,</span>
+    <span class="n">QFT</span><span class="p">,</span>
+    <span class="n">inverseQFT</span><span class="p">,</span>
+    <span class="n">QRAMCircuit_qutrit</span><span class="p">,</span>
+    <span class="n">QRAMLoad</span><span class="p">,</span>
+    <span class="n">QRAMLoadFast</span><span class="p">,</span>
+    <span class="n">Xgate_Bool</span><span class="p">,</span>
+    <span class="n">FlipBools</span><span class="p">,</span>
+    <span class="n">Swap_Bool_Bool</span><span class="p">,</span>
+    <span class="n">ShiftLeft</span><span class="p">,</span>
+    <span class="n">ShiftRight</span><span class="p">,</span>
+    <span class="n">Mult_UInt_ConstUInt</span><span class="p">,</span>
+    <span class="n">Add_Mult_UInt_ConstUInt</span><span class="p">,</span>
+    <span class="n">Mod_Mult_UInt_ConstUInt</span><span class="p">,</span>
+    <span class="n">Add_UInt_UInt</span><span class="p">,</span>
+    <span class="n">Add_UInt_UInt_InPlace</span><span class="p">,</span>
+    <span class="n">Add_UInt_ConstUInt</span><span class="p">,</span>
+    <span class="n">Add_ConstUInt</span><span class="p">,</span>
+    <span class="n">Div_Sqrt_Arccos_Int_Int</span><span class="p">,</span>
+    <span class="n">Sqrt_Div_Arccos_Int_Int</span><span class="p">,</span>
+    <span class="n">GetRotateAngle_Int_Int</span><span class="p">,</span>
+    <span class="n">AddAssign_AnyInt_AnyInt</span><span class="p">,</span>
+    <span class="n">Assign</span><span class="p">,</span>
+    <span class="n">Compare_UInt_UInt</span><span class="p">,</span>
+    <span class="n">Less_UInt_UInt</span><span class="p">,</span>
+    <span class="n">Swap_General_General</span><span class="p">,</span>
+    <span class="n">GetMid_UInt_UInt</span><span class="p">,</span>
+    <span class="n">CustomArithmetic</span><span class="p">,</span>
+    <span class="n">StateHashExceptKey</span><span class="p">,</span>
+    <span class="n">StateHashExceptQubits</span><span class="p">,</span>
+    <span class="n">StateEqualExceptKey</span><span class="p">,</span>
+    <span class="n">StateEqualExceptQubits</span><span class="p">,</span>
+    <span class="n">StateLessExceptKey</span><span class="p">,</span>
+    <span class="n">StateLessExceptQubits</span><span class="p">,</span>
+    <span class="n">Rot_GeneralUnitary</span><span class="p">,</span>
+    <span class="n">Rot_GeneralStatePrep</span><span class="p">,</span>
+    <span class="n">stateprep_unitary_build_schmidt</span><span class="p">,</span>
+    <span class="n">SortExceptKey</span><span class="p">,</span>
+    <span class="n">SortByKey</span><span class="p">,</span>
+    <span class="n">SortExceptBit</span><span class="p">,</span>
+    <span class="n">SortExceptKeyHadamard</span><span class="p">,</span>
+    <span class="n">SortUnconditional</span><span class="p">,</span>
+    <span class="n">SortByAmplitude</span><span class="p">,</span>
+    <span class="n">SortByKey2</span><span class="p">,</span>
+    <span class="n">Phase_Bool</span><span class="p">,</span>
+    <span class="n">Rot_Bool</span><span class="p">,</span>
+    <span class="n">Ygate_Bool</span><span class="p">,</span>
+    <span class="n">Zgate_Bool</span><span class="p">,</span>
+    <span class="n">Sgate_Bool</span><span class="p">,</span>
+    <span class="n">Tgate_Bool</span><span class="p">,</span>
+    <span class="n">RXgate_Bool</span><span class="p">,</span>
+    <span class="n">RYgate_Bool</span><span class="p">,</span>
+    <span class="n">RZgate_Bool</span><span class="p">,</span>
+    <span class="n">SXgate_Bool</span><span class="p">,</span>
+    <span class="n">U2gate_Bool</span><span class="p">,</span>
+    <span class="n">U3gate_Bool</span><span class="p">,</span>
+    <span class="n">CondRot_Rational_Bool</span><span class="p">,</span>
+    <span class="n">PlusOneAndOverflow</span><span class="p">,</span>
+    <span class="n">split_systems</span><span class="p">,</span>
+    <span class="n">combine_systems</span><span class="p">,</span>
+    <span class="n">merge_system</span><span class="p">,</span>
+    <span class="n">remove_system</span><span class="p">,</span>
+    <span class="n">StatePrintDisplay</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="c1"># Python-only function (defined in __init__.py)</span>
+
+<span class="c1"># Python-only functions and classes</span>
+<div class="viewcode-block" id="StatePrint">
+<a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.StatePrint">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">StatePrint</span><span class="p">(</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="s2">&quot;StatePrintDisplay&quot;</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a formatted string representation of a SparseState.&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="to_string">
+<a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.to_string">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="s2">&quot;StatePrintDisplay&quot;</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a formatted string representation of a SparseState (alias for StatePrint).&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="print">
+<a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.print">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="s2">&quot;StatePrintDisplay&quot;</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a SparseState to stdout in Detail mode.&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
 <div class="viewcode-block" id="test_import">
 <a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.test_import">[文档]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_import</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -308,7 +445,7 @@
 <div class="viewcode-block" id="StatePrinter">
 <a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.StatePrinter">[文档]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StatePrinter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pythonic state printer with configurable display mode.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reusable state formatter with configurable default mode.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -316,16 +453,18 @@
         <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="o">...</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="s2">&quot;StatePrintDisplay&quot;</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format a state using this printer&#39;s mode (or override it).&quot;&quot;&quot;</span>
+        <span class="o">...</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
-<div class="viewcode-block" id="StatePrinter.to_string">
-<a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.StatePrinter.to_string">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SparseState</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span></div>
-
 <div class="viewcode-block" id="StatePrinter.mode">
 <a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.StatePrinter.mode">[文档]</a>
-    <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">StatePrintDisplay</span></div>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span></div>
 
 <div class="viewcode-block" id="StatePrinter.precision">
 <a class="viewcode-back" href="../../autoapi/PySparQ/pysparq/index.html#PySparQ.pysparq.StatePrinter.precision">[文档]</a>

@@ -389,7 +389,7 @@
 <span class="c1"># QRAM 加载：并行访问所有地址</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QRAMLoad</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># 输出包含 16 个状态：</span>
 <span class="c1"># |addr=0,data=0⟩, |addr=1,data=10⟩, ...</span>
 

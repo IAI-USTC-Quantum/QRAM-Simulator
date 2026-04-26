@@ -317,7 +317,7 @@
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -343,7 +343,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hadamard_Int(q, 1) 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -366,7 +366,7 @@ Hadamard_Int(q, 1) 后:
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int_Full</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hadamard_Int_Full(q) 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -390,7 +390,7 @@ Hadamard_Int_Full(q) 后:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Default 模式:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Default</span><span class="p">)(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Default</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -407,7 +407,7 @@ Default 模式:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Binary 模式:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Binary</span><span class="p">)(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Binary</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -424,7 +424,7 @@ Binary 模式:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Prob 模式:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">Prob</span><span class="p">)(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Prob</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -457,7 +457,7 @@ Prob 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -477,7 +477,7 @@ Prob 模式:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="c1"># sum = 0 ^ (1 + 2) = 3</span>
 </pre></div>
 </div>
@@ -498,7 +498,7 @@ Add_UInt_UInt 后:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;再次 Add_UInt_UInt 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="c1"># sum = 3 ^ 3 = 0</span>
 </pre></div>
 </div>
@@ -532,7 +532,7 @@ Add_UInt_UInt 后:
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始叠加态:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -552,7 +552,7 @@ Add_UInt_UInt 后:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add_UInt_UInt_InPlace 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 <span class="c1"># 每个分支: y = 1 + x</span>
 </pre></div>
 </div>
@@ -573,7 +573,7 @@ Add_UInt_UInt_InPlace 后:
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dagger 后:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>

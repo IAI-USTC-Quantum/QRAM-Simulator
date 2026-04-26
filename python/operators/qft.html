@@ -379,7 +379,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># |q=1⟩ : (1+0j)</span>
 
 <span class="c1"># 应用 QFT</span>
@@ -387,7 +387,7 @@
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">QFT 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># 产生相位均匀分布的叠加态</span>
 
 <span class="c1"># 撤销（逆变换）</span>
@@ -513,17 +513,17 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;初始状态:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># QFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QFT</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">QFT 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># inverseQFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">inverseQFT</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">inverseQFT 后:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># 恢复到 |q=5⟩</span>
 </pre></div>
 </div>

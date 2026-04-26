@@ -462,7 +462,7 @@
 <span class="c1"># result = 0 ^ (3 + 5) = 8</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;lhs&quot;</span><span class="p">,</span> <span class="s2">&quot;rhs&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 <span class="c1"># 输出: |lhs=3,rhs=5,result=8⟩ : (1+0j)</span>
 
 <span class="c1"># 再次应用 = 撤销</span>
