@@ -29,6 +29,7 @@ from typing import Callable
 import numpy as np
 
 import pysparq as ps
+from pysparq.operators import ControllableOperatorMixin
 
 
 def compute_fs(s: float, kappa: float, p: float) -> float:
@@ -176,7 +177,7 @@ def calculate_angles(coeffs: list[float]) -> list[float]:
     return angles
 
 
-class BlockEncodingHs:
+class BlockEncodingHs(ControllableOperatorMixin):
     """Block encoding of the interpolating Hamiltonian H(s).
 
     H(s) = (1 - f(s)) * H₀ + f(s) * H₁
@@ -206,6 +207,7 @@ class BlockEncodingHs:
         anc_4: str,
         fs: float,
     ):
+        super().__init__()
         self.enc_A = enc_A
         self.enc_b = enc_b
         self.main_reg = main_reg
@@ -216,18 +218,6 @@ class BlockEncodingHs:
         self.anc_4 = anc_4
         self.fs = fs
         self.R_s = compute_rotation_matrix(fs)
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> "BlockEncodingHs":
-        """Set condition registers."""
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply block encoding of H(s)."""
@@ -357,7 +347,7 @@ class BlockEncodingHsPD:
         ps.Hadamard_Bool(self.anc_2)(state)
 
 
-class WalkS:
+class WalkS(ControllableOperatorMixin):
     """Quantum walk operator at parameter s.
 
     Combines block encoding of H(s) with reflection operations to implement
@@ -383,6 +373,7 @@ class WalkS:
         p: float,
         is_positive_definite: bool = False,
     ):
+        super().__init__()
         self.main_reg = main_reg
         self.anc_UA = anc_UA
         self.anc_1 = anc_1
@@ -409,29 +400,6 @@ class WalkS:
             self.enc_Hs = BlockEncodingHs(
                 enc_A, enc_b, main_reg, anc_UA, anc_1, anc_2, anc_3, anc_4, self.fs
             )
-
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> "WalkS":
-        """Set condition registers."""
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(self, reg: str, pos: int) -> "WalkS":
-        """Set bit condition."""
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def clear_conditions(self) -> None:
-        """Clear all conditions."""
-        self._condition_regs = []
-        self._condition_bits = []
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply walk operator."""

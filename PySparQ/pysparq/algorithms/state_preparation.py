@@ -25,6 +25,7 @@ import math
 import numpy as np
 
 import pysparq as ps
+from pysparq.operators import ControllableOperatorMixin
 
 from pysparq.algorithms.qram_utils import (
     get_complement,
@@ -35,7 +36,7 @@ from pysparq.algorithms.qram_utils import (
 )
 
 
-class StatePrepViaQRAM:
+class StatePrepViaQRAM(ControllableOperatorMixin):
     """QRAM-based quantum operator for state preparation via binary tree decomposition.
 
     Given a QRAM circuit that stores the binary-tree representation of a
@@ -60,47 +61,12 @@ class StatePrepViaQRAM:
         data_size: int,
         rational_size: int,
     ):
+        super().__init__()
         self.qram = qram
         self.work_qubit = work_qubit
         self.addr_size = ps.System.size_of(work_qubit)
         self.data_size = data_size
         self.rational_size = rational_size
-
-        self._condition_regs: list[str | int] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_nonzeros(
-        self, cond: str | int | list[str | int]
-    ) -> "StatePrepViaQRAM":
-        """Set condition registers for conditional execution."""
-        if isinstance(cond, list):
-            self._condition_regs = cond
-        else:
-            self._condition_regs = [cond]
-        return self
-
-    def conditioned_by_all_ones(
-        self, cond: str | int | list[str | int]
-    ) -> "StatePrepViaQRAM":
-        """Set all-ones condition registers."""
-        if isinstance(cond, list):
-            self._condition_regs = cond
-        else:
-            self._condition_regs = [cond]
-        return self
-
-    def conditioned_by_bit(
-        self, reg: str | int, bit: int
-    ) -> "StatePrepViaQRAM":
-        """Set bit-level condition."""
-        self._condition_bits = [(reg, bit)]
-        return self
-
-    def clear_conditions(self) -> "StatePrepViaQRAM":
-        """Clear all conditions."""
-        self._condition_regs = []
-        self._condition_bits = []
-        return self
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply the forward state-preparation operator.
@@ -404,6 +370,13 @@ class StatePreparation:
         :class:`StatePrepViaQRAM` to prepare the target distribution.
         StatePrepViaQRAM manages its own temporary registers internally.
         """
+        import warnings
+        warnings.warn(
+            "StatePreparation.run() is deprecated; "
+            "use make_tree_and_qram() instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         ps.System.clear()
 
         addr_sz = self.qubit_number + 1
@@ -415,6 +388,57 @@ class StatePreparation:
             self.qram, "addr_parent", self.data_size, self.rational_size
         )
         state_prep_op(self._state)
+
+
+# ==============================================================================
+# Functional v2 API
+# ==============================================================================
+
+
+def make_tree_and_qram(
+    distribution: list[float] | np.ndarray,
+    *,
+    data_size: int = 8,
+    rational_size: int | None = None,
+    work_reg: str | None = None,
+    qram: object | None = None,
+) -> tuple[StatePrepViaQRAM, object, str]:
+    """Functional state-preparation pipeline (v2).
+
+    Returns ``(operator, qram, work_reg)``.
+    Does NOT call ``ps.System.clear()`` — caller is responsible.
+    Does NOT return a result object — caller manages the state lifecycle.
+
+    Example:
+        >>> ps.System.clear()
+        >>> op, qram, work_reg = make_tree_and_qram(
+        ...     [0.5, 0.3, 0.1, 0.1], data_size=8)
+        >>> state = ps.SparseState()
+        >>> op(state)    # apply forward
+        >>> op.dag(state)  # apply inverse
+    """
+    rational_size = rational_size or min(50, data_size * 2)
+    dist_list = list(distribution)
+
+    # Convert floats to integers for QRAM storage.
+    # Scale so the largest value fits within the positive range of data_size bits.
+    float_max = max(abs(v) for v in dist_list) if dist_list else 1.0
+    scale = (1 << (data_size - 1)) / float_max if float_max > 0 else 1
+    int_dist = [int(round(v * scale)) for v in dist_list]
+
+    tree = make_vector_tree(int_dist, data_size)
+    n_qubits = int(math.log2(len(dist_list)))
+    if qram is None:
+        qram = ps.QRAMCircuit_qutrit(n_qubits + 1, data_size, tree)
+    if work_reg is None:
+        work_reg = "addr_parent"
+    ps.System.add_register(work_reg, ps.UnsignedInteger, n_qubits + 1)
+    op = StatePrepViaQRAM(qram, work_reg, data_size, rational_size)
+    return op, qram, work_reg
+
+
+# Alias for discoverability
+prepare_state_v2 = make_tree_and_qram
 
 
 def create_state_preparation_demo() -> str:

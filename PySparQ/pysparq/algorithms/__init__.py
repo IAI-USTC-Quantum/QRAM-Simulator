@@ -32,10 +32,11 @@ from .block_encoding import (
 )
 
 # StatePreparation from separate module
-from .state_preparation import StatePreparation
+from .state_preparation import StatePreparation, make_tree_and_qram
 
-# Factory function to auto-detect matrix type
-from .block_encoding import BlockEncodingTridiagonal, BlockEncodingViaQRAM
+# CKS v2
+from .cks_solver import cks_solve_v2
+
 import numpy as np
 
 
@@ -95,6 +96,8 @@ __all__ = [
     "BlockEncodingTridiagonal",
     "BlockEncodingViaQRAM",
     "StatePreparation",
+    "cks_solve_v2",
+    "make_tree_and_qram",
 ]
 
 __version__ = "0.1.0"
