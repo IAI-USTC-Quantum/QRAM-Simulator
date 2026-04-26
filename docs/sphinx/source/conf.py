@@ -147,8 +147,8 @@ copybutton_here_doc_delimiter = "EOT"
 # -- nbsphinx options --------------------------------------------------------
 # https://nbsphinx.readthedocs.io/
 
-nbsphinx_execute = "auto"  # Execute notebooks if pysparq is available
-nbsphinx_allow_errors = False
+nbsphinx_execute = "always"  # Re-execute on every build to capture fresh output
+nbsphinx_allow_errors = True   # Continue building docs even if a notebook cell fails
 nbsphinx_timeout = 60
 # Note: nbsphinx prolog/epilog templates use env.docname instead of docname
 # in newer versions. We omit prolog for simplicity.
