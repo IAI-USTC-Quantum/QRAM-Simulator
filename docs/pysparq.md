@@ -58,7 +58,11 @@ ps.Init_Unsafe("b", 3)(state)
 ps.Add_UInt_UInt("a", "b", "result")(state)
 
 # Print state
-ps.StatePrint()(state)
+ps.pprint(state)
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)a : UInt4 | |(1)b : UInt4 | |(2)result : UInt4 |
+# 1.000000+0.000000i  a=|5> b=|3> result=|8>
 ```
 
 ## Core Concepts
@@ -350,14 +354,18 @@ prob = ps.PartialTraceSelect({"reg_a": 0, "reg_b": 1})(state)
 
 ### State Inspection
 
-#### `StatePrint(display_mode=0, precision=0)`
-Print the quantum state.
+#### `StatePrint(state, mode=1, precision=0)` / `ps.pprint(state, mode=1)`
+Print or return a formatted string representation of the quantum state.
+
+- ``ps.StatePrint(state)`` returns a string (Detail mode by default)
+- ``ps.pprint(state)`` prints to stdout (Detail mode by default)
 
 ```python
-ps.StatePrint()(state)                    # Default
-ps.StatePrint(ps.Detail)(state)           # Detailed view
-ps.StatePrint(ps.Binary)(state)           # Binary representation
-ps.StatePrint(ps.Prob)(state)             # Probability view
+ps.pprint(state)                                              # Detail → stdout
+ps.StatePrint(state)                                         # Detail → string
+ps.StatePrint(state, mode=ps.StatePrintDisplay.Default)       # Default → string
+ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary)       # Binary → string
+ps.pprint(state, mode=ps.StatePrintDisplay.Prob)               # Prob → stdout
 ```
 
 #### `CheckNormalization(threshold=1e-5)`
@@ -399,7 +407,11 @@ ps.Init_Unsafe("b", 5)(state)
 ps.Add_UInt_UInt("a", "b", "sum")(state)
 
 # Result: sum = 7 + 5 = 12
-ps.StatePrint()(state)
+ps.pprint(state)  # Detail mode
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)a : UInt4 | |(1)b : UInt4 | |(2)sum : UInt4 |
+# 1.000000+0.000000i  a=|7> b=|5> sum=|12>
 ```
 
 ### Example 2: Conditional Operation
@@ -424,8 +436,12 @@ ps.Init_Unsafe("flag", 1)(state)
 # Add x to y only when flag is set
 ps.Add_UInt_UInt_InPlace("x", "y").conditioned_by_nonzeros("flag")(state)
 
-# Result: y = 13 (if flag was 1), otherwise y = 10
-ps.StatePrint()(state)
+# Result: y = 13 (flag=1 时触发条件加法：y = y + x = 10 + 3)
+ps.pprint(state)
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)x : UInt4 | |(1)y : UInt4 | |(2)flag : Bool1 |
+# 1.000000+0.000000i  x=|3> y=|13> flag=|true>
 ```
 
 ### Example 3: Grover-like Search
@@ -453,7 +469,11 @@ for _ in range(n_iterations):
     ps.Reflection_Bool("search")(state)
 
 # Measure
-ps.StatePrint(ps.Prob)(state)
+ps.pprint(state, mode=ps.StatePrintDisplay.Prob)
+# 输出：
+# StatePrint (mode=Prob)
+# 1.000000+0.000000i (p = 1) |0>
+# （简化示例，Reflection_Bool 仅作演示用；实际 Grover Oracle 需要 QRAMLoad）
 ```
 
 ### Example 4: QRAM Data Loading
@@ -482,7 +502,11 @@ ps.Init_Unsafe("addr", 5)(state)
 ps.QRAMLoad(qram, "addr", "data")(state)
 
 # Result: data register now contains 42
-ps.StatePrint()(state)
+ps.pprint(state)
+# 输出：
+# StatePrint (mode=Detail)
+# |(0)addr : UInt4 | |(1)data : UInt8 |
+# 1.000000+0.000000i  addr=|5> data=|42>
 ```
 
 ## Performance Tips

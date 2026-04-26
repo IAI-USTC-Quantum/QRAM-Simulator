@@ -115,7 +115,7 @@ Add_UInt_UInt（外置加法）
    # result = 0 ^ (3 + 5) = 8
    ps.Add_UInt_UInt("lhs", "rhs", "result")(state)
 
-   ps.StatePrint()(state)
+   ps.pprint(state)
    # 输出: |lhs=3,rhs=5,result=8⟩ : (1+0j)
 
    # 再次应用 = 撤销

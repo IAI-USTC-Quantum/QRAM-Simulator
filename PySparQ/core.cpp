@@ -115,6 +115,11 @@ Attributes:
         .def_static("add_register", &System::add_register)
         .def_static("add_register_synchronous", (size_t (*)(std::string_view, StateStorageType, size_t, SparseState &))&System::add_register_synchronous)
         .def_static("add_register_synchronous", (size_t (*)(std::string_view, StateStorageType, size_t, std::vector<System> &))&System::add_register_synchronous)
+        .def_static("set_register_type", [](std::string_view name, StateStorageType new_type) {
+            size_t id = System::get(name);
+            if (id < System::name_register_map.size())
+                std::get<1>(System::name_register_map[id]) = new_type;
+        })
         .def_static("remove_register", (void (*)(size_t))&System::remove_register)
         .def_static("remove_register", (void (*)(std::string_view))&System::remove_register)
         .def_static("remove_register_synchronous", (void (*)(size_t, std::vector<System> &))&System::remove_register_synchronous)
@@ -141,39 +146,47 @@ Attributes:
 
     sparse_state.def_readonly("basis_states", &SparseState::basis_states)
         .def("size", &SparseState::size)
-        .def("empty", &SparseState::empty);
+        .def("empty", &SparseState::empty)
+        .def("to_string", &SparseState::to_string, py::arg("display") = 0,
+             py::arg("precision") = 0,
+             "Return a formatted string representation of the state.\n\n"
+             "Args:\n"
+             "    display: Display mode flags (StatePrintDisplay values).\n"
+             "    precision: Number of decimal places for floating-point numbers.")
+        .def("__str__",  [](const SparseState& self) { return self.to_string(1); })
+        .def("__repr__", [](const SparseState& self) { return self.to_string(1); });
 
     /* condrot.h */
     BIND_BASE_OPERATOR(CondRot_Rational_Bool)
         .def(py::init<std::string_view, std::string_view>())
         .def(py::init<size_t, size_t>());
 
-    using CondRot_Rational_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
+    using CondRot_General_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
 
-    BIND_BASE_OPERATOR_SUBNAME(CondRot_Rational_Bool_Cpp, "CondRot_Rational_Bool")
+    py::class_<CondRot_General_Bool_Cpp, BaseOperator>(m, "CondRot_General_Bool")
         .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
                       {
 				auto cpp_func = [py_func](size_t x) -> u22_t {
 					py::object result = py_func(x);
-					return result.cast<u22_t>();
+					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
 					};
-				return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
+				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
              py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
         .def(py::init([](size_t reg_in, size_t reg_out, py::function py_func)
                       {
 				auto cpp_func = [py_func](size_t x) -> u22_t {
 					py::object result = py_func(x);
-					return result.cast<u22_t>();
+					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
 					};
-				return new CondRot_Rational_Bool_Cpp(reg_in, reg_out, cpp_func); }),
+				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
              py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
 
-        //.def_static("_is_diagonal", &CondRot_Rational_Bool_Cpp::_is_diagonal)
-        //.def_static("_is_off_diagonal", &CondRot_Rational_Bool_Cpp::_is_off_diagonal)
+        //.def_static("_is_diagonal", &CondRot_General_Bool_Cpp::_is_diagonal)
+        //.def_static("_is_off_diagonal", &CondRot_General_Bool_Cpp::_is_off_diagonal)
 
-        .def("operate_pair", &CondRot_Rational_Bool_Cpp::operate_pair)
-        .def("operate_alone_zero", &CondRot_Rational_Bool_Cpp::operate_alone_zero)
-        .def("operate_alone_one", &CondRot_Rational_Bool_Cpp::operate_alone_one);
+        .def("operate_pair", &CondRot_General_Bool_Cpp::operate_pair)
+        .def("operate_alone_zero", &CondRot_General_Bool_Cpp::operate_alone_zero)
+        .def("operate_alone_one", &CondRot_General_Bool_Cpp::operate_alone_one);
 
     /* dark_magic.h */
     BIND_SELF_ADJOINT_OPERATOR(Normalize, R"doc(
@@ -239,7 +252,27 @@ Example:
         .def(py::init<int32_t>(), py::arg("disp") = 0)
         .def(py::init<int32_t, int>(), py::arg("disp"), py::arg("precision"))
         .def(py::init<StatePrintDisplay>(), py::arg("disp"))
-        .def_readwrite_static("on", &StatePrint::on);
+        .def_readwrite_static("on", &StatePrint::on)
+        .def("__call__", [](StatePrint& self, py::object state_obj) -> std::string {
+            py::list sys_list = state_obj.attr("basis_states").cast<py::list>();
+            std::vector<System> systems;
+            systems.reserve(py::len(sys_list));
+            for (py::handle item : sys_list) {
+                System& sys = item.cast<System&>();
+                systems.push_back(sys);
+            }
+            return self.to_string(systems);
+        }, py::arg("state"),
+            "Return formatted state string for the given SparseState.");
+
+    // ps.print() - convenience function that prints state to stdout
+    m.def("print", [](SparseState& state) {
+        std::string result = state.to_string(1);  // Detail mode
+        py::print(result, "end"_a = "");
+    }, py::arg("state"),
+        "Print a SparseState to stdout in detail mode.\n\n"
+        "Uses Detail display mode (shows register names and types).\n"
+        "Output is captured by Jupyter/IPython notebooks.");
 
     // TestRemovable 绑定
     BIND_SELF_ADJOINT_OPERATOR(TestRemovable)

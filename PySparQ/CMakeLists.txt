@@ -12,6 +12,7 @@ project(
 # pybind11 is provided by ThirdParty/CMakeLists.txt (find_package)
 
 pybind11_add_module(_core core.cpp)
+target_compile_definitions(_core PRIVATE QRAM_Release)
 target_link_libraries(_core PRIVATE SparQ)
 
 pybind11_add_module(_dynamic_operator pysparq/dynamic_operator/src/dynamic_operator_loader.cpp)

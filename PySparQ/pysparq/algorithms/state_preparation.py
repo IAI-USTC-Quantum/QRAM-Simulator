@@ -118,7 +118,7 @@ class StatePrepViaQRAM:
 
         for k in range(self.addr_size):
             ps.SplitRegister(self.work_qubit, "rotation", 1)(state)
-            ps.System.name_register_map[ps.System.get("rotation")][1] = ps.Boolean
+            ps.System.set_register_type("rotation", ps.Boolean)
 
             ps.Add_ConstUInt("addr_parent", pow2(k) - 1)(state)
             ps.Add_UInt_UInt_InPlace(self.work_qubit, "addr_parent")(state)
@@ -199,7 +199,7 @@ class StatePrepViaQRAM:
         for k in range(self.addr_size):
             ps.ShiftRight(self.work_qubit, 1)(state)
             ps.SplitRegister(self.work_qubit, "rotation", 1)(state)
-            ps.System.name_register_map[ps.System.get("rotation")][1] = ps.Boolean
+            ps.System.set_register_type("rotation", ps.Boolean)
 
             idx = self.addr_size - 1 - k
             ps.Add_ConstUInt("addr_parent", pow2(idx) - 1)(state)
@@ -384,7 +384,7 @@ class StatePreparation:
         )
         norm = math.sqrt(total)
 
-        addr_reg = ps.System.get("addr_parent")
+        addr_reg = ps.System.get_id("addr_parent")
         fid = complex(0, 0)
 
         for basis in self._state.basis_states:
@@ -400,18 +400,14 @@ class StatePreparation:
     def run(self) -> None:
         """Execute the full state-preparation pipeline.
 
-        Creates the quantum state with the required registers and applies
+        Creates the quantum state with the work register and applies
         :class:`StatePrepViaQRAM` to prepare the target distribution.
+        StatePrepViaQRAM manages its own temporary registers internally.
         """
         ps.System.clear()
 
         addr_sz = self.qubit_number + 1
         ps.System.add_register("addr_parent", ps.UnsignedInteger, addr_sz)
-        ps.System.add_register("addr_child", ps.UnsignedInteger, addr_sz)
-        ps.System.add_register("data_parent", ps.SignedInteger, self.data_size)
-        ps.System.add_register("data_child", ps.SignedInteger, self.data_size)
-        ps.System.add_register("temp_bit", ps.Boolean, 1)
-        ps.System.add_register("div_result", ps.Rational, self.rational_size)
 
         self._state = ps.SparseState()
 

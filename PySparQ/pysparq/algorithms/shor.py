@@ -63,10 +63,10 @@ def general_expmod(a: int, x: int, N: int) -> int:
 
 
 def find_best_fraction(y: int, Q: int, N: int) -> tuple[int, int]:
-    """Find the best fraction c/r approximating y/Q using Farey sequence.
+    """Find the best fraction c/r approximating y/Q with r <= N.
 
-    Uses the Farey sequence to find the fraction with smallest denominator
-    that best approximates y/Q, where denominator is bounded by N.
+    Uses the continued fraction expansion of y/Q to find the convergent
+    with the largest denominator not exceeding N.
 
     Args:
         y: Numerator of measurement result
@@ -77,37 +77,31 @@ def find_best_fraction(y: int, Q: int, N: int) -> tuple[int, int]:
         Tuple of (denominator, numerator) = (r, c)
 
     Example:
-        >>> find_best_fraction(4, 16, 15)  # 4/16 = 1/4
+        >>> find_best_fraction(64, 256, 15)  # 64/256 = 1/4
         (4, 1)
     """
-    target = y / Q
-    low_num, low_den = 0, 1
-    high_num, high_den = 1, 1
+    # Continued fraction expansion using integer arithmetic
+    h_prev2, h_prev1 = 0, 1  # numerators of convergents p[-2], p[-1]
+    k_prev2, k_prev1 = 1, 0  # denominators of convergents q[-2], q[-1]
 
-    best_num, best_den = 0, 1
-    best_diff = 1.0
+    a, b = y, Q
 
-    while True:
-        mediant_num = low_num + high_num
-        mediant_den = low_den + high_den
+    while b != 0:
+        q = a // b
+        r = a % b
 
-        if mediant_den > N:
+        h_new = q * h_prev1 + h_prev2
+        k_new = q * k_prev1 + k_prev2
+
+        if k_new > N:
             break
 
-        mediant_value = mediant_num / mediant_den
-        diff = abs(mediant_value - target)
+        h_prev2, h_prev1 = h_prev1, h_new
+        k_prev2, k_prev1 = k_prev1, k_new
 
-        if diff < best_diff:
-            best_diff = diff
-            best_num = mediant_num
-            best_den = mediant_den
+        a, b = b, r
 
-        if mediant_value < target:
-            low_num, low_den = mediant_num, mediant_den
-        else:
-            high_num, high_den = mediant_num, mediant_den
-
-    return best_den, best_num  # (r, c)
+    return k_prev1, h_prev1  # (r, c)
 
 
 def compute_period(meas_result: int, size: int, N: int) -> int:

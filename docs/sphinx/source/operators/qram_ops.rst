@@ -79,7 +79,7 @@ QRAMLoad
    # QRAM 加载：并行访问所有地址
    ps.QRAMLoad(qram, "addr", "data")(state)
 
-   ps.StatePrint()(state)
+   ps.pprint(state)
    # 输出包含 16 个状态：
    # |addr=0,data=0⟩, |addr=1,data=10⟩, ...
 
