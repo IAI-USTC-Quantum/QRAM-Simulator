@@ -95,7 +95,7 @@ SparseState 类
    state = ps.SparseState()
 
    print("初始状态:")
-   ps.print(state)
+   ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
    # |(0)q : UInt2 |
@@ -105,7 +105,7 @@ SparseState 类
    ps.Hadamard_Int("q", 1)(state)
 
    print("\nHadamard 后:")
-   ps.print(state)
+   ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
    # |(0)q : UInt2 |
@@ -116,7 +116,7 @@ SparseState 类
    ps.Hadamard_Int_Full("q")(state)
 
    print("\n完整 Hadamard 后:")
-   ps.print(state)
+   ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
    # |(0)q : UInt2 |
@@ -128,7 +128,7 @@ SparseState 类
 状态打印模式
 ------------
 
-``ps.StatePrint(state, mode)`` 和 ``ps.print(state, mode)`` 支持多种显示模式：
+``ps.StatePrint(state, mode)`` 和 ``ps.pprint(state, mode)`` 支持多种显示模式：
 
 .. list-table:: StatePrintDisplay 枚举
    :header-rows: 1
@@ -157,7 +157,7 @@ SparseState 类
 .. code-block:: python
 
    # 不同显示模式
-   ps.print(state)                                                    # Detail（默认）
+   ps.pprint(state)                                                    # Detail（默认）
    print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default))      # Default
    print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary))       # Binary
    print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Prob))         # Prob

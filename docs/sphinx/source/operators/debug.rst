@@ -78,7 +78,7 @@ StatePrint（状态打印）
    import pysparq as ps
 
    # 打印到 stdout（Detail 模式）
-   ps.print(state)
+   ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
    # |(0)addr : UInt4 | |(1)data : UInt8 |

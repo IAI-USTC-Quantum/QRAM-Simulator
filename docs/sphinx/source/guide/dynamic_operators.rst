@@ -289,7 +289,7 @@ BaseOperator
    op(state)
 
    # 查看结果
-   ps.print(state)
+   ps.pprint(state)
 
 示例 2：量子游走算子
 ~~~~~~~~~~~~~~~~~~~~

@@ -10,7 +10,7 @@ Basic Usage:
     >>> ps.System.add_register("q", ps.UnsignedInteger, 4)
     >>> state = ps.SparseState()
     >>> ps.Init_Unsafe("q", 5)(state)
-    >>> ps.print(state)                          # print to stdout (Detail mode)
+    >>> ps.pprint(state)                         # print to stdout (Detail mode)
     >>> str(state)                               # __str__ → Detail mode string
     >>> repr(state)                              # __repr__ → Detail mode string
     >>> ps.StatePrint(state)                     # returns Detail mode string
@@ -165,7 +165,7 @@ from .dynamic_operator import compile_operator, CompilationError, DynamicOperato
 
 
 # --------------------------------------------------------------------
-# State string formatting (shadows _core.StatePrint and _core.print)
+# State string formatting (shadows _core.StatePrint)
 # --------------------------------------------------------------------
 
 def StatePrint(
@@ -224,7 +224,7 @@ def to_string(
     return state.to_string(int(mode), precision)
 
 
-def print(state: SparseState, mode: int | StatePrintDisplay = 1, precision: int = 0) -> None:
+def pprint(state: SparseState, mode: int | StatePrintDisplay = 1, precision: int = 0) -> None:
     """Print a SparseState to stdout in the specified display mode.
 
     This function prints directly to standard output, which is captured
@@ -240,8 +240,8 @@ def print(state: SparseState, mode: int | StatePrintDisplay = 1, precision: int 
         >>> ps.AddRegister("q", ps.UnsignedInteger, 2)(ps.SparseState())
         >>> state = ps.SparseState()
         >>> ps.Hadamard_Int("q", 2)(state)
-        >>> ps.print(state)   # prints to stdout in Detail mode
-        >>> ps.print(state, mode=ps.StatePrintDisplay.Prob)   # Prob mode
+        >>> ps.pprint(state)   # prints to stdout in Detail mode
+        >>> ps.pprint(state, mode=ps.StatePrintDisplay.Prob)   # Prob mode
     """
     result = state.to_string(int(mode), precision)
     import sys

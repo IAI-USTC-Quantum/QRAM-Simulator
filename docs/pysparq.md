@@ -58,7 +58,7 @@ ps.Init_Unsafe("b", 3)(state)
 ps.Add_UInt_UInt("a", "b", "result")(state)
 
 # Print state
-ps.print(state)
+ps.pprint(state)
 # 输出：
 # StatePrint (mode=Detail)
 # |(0)a : UInt4 | |(1)b : UInt4 | |(2)result : UInt4 |
@@ -354,18 +354,18 @@ prob = ps.PartialTraceSelect({"reg_a": 0, "reg_b": 1})(state)
 
 ### State Inspection
 
-#### `StatePrint(state, mode=1, precision=0)` / `ps.print(state, mode=1)`
+#### `StatePrint(state, mode=1, precision=0)` / `ps.pprint(state, mode=1)`
 Print or return a formatted string representation of the quantum state.
 
 - ``ps.StatePrint(state)`` returns a string (Detail mode by default)
-- ``ps.print(state)`` prints to stdout (Detail mode by default)
+- ``ps.pprint(state)`` prints to stdout (Detail mode by default)
 
 ```python
-ps.print(state)                                              # Detail → stdout
+ps.pprint(state)                                              # Detail → stdout
 ps.StatePrint(state)                                         # Detail → string
 ps.StatePrint(state, mode=ps.StatePrintDisplay.Default)       # Default → string
 ps.StatePrint(state, mode=ps.StatePrintDisplay.Binary)       # Binary → string
-ps.print(state, mode=ps.StatePrintDisplay.Prob)               # Prob → stdout
+ps.pprint(state, mode=ps.StatePrintDisplay.Prob)               # Prob → stdout
 ```
 
 #### `CheckNormalization(threshold=1e-5)`
@@ -407,7 +407,7 @@ ps.Init_Unsafe("b", 5)(state)
 ps.Add_UInt_UInt("a", "b", "sum")(state)
 
 # Result: sum = 7 + 5 = 12
-ps.print(state)  # Detail mode
+ps.pprint(state)  # Detail mode
 # 输出：
 # StatePrint (mode=Detail)
 # |(0)a : UInt4 | |(1)b : UInt4 | |(2)sum : UInt4 |
@@ -437,7 +437,7 @@ ps.Init_Unsafe("flag", 1)(state)
 ps.Add_UInt_UInt_InPlace("x", "y").conditioned_by_nonzeros("flag")(state)
 
 # Result: y = 13 (flag=1 时触发条件加法：y = y + x = 10 + 3)
-ps.print(state)
+ps.pprint(state)
 # 输出：
 # StatePrint (mode=Detail)
 # |(0)x : UInt4 | |(1)y : UInt4 | |(2)flag : Bool1 |
@@ -469,7 +469,7 @@ for _ in range(n_iterations):
     ps.Reflection_Bool("search")(state)
 
 # Measure
-ps.print(state, mode=ps.StatePrintDisplay.Prob)
+ps.pprint(state, mode=ps.StatePrintDisplay.Prob)
 # 输出：
 # StatePrint (mode=Prob)
 # 1.000000+0.000000i (p = 1) |0>
@@ -502,7 +502,7 @@ ps.Init_Unsafe("addr", 5)(state)
 ps.QRAMLoad(qram, "addr", "data")(state)
 
 # Result: data register now contains 42
-ps.print(state)
+ps.pprint(state)
 # 输出：
 # StatePrint (mode=Detail)
 # |(0)addr : UInt4 | |(1)data : UInt8 |
