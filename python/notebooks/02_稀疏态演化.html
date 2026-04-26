@@ -327,9 +327,11 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-初始状态:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[1]</span><span class="ansi-green-fg">, line 12</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
 
-基态数量: 1
 </pre></div></div>
 </div>
 <section id="Hadamard-变换">
@@ -353,9 +355,11 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Hadamard_Int(q, 1) 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[2]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
 
-基态数量: 2
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -376,9 +380,11 @@ Hadamard_Int(q, 1) 后:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Hadamard_Int_Full(q) 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[3]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
 
-基态数量: 2
 </pre></div></div>
 </div>
 </section>
@@ -394,12 +400,26 @@ Hadamard_Int_Full(q) 后:
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Default 模式:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[4]</span><span class="ansi-green-fg">, line 2</span>
+<span class="ansi-green-fg">      1</span> print(<span class="ansi-yellow-fg">&#34;Default 模式:&#34;</span>)
+<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">2</span> print(ps.StatePrint(state, mode=ps.StatePrintDisplay.Default))
+
+<span class="ansi-red-fg">NameError</span>: name &#39;ps&#39; is not defined
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -416,7 +436,11 @@ Default 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Binary 模式:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[5]</span><span class="ansi-green-fg">, line 2</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state, mode=ps.StatePrintDisplay.Binary))</span>
+                                                      ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -433,7 +457,11 @@ Binary 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Prob 模式:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[6]</span><span class="ansi-green-fg">, line 2</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state, mode=ps.StatePrintDisplay.Prob))</span>
+                                                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 </section>
@@ -466,7 +494,11 @@ Prob 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-初始状态:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[7]</span><span class="ansi-green-fg">, line 15</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -487,7 +519,11 @@ Prob 模式:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Add_UInt_UInt 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[8]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -508,7 +544,11 @@ Add_UInt_UInt 后:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-再次 Add_UInt_UInt 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[9]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 </section>
@@ -541,7 +581,11 @@ Add_UInt_UInt 后:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-初始叠加态:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[10]</span><span class="ansi-green-fg">, line 15</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -562,7 +606,11 @@ Add_UInt_UInt 后:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Add_UInt_UInt_InPlace 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[11]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -582,7 +630,11 @@ Add_UInt_UInt_InPlace 后:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-dagger 后:
+  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[12]</span><span class="ansi-green-fg">, line 5</span>
+<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state))</span>
+                    ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
+
 </pre></div></div>
 </div>
 </section>
@@ -606,16 +658,30 @@ dagger 后:
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 遍历基态:
-  基态 0: x=0, y=1, 振幅=(0.5+0j)
-  基态 1: x=1, y=1, 振幅=(0.5+0j)
-  基态 2: x=2, y=1, 振幅=(0.5+0j)
-  基态 3: x=3, y=1, 振幅=(0.5+0j)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[13]</span><span class="ansi-green-fg">, line 3</span>
+<span class="ansi-green-fg">      1</span> <span style="color: rgb(95,135,135)"># 遍历所有基态</span>
+<span class="ansi-green-fg">      2</span> print(<span class="ansi-yellow-fg">&#34;遍历基态:&#34;</span>)
+<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> i, system <span class="ansi-bold" style="color: rgb(0,135,0)">in</span> enumerate(state.basis_states):
+<span class="ansi-green-fg">      4</span>     x_id = ps.System.get_id(<span class="ansi-yellow-fg">&#34;x&#34;</span>)
+<span class="ansi-green-fg">      5</span>     y_id = ps.System.get_id(<span class="ansi-yellow-fg">&#34;y&#34;</span>)
+<span class="ansi-green-fg">      6</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;state&#39; is not defined
 </pre></div></div>
 </div>
 </section>

@@ -341,7 +341,7 @@
 </section>
 <section id="初始化寄存器">
 <h2>初始化寄存器<a class="headerlink" href="#初始化寄存器" title="链接到此标题。">¶</a></h2>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
@@ -353,6 +353,17 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+StatePrint (mode=Detail)
+|(0)counter : UInt4 | |(1)flag : Bool1 |
+1.000000+0.000000i  counter=|5&gt; flag=|false&gt;
+
+</pre></div></div>
 </div>
 </section>
 <section id="创建叠加态">
@@ -375,6 +386,11 @@
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Hadamard 后:
+StatePrint (mode=Detail)
+|(0)counter : UInt4 | |(1)flag : Bool1 |
+0.707107+0.000000i  counter=|5&gt; flag=|false&gt;
+0.707107+0.000000i  counter=|5&gt; flag=|true&gt;
+
 </pre></div></div>
 </div>
 </section>
@@ -401,6 +417,11 @@ Hadamard 后:
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 加法后:
+StatePrint (mode=Detail)
+|(0)counter : UInt4 | |(1)flag : Bool1 | |(2)result : UInt4 |
+0.707107+0.000000i  counter=|5&gt; flag=|false&gt; result=|8&gt;
+0.707107+0.000000i  counter=|5&gt; flag=|true&gt; result=|8&gt;
+
 </pre></div></div>
 </div>
 </section>
@@ -462,6 +483,10 @@ counter ID: 0
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 条件加法结果:
+StatePrint (mode=Detail)
+|(0)a : UInt4 | |(1)b : UInt4 | |(2)result : UInt4 | |(3)ctrl : Bool1 |
+1.000000+0.000000i  a=|3&gt; b=|5&gt; result=|8&gt; ctrl=|true&gt;
+
 </pre></div></div>
 </div>
 </section>
