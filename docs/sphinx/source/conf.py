@@ -45,12 +45,6 @@ exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",
-    # Exclude 03_算子示例.ipynb from nbsphinx execution: the new live cells added in
-    # this notebook invoke pysparq operations that cause the Jupyter kernel to die
-    # (DeadKernelError) in the docs CI environment.  nbsphinx_allow_errors does not
-    # suppress kernel-death failures, so we exclude the notebook from the build
-    # entirely.  It is still present in the repo as a reference document.
-    "notebooks/03_算子示例.ipynb",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -162,3 +156,8 @@ nbsphinx_allow_errors = True   # Continue building docs even if a notebook cell 
 nbsphinx_timeout = 60
 # Note: nbsphinx prolog/epilog templates use env.docname instead of docname
 # in newer versions. We omit prolog for simplicity.
+# Skip execution for 03_算子示例.ipynb: the new live cells trigger compile_operator
+# (runtime C++ compilation), which causes the Jupyter kernel to die (DeadKernelError)
+# in the docs CI environment.  nbsphinx_allow_errors does not suppress kernel-death
+# failures.  The notebook is still rendered as static content.
+nbsphinx_exclude_patterns = ["notebooks/03_算子示例.ipynb"]
