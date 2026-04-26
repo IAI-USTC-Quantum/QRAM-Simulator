@@ -9,6 +9,7 @@ var structqram__simulator_1_1StatePrint =
     [ "dag", "structqram__simulator_1_1StatePrint.html#a417c2f939b0feb8829a59457cc68c0ce", null ],
     [ "disp2str", "structqram__simulator_1_1StatePrint.html#abbf7751f74ea11964a73a301da32c778", null ],
     [ "operator()", "structqram__simulator_1_1StatePrint.html#ae83d24c3c282fc0fd127698f6a4574b7", null ],
+    [ "to_string", "structqram__simulator_1_1StatePrint.html#ae82481b9c3196d8bcd468d2715bee513", null ],
     [ "display", "structqram__simulator_1_1StatePrint.html#a7864ed6aed850feb21dd45b3e294734f", null ],
     [ "precision", "structqram__simulator_1_1StatePrint.html#a6adb0c27ab7b692ed7c5e97078176d19", null ]
 ];

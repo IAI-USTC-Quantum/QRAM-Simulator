@@ -128,8 +128,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abbf7751f74ea11964a73a301da32c778" id="r_abbf7751f74ea11964a73a301da32c778"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1StatePrint.html#abbf7751f74ea11964a73a301da32c778">disp2str</a> () <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a></td></tr>
 <tr class="memdesc:abbf7751f74ea11964a73a301da32c778"><td class="mdescLeft">&#160;</td><td class="mdescRight">将显示模式转换为字符串  <br /></td></tr>
 <tr class="separator:abbf7751f74ea11964a73a301da32c778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae82481b9c3196d8bcd468d2715bee513" id="r_ae82481b9c3196d8bcd468d2715bee513"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1StatePrint.html#ae82481b9c3196d8bcd468d2715bee513">to_string</a> (std::vector&lt; <a class="el" href="structqram__simulator_1_1System.html">System</a> &gt; &amp;state) <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a></td></tr>
+<tr class="memdesc:ae82481b9c3196d8bcd468d2715bee513"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用状态打印，返回格式化字符串  <br /></td></tr>
+<tr class="separator:ae82481b9c3196d8bcd468d2715bee513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae83d24c3c282fc0fd127698f6a4574b7" id="r_ae83d24c3c282fc0fd127698f6a4574b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1StatePrint.html#ae83d24c3c282fc0fd127698f6a4574b7">operator()</a> (std::vector&lt; <a class="el" href="structqram__simulator_1_1System.html">System</a> &gt; &amp;state) <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a></td></tr>
-<tr class="memdesc:ae83d24c3c282fc0fd127698f6a4574b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用状态打印  <br /></td></tr>
+<tr class="memdesc:ae83d24c3c282fc0fd127698f6a4574b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用状态打印（打印到标准输出）  <br /></td></tr>
 <tr class="separator:ae83d24c3c282fc0fd127698f6a4574b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a417c2f939b0feb8829a59457cc68c0ce" id="r_a417c2f939b0feb8829a59457cc68c0ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1StatePrint.html#a417c2f939b0feb8829a59457cc68c0ce">dag</a> (std::vector&lt; <a class="el" href="structqram__simulator_1_1System.html">System</a> &gt; &amp;state) <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">override</a></td></tr>
 <tr class="memdesc:a417c2f939b0feb8829a59457cc68c0ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用 dagger 操作（自伴算子 dagger 等于自身）  <br /></td></tr>
@@ -475,7 +478,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>应用状态打印 </p>
+<p>应用状态打印（打印到标准输出） </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>系统状态向量 </td></tr>
@@ -484,6 +487,33 @@ Static Public Attributes</h2></td></tr>
 </dl>
 
 <p>Implements <a class="el" href="structqram__simulator_1_1BaseOperator.html#ad1c9dfd552ac32b85fbed303811306ba">qram_simulator::BaseOperator</a>.</p>
+
+</div>
+</div>
+<a id="ae82481b9c3196d8bcd468d2715bee513" name="ae82481b9c3196d8bcd468d2715bee513"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae82481b9c3196d8bcd468d2715bee513">&#9670;&#160;</a></span>to_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string qram_simulator::StatePrint::to_string </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="structqram__simulator_1_1System.html">System</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>应用状态打印，返回格式化字符串 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>系统状态向量 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>格式化状态字符串 </dd></dl>
 
 </div>
 </div>

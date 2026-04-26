@@ -352,17 +352,17 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 打印状态（稀疏格式：只显示非零振幅）</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>将某一基态设为特定值：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>   <span class="c1"># 将寄存器初始化为 |0101⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>通过加法算子驱动态演化（寄存器级编程的核心）：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Add_ConstUInt</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># |0101⟩ → |0110⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -382,15 +382,15 @@
 
 <span class="c1"># a ← a + b</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 10</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 10</span>
 
 <span class="c1"># a ← a × 2</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Mult_UInt_ConstUInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 20</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 20</span>
 
 <span class="c1"># a ← a &lt;&lt; 1（左移1位）</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 40</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>           <span class="c1"># a = 40</span>
 </pre></div>
 </div>
 </section>
@@ -417,7 +417,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">QRAMLoad</span><span class="p">(</span><span class="n">qram</span><span class="p">,</span> <span class="s2">&quot;addr&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 
 <span class="c1"># 状态包含所有 (addr, memory[addr]) 对的振幅</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -431,7 +431,7 @@
 <span class="n">ps</span><span class="o">.</span><span class="n">Init_Unsafe</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">QFT</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>        <span class="c1"># 应用 QFT</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">inverseQFT</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">)(</span><span class="n">state</span><span class="p">)</span>  <span class="c1"># 应用逆 QFT，恢复到 |5⟩</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

@@ -19,6 +19,14 @@ Submodules
    /autoapi/PySparQ/pysparq/dynamic_operator/index
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.StatePrinter
+
+
 Functions
 ---------
 
@@ -29,6 +37,22 @@ Functions
 
 Package Contents
 ----------------
+
+.. py:class:: StatePrinter(mode: int | StatePrintDisplay = 1, precision: int = 0)
+
+   Pythonic state printer with configurable display mode.
+
+
+   .. py:method:: to_string(state: SparseState, mode: int | None = None) -> str
+
+
+   .. py:attribute:: mode
+      :type:  int | StatePrintDisplay
+
+
+   .. py:attribute:: precision
+      :type:  int
+
 
 .. py:function:: test_import() -> None
 

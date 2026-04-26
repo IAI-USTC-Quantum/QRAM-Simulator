@@ -23,5 +23,6 @@ var structqram__simulator_1_1SparseState =
     [ "rend", "structqram__simulator_1_1SparseState.html#a6a1c2e87c29d253c921065f30a26079f", null ],
     [ "rend", "structqram__simulator_1_1SparseState.html#a4d7cb68e7bedc87cf384ddf864da3720", null ],
     [ "size", "structqram__simulator_1_1SparseState.html#a2aaf30462291102b47720f4ec705e651", null ],
+    [ "to_string", "structqram__simulator_1_1SparseState.html#a42c329660223c5b2fc937e25c812596e", null ],
     [ "basis_states", "structqram__simulator_1_1SparseState.html#a1771263b7f0c240167670e5b3d587fd9", null ]
 ];

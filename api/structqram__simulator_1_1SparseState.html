@@ -170,6 +170,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4f15f27ed9296ffa0d8254e8f21ee614" id="r_a4f15f27ed9296ffa0d8254e8f21ee614"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1SparseState.html#a4f15f27ed9296ffa0d8254e8f21ee614">empty</a> () <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a></td></tr>
 <tr class="memdesc:a4f15f27ed9296ffa0d8254e8f21ee614"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查是否为空  <br /></td></tr>
 <tr class="separator:a4f15f27ed9296ffa0d8254e8f21ee614"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42c329660223c5b2fc937e25c812596e" id="r_a42c329660223c5b2fc937e25c812596e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1SparseState.html#a42c329660223c5b2fc937e25c812596e">to_string</a> (<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">int32_t</a> display=0, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">int</a> precision=0) <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a></td></tr>
+<tr class="memdesc:a42c329660223c5b2fc937e25c812596e"><td class="mdescLeft">&#160;</td><td class="mdescRight">将状态格式化为字符串  <br /></td></tr>
+<tr class="separator:a42c329660223c5b2fc937e25c812596e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -839,6 +842,44 @@ Public Attributes</h2></td></tr>
 
 <p>获取大小 </p>
 <dl class="section return"><dt>Returns</dt><dd>基态数量 </dd></dl>
+
+</div>
+</div>
+<a id="a42c329660223c5b2fc937e25c812596e" name="a42c329660223c5b2fc937e25c812596e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42c329660223c5b2fc937e25c812596e">&#9670;&#160;</a></span>to_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string qram_simulator::SparseState::to_string </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">int32_t</a>&#160;</td>
+          <td class="paramname"><em>display</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">int</a>&#160;</td>
+          <td class="paramname"><em>precision</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将状态格式化为字符串 </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">display</td><td>显示模式（见 StatePrintDisplay） </td></tr>
+    <tr><td class="paramname">precision</td><td>精度（小数位数） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>格式化状态字符串 </dd></dl>
 
 </div>
 </div>
