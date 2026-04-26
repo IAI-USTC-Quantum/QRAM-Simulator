@@ -221,18 +221,20 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Setup Python
+    - id: setup-python
+      name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
     - name: Install Documentation Dependencies
       run: |
-        "$pythonLocation/bin/python" -m pip install -r docs/sphinx/requirements.txt
+        "${{ env.pythonLocation }}/bin/python" -m pip install -r docs/sphinx/requirements.txt
         sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1
 
     - name: Install pysparq for notebook execution
-      run: "$pythonLocation/bin/python" -m pip install --no-cache-dir .
+      run: |
+        "${{ env.pythonLocation }}/bin/python" -m pip install --no-cache-dir .
 
     - name: Generate Doxygen Documentation
       run: doxygen Doxyfile
