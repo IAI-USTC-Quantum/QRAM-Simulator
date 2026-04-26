@@ -26,7 +26,10 @@ minimum-version = "build-system.requires"
 cmake.version = ">=3.15"
 cmake.build-type = "Release"
 wheel.platlib = true
-wheel.packages = {"pysparq" = "PySparQ/pysparq"}
+# wheel.packages is required WITH wheel.platlib to include Python source
+# files from PySparQ/pysparq/ in the wheel alongside the compiled .so
+# extensions from the CMake install prefix (platlib).
+wheel.packages = {pysparq = "PySparQ/pysparq"}
 ninja.make-fallback = false
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 
