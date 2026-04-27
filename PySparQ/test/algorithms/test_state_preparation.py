@@ -238,7 +238,7 @@ class TestStatePreparationConditioning:
         prep = StatePrepViaQRAM(qram, "work_qubit", data_size, rational_size)
         prep.conditioned_by_nonzeros("cond")
         prep.clear_conditions()
-        assert len(prep._condition_regs) == 0
+        assert len(prep.condition_regs) == 0
 
 
 class TestStatePreparationIntegration:

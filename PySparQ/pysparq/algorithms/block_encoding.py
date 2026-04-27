@@ -29,6 +29,7 @@ import math
 import numpy as np
 
 import pysparq as ps
+from pysparq.operators import ControllableOperatorMixin
 
 from pysparq.algorithms.qram_utils import make_func, make_func_inv, pow2
 
@@ -101,7 +102,7 @@ def get_u_minus(size: int) -> np.ndarray:
 # ==============================================================================
 
 
-class BlockEncodingTridiagonal:
+class BlockEncodingTridiagonal(ControllableOperatorMixin):
     """Block encoding of a tridiagonal matrix alpha*I + beta*T.
 
     The operator prepares a 4-element ancilla state, applies a
@@ -113,6 +114,7 @@ class BlockEncodingTridiagonal:
     """
 
     def __init__(self, main_reg: str, anc_UA: str, alpha: float, beta: float):
+        super().__init__()
         self.main_reg = main_reg
         self.anc_UA = anc_UA
         self.alpha = alpha
@@ -139,39 +141,6 @@ class BlockEncodingTridiagonal:
             complex(p2, 0),
             complex(p3, 0),
         ]
-
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    # -- conditioning helpers --------------------------------------------------
-
-    def conditioned_by_nonzeros(
-        self, conds: str | list[str]
-    ) -> BlockEncodingTridiagonal:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> BlockEncodingTridiagonal:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(
-        self, reg: str | int, pos: int
-    ) -> BlockEncodingTridiagonal:
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def clear_conditions(self) -> None:
-        self._condition_regs = []
-        self._condition_bits = []
 
     # -- internal helper -------------------------------------------------------
 
@@ -260,7 +229,7 @@ class BlockEncodingTridiagonal:
 # ==============================================================================
 
 
-class UR:
+class UR(ControllableOperatorMixin):
     """Right-multiplication operator for QRAM-based block encoding.
 
     Implements the :math:`U_R` unitary that encodes the column norms of
@@ -278,38 +247,12 @@ class UR:
         data_size: int,
         rational_size: int,
     ):
+        super().__init__()
         self.qram = qram
         self.column_index = column_index
         self.data_size = data_size
         self.rational_size = rational_size
         self.addr_size = ps.System.size_of(column_index)
-
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    # -- conditioning helpers --------------------------------------------------
-
-    def conditioned_by_nonzeros(self, conds: str | list[str]) -> UR:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_all_ones(self, conds: str | list[str]) -> UR:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(self, reg: str | int, pos: int) -> UR:
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def clear_conditions(self) -> None:
-        self._condition_regs = []
-        self._condition_bits = []
 
     # -- forward ---------------------------------------------------------------
 
@@ -418,7 +361,7 @@ class UR:
 # ==============================================================================
 
 
-class UL:
+class UL(ControllableOperatorMixin):
     """Left-multiplication operator for QRAM-based block encoding.
 
     Implements the :math:`U_L` unitary that encodes the row structure of
@@ -438,39 +381,13 @@ class UL:
         data_size: int,
         rational_size: int,
     ):
+        super().__init__()
         self.qram = qram
         self.row_index = row_index
         self.column_index = column_index
         self.data_size = data_size
         self.rational_size = rational_size
         self.addr_size = ps.System.size_of(row_index)
-
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    # -- conditioning helpers --------------------------------------------------
-
-    def conditioned_by_nonzeros(self, conds: str | list[str]) -> UL:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_all_ones(self, conds: str | list[str]) -> UL:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(self, reg: str | int, pos: int) -> UL:
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def clear_conditions(self) -> None:
-        self._condition_regs = []
-        self._condition_bits = []
 
     # -- forward ---------------------------------------------------------------
 
@@ -643,7 +560,7 @@ class UL:
 # ==============================================================================
 
 
-class BlockEncodingViaQRAM:
+class BlockEncodingViaQRAM(ControllableOperatorMixin):
     """Block encoding of an arbitrary matrix via QRAM.
 
     The block encoding is composed as:
@@ -666,44 +583,12 @@ class BlockEncodingViaQRAM:
         data_size: int,
         rational_size: int,
     ):
+        super().__init__()
         self.qram = qram
         self.column_index = column_index
         self.row_index = row_index
         self.data_size = data_size
         self.rational_size = rational_size
-
-        self._condition_regs: list[str] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    # -- conditioning helpers --------------------------------------------------
-
-    def conditioned_by_nonzeros(
-        self, conds: str | list[str]
-    ) -> BlockEncodingViaQRAM:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_all_ones(
-        self, conds: str | list[str]
-    ) -> BlockEncodingViaQRAM:
-        if isinstance(conds, list):
-            self._condition_regs = conds
-        else:
-            self._condition_regs = [conds]
-        return self
-
-    def conditioned_by_bit(
-        self, reg: str | int, pos: int
-    ) -> BlockEncodingViaQRAM:
-        self._condition_bits = [(reg, pos)]
-        return self
-
-    def clear_conditions(self) -> None:
-        self._condition_regs = []
-        self._condition_bits = []
 
     # -- internal helper -------------------------------------------------------
 

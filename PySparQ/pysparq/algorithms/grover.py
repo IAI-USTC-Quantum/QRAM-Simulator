@@ -26,9 +26,10 @@ from __future__ import annotations
 import math
 
 import pysparq as ps
+from pysparq.operators import ControllableOperatorMixin
 
 
-class GroverOracle:
+class GroverOracle(ControllableOperatorMixin):
     """Oracle for Grover's search that marks target values.
 
     The oracle performs:
@@ -57,38 +58,11 @@ class GroverOracle:
         data_reg: str | int,
         search_reg: str | int,
     ):
+        super().__init__()
         self.qram = qram
         self.addr_reg = addr_reg
         self.data_reg = data_reg
         self.search_reg = search_reg
-
-        self._condition_regs: list[str | int] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_nonzeros(
-        self, cond: str | int | list[str | int]
-    ) -> "GroverOracle":
-        """Set condition registers for conditional execution."""
-        if isinstance(cond, list):
-            self._condition_regs = cond
-        else:
-            self._condition_regs = [cond]
-        return self
-
-    def conditioned_by_all_ones(self, conds) -> "GroverOracle":
-        """Set condition registers for conditional execution (all-ones alias)."""
-        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
-        return self
-
-    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOracle":
-        """Add a single-bit condition."""
-        self._condition_bits.append((reg, pos))
-        return self
-
-    def clear_conditions(self) -> None:
-        """Clear all conditions."""
-        self._condition_regs = []
-        self._condition_bits = []
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply the inverse oracle (self-inverse reflection)."""
@@ -128,7 +102,7 @@ class GroverOracle:
         ps.QRAMLoad(self.qram, self.addr_reg, self.data_reg)(state)
 
 
-class DiffusionOperator:
+class DiffusionOperator(ControllableOperatorMixin):
     """HPH (Hadamard-Phase-Hadamard) diffusion operator.
 
     The diffusion operator performs reflection about the equal
@@ -152,34 +126,8 @@ class DiffusionOperator:
     """
 
     def __init__(self, addr_reg: str | int):
+        super().__init__()
         self.addr_reg = addr_reg
-        self._condition_regs: list[str | int] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_nonzeros(
-        self, cond: str | int | list[str | int]
-    ) -> "DiffusionOperator":
-        """Set condition registers for conditional execution."""
-        if isinstance(cond, list):
-            self._condition_regs = cond
-        else:
-            self._condition_regs = [cond]
-        return self
-
-    def conditioned_by_all_ones(self, conds) -> "DiffusionOperator":
-        """Set condition registers for conditional execution (all-ones alias)."""
-        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
-        return self
-
-    def conditioned_by_bit(self, reg: str | int, pos: int) -> "DiffusionOperator":
-        """Add a single-bit condition."""
-        self._condition_bits.append((reg, pos))
-        return self
-
-    def clear_conditions(self) -> None:
-        """Clear all conditions."""
-        self._condition_regs = []
-        self._condition_bits = []
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply the inverse diffusion (self-inverse H-P-PhaseFlip-P-H)."""
@@ -201,7 +149,7 @@ class DiffusionOperator:
         ps.Hadamard_Int_Full(self.addr_reg)(state)
 
 
-class GroverOperator:
+class GroverOperator(ControllableOperatorMixin):
     """Combined Grover operator: Oracle followed by Diffusion.
 
     The full Grover iteration is:
@@ -227,35 +175,9 @@ class GroverOperator:
         data_reg: str | int,
         search_reg: str | int,
     ):
+        super().__init__()
         self.oracle = GroverOracle(qram, addr_reg, data_reg, search_reg)
         self.diffusion = DiffusionOperator(addr_reg)
-        self._condition_regs: list[str | int] = []
-        self._condition_bits: list[tuple[str | int, int]] = []
-
-    def conditioned_by_nonzeros(
-        self, cond: str | int | list[str | int]
-    ) -> "GroverOperator":
-        """Set condition registers for conditional execution."""
-        if isinstance(cond, list):
-            self._condition_regs = cond
-        else:
-            self._condition_regs = [cond]
-        return self
-
-    def conditioned_by_all_ones(self, conds) -> "GroverOperator":
-        """Set condition registers for conditional execution (all-ones alias)."""
-        self._condition_regs = [conds] if isinstance(conds, (str, int)) else list(conds)
-        return self
-
-    def conditioned_by_bit(self, reg: str | int, pos: int) -> "GroverOperator":
-        """Add a single-bit condition."""
-        self._condition_bits.append((reg, pos))
-        return self
-
-    def clear_conditions(self) -> None:
-        """Clear all conditions."""
-        self._condition_regs = []
-        self._condition_bits = []
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply the inverse Grover operator (delegates to sub-operators' dag)."""

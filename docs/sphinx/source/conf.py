@@ -151,8 +151,7 @@ copybutton_here_doc_delimiter = "EOT"
 # -- nbsphinx options --------------------------------------------------------
 # https://nbsphinx.readthedocs.io/
 
-nbsphinx_execute = "always"  # Re-execute on every build to capture fresh output
-nbsphinx_allow_errors = True   # Continue building docs even if a notebook cell fails
+nbsphinx_execute = "never"  # Disable execution: kernel dies on compile_operator cells
 nbsphinx_timeout = 60
 # Note: nbsphinx prolog/epilog templates use env.docname instead of docname
 # in newer versions. We omit prolog for simplicity.

@@ -230,7 +230,7 @@ jobs:
     - name: Install Documentation Dependencies
       run: |
         "${{ env.pythonLocation }}/bin/python" -m pip install -r docs/sphinx/requirements.txt
-        sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1
+        sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1 cmake ninja-build g++ python3-dev
 
     - name: Install pysparq for notebook execution
       run: |
