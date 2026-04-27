@@ -235,6 +235,9 @@ namespace qram_simulator
 			}
 		);
 
+		if (iter == name_register_map.rend())
+			throw_general_runtime_error("Register not found.");
+
 		return *iter;
 	}
 
