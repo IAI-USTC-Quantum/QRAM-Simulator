@@ -59,6 +59,8 @@ extern "C" const char* get_operator_name() {{
 """
 
     # Python 增强模板 - 包含支持 ctypes 调用的辅助函数
+    # 关键：通过 state._cpp_ptr()（pysparq._core.SparseState 中暴露）获取 C++ SparseState* 指针，
+    # ctypes 将其作为 c_void_p 传递，确保指针值正确传递且 ABI 一致。
     PYTHON_TEMPLATE = """#include "basic_components.h"
 #include <vector>
 #include <complex>
@@ -80,6 +82,8 @@ extern "C" const char* get_operator_name() {{
 }}
 
 // Python 调用辅助函数 - 应用算子到 SparseState
+// Python 侧通过 state._cpp_ptr() 获取 C++ SparseState* 指针，
+// ctypes 将其作为 ctypes.c_void_p 传递。
 extern "C" void apply_operator(BaseOperator* op, SparseState* state) {{
     if (op && state) {{
         (*op)(*state);
@@ -88,20 +92,6 @@ extern "C" void apply_operator(BaseOperator* op, SparseState* state) {{
 
 // Python 调用辅助函数 - 应用 dagger
 extern "C" void apply_operator_dag(BaseOperator* op, SparseState* state) {{
-    if (op && state) {{
-        op->dag(*state);
-    }}
-}}
-
-// Python 调用辅助函数 - 应用算子到 basis_states 向量
-extern "C" void apply_operator_vec(BaseOperator* op, std::vector<System>* state) {{
-    if (op && state) {{
-        (*op)(*state);
-    }}
-}}
-
-// Python 调用辅助函数 - 应用 dagger 到 basis_states 向量
-extern "C" void apply_operator_vec_dag(BaseOperator* op, std::vector<System>* state) {{
     if (op && state) {{
         op->dag(*state);
     }}

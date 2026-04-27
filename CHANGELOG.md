@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pyqsparse/` 目录（旧版存根输出）
 
 ### Fixed
-- 无
+- `compile_operator` 编译的算子作用于 `SparseState` 时触发段错误（#67）：通过 `state._cpp_ptr()` 获取 C++ 对象地址，并修复 wrapper 跨实例共享问题
 
 ---
 
