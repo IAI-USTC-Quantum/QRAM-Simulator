@@ -155,8 +155,5 @@ nbsphinx_execute = "never"  # Disable execution: kernel dies on compile_operator
 nbsphinx_timeout = 60
 # Note: nbsphinx prolog/epilog templates use env.docname instead of docname
 # in newer versions. We omit prolog for simplicity.
-# Skip execution for 03_算子示例.ipynb: the new live cells trigger compile_operator
-# (runtime C++ compilation), which causes the Jupyter kernel to die (DeadKernelError)
-# in the docs CI environment.  nbsphinx_allow_errors does not suppress kernel-death
-# failures.  The notebook is still rendered as static content.
-nbsphinx_exclude_patterns = ["notebooks/03_算子示例.ipynb"]
+# compile_operator cells require pysparq and g++ in the Jupyter kernel environment,
+# so notebooks are rendered as static content only (not executed).

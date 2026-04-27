@@ -69,7 +69,9 @@ Note:
     The sparse representation is memory-efficient but may be slower
     for dense superposition states.
 )doc");
-    sparse_state.def(py::init<>(), "Create an empty sparse quantum state");
+    sparse_state.def(py::init<>(), "Create an empty sparse quantum state")
+        .def("_cpp_ptr", [](SparseState& self) { return reinterpret_cast<std::uintptr_t>(&self); },
+                    "Return the raw C++ SparseState* address as uintptr_t.");
 
     py::class_<System>(m, "System", R"doc(
 Quantum system managing named registers.

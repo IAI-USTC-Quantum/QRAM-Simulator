@@ -101,13 +101,12 @@ class CppOperatorWrapper:
             self._get_name_func = self._handle.get_operator_name
             self._get_base_class_func = self._handle.get_base_class
             
-            # Python 增强函数（可选，如果存在）
+            # Python 增强函数 - 通过 state._cpp_ptr() 获取 C++ SparseState* 指针
             try:
                 self._apply_func = self._handle.apply_operator
                 self._apply_dag_func = self._handle.apply_operator_dag
             except AttributeError:
-                # 旧版本模板没有这些函数
-                pass
+                pass  # 旧版本模板没有这些函数
                 
         except AttributeError as e:
             raise DynamicOperatorLoadError(f"找不到必需的工厂函数: {e}")
@@ -162,9 +161,10 @@ class CppOperatorWrapper:
             self._get_base_class_func.restype = ctypes.c_char_p
             
         if self._apply_func:
+            # SparseState* 参数：ctypes.c_void_p 传递指针值
             self._apply_func.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
             self._apply_func.restype = None
-            
+
         if self._apply_dag_func:
             self._apply_dag_func.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
             self._apply_dag_func.restype = None
@@ -260,47 +260,28 @@ class CppOperatorWrapper:
                 return result.decode('utf-8')
         return "BaseOperator"
     
-    def apply(self, ptr: int, state_ptr: int):
+    def apply(self, ptr: int, state_cpp_ptr: int):
         """
-        应用算子到状态
-        
+        应用算子到 SparseState
+
         Args:
             ptr: 算子对象地址
-            state_ptr: 状态对象地址
+            state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）
         """
-        if self._apply_func and ptr and state_ptr:
-            self._apply_func(ptr, state_ptr)
-    
-    def apply_dag(self, ptr: int, state_ptr: int):
+        if self._apply_func and ptr and state_cpp_ptr:
+            self._apply_func(ptr, state_cpp_ptr)
+
+    def apply_dag(self, ptr: int, state_cpp_ptr: int):
         """
-        应用 dagger 到状态
-        
+        应用 dagger 到 SparseState
+
         Args:
             ptr: 算子对象地址
-            state_ptr: 状态对象地址
+            state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）
         """
-        if self._apply_dag_func and ptr and state_ptr:
-            self._apply_dag_func(ptr, state_ptr)
+        if self._apply_dag_func and ptr and state_cpp_ptr:
+            self._apply_dag_func(ptr, state_cpp_ptr)
 
-
-def _get_state_ptr(state):
-    """
-    获取状态对象的内部指针
-    
-    这个函数依赖于 pybind11 对象的内部结构。
-    我们使用 __int__ 方法（如果存在）或通过 id() 获取地址。
-    
-    Args:
-        state: SparseState 对象
-        
-    Returns:
-        状态对象地址
-    """
-    # pybind11 对象通常可以通过 __int__() 获取指针
-    # 如果没有，我们使用 id() 作为备选
-    if hasattr(state, '__int__'):
-        return int(state)
-    return id(state)
 
 
 def create_operator_class(
@@ -338,7 +319,7 @@ def create_operator_class(
     def custom_init(self, **kwargs):
         """
         动态算子构造函数
-        
+
         Args:
             **kwargs: 构造函数参数（按名称传参）
         """
@@ -348,69 +329,59 @@ def create_operator_class(
             if arg_name not in kwargs:
                 raise TypeError(f"缺少必需参数: {arg_name}")
             args.append(kwargs[arg_name])
-        
+
         # 存储参数用于 dag
         self._args = tuple(args)
-        self._wrapper = wrapper
-        self._base_class = base_class
+        # 将 wrapper 和 base_class 存储在类上（而非实例上），
+        # 这样所有实例共享同一个 wrapper，避免 __del__ 被调用时误关动态库。
+        self._wrapper = DynamicOpClass._wrapper
+        self._base_class = DynamicOpClass._base_class
         self._instance_id = _register_instance(self)
-        
+
         # 创建 C++ 算子实例
-        self._cpp_ptr = wrapper.create(*args)
+        self._cpp_ptr = self._wrapper.create(*args)
     
     def call_method(self, state):
         """
         调用算子
-        
+
         Args:
-            state: SparseState 或 basis_states 列表
-            
+            state: SparseState 对象
+
         Returns:
             返回输入状态（支持链式调用）
         """
         if not self._cpp_ptr:
             raise RuntimeError("算子未初始化或已销毁")
-        
-        # 获取状态指针并调用 C++ 算子
-        if hasattr(self._wrapper, '_apply_func') and self._wrapper._apply_func:
-            # 使用辅助函数调用
-            state_ptr = _get_state_ptr(state)
-            self._wrapper.apply(self._cpp_ptr, state_ptr)
-        else:
-            # 回退方案：通过 pysparq 的绑定调用
-            # 这需要重新加载库并创建绑定对象
-            _call_via_pybind11(self, state)
-        
+
+        # 通过 state._cpp_ptr()（在 pysparq._core.SparseState 中暴露）获取 C++ SparseState* 指针
+        state_cpp_ptr = state._cpp_ptr()
+        self._wrapper.apply(self._cpp_ptr, state_cpp_ptr)
+
         return state
-    
+
     def dag_method(self, state):
         """
         调用 dagger 操作
-        
+
         Args:
-            state: SparseState 或 basis_states 列表
-            
+            state: SparseState 对象
+
         Returns:
             返回输入状态
         """
         if not self._cpp_ptr:
             raise RuntimeError("算子未初始化或已销毁")
-        
+
+        state_cpp_ptr = state._cpp_ptr()
+
         if base_class == "SelfAdjointOperator":
             # 自伴算子 dagger 等于自身
-            state_ptr = _get_state_ptr(state)
-            if hasattr(self._wrapper, '_apply_func') and self._wrapper._apply_func:
-                self._wrapper.apply(self._cpp_ptr, state_ptr)
-            else:
-                _call_via_pybind11(self, state)
+            self._wrapper.apply(self._cpp_ptr, state_cpp_ptr)
         else:
             # BaseOperator 使用 dagger 辅助函数
-            if hasattr(self._wrapper, '_apply_dag_func') and self._wrapper._apply_dag_func:
-                state_ptr = _get_state_ptr(state)
-                self._wrapper.apply_dag(self._cpp_ptr, state_ptr)
-            else:
-                _call_dag_via_pybind11(self, state)
-        
+            self._wrapper.apply_dag(self._cpp_ptr, state_cpp_ptr)
+
         return state
     
     def repr_method(self) -> str:
@@ -427,12 +398,8 @@ def create_operator_class(
             self._cpp_ptr = 0
         if hasattr(self, '_instance_id'):
             _unregister_instance(self._instance_id)
-        # 关闭动态库句柄（Windows 需要显式释放才能删除文件）
-        if hasattr(self, '_wrapper'):
-            try:
-                self._wrapper.close()
-            except Exception:
-                pass
+        # 注意：不要在这里关闭 wrapper，因为 wrapper 由类级别管理，跨所有实例共享。
+        # 动态库的关闭由 cleanup_all_instances() 或显式调用负责。
     
     # 创建动态类
     DynamicOpClass = type(
@@ -450,6 +417,10 @@ def create_operator_class(
         }
     )
     
+    # 将 wrapper 和 base_class 存储在类级别（跨实例共享）
+    DynamicOpClass._wrapper = wrapper
+    DynamicOpClass._base_class = base_class
+
     # 添加文档字符串
     arg_docs = "\n".join(f"        {arg_name} ({arg_type})" for arg_type, arg_name in constructor_args) if constructor_args else "        (无)"
     DynamicOpClass.__doc__ = f"""
@@ -466,27 +437,6 @@ def create_operator_class(
 """
     
     return DynamicOpClass
-
-
-def _call_via_pybind11(operator_instance, state):
-    """
-    通过 pybind11 回退调用算子
-    
-    这是一个备用方案，当 ctypes 辅助函数不可用时使用。
-    这需要重新加载库并通过 pysparq 创建绑定对象。
-    """
-    raise NotImplementedError(
-        "动态算子调用需要 PySparQ 支持。"
-        "请确保使用的是支持动态算子的 PySparQ 版本。"
-    )
-
-
-def _call_dag_via_pybind11(operator_instance, state):
-    """通过 pybind11 调用 dagger"""
-    raise NotImplementedError(
-        "动态算子 dagger 调用需要 PySparQ 支持。"
-        "请确保使用的是支持动态算子的 PySparQ 版本。"
-    )
 
 
 def cleanup_all_instances():
