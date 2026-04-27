@@ -90,21 +90,21 @@ Module Contents
    :param lib_path: 动态库路径
 
 
-   .. py:method:: apply(ptr: int, state_ptr: int)
+   .. py:method:: apply(ptr: int, state_cpp_ptr: int)
 
-      应用算子到状态
-
-      :param ptr: 算子对象地址
-      :param state_ptr: 状态对象地址
-
-
-
-   .. py:method:: apply_dag(ptr: int, state_ptr: int)
-
-      应用 dagger 到状态
+      应用算子到 SparseState
 
       :param ptr: 算子对象地址
-      :param state_ptr: 状态对象地址
+      :param state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）
+
+
+
+   .. py:method:: apply_dag(ptr: int, state_cpp_ptr: int)
+
+      应用 dagger 到 SparseState
+
+      :param ptr: 算子对象地址
+      :param state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）
 
 
 

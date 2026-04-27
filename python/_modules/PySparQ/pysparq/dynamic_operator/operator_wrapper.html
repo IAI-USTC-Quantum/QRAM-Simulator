@@ -406,13 +406,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">get_operator_name</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_base_class_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">get_base_class</span>
             
-            <span class="c1"># Python 增强函数（可选，如果存在）</span>
+            <span class="c1"># Python 增强函数 - 通过 state._cpp_ptr() 获取 C++ SparseState* 指针</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">apply_operator</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">apply_operator_dag</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="c1"># 旧版本模板没有这些函数</span>
-                <span class="k">pass</span>
+                <span class="k">pass</span>  <span class="c1"># 旧版本模板没有这些函数</span>
                 
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DynamicOperatorLoadError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;找不到必需的工厂函数: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -468,9 +467,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_base_class_func</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_char_p</span>
             
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span><span class="p">:</span>
+            <span class="c1"># SparseState* 参数：ctypes.c_void_p 传递指针值</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="kc">None</span>
-            
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="kc">None</span>
@@ -583,52 +583,33 @@
     
 <div class="viewcode-block" id="CppOperatorWrapper.apply">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/dynamic_operator/operator_wrapper/index.html#PySparQ.pysparq.dynamic_operator.CppOperatorWrapper.apply">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        应用算子到状态</span>
-<span class="sd">        </span>
+<span class="sd">        应用算子到 SparseState</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            ptr: 算子对象地址</span>
-<span class="sd">            state_ptr: 状态对象地址</span>
+<span class="sd">            state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span> <span class="ow">and</span> <span class="n">ptr</span> <span class="ow">and</span> <span class="n">state_ptr</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span> <span class="ow">and</span> <span class="n">ptr</span> <span class="ow">and</span> <span class="n">state_cpp_ptr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_apply_func</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">)</span></div>
 
-    
+
 <div class="viewcode-block" id="CppOperatorWrapper.apply_dag">
 <a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/dynamic_operator/operator_wrapper/index.html#PySparQ.pysparq.dynamic_operator.CppOperatorWrapper.apply_dag">[文档]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">apply_dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_dag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        应用 dagger 到状态</span>
-<span class="sd">        </span>
+<span class="sd">        应用 dagger 到 SparseState</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            ptr: 算子对象地址</span>
-<span class="sd">            state_ptr: 状态对象地址</span>
+<span class="sd">            state_cpp_ptr: C++ SparseState* 指针（通过 state._cpp_ptr() 获取）</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span> <span class="ow">and</span> <span class="n">ptr</span> <span class="ow">and</span> <span class="n">state_ptr</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span> <span class="ow">and</span> <span class="n">ptr</span> <span class="ow">and</span> <span class="n">state_cpp_ptr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">)</span></div>
 </div>
 
 
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_state_ptr</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    获取状态对象的内部指针</span>
-<span class="sd">    </span>
-<span class="sd">    这个函数依赖于 pybind11 对象的内部结构。</span>
-<span class="sd">    我们使用 __int__ 方法（如果存在）或通过 id() 获取地址。</span>
-<span class="sd">    </span>
-<span class="sd">    Args:</span>
-<span class="sd">        state: SparseState 对象</span>
-<span class="sd">        </span>
-<span class="sd">    Returns:</span>
-<span class="sd">        状态对象地址</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pybind11 对象通常可以通过 __int__() 获取指针</span>
-    <span class="c1"># 如果没有，我们使用 id() 作为备选</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;__int__&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="create_operator_class">
@@ -668,7 +649,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">custom_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        动态算子构造函数</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: 构造函数参数（按名称传参）</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -678,69 +659,59 @@
             <span class="k">if</span> <span class="n">arg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;缺少必需参数: </span><span class="si">{</span><span class="n">arg_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">arg_name</span><span class="p">])</span>
-        
+
         <span class="c1"># 存储参数用于 dag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span> <span class="o">=</span> <span class="n">wrapper</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_base_class</span> <span class="o">=</span> <span class="n">base_class</span>
+        <span class="c1"># 将 wrapper 和 base_class 存储在类上（而非实例上），</span>
+        <span class="c1"># 这样所有实例共享同一个 wrapper，避免 __del__ 被调用时误关动态库。</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span> <span class="o">=</span> <span class="n">DynamicOpClass</span><span class="o">.</span><span class="n">_wrapper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_class</span> <span class="o">=</span> <span class="n">DynamicOpClass</span><span class="o">.</span><span class="n">_base_class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_id</span> <span class="o">=</span> <span class="n">_register_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        
+
         <span class="c1"># 创建 C++ 算子实例</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span> <span class="o">=</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     
     <span class="k">def</span><span class="w"> </span><span class="nf">call_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        调用算子</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            state: SparseState 或 basis_states 列表</span>
-<span class="sd">            </span>
+<span class="sd">            state: SparseState 对象</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            返回输入状态（支持链式调用）</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;算子未初始化或已销毁&quot;</span><span class="p">)</span>
-        
-        <span class="c1"># 获取状态指针并调用 C++ 算子</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="p">,</span> <span class="s1">&#39;_apply_func&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">_apply_func</span><span class="p">:</span>
-            <span class="c1"># 使用辅助函数调用</span>
-            <span class="n">state_ptr</span> <span class="o">=</span> <span class="n">_get_state_ptr</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># 回退方案：通过 pysparq 的绑定调用</span>
-            <span class="c1"># 这需要重新加载库并创建绑定对象</span>
-            <span class="n">_call_via_pybind11</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        
+
+        <span class="c1"># 通过 state._cpp_ptr()（在 pysparq._core.SparseState 中暴露）获取 C++ SparseState* 指针</span>
+        <span class="n">state_cpp_ptr</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">state</span>
-    
+
     <span class="k">def</span><span class="w"> </span><span class="nf">dag_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        调用 dagger 操作</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            state: SparseState 或 basis_states 列表</span>
-<span class="sd">            </span>
+<span class="sd">            state: SparseState 对象</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            返回输入状态</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;算子未初始化或已销毁&quot;</span><span class="p">)</span>
-        
+
+        <span class="n">state_cpp_ptr</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">base_class</span> <span class="o">==</span> <span class="s2">&quot;SelfAdjointOperator&quot;</span><span class="p">:</span>
             <span class="c1"># 自伴算子 dagger 等于自身</span>
-            <span class="n">state_ptr</span> <span class="o">=</span> <span class="n">_get_state_ptr</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="p">,</span> <span class="s1">&#39;_apply_func&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">_apply_func</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_call_via_pybind11</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># BaseOperator 使用 dagger 辅助函数</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="p">,</span> <span class="s1">&#39;_apply_dag_func&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">_apply_dag_func</span><span class="p">:</span>
-                <span class="n">state_ptr</span> <span class="o">=</span> <span class="n">_get_state_ptr</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply_dag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_ptr</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_call_dag_via_pybind11</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">apply_dag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span><span class="p">,</span> <span class="n">state_cpp_ptr</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">state</span>
     
     <span class="k">def</span><span class="w"> </span><span class="nf">repr_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -757,12 +728,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_cpp_ptr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_instance_id&#39;</span><span class="p">):</span>
             <span class="n">_unregister_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_instance_id</span><span class="p">)</span>
-        <span class="c1"># 关闭动态库句柄（Windows 需要显式释放才能删除文件）</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_wrapper&#39;</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+        <span class="c1"># 注意：不要在这里关闭 wrapper，因为 wrapper 由类级别管理，跨所有实例共享。</span>
+        <span class="c1"># 动态库的关闭由 cleanup_all_instances() 或显式调用负责。</span>
     
     <span class="c1"># 创建动态类</span>
     <span class="n">DynamicOpClass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span>
@@ -780,6 +747,10 @@
         <span class="p">}</span>
     <span class="p">)</span>
     
+    <span class="c1"># 将 wrapper 和 base_class 存储在类级别（跨实例共享）</span>
+    <span class="n">DynamicOpClass</span><span class="o">.</span><span class="n">_wrapper</span> <span class="o">=</span> <span class="n">wrapper</span>
+    <span class="n">DynamicOpClass</span><span class="o">.</span><span class="n">_base_class</span> <span class="o">=</span> <span class="n">base_class</span>
+
     <span class="c1"># 添加文档字符串</span>
     <span class="n">arg_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;        </span><span class="si">{</span><span class="n">arg_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">arg_type</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">arg_type</span><span class="p">,</span> <span class="n">arg_name</span> <span class="ow">in</span> <span class="n">constructor_args</span><span class="p">)</span> <span class="k">if</span> <span class="n">constructor_args</span> <span class="k">else</span> <span class="s2">&quot;        (无)&quot;</span>
     <span class="n">DynamicOpClass</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -797,27 +768,6 @@
     
     <span class="k">return</span> <span class="n">DynamicOpClass</span></div>
 
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_call_via_pybind11</span><span class="p">(</span><span class="n">operator_instance</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    通过 pybind11 回退调用算子</span>
-<span class="sd">    </span>
-<span class="sd">    这是一个备用方案，当 ctypes 辅助函数不可用时使用。</span>
-<span class="sd">    这需要重新加载库并通过 pysparq 创建绑定对象。</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-        <span class="s2">&quot;动态算子调用需要 PySparQ 支持。&quot;</span>
-        <span class="s2">&quot;请确保使用的是支持动态算子的 PySparQ 版本。&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_call_dag_via_pybind11</span><span class="p">(</span><span class="n">operator_instance</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;通过 pybind11 调用 dagger&quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-        <span class="s2">&quot;动态算子 dagger 调用需要 PySparQ 支持。&quot;</span>
-        <span class="s2">&quot;请确保使用的是支持动态算子的 PySparQ 版本。&quot;</span>
-    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="cleanup_all_instances">

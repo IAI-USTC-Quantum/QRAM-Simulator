@@ -455,6 +455,8 @@
 <span class="sd">}}</span>
 
 <span class="sd">// Python 调用辅助函数 - 应用算子到 SparseState</span>
+<span class="sd">// Python 侧通过 state._cpp_ptr() 获取 C++ SparseState* 指针，</span>
+<span class="sd">// ctypes 将其作为 ctypes.c_void_p 传递。</span>
 <span class="sd">extern &quot;C&quot; void apply_operator(BaseOperator* op, SparseState* state) {{</span>
 <span class="sd">    if (op &amp;&amp; state) {{</span>
 <span class="sd">        (*op)(*state);</span>
@@ -463,20 +465,6 @@
 
 <span class="sd">// Python 调用辅助函数 - 应用 dagger</span>
 <span class="sd">extern &quot;C&quot; void apply_operator_dag(BaseOperator* op, SparseState* state) {{</span>
-<span class="sd">    if (op &amp;&amp; state) {{</span>
-<span class="sd">        op-&gt;dag(*state);</span>
-<span class="sd">    }}</span>
-<span class="sd">}}</span>
-
-<span class="sd">// Python 调用辅助函数 - 应用算子到 basis_states 向量</span>
-<span class="sd">extern &quot;C&quot; void apply_operator_vec(BaseOperator* op, std::vector&lt;System&gt;* state) {{</span>
-<span class="sd">    if (op &amp;&amp; state) {{</span>
-<span class="sd">        (*op)(*state);</span>
-<span class="sd">    }}</span>
-<span class="sd">}}</span>
-
-<span class="sd">// Python 调用辅助函数 - 应用 dagger 到 basis_states 向量</span>
-<span class="sd">extern &quot;C&quot; void apply_operator_vec_dag(BaseOperator* op, std::vector&lt;System&gt;* state) {{</span>
 <span class="sd">    if (op &amp;&amp; state) {{</span>
 <span class="sd">        op-&gt;dag(*state);</span>
 <span class="sd">    }}</span>

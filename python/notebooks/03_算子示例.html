@@ -622,18 +622,11 @@
 </div>
 </div>
 <p>如需新 primitives（超出已有算子表达能力），使用 <code class="docutils literal notranslate"><span class="pre">compile_operator</span></code> 将 C++ 代码编译为动态链接库：</p>
-<div class="warning docutils container">
-<p><code class="docutils literal notranslate"><span class="pre">compile_operator</span></code> 目前存在已知问题（<a class="reference external" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/issues/67">#67</a>）：将编译后的算子作用于 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code> 时会触发段错误。该问题正在修复中，当前代码展示仅供参考。</p>
-</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># WARNING: Known issue [#67](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/issues/67) -</span>
-<span class="c1"># calling the compiled operator on SparseState currently segfaults.</span>
-<span class="c1"># This cell is excluded from nbsphinx execution and shown for reference only.</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.dynamic_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_operator</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pysparq.dynamic_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_operator</span>
 
 <span class="n">cpp_code</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">class FlipOp : public SelfAdjointOperator {</span>
@@ -676,7 +669,7 @@
 <li><p>QFT / inverseQFT</p></li>
 <li><p>条件操作</p></li>
 <li><p><strong>Block Encoding</strong>：用 <code class="docutils literal notranslate"><span class="pre">BlockEncodingTridiagonal</span></code> 对三对角矩阵进行块编码</p></li>
-<li><p><strong>自定义算子</strong>：Python 侧组合已有算子，或通过 <code class="docutils literal notranslate"><span class="pre">compile_operator</span></code> 编译 C++ 代码（存在已知问题，见 <a class="reference external" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/issues/67">#67</a>）</p></li>
+<li><p><strong>自定义算子</strong>：Python 侧组合已有算子，或通过 <code class="docutils literal notranslate"><span class="pre">compile_operator</span></code> 编译 C++ 代码</p></li>
 </ul>
 </section>
 </section>
