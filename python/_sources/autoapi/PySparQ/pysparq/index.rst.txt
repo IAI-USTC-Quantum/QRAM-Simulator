@@ -17,6 +17,7 @@ Submodules
 
    /autoapi/PySparQ/pysparq/algorithms/index
    /autoapi/PySparQ/pysparq/dynamic_operator/index
+   /autoapi/PySparQ/pysparq/operators/index
 
 
 Classes

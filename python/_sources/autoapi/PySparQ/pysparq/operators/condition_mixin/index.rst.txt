@@ -1,0 +1,70 @@
+PySparQ.pysparq.operators.condition_mixin
+=========================================
+
+.. py:module:: PySparQ.pysparq.operators.condition_mixin
+
+.. autoapi-nested-parse::
+
+   Condition-setting mixin for PySparQ composite operators.
+
+   This module provides the canonical condition-setting interface used by all
+   PySparQ composite operators.  Subclasses inherit the four condition methods
+   instead of reimplementing them.
+
+   Design: the mixin stores its state in ``__condition_regs`` / ``__condition_bits``
+   (name-mangled to avoid conflicts with subclasses that write to ``_condition_regs``
+   / ``_condition_bits`` directly in ``__call__`` bodies), and exposes the public
+   names via properties.  Subclass ``__call__`` bodies that read or assign
+   ``self._condition_regs`` / ``self._condition_bits`` interact with the property
+   storage, which in turn reads/writes the mixin's mangled names.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.operators.condition_mixin.ControllableOperatorMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: ControllableOperatorMixin(*, condition_regs: list | None = None, condition_bits: list | None = None)
+
+   Mixin providing the standard condition-setting interface.
+
+   Provides:
+       conditioned_by_nonzeros(cond)   -> self
+       conditioned_by_all_ones(cond)   -> self
+       conditioned_by_bit(reg, pos)    -> self
+       clear_conditions()             -> self
+
+   Subclasses MUST implement __call__(self, state) -> None.
+   Subclasses SHOULD implement dag(self, state) -> None
+   if the operator is not self-adjoint.
+
+
+   .. py:method:: clear_conditions() -> Self
+
+
+   .. py:method:: conditioned_by_all_ones(cond: str | int | list) -> Self
+
+
+   .. py:method:: conditioned_by_bit(reg: str | int, pos: int) -> Self
+
+
+   .. py:method:: conditioned_by_nonzeros(cond: str | int | list) -> Self
+
+
+   .. py:property:: condition_bits
+      :type: list
+
+
+
+   .. py:property:: condition_regs
+      :type: list
+
+
+

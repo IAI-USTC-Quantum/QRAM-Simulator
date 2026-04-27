@@ -214,17 +214,13 @@
 <li class="toctree-l2"><a class="reference internal" href="../guide/core_concepts/operators.html">算子</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../guide/development/index.html">量子算法开发指南</a><input aria-label="Toggle navigation of 量子算法开发指南" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guide/development/workflow.html">开发工作流</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/development/templates.html">代码模板</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/development/verification.html">测试验证</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guide/development/standards.html">代码规范</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/development/workflow.html">开发工作流</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/development/templates.html">代码模板</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/development/verification.html">测试验证</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">算子参考</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../operators/index.html">算子参考</a><input aria-label="Toggle navigation of 算子参考" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../operators/index.html">算子参考</a><input aria-label="Toggle navigation of 算子参考" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../operators/arithmetic.html">算术算子</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../operators/gates.html">基本量子门</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../operators/hadamard.html">Hadamard 操作</a></li>
@@ -249,12 +245,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API 参考</span></p>
 <ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api/python.html">Python API 参考</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/dynamic_operator.html">动态算子 API 参考</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../autoapi/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="simple">
 </ul>
 </li>
 </ul>
@@ -302,8 +298,8 @@
           <section id="稀疏态演化示例">
 <h1>稀疏态演化示例<a class="headerlink" href="#稀疏态演化示例" title="链接到此标题。">¶</a></h1>
 <p>本教程展示 SparseState 如何随算子操作演化，并进一步演示 QFT 和 QRAM 等组合算子的使用。</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pysparq</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ps</span>
@@ -322,25 +318,11 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-初始状态:
-StatePrint (mode=Detail)
-|(0)q : UInt2 |
-1.000000+0.000000i  q=|0&gt;
-
-
-基态数量: 1
-</pre></div></div>
-</div>
 <section id="Hadamard-变换">
 <h2>Hadamard 变换<a class="headerlink" href="#Hadamard-变换" title="链接到此标题。">¶</a></h2>
 <p>Hadamard 创建量子叠加态。</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hadamard_Int: 对指定数量的量子比特应用 Hadamard</span>
@@ -352,23 +334,8 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Hadamard_Int(q, 1) 后:
-StatePrint (mode=Detail)
-|(0)q : UInt2 |
-0.707107+0.000000i  q=|0&gt;
-0.707107+0.000000i  q=|1&gt;
-
-
-基态数量: 2
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hadamard_Int_Full: 对所有量子比特应用完整 Hadamard</span>
@@ -380,27 +347,12 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Hadamard_Int_Full(q) 后:
-StatePrint (mode=Detail)
-|(0)q : UInt2 |
-0.707107+0.000000i  q=|0&gt;
-0.707107+0.000000i  q=|2&gt;
-
-
-基态数量: 2
-</pre></div></div>
-</div>
 </section>
 <section id="状态打印模式">
 <h2>状态打印模式<a class="headerlink" href="#状态打印模式" title="链接到此标题。">¶</a></h2>
 <p>StatePrint 支持多种显示模式。</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Default 模式:&quot;</span><span class="p">)</span>
@@ -408,65 +360,29 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Default 模式:
-StatePrint (mode=Default)
-0.707107+0.000000i |0&gt;
-0.707107+0.000000i |2&gt;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Binary 模式:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Binary</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Binary</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[5]</span><span class="ansi-green-fg">, line 2</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state, mode=ps.StatePrintDisplay.Binary))</span>
-                                                      ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Prob 模式:&quot;</span><span class="p">)</span>
-<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Prob</span><span class="p">))</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrintDisplay</span><span class="o">.</span><span class="n">Prob</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-  <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[6]</span><span class="ansi-green-fg">, line 2</span>
-<span class="ansi-red-fg">    </span><span class="ansi-red-fg">ps.pprint(state, mode=ps.StatePrintDisplay.Prob))</span>
-                                                    ^
-<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unmatched &#39;)&#39;
-
-</pre></div></div>
 </div>
 </section>
 <section id="算术操作演化">
 <h2>算术操作演化<a class="headerlink" href="#算术操作演化" title="链接到此标题。">¶</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -487,20 +403,8 @@ StatePrint (mode=Default)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-初始状态:
-StatePrint (mode=Detail)
-|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
-1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|0&gt;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 加法: sum ^= a + b</span>
@@ -512,20 +416,8 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Add_UInt_UInt 后:
-StatePrint (mode=Detail)
-|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
-1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|3&gt;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 再次应用 = 撤销（XOR 机制）</span>
@@ -537,23 +429,11 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-再次 Add_UInt_UInt 后:
-StatePrint (mode=Detail)
-|(0)a : UInt2 | |(1)b : UInt2 | |(2)sum : UInt2 |
-1.000000+0.000000i  a=|1&gt; b=|2&gt; sum=|0&gt;
-
-</pre></div></div>
-</div>
 </section>
 <section id="叠加态上的算术">
 <h2>叠加态上的算术<a class="headerlink" href="#叠加态上的算术" title="链接到此标题。">¶</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -574,23 +454,8 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-初始叠加态:
-StatePrint (mode=Detail)
-|(0)x : UInt2 | |(1)y : UInt2 |
-0.500000+0.000000i  x=|0&gt; y=|1&gt;
-0.500000+0.000000i  x=|1&gt; y=|1&gt;
-0.500000+0.000000i  x=|2&gt; y=|1&gt;
-0.500000+0.000000i  x=|3&gt; y=|1&gt;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 内置加法: y += x（每个分支独立计算）</span>
@@ -602,23 +467,8 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Add_UInt_UInt_InPlace 后:
-StatePrint (mode=Detail)
-|(0)x : UInt2 | |(1)y : UInt2 |
-0.500000+0.000000i  x=|0&gt; y=|1&gt;
-0.500000+0.000000i  x=|1&gt; y=|2&gt;
-0.500000+0.000000i  x=|2&gt; y=|3&gt;
-0.500000+0.000000i  x=|3&gt; y=|0&gt;
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 撤销</span>
@@ -629,26 +479,11 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-dagger 后:
-StatePrint (mode=Detail)
-|(0)x : UInt2 | |(1)y : UInt2 |
-0.500000+0.000000i  x=|0&gt; y=|1&gt;
-0.500000+0.000000i  x=|1&gt; y=|1&gt;
-0.500000+0.000000i  x=|2&gt; y=|1&gt;
-0.500000+0.000000i  x=|3&gt; y=|1&gt;
-
-</pre></div></div>
-</div>
 </section>
 <section id="访问基态数据">
 <h2>访问基态数据<a class="headerlink" href="#访问基态数据" title="链接到此标题。">¶</a></h2>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 遍历所有基态</span>
@@ -665,23 +500,15 @@ StatePrint (mode=Detail)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-遍历基态:
-  基态 0: x=0, y=1, 振幅=(0.5+0j)
-  基态 1: x=1, y=1, 振幅=(0.5+0j)
-  基态 2: x=2, y=1, 振幅=(0.5+0j)
-  基态 3: x=3, y=1, 振幅=(0.5+0j)
-</pre></div></div>
-</div>
 </section>
 <section id="QRAM-数据加载">
 <h2>QRAM 数据加载<a class="headerlink" href="#QRAM-数据加载" title="链接到此标题。">¶</a></h2>
 <p>在叠加态下通过 QRAM 批量加载经典数据：</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 <span class="n">n_addr</span><span class="p">,</span> <span class="n">n_data</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
@@ -705,11 +532,15 @@ StatePrint (mode=Detail)
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">基态数量: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>QRAM 加载后，状态为所有 :math:<code class="docutils literal notranslate"><span class="pre">|addr\rangle</span> <span class="pre">\otimes</span> <span class="pre">|memory[addr]\rangle</span></code> 的叠加，基态数等于地址空间大小。</p>
+</div>
 </section>
 <section id="QFT-变换">
 <h2>QFT 变换<a class="headerlink" href="#QFT-变换" title="链接到此标题。">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">UnsignedInteger</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SparseState</span><span class="p">()</span>
 
@@ -725,6 +556,7 @@ StatePrint (mode=Detail)
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;逆 QFT 后:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">StatePrint</span><span class="p">()(</span><span class="n">state</span><span class="p">))</span>  <span class="c1"># 恢复到 |1⟩</span>
 </pre></div>
+</div>
 </div>
 </section>
 <section id="总结">

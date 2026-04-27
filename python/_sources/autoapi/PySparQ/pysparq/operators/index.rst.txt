@@ -1,0 +1,21 @@
+PySparQ.pysparq.operators
+=========================
+
+.. py:module:: PySparQ.pysparq.operators
+
+.. autoapi-nested-parse::
+
+   PySparQ operator mixins and base classes.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/PySparQ/pysparq/operators/base/index
+   /autoapi/PySparQ/pysparq/operators/condition_mixin/index
+
+

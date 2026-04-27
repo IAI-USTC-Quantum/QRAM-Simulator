@@ -1,0 +1,41 @@
+PySparQ.pysparq.operators.base
+==============================
+
+.. py:module:: PySparQ.pysparq.operators.base
+
+.. autoapi-nested-parse::
+
+   Abstract base class for PySparQ composite operators.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.operators.base.ControllableOperator
+
+
+Module Contents
+---------------
+
+.. py:class:: ControllableOperator(*, condition_regs: list | None = None, condition_bits: list | None = None)
+
+   Bases: :py:obj:`pysparq.operators.condition_mixin.ControllableOperatorMixin`, :py:obj:`abc.ABC`
+
+
+   ABC requiring __call__ and dag implementations.
+
+   Subclasses must implement __call__(self, state) -> None.
+   dag() raises NotImplementedError by default.
+
+
+   .. py:method:: dag(state) -> None
+      :abstractmethod:
+
+
+      Apply the adjoint of the operator to *state*.
+
+
+
