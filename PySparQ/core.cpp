@@ -428,7 +428,15 @@ Args:
     py::class_<qram_qutrit::QRAMCircuit>(m, "QRAMCircuit_qutrit")
         .def(py::init<size_t, size_t>(), py::arg("addr_size"), py::arg("data_size"))
         .def(py::init<size_t, size_t, const memory_t &>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
-        .def(py::init<size_t, size_t, memory_t &&>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"));
+        .def(py::init<size_t, size_t, memory_t &&>(), py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
+        .def(py::init([](size_t addr_size, size_t data_size, py::array_t<uint64_t, py::array::c_style | py::array::forcecast> np_arr)
+                      {
+                          const uint64_t *ptr = np_arr.data();
+                          memory_t mem(ptr, ptr + np_arr.size());
+                          return new qram_qutrit::QRAMCircuit(addr_size, data_size, std::move(mem));
+                      }),
+             py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
+        .def_readonly("address_size", &qram_qutrit::QRAMCircuit::address_size);
 
     // 绑定QRAMLoad
     BIND_SELF_ADJOINT_OPERATOR(QRAMLoad, R"doc(
