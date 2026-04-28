@@ -8,5 +8,5 @@ var searchData=
   ['max_5fsystem_5fsize_5',['max_system_size',['../structqram__simulator_1_1System.html#a782a5e0a8c58e415f6d56de6e2ede1be',1,'qram_simulator::System']]],
   ['memory_6',['memory',['../structqram__simulator_1_1qram__qubit_1_1QRAMCircuit.html#a7333a22e14c2bb29db0dde381c7f91c3',1,'qram_simulator::qram_qubit::QRAMCircuit::memory'],['../structqram__simulator_1_1qram__qutrit_1_1QRAMCircuit.html#a8a860312481f5315f814507188da5452',1,'qram_simulator::qram_qutrit::QRAMCircuit::memory']]],
   ['mid_5fid_7',['mid_id',['../structqram__simulator_1_1GetMid__UInt__UInt.html#ac4d3f4004adb3a7bd261e52f555544b2',1,'qram_simulator::GetMid_UInt_UInt']]],
-  ['mult_5fint_8',['mult_int',['../structqram__simulator_1_1Mult__UInt__ConstUInt.html#a8bc9b731bb2f5440eb5e73645454140b',1,'qram_simulator::Mult_UInt_ConstUInt::mult_int'],['../structqram__simulator_1_1Add__Mult__UInt__ConstUInt.html#a6347510a5a11a695e152543f60dfa17d',1,'qram_simulator::Add_Mult_UInt_ConstUInt::mult_int']]]
+  ['mult_5fint_8',['mult_int',['../structqram__simulator_1_1Mult__UInt__ConstUInt.html#a8bc9b731bb2f5440eb5e73645454140b',1,'qram_simulator::Mult_UInt_ConstUInt::mult_int'],['../structqram__simulator_1_1Add__Mult__UInt__ConstUInt__InPlace.html#aa7e91141711ca530d436f46d3c0e47ec',1,'qram_simulator::Add_Mult_UInt_ConstUInt_InPlace::mult_int']]]
 ];

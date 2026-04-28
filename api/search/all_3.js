@@ -5,7 +5,7 @@ var searchData=
   ['calc_5fpos_2',['calc_pos',['../namespaceqram__simulator.html#a08e7a476588b10793d891769411c044c',1,'qram_simulator']]],
   ['check_5f0_3',['check_0',['../structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a452624c7071118a56b440adeed482620',1,'qram_simulator::qram_qutrit::QRAMNode']]],
   ['check_5fhash_4',['CHECK_HASH',['../global__macros_8h.html#a75843abf77faf58dcffbcda5f021aa09',1,'global_macros.h']]],
-  ['check_5finplace_5funitarity_5',['check_inplace_unitarity',['../namespaceqram__simulator.html#a28357ac90ed03c81f5e9cf0bbf545ec2',1,'qram_simulator']]],
+  ['check_5finplace_5funitarity_5',['check_inplace_unitarity',['../namespaceqram__simulator.html#af363d66c4e1944f26d263ee96490726e',1,'qram_simulator']]],
   ['checkduplicatekey_6',['checkduplicatekey',['../structqram__simulator_1_1CheckDuplicateKey.html',1,'qram_simulator::CheckDuplicateKey'],['../structqram__simulator_1_1CheckDuplicateKey.html#a97c9886fdc09c6b4f57c29c177f8f300',1,'qram_simulator::CheckDuplicateKey::CheckDuplicateKey()']]],
   ['checknan_7',['checknan',['../structqram__simulator_1_1CheckNan.html',1,'qram_simulator::CheckNan'],['../structqram__simulator_1_1CheckNan.html#a1ed4bfa7392b128cb02b660a53e45173',1,'qram_simulator::CheckNan::CheckNan()']]],
   ['checknormalization_8',['checknormalization',['../structqram__simulator_1_1CheckNormalization.html',1,'qram_simulator::CheckNormalization'],['../structqram__simulator_1_1CheckNormalization.html#a843743b45098c0b7a4dee8057f496719',1,'qram_simulator::CheckNormalization::CheckNormalization()'],['../structqram__simulator_1_1CheckNormalization.html#a50355b7c659c68f8f80086b7bfaa077a',1,'qram_simulator::CheckNormalization::CheckNormalization(double threshold_)']]],

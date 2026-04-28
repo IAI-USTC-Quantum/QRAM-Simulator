@@ -16,7 +16,7 @@ var debugger_8h =
       [ "Prob", "debugger_8h.html#a5e5346f8cdf737c6485b90638c8eae92abfc112f656cfa6af7f72817a50546a09", null ]
     ] ],
     [ "_extract_block_encoding", "debugger_8h.html#a851129def8ccc68fbfd20eec0d0ee2be", null ],
-    [ "check_inplace_unitarity", "debugger_8h.html#a28357ac90ed03c81f5e9cf0bbf545ec2", null ],
+    [ "check_inplace_unitarity", "debugger_8h.html#af363d66c4e1944f26d263ee96490726e", null ],
     [ "extract_block_encoding", "debugger_8h.html#a8f70450f8f547d15c80a1aface89686e", null ],
     [ "state_equal_check", "debugger_8h.html#ab4357990190b299699fec1015993b848", null ]
 ];

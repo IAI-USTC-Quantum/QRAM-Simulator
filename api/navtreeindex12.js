@@ -1,9 +1,5 @@
 var NAVTREEINDEX12 =
 {
-"structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a6fd6f2f1009da0eeb7c5b5f8e4251a75":[1,0,2,1,2,15],
-"structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a7e375ebd3248012ebe1079dd47bc2518":[0,0,2,1,2,2],
-"structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a7e375ebd3248012ebe1079dd47bc2518":[1,0,2,1,2,2],
-"structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a84680ac322f775d4b3dceeade1e8e602":[0,0,2,1,2,7],
 "structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a84680ac322f775d4b3dceeade1e8e602":[1,0,2,1,2,7],
 "structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a997c82216157d90f893279c4419468d5":[0,0,2,1,2,6],
 "structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a997c82216157d90f893279c4419468d5":[1,0,2,1,2,6],

@@ -101,7 +101,9 @@ $(document).ready(function(){initNavTree('debugger_8h.html',''); initResizable()
 
 <p>调试工具定义  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="basic__components_8h_source.html">basic_components.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;functional&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
+<code>#include &quot;<a class="el" href="basic__components_8h_source.html">basic_components.h</a>&quot;</code><br />
 <code>#include &quot;matrix.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="partial__trace_8h_source.html">partial_trace.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="sort__state_8h_source.html">sort_state.h</a>&quot;</code><br />
@@ -156,10 +158,10 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a28357ac90ed03c81f5e9cf0bbf545ec2" id="r_a28357ac90ed03c81f5e9cf0bbf545ec2"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">typename</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">OperationNq1q</a> &gt; </td></tr>
-<tr class="memitem:a28357ac90ed03c81f5e9cf0bbf545ec2"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#a28357ac90ed03c81f5e9cf0bbf545ec2">qram_simulator::check_inplace_unitarity</a> (<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a> dagger)</td></tr>
-<tr class="memdesc:a28357ac90ed03c81f5e9cf0bbf545ec2"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查原地操作的幺正性  <br /></td></tr>
-<tr class="separator:a28357ac90ed03c81f5e9cf0bbf545ec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af363d66c4e1944f26d263ee96490726e" id="r_af363d66c4e1944f26d263ee96490726e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">typename</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Op</a> &gt; </td></tr>
+<tr class="memitem:af363d66c4e1944f26d263ee96490726e"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#af363d66c4e1944f26d263ee96490726e">qram_simulator::check_inplace_unitarity</a> (std::initializer_list&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">reg_sizes</a>, std::function&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Op</a>(std::vector&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt;)&gt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">op_factory</a>, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a> dagger=<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">false</a>)</td></tr>
+<tr class="memdesc:af363d66c4e1944f26d263ee96490726e"><td class="mdescLeft">&#160;</td><td class="mdescRight">检查原地操作的幺正性（通用版本）  <br /></td></tr>
+<tr class="separator:af363d66c4e1944f26d263ee96490726e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a851129def8ccc68fbfd20eec0d0ee2be" id="r_a851129def8ccc68fbfd20eec0d0ee2be"><td class="memTemplParams" colspan="2">template&lt;typename BlockEncoding , typename StateType  = SparseState&gt; </td></tr>
 <tr class="memitem:a851129def8ccc68fbfd20eec0d0ee2be"><td class="memTemplItemLeft" align="right" valign="top">DenseMatrix&lt; complex_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">qram_simulator::_extract_block_encoding</a> (BlockEncoding encA, std::string_view main_reg, std::string_view anc_UA, bool is_full=false, bool is_dag=false)</td></tr>
 <tr class="memdesc:a851129def8ccc68fbfd20eec0d0ee2be"><td class="mdescLeft">&#160;</td><td class="mdescRight">提取块编码矩阵（内部实现）  <br /></td></tr>

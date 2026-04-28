@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['a_0',['a',['../structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html#a6731686ee0f566a3abd9d2af2326de59',1,'qram_simulator::Mod_Mult_UInt_ConstUInt']]],
-  ['add_5fint_1',['add_int',['../structqram__simulator_1_1Add__UInt__ConstUInt.html#a81d8defa2aa2774591765cf3c885a12e',1,'qram_simulator::Add_UInt_ConstUInt::add_int'],['../structqram__simulator_1_1Add__ConstUInt.html#a7a357289c414307856342a9f98f23b03',1,'qram_simulator::Add_ConstUInt::add_int']]],
+  ['a_0',['a',['../structqram__simulator_1_1Mod__Mult__UInt__ConstUInt__InPlace.html#a5981c63053b49a5d2fd09f142f1c895e',1,'qram_simulator::Mod_Mult_UInt_ConstUInt_InPlace']]],
+  ['add_5fint_1',['add_int',['../structqram__simulator_1_1Add__UInt__ConstUInt.html#a81d8defa2aa2774591765cf3c885a12e',1,'qram_simulator::Add_UInt_ConstUInt::add_int'],['../structqram__simulator_1_1Add__ConstUInt__InPlace.html#a5afb51a8d7c3927a0adea8564275bf1f',1,'qram_simulator::Add_ConstUInt_InPlace::add_int']]],
   ['addr_2',['addr',['../structqram__simulator_1_1QRAMInputGenerator.html#a86937919e736642b582488828ace0fdf',1,'qram_simulator::QRAMInputGenerator::addr'],['../structqram__simulator_1_1qram__qutrit_1_1QRAMNode.html#a6fd6f2f1009da0eeb7c5b5f8e4251a75',1,'qram_simulator::qram_qutrit::QRAMNode::addr'],['../namespaceqram__simulator_1_1qram__qubit.html#ab879918420c8e27ed7e551800fd6cf2e',1,'qram_simulator::qram_qubit::Addr']]],
   ['addr_5fdist_3',['addr_dist',['../structqram__simulator_1_1QRAMInputGenerator.html#a0551ae50fb53dae879b7078d683a3d88',1,'qram_simulator::QRAMInputGenerator']]],
   ['addr_5fsize_4',['addr_size',['../structqram__simulator_1_1qram__qubit_1_1QRAMCircuit.html#a875b2dfa9bd5e766f05f25e1966b4e02',1,'qram_simulator::qram_qubit::QRAMCircuit::addr_size'],['../structqram__simulator_1_1TimeStep.html#a9b45dd0afa5a2384637d0f2750aa1efc',1,'qram_simulator::TimeStep::addr_size']]],

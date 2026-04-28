@@ -2,8 +2,8 @@ var searchData=
 [
   ['selfadjointoperator_0',['SelfAdjointOperator',['../classqram__simulator_1_1SelfAdjointOperator.html',1,'qram_simulator']]],
   ['sgate_5fbool_1',['Sgate_Bool',['../structqram__simulator_1_1Sgate__Bool.html',1,'qram_simulator']]],
-  ['shiftleft_2',['ShiftLeft',['../structqram__simulator_1_1ShiftLeft.html',1,'qram_simulator']]],
-  ['shiftright_3',['ShiftRight',['../structqram__simulator_1_1ShiftRight.html',1,'qram_simulator']]],
+  ['shiftleft_5finplace_2',['ShiftLeft_InPlace',['../structqram__simulator_1_1ShiftLeft__InPlace.html',1,'qram_simulator']]],
+  ['shiftright_5finplace_3',['ShiftRight_InPlace',['../structqram__simulator_1_1ShiftRight__InPlace.html',1,'qram_simulator']]],
   ['sortbyamplitude_4',['SortByAmplitude',['../structqram__simulator_1_1SortByAmplitude.html',1,'qram_simulator']]],
   ['sortbykey_5',['SortByKey',['../structqram__simulator_1_1SortByKey.html',1,'qram_simulator']]],
   ['sortbykey2_6',['SortByKey2',['../structqram__simulator_1_1SortByKey2.html',1,'qram_simulator']]],

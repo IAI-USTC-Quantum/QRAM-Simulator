@@ -3,14 +3,14 @@ var hierarchy =
     [ "qram_simulator::AddRegister", "structqram__simulator_1_1AddRegister.html", null ],
     [ "qram_simulator::AddRegisterWithHadamard", "structqram__simulator_1_1AddRegisterWithHadamard.html", null ],
     [ "qram_simulator::BaseOperator", "structqram__simulator_1_1BaseOperator.html", [
-      [ "qram_simulator::AddAssign_AnyInt_AnyInt", "structqram__simulator_1_1AddAssign__AnyInt__AnyInt.html", null ],
-      [ "qram_simulator::Add_ConstUInt", "structqram__simulator_1_1Add__ConstUInt.html", null ],
-      [ "qram_simulator::Add_Mult_UInt_ConstUInt", "structqram__simulator_1_1Add__Mult__UInt__ConstUInt.html", null ],
+      [ "qram_simulator::AddAssign_AnyInt_AnyInt_InPlace", "structqram__simulator_1_1AddAssign__AnyInt__AnyInt__InPlace.html", null ],
+      [ "qram_simulator::Add_ConstUInt_InPlace", "structqram__simulator_1_1Add__ConstUInt__InPlace.html", null ],
+      [ "qram_simulator::Add_Mult_UInt_ConstUInt_InPlace", "structqram__simulator_1_1Add__Mult__UInt__ConstUInt__InPlace.html", null ],
       [ "qram_simulator::Add_UInt_UInt_InPlace", "structqram__simulator_1_1Add__UInt__UInt__InPlace.html", null ],
       [ "qram_simulator::CondRot_General_Bool< Callable >", "structqram__simulator_1_1CondRot__General__Bool.html", null ],
       [ "qram_simulator::CondRot_Rational_Bool", "structqram__simulator_1_1CondRot__Rational__Bool.html", null ],
       [ "qram_simulator::GlobalPhase_Int", "structqram__simulator_1_1GlobalPhase__Int.html", null ],
-      [ "qram_simulator::Mod_Mult_UInt_ConstUInt", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt.html", null ],
+      [ "qram_simulator::Mod_Mult_UInt_ConstUInt_InPlace", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt__InPlace.html", null ],
       [ "qram_simulator::ModuleInheritance_Test", "structqram__simulator_1_1ModuleInheritance__Test.html", null ],
       [ "qram_simulator::Phase_Bool", "structqram__simulator_1_1Phase__Bool.html", [
         [ "qram_simulator::Sgate_Bool", "structqram__simulator_1_1Sgate__Bool.html", null ],
@@ -76,8 +76,8 @@ var hierarchy =
         [ "qram_simulator::Ygate_Bool", "structqram__simulator_1_1Ygate__Bool.html", null ],
         [ "qram_simulator::ZeroConditionalPhaseFlip", "structqram__simulator_1_1ZeroConditionalPhaseFlip.html", null ]
       ] ],
-      [ "qram_simulator::ShiftLeft", "structqram__simulator_1_1ShiftLeft.html", null ],
-      [ "qram_simulator::ShiftRight", "structqram__simulator_1_1ShiftRight.html", null ],
+      [ "qram_simulator::ShiftLeft_InPlace", "structqram__simulator_1_1ShiftLeft__InPlace.html", null ],
+      [ "qram_simulator::ShiftRight_InPlace", "structqram__simulator_1_1ShiftRight__InPlace.html", null ],
       [ "qram_simulator::inverseQFT", "structqram__simulator_1_1inverseQFT.html", null ]
     ] ],
     [ "qram_simulator::qram_qubit::Branch", "structqram__simulator_1_1qram__qubit_1_1Branch.html", null ],
