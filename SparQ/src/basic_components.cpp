@@ -143,6 +143,8 @@ namespace qram_simulator
 	void System::clear()
 	{
 		name_register_map.clear();
+		name_to_index.clear();
+		name_index_valid = true;
 		temporal_registers.clear();
 		reusable_registers.clear();
 		max_qubit_count = 0;
@@ -216,12 +218,20 @@ namespace qram_simulator
 #ifdef SINGLE_THREAD
 		profiler _("System::get");
 #endif
-		for (size_t i = name_register_map.size(); i --> 0; )
-		{
+		if (name_index_valid) {
+			auto it = name_to_index.find(std::string(name));
+			if (it != name_to_index.end() && status_of(it->second))
+				return it->second;
+		}
+		// Fallback / migration: linear scan
+		for (size_t i = name_register_map.size(); i-- > 0; ) {
 			if (!status_of(i))
 				continue;
-			if (name == name_of(i))
+			if (name == name_of(i)) {
+				if (name_index_valid)
+					register_name(std::string(name), i);
 				return i;
+			}
 		}
 		return SIZE_MAX;
 	}
@@ -326,7 +336,11 @@ namespace qram_simulator
 				throw_general_runtime_error("All spaces are run out when adding new register.");
 			else {
 				size_t reg_id = reusable_registers.back();
-				name_register_map[reg_id] = { std::string(name), type, size, true };								
+				// Remove old name from hash index if present
+				if (status_of(reg_id))
+					unregister_name(name_of(reg_id));
+				name_register_map[reg_id] = { std::string(name), type, size, true };
+				register_name(std::string(name), reg_id);
 				reusable_registers.pop_back();
 				add_register_status_bitmap(reg_id);
 				return reg_id;
@@ -340,6 +354,7 @@ namespace qram_simulator
 				max_register_count = get_activated_register_size();
 
 			size_t reg_id = name_register_map.size() - 1;
+			register_name(std::string(name), reg_id);
 			add_register_status_bitmap(reg_id);
 			return reg_id;
 		}
@@ -373,6 +388,7 @@ namespace qram_simulator
 		if (!get_status(name_register_map[id]))
 			throw_general_runtime_error("Register is not activated.");
 
+		unregister_name(name_of(id));
 		get_status(name_register_map[id]) = false;
 		reusable_registers.push_back(id);
 		remove_register_status_bitmap(id);

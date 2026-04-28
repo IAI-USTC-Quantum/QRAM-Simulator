@@ -328,7 +328,7 @@ namespace qram_simulator
 
 		/* FOR DEBUG */
 		//// move the content into the garbage register
-		Swap_General_General(reg_id, garbage_id)(state);
+		Swap_General_General(System::name_of(reg_id), System::name_of(garbage_id))(state);
 
 		//// add the name into stack (for whenever resuming)
 		System::temporal_registers.push_back(garbage_id);
@@ -344,7 +344,7 @@ namespace qram_simulator
 
 		/* FOR DEBUG */
 		size_t garbage_id = System::temporal_registers.back();
-		Swap_General_General(reg_id, garbage_id)(state);
+		Swap_General_General(System::name_of(reg_id), System::name_of(garbage_id))(state);
 
 		/* remove if you hope faster (and with trust) */
 		// (PartialTrace(garbage_name))(state);

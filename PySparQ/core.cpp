@@ -160,8 +160,7 @@ Attributes:
 
     /* condrot.h */
     BIND_BASE_OPERATOR(CondRot_Rational_Bool)
-        .def(py::init<std::string_view, std::string_view>())
-        .def(py::init<size_t, size_t>());
+        .def(py::init<std::string_view, std::string_view>());
 
     using CondRot_General_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
 
@@ -789,9 +788,7 @@ Example:
 
     BIND_SELF_ADJOINT_OPERATOR(SortExceptKeyHadamard)
         .def(py::init<std::string_view, std::set<size_t>>(),
-             py::arg("key"), py::arg("qubit_ids"))
-        .def(py::init<size_t, std::set<size_t>>(),
-             py::arg("key_id"), py::arg("qubit_ids"));
+             py::arg("key"), py::arg("qubit_ids"));
 
     BIND_SELF_ADJOINT_OPERATOR(SortUnconditional)
         .def(py::init<>());
@@ -801,9 +798,7 @@ Example:
 
     BIND_SELF_ADJOINT_OPERATOR(SortByKey2)
         .def(py::init<std::string_view, std::string_view>(),
-             py::arg("key1"), py::arg("key2"))
-        .def(py::init<size_t, size_t>(),
-             py::arg("key1_id"), py::arg("key2_id"));
+             py::arg("key1"), py::arg("key2"));
 
     /* system_operations.h */
     // 系统分割组合
