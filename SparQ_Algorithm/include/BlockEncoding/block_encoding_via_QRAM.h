@@ -44,8 +44,8 @@ namespace qram_simulator {
 					for (size_t k = 0; k < addr_size; ++k) {
 						auto target = SplitRegister(column_index, "rotation", 1)(state);
 						CombineRegister(column_index, "temp_bit")(state);
-						ShiftRight(column_index, 1)(state);
-						Add_ConstUInt(column_index, pow2(k) - 1)(state);
+						ShiftRight_InPlace(column_index, 1)(state);
+						Add_ConstUInt_InPlace(column_index, pow2(k) - 1)(state);
 						Mult_UInt_ConstUInt(column_index, 2, "addr_child")(state);
 						Xgate_Bool("addr_child", 0)(state);
 						QRAMLoad(qram, column_index, "data_parent")(state);
@@ -64,13 +64,13 @@ namespace qram_simulator {
 						QRAMLoad(qram, column_index, "data_parent")(state);
 						Xgate_Bool("addr_child", 0)(state);
 						Mult_UInt_ConstUInt(column_index, 2, "addr_child")(state);
-						Add_ConstUInt(column_index, pow2(addr_size) - pow2(k) + 1)(state);
-						ShiftLeft(column_index, 1)(state);
+						Add_ConstUInt_InPlace(column_index, pow2(addr_size) - pow2(k) + 1)(state);
+						ShiftLeft_InPlace(column_index, 1)(state);
 						SplitRegister(column_index, "temp_bit", 1)(state);
 						CombineRegister(column_index, "rotation")(state);
-						ShiftLeft(column_index, 1)(state);
+						ShiftLeft_InPlace(column_index, 1)(state);
 					}
-					ShiftRight(column_index, 1)(state);
+					ShiftRight_InPlace(column_index, 1)(state);
 					RemoveRegister("data_parent")(state);
 					RemoveRegister("addr_child")(state);
 					RemoveRegister("data_child")(state);
@@ -93,13 +93,13 @@ namespace qram_simulator {
 					size_t n_digit = System::size_of("div_result");
 					auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func_inv(value, n_digit); };
 
-					ShiftLeft(column_index, 1)(state);
+					ShiftLeft_InPlace(column_index, 1)(state);
 					for (size_t k = 0; k < addr_size; ++k) {
-						ShiftRight(column_index, 1)(state);
+						ShiftRight_InPlace(column_index, 1)(state);
 						SplitRegister(column_index, "rotation", 1)(state);
 						CombineRegister(column_index, "temp_bit")(state);
-						ShiftRight(column_index, 1)(state);
-						Add_ConstUInt(column_index, pow2(addr_size - 1 - k) - 1)(state);
+						ShiftRight_InPlace(column_index, 1)(state);
+						Add_ConstUInt_InPlace(column_index, pow2(addr_size - 1 - k) - 1)(state);
 						Mult_UInt_ConstUInt(column_index, 2, "addr_child")(state);
 						Xgate_Bool("addr_child", 0)(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
@@ -118,8 +118,8 @@ namespace qram_simulator {
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 						Xgate_Bool("addr_child", 0)(state);
 						Mult_UInt_ConstUInt(column_index, 2, "addr_child")(state);
-						Add_ConstUInt(column_index, pow2(addr_size) - pow2(addr_size - 1 - k) + 1)(state);
-						ShiftLeft(column_index, 1)(state);
+						Add_ConstUInt_InPlace(column_index, pow2(addr_size) - pow2(addr_size - 1 - k) + 1)(state);
+						ShiftLeft_InPlace(column_index, 1)(state);
 						SplitRegister(column_index, "temp_bit", 1)(state);
 						CombineRegister(column_index, "rotation")(state);
 					}
@@ -170,8 +170,8 @@ namespace qram_simulator {
 					for (size_t k = addr_size; k < 2 * addr_size; ++k) {
 						auto target = SplitRegister(row_index, "rotation", 1)(state);
 						std::get<1>(System::name_register_map[System::get("rotation")]) = Boolean;
-						Add_ConstUInt("addr_parent", pow2(k) - 1)(state);
-						Add_Mult_UInt_ConstUInt(column_index, pow2(k - addr_size), "addr_parent")(state);
+						Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state);
+						Add_Mult_UInt_ConstUInt_InPlace(column_index, pow2(k - addr_size), "addr_parent")(state);
 						Add_UInt_UInt_InPlace(row_index, "addr_parent")(state);
 						Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 						Xgate_Bool("addr_child", 0)(state);
@@ -192,9 +192,9 @@ namespace qram_simulator {
 						}
 						else
 						{
-							ShiftLeft("addr_parent", 1)(state);
+							ShiftLeft_InPlace("addr_parent", 1)(state);
 							Xgate_Bool("addr_parent", 0)(state);
-							Add_ConstUInt("addr_child", 1)(state);
+							Add_ConstUInt_InPlace("addr_child", 1)(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
 							QRAMLoad(qram, "addr_child", "data_child")(state);
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
@@ -205,19 +205,19 @@ namespace qram_simulator {
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
 							QRAMLoad(qram, "addr_child", "data_child")(state);
-							Add_ConstUInt("addr_child", 1).dag(state);
+							Add_ConstUInt_InPlace("addr_child", 1).dag(state);
 							Xgate_Bool("addr_parent", 0)(state);
-							ShiftRight("addr_parent", 1)(state);
+							ShiftRight_InPlace("addr_parent", 1)(state);
 						}
 						Xgate_Bool("addr_child", 0)(state);
 						Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 						Add_UInt_UInt_InPlace(row_index, "addr_parent").dag(state);
-						Add_Mult_UInt_ConstUInt(column_index, pow2(k - addr_size), "addr_parent").dag(state);
-						Add_ConstUInt("addr_parent", pow2(k) - 1).dag(state);
+						Add_Mult_UInt_ConstUInt_InPlace(column_index, pow2(k - addr_size), "addr_parent").dag(state);
+						Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state);
 						CombineRegister(row_index, "rotation")(state);
-						ShiftLeft(row_index, 1)(state);
+						ShiftLeft_InPlace(row_index, 1)(state);
 					}
-					ShiftRight(row_index, 1)(state);
+					ShiftRight_InPlace(row_index, 1)(state);
 					RemoveRegister("addr_parent")(state);
 					RemoveRegister("data_parent")(state);
 					RemoveRegister("addr_child")(state);
@@ -239,13 +239,13 @@ namespace qram_simulator {
 					size_t n_digit = System::size_of("div_result");
 					auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func_inv(value, n_digit); };
 
-					ShiftLeft(row_index, 1)(state);
+					ShiftLeft_InPlace(row_index, 1)(state);
 					for (size_t k = 2 * addr_size - 1; k >= addr_size; --k) {
-						ShiftRight(row_index, 1)(state);
+						ShiftRight_InPlace(row_index, 1)(state);
 						SplitRegister(row_index, "rotation", 1)(state);
 						std::get<1>(System::name_register_map[System::get("rotation")]) = Boolean;
-						Add_ConstUInt("addr_parent", pow2(k) - 1)(state);
-						Add_Mult_UInt_ConstUInt(column_index, pow2(k - addr_size), "addr_parent")(state);
+						Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state);
+						Add_Mult_UInt_ConstUInt_InPlace(column_index, pow2(k - addr_size), "addr_parent")(state);
 						Add_UInt_UInt_InPlace(row_index, "addr_parent")(state);
 						Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 						Xgate_Bool("addr_child", 0)(state);
@@ -265,9 +265,9 @@ namespace qram_simulator {
 						}
 						else
 						{
-							ShiftLeft("addr_parent", 1)(state);
+							ShiftLeft_InPlace("addr_parent", 1)(state);
 							Xgate_Bool("addr_parent", 0)(state);
-							Add_ConstUInt("addr_child", 1)(state);
+							Add_ConstUInt_InPlace("addr_child", 1)(state);
 							QRAMLoad(qram, "addr_child", "data_child")(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
@@ -281,16 +281,16 @@ namespace qram_simulator {
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 							QRAMLoad(qram, "addr_child", "data_child")(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
-							Add_ConstUInt("addr_child", 1).dag(state);
+							Add_ConstUInt_InPlace("addr_child", 1).dag(state);
 							Xgate_Bool("addr_parent", 0)(state);
-							ShiftRight("addr_parent", 1)(state);
+							ShiftRight_InPlace("addr_parent", 1)(state);
 
 						}
 						Xgate_Bool("addr_child", 0)(state);
 						Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 						Add_UInt_UInt_InPlace(row_index, "addr_parent").dag(state);
-						Add_Mult_UInt_ConstUInt(column_index, pow2(k - addr_size), "addr_parent").dag(state);
-						Add_ConstUInt("addr_parent", pow2(k) - 1).dag(state);
+						Add_Mult_UInt_ConstUInt_InPlace(column_index, pow2(k - addr_size), "addr_parent").dag(state);
+						Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state);
 						CombineRegister(row_index, "rotation")(state);
 
 					}

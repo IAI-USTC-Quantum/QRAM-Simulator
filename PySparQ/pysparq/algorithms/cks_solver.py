@@ -365,104 +365,98 @@ class QuantumBinarySearch(ControllableOperatorMixin):
         """Execute quantum binary search."""
         # Create flag register
         ps.AddRegister("qbs_flag", ps.Boolean, 1)(state)
-        flag = "qbs_flag"
-        ps.Xgate_Bool(flag, 0)(state)
+        ps.Xgate_Bool("qbs_flag", 0)(state)
 
         # Create comparison registers
         ps.AddRegister("compare_less", ps.Boolean, 1)(state)
-        compare_less = "compare_less"
         ps.AddRegister("compare_equal", ps.Boolean, 1)(state)
-        compare_equal = "compare_equal"
         ps.AddRegister(
-            "left_reg", ps.UnsignedInteger, self.addr_size + 1
+            "left_reg", ps.UnsignedInteger, self.qram.address_size + 1
         )(state)
-        left_reg = "left_reg"
         ps.AddRegister(
-            "right_reg", ps.UnsignedInteger, self.addr_size + 1
+            "right_reg", ps.UnsignedInteger, self.qram.address_size + 1
         )(state)
-        right_reg = "right_reg"
         ps.AddRegister(
-            "mid_reg", ps.UnsignedInteger, self.addr_size + 1
+            "mid_reg", ps.UnsignedInteger, self.qram.address_size + 1
         )(state)
-        mid_reg = "mid_reg"
         ps.AddRegister(
-            "midval_reg", ps.UnsignedInteger, self.data_size
+            "midval_reg", ps.UnsignedInteger, self.qram.data_size
         )(state)
         midval_reg = "midval_reg"
 
         # Initialize bounds
-        ps.Assign(self.address_offset_reg, left_reg)(state)
-        ps.Add_UInt_ConstUInt(left_reg, self.total_length, right_reg)(state)
+        ps.Assign(self.address_offset_reg, "left_reg")(state)
+        ps.Add_UInt_ConstUInt("left_reg", self.total_length, "right_reg")(state)
 
         # Binary search iterations
         for iteration in range(self.max_step):
             # Compute mid
-            ps.GetMid_UInt_UInt(left_reg, right_reg, mid_reg).conditioned_by_nonzeros(
-                flag
+            ps.GetMid_UInt_UInt("left_reg", "right_reg", "mid_reg").conditioned_by_nonzeros(
+                "qbs_flag"
             )(state)
 
             # Load mid value
-            ps.QRAMLoad(self.qram, mid_reg, midval_reg).conditioned_by_nonzeros(flag)(
+            ps.QRAMLoad(self.qram, "mid_reg", "midval_reg").conditioned_by_nonzeros("qbs_flag")(
                 state
             )
 
             # Compare with target
             ps.Compare_UInt_UInt(
-                midval_reg, self.target_reg, compare_less, compare_equal
-            ).conditioned_by_nonzeros(flag)(state)
+                "midval_reg", self.target_reg, "compare_less", "compare_equal"
+            ).conditioned_by_nonzeros("qbs_flag")(state)
 
             # If found, copy to result
-            ps.Assign(mid_reg, self.result_reg).conditioned_by_nonzeros(
-                [compare_equal, flag]
+            ps.Assign("mid_reg", self.result_reg).conditioned_by_nonzeros(
+                ["compare_equal", "qbs_flag"]
             )(state)
 
             if iteration != self.max_step - 1:
                 # Update flag
-                ps.Assign(compare_equal, flag)(state)
+                ps.Assign("compare_equal", "qbs_flag")(state)
 
                 # Update bounds
-                ps.Swap_General_General(left_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool(compare_less, 0)(state)
-                ps.Swap_General_General(right_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
 
         # Uncompute
         for iteration in range(self.max_step - 1, -1, -1):
             if iteration != self.max_step - 1:
-                ps.Swap_General_General(right_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool(compare_less, 0)(state)
-                ps.Swap_General_General(left_reg, mid_reg).conditioned_by_nonzeros(
-                    [compare_less, flag]
+                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
+                    ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Assign(compare_equal, flag)(state)
+                ps.Assign("compare_equal", "qbs_flag")(state)
 
             ps.Compare_UInt_UInt(
-                midval_reg, self.target_reg, compare_less, compare_equal
-            ).conditioned_by_nonzeros(flag)(state)
-            ps.QRAMLoad(self.qram, mid_reg, midval_reg).conditioned_by_nonzeros(flag)(
+                "midval_reg", self.target_reg, "compare_less", "compare_equal"
+            ).conditioned_by_nonzeros("qbs_flag")(state)
+            ps.QRAMLoad(self.qram, "mid_reg", "midval_reg").conditioned_by_nonzeros("qbs_flag")(
                 state
             )
-            ps.GetMid_UInt_UInt(left_reg, right_reg, mid_reg).conditioned_by_nonzeros(
-                flag
+            ps.GetMid_UInt_UInt("left_reg", "right_reg", "mid_reg").conditioned_by_nonzeros(
+                "qbs_flag"
             )(state)
 
         # Cleanup
-        ps.Add_UInt_ConstUInt(left_reg, self.total_length, right_reg)(state)
-        ps.Assign(self.address_offset_reg, left_reg)(state)
-        ps.Xgate_Bool(flag, 0)(state)
+        ps.Add_UInt_ConstUInt("left_reg", self.total_length, "right_reg")(state)
+        ps.Assign(self.address_offset_reg, "left_reg")(state)
+        ps.Xgate_Bool("qbs_flag", 0)(state)
 
-        ps.RemoveRegister(compare_less)(state)
-        ps.RemoveRegister(compare_equal)(state)
-        ps.RemoveRegister(left_reg)(state)
-        ps.RemoveRegister(right_reg)(state)
-        ps.RemoveRegister(mid_reg)(state)
-        ps.RemoveRegister(midval_reg)(state)
-        ps.RemoveRegister(flag)(state)
+        ps.RemoveRegister("compare_less")(state)
+        ps.RemoveRegister("compare_equal")(state)
+        ps.RemoveRegister("left_reg")(state)
+        ps.RemoveRegister("right_reg")(state)
+        ps.RemoveRegister("mid_reg")(state)
+        ps.RemoveRegister("midval_reg")(state)
+        ps.RemoveRegister("qbs_flag")(state)
 
 
 class CondRotQW(ControllableOperatorMixin):
@@ -615,7 +609,6 @@ class TOperator(ControllableOperatorMixin):
         """Apply T operator (forward)."""
         # Add data register
         ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
-        data_reg = "data"
 
         # Hadamard on column index register
         n_bits = int(math.log2(self.nnz_col)) + 1
@@ -629,7 +622,7 @@ class TOperator(ControllableOperatorMixin):
         self._find_column_position(state, inverse=False)
 
         # Conditional rotation
-        CondRotQW(self.j_reg, self.k_reg, data_reg, self.b2_reg, self.mat)(state)
+        CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat)(state)
 
         # Uncompute
         self._find_column_position(state, inverse=True)
@@ -646,7 +639,6 @@ class TOperator(ControllableOperatorMixin):
     def dag(self, state: ps.SparseState) -> None:
         """Apply T operator (inverse)."""
         ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
-        data_reg = "data"
 
         self._find_column_position(state, inverse=False)
         ps.CheckNan()(state)
@@ -654,7 +646,7 @@ class TOperator(ControllableOperatorMixin):
         self._load_matrix_element(state)
         self._find_column_position(state, inverse=False)
 
-        CondRotQW(self.j_reg, self.k_reg, data_reg, self.b2_reg, self.mat).dag(state)
+        CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat).dag(state)
         ps.ClearZero()(state)
 
         self._find_column_position(state, inverse=True)
@@ -674,7 +666,7 @@ class TOperator(ControllableOperatorMixin):
         Computes data_addr = data_offset + j * nnz_col + k,
         loads from QRAM, then uncomputes the address.
         """
-        ps.AddRegister("data_addr", ps.UnsignedInteger, self.addr_size)(state)
+        ps.AddRegister("data_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
         # Compute address and load
         self._get_data_addr(state)
@@ -687,16 +679,16 @@ class TOperator(ControllableOperatorMixin):
         """Compute data address for matrix element.
 
         Implements GetDataAddr: data_addr = data_offset + j * nnz_col + k
-        This is self-adjoint (calling twice returns to original state).
+        Self-adjoint: calling twice returns to original state (XOR-based).
         """
         # Step 1: data_addr = j * nnz_col
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, "data_addr")(state)
+        ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "data_addr")(state)
 
         # Step 2: data_addr = data_offset + data_addr
         ps.Add_UInt_UInt(self.data_offset_reg, "data_addr", "data_addr")(state)
 
         # Step 3: data_addr += k (using AddAssign which is self-adjoint)
-        ps.AddAssign_AnyInt_AnyInt(self.k_reg, "data_addr")(state)
+        ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "data_addr")(state)
 
     def _find_column_position(self, state: ps.SparseState, inverse: bool = False) -> None:
         """Find column position in sparse storage (SparseMatrixOracle2).
@@ -707,22 +699,20 @@ class TOperator(ControllableOperatorMixin):
         This uses quantum binary search within the row's column list.
         """
         # Create row_addr register for the row's starting address
-        ps.AddRegister("row_addr", ps.UnsignedInteger, self.addr_size)(state)
-        row_addr = "row_addr"
+        ps.AddRegister("row_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
         # Compute row_addr = sparse_offset + j * nnz_col
         # Step 1: row_addr = j * nnz_col
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+        ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
         # Step 2: row_addr = sparse_offset + row_addr
-        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+        ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
 
         if not inverse:
             # Forward: |j>|k>|0> -> |j>|s_j>|search_result>
             # Use quantum binary search to find k in the row's sorted column list
             # The search finds the position s_j such that columns[s_j] = k
             qbs = QuantumBinarySearch(
-                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg,
-                self.addr_size, self.data_size,
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg
             )
             qbs(state)
 
@@ -733,30 +723,29 @@ class TOperator(ControllableOperatorMixin):
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
 
             # Uncompute: k += row_addr (which was added to get full address)
-            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr).dag(state)
+            ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr").dag(state)
         else:
             # Inverse: uncompute the operations
             # Re-compute row_addr
-            ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
-            ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
+            ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
+            ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
 
             # Inverse of the swap and load operations
-            ps.AddAssign_AnyInt_AnyInt(self.k_reg, row_addr)(state)
+            ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr")(state)
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
 
             # Inverse binary search
             qbs = QuantumBinarySearch(
-                self.qram, row_addr, self.nnz_col, self.k_reg, self.search_result_reg,
-                self.addr_size, self.data_size,
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg
             )
             qbs(state)
 
-        # Uncompute row_addr
-        ps.Add_UInt_UInt(self.sparse_offset_reg, row_addr, row_addr)(state)
-        ps.Add_Mult_UInt_ConstUInt(self.j_reg, self.nnz_col, row_addr)(state)
+        # Uncompute row_addr (self-adjoint: XOR-based)
+        ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
+        ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
 
-        ps.RemoveRegister(row_addr)(state)
+        ps.RemoveRegister("row_addr")(state)
 
 
 class QuantumWalk(ControllableOperatorMixin):

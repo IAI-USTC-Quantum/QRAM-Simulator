@@ -6,6 +6,8 @@
  */
 
 #pragma once
+#include <functional>
+#include <sstream>
 #include "basic_components.h"
 #include "matrix.h"
 #include "partial_trace.h"
@@ -359,60 +361,90 @@ namespace qram_simulator
 	};
 
 	/**
-	 * @brief 检查原地操作的幺正性
-	 * @details 验证 N+1 比特原地操作是否为幺正操作
-	 * @tparam OperationNq1q 操作类型
-	 * @param dagger 是否检查 dagger 版本
-	 * @return 真值表
-	 * @throws 当操作非幺正时抛出异常
+	 * @brief 检查原地操作的幺正性（通用版本）
+	 * @details 对任意寄存器布局的原地操作进行幺正性验证：
+	 *          1. 遍历所有 2^total_bits 个输入态
+	 *          2. 执行 round-trip 测试：U then U† (或 U† then U)
+	 *          3. 验证状态未分裂（state.size() == 1）
+	 *          4. 验证 round-trip 恢复到原始值（U*U† = I）
+	 *          5. 验证 bijectivity（无输出碰撞）
+	 * @tparam Op 操作类型（必须继承 BaseOperator）
+	 * @param reg_sizes 每个寄存器的大小（initializer_list），建议总位数 ≤ 16
+	 * @param op_factory 工厂函数：std::vector<size_t>(reg_ids) → Op
+	 * @param dagger 为 false 时执行 U then U†；为 true 时执行 U† then U
+	 * @return 真值表（输入索引 → 输出索引）
+	 * @throws 当操作非幺正（状态分裂）、非双射（输出碰撞）或 round-trip 失败时抛出异常
 	 */
-	template<typename OperationNq1q>
-	std::vector<size_t> check_inplace_unitarity(bool dagger)
+	template <typename Op>
+	std::vector<size_t> check_inplace_unitarity(
+		std::initializer_list<size_t> reg_sizes,
+		std::function<Op(std::vector<size_t>)> op_factory,
+		bool dagger = false)
 	{
 		System::clear();
 
-		size_t N = 2;
-		size_t reg1 = System::add_register("reg1", UnsignedInteger, N);
-		size_t reg2 = System::add_register("reg2", UnsignedInteger, 1);
-
-		OperationNq1q op("reg1", "reg2");
-
-		std::vector<bool> expected_output(pow2(N + 1), false);
-		std::vector<size_t> truth_table(pow2(N + 1), 0);
-
-		for (size_t i = 0; i < pow2(N); ++i)
-		{
-			for (size_t j = 0; j < pow2(1); ++j)
-			{
-				std::vector<System> state;
-				state.emplace_back();
-				state.back().get(reg1).value = i;
-				state.back().get(reg2).value = j;
-
-				if (dagger)
-					op.dag(state);
-				else
-					op(state);
-
-				if (state.size() != 1)
-				{
-					throw_bad_result("Bad check inplace unitarity: state size is not 1");
-				}
-
-				size_t out_i = state[0].get(reg1).value;
-				size_t out_j = state[0].get(reg2).value;
-				size_t out = (out_j << N) + out_i;
-				size_t in = (j << N) + i;
-
-				if (expected_output[out])
-				{
-					fmt::print("truth_table: {}", truth_table);
-					throw_bad_result("Bad check inplace unitarity: output state already exists");
-				}
-				expected_output[out] = true;
-				truth_table[in] = out;
-			}
+		std::vector<size_t> reg_ids;
+		std::vector<size_t> sizes_vec;
+		std::stringstream sbuf;
+		for (size_t i = 0; i < reg_sizes.size(); ++i) {
+			sbuf.str(""); sbuf << "_qram_tmp_" << i;
+			size_t sz = *(reg_sizes.begin() + i);
+			size_t id = System::add_register(sbuf.str(), UnsignedInteger, sz);
+			reg_ids.push_back(id);
+			sizes_vec.push_back(sz);
 		}
+
+		size_t total_bits = 0;
+		for (size_t sz : sizes_vec) total_bits += sz;
+		if (total_bits > 16)
+			fmt::print("WARNING: check_inplace_unitarity with {} total bits\n", total_bits);
+
+		Op op = op_factory(reg_ids);
+		const size_t N = pow2(total_bits);
+
+		std::vector<bool>   output_seen(N, false);
+		std::vector<size_t> truth_table(N, 0);
+
+		for (size_t input = 0; input < N; ++input) {
+			std::vector<System> st;
+			st.emplace_back();
+
+			size_t remaining = input;
+			for (size_t ri = 0; ri < reg_ids.size(); ++ri) {
+				st[0].get(reg_ids[ri]).value = remaining & (pow2(sizes_vec[ri]) - 1);
+				remaining >>= sizes_vec[ri];
+			}
+
+			if (dagger) {
+				op.dag(st);
+				op(st);
+			} else {
+				op(st);
+				op.dag(st);
+			}
+
+			if (st.size() != 1)
+				throw_bad_result("check_inplace_unitarity: state split (non-unitary)");
+
+			size_t roundtrip = 0, shift = 0;
+			for (size_t ri = 0; ri < reg_ids.size(); ++ri) {
+				roundtrip |= (st[0].get(reg_ids[ri]).value & (pow2(sizes_vec[ri]) - 1)) << shift;
+				shift += sizes_vec[ri];
+			}
+			if (roundtrip != input)
+				throw_bad_result("check_inplace_unitarity: U*U† ≠ I");
+
+			size_t output = 0; shift = 0;
+			for (size_t ri = 0; ri < reg_ids.size(); ++ri) {
+				output |= (st[0].get(reg_ids[ri]).value & (pow2(sizes_vec[ri]) - 1)) << shift;
+				shift += sizes_vec[ri];
+			}
+			if (output_seen[output])
+				throw_bad_result("check_inplace_unitarity: non-bijective output collision");
+			output_seen[output] = true;
+			truth_table[input] = output;
+		}
+
 		System::clear();
 		return truth_table;
 	}

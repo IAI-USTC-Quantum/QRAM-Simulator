@@ -1452,13 +1452,13 @@ auto test_sparse() {
 		QRAMLoad(qram, "addr_child", "data_child")(system_states);
 		QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 		Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(system_states);
-		ShiftLeft("addr_parent", 1)(system_states);
+		ShiftLeft_InPlace("addr_parent", 1)(system_states);
 		Swap_Bool_Bool("temp_bit", 0, "addr_parent", 0)(system_states);
 		StatePrint(StatePrintDisplay::Detail | 0)(system_states);
 		std::cout << "===========================================================================================================================" << std::endl;
 	}
 	StatePrint(StatePrintDisplay::Detail | 0)(system_states);
-	ShiftLeft("addr_parent", 1)(system_states);
+	ShiftLeft_InPlace("addr_parent", 1)(system_states);
 	Assign("addr_parent", "addr_child")(system_states);
 	Xgate_Bool("addr_child", 0)(system_states);
 	QRAMLoad(qram, "addr_parent", "data_parent")(system_states);

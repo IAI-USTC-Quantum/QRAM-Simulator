@@ -176,7 +176,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void ShiftLeft::operator()(CuSparseState& state) const
+	void ShiftLeft_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		size_t size = System::size_of(register_1);
@@ -241,7 +241,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void ShiftRight::operator()(CuSparseState& state) const
+	void ShiftRight_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		size_t size = System::size_of(register_1);
@@ -263,6 +263,16 @@ namespace qram_simulator {
 					ShiftRight_Functor_Control(register_1, digit, size, register_1_size, CuCondition_Args)
 				);
 		}
+	}
+
+	void ShiftLeft_InPlace::dag(CuSparseState& state) const
+	{
+		ShiftRight_InPlace{register_1, digit}(state);
+	}
+
+	void ShiftRight_InPlace::dag(CuSparseState& state) const
+	{
+		ShiftLeft_InPlace{register_1, digit}(state);
 	}
 
 	struct Mult_UInt_ConstUInt_Functor_Control {
@@ -360,7 +370,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Add_Mult_UInt_ConstUInt::operator()(CuSparseState& state) const
+	void Add_Mult_UInt_ConstUInt_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(lhs); // 获取lhs的大小
@@ -388,7 +398,7 @@ namespace qram_simulator {
 		size_t lhs;
 		size_t res;
 		size_t mult_int;
-		size_t lhs_size; // 新增变量
+		size_t lhs_size;
 		size_t dim;
 
 		CuCondition_Functor
@@ -399,9 +409,12 @@ namespace qram_simulator {
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
+				auto dim_val = 1ULL << dim;
+				auto lhs_val = CuGetAsUint64(s, lhs, lhs_size);
+				// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
 				auto& reg_out = CuGet(s, res);
-				reg_out.value += (pow2(dim) - mult_int * CuGetAsUint64(s, lhs, lhs_size));
-				reg_out.value %= pow2(dim);
+				reg_out.value += (dim_val - lhs_val * mult_int % dim_val);
+				reg_out.value %= dim_val;
 			}
 		}
 	};
@@ -410,7 +423,7 @@ namespace qram_simulator {
 		size_t lhs;
 		size_t res;
 		size_t mult_int;
-		size_t lhs_size; // 新增变量
+		size_t lhs_size;
 		size_t dim;
 
 		Add_Mult_UInt_ConstUInt_Functor_Dag(size_t lhs_, size_t res_, size_t mult_int_, size_t lhs_size_, size_t dim_)
@@ -418,17 +431,21 @@ namespace qram_simulator {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
+			auto dim_val = 1ULL << dim;
+			auto lhs_val = CuGetAsUint64(s, lhs, lhs_size);
+			// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
 			auto& reg_out = CuGet(s, res);
-			reg_out.value += (pow2(dim) - mult_int * CuGetAsUint64(s, lhs, lhs_size));
-			reg_out.value %= pow2(dim);
+			reg_out.value += (dim_val - lhs_val * mult_int % dim_val);
+			reg_out.value %= dim_val;
 		}
 	};
 
-	void Add_Mult_UInt_ConstUInt::dag(CuSparseState& state) const
+	void Add_Mult_UInt_ConstUInt_InPlace::dag(CuSparseState& state) const
 	{
 		state.move_to_gpu();
-		size_t lhs_size = System::size_of(lhs); // 获取lhs的大小
+		size_t lhs_size = System::size_of(lhs);
 		size_t dim = System::size_of(res);
+		auto dim_val = 1ULL << dim;
 
 		if (!HasCondition)
 		{
@@ -724,7 +741,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Add_ConstUInt::operator()(CuSparseState& state) const
+	void Add_ConstUInt_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		auto dim = System::size_of(reg_in);
@@ -781,7 +798,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Add_ConstUInt::dag(CuSparseState& state) const
+	void Add_ConstUInt_InPlace::dag(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		auto dim = System::size_of(reg_in);
@@ -1133,7 +1150,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void AddAssign_AnyInt_AnyInt::operator()(CuSparseState& state) const
+	void AddAssign_AnyInt_AnyInt_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 
@@ -1154,7 +1171,7 @@ namespace qram_simulator {
 			}
 	}
 
-	void AddAssign_AnyInt_AnyInt::dag(CuSparseState& state) const
+	void AddAssign_AnyInt_AnyInt_InPlace::dag(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		CuCondition_Host_Prepare
@@ -1597,7 +1614,7 @@ namespace qram_simulator {
 		return 1; // Should not happen if a and N are coprime
 	}
 
-	void Mod_Mult_UInt_ConstUInt::operator()(CuSparseState& state) const {
+	void Mod_Mult_UInt_ConstUInt_InPlace::operator()(CuSparseState& state) const {
 		state.move_to_gpu();
 		size_t reg_size = System::size_of(reg);
 
@@ -1615,7 +1632,7 @@ namespace qram_simulator {
 		}
 	}
 
-	void Mod_Mult_UInt_ConstUInt::dag(CuSparseState& state) const {
+	void Mod_Mult_UInt_ConstUInt_InPlace::dag(CuSparseState& state) const {
 		state.move_to_gpu();
 		size_t reg_size = System::size_of(reg);
 		uint64_t inverse_opnum = compute_modular_inverse(opnum, N);

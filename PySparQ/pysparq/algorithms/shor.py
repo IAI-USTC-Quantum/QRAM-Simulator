@@ -224,7 +224,7 @@ class ModMul:
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply modular multiplication to the state."""
-        op = ps.Mod_Mult_UInt_ConstUInt(self.reg, self.a, self.x, self.N)
+        op = ps.Mod_Mult_UInt_ConstUInt_InPlace(self.reg, self.a, self.x, self.N)
 
         if self._condition_bits:
             cond_reg, _ = self._condition_bits[-1]
@@ -234,7 +234,7 @@ class ModMul:
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply the dagger operation (inverse modular multiplication)."""
-        op = ps.Mod_Mult_UInt_ConstUInt(self.reg, self.a, self.x, self.N)
+        op = ps.Mod_Mult_UInt_ConstUInt_InPlace(self.reg, self.a, self.x, self.N)
 
         if self._condition_bits:
             cond_reg, _ = self._condition_bits[-1]

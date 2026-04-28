@@ -12,7 +12,7 @@
  *    - 通过bitwise XOR保证unitary：result ^= f(inputs)
  *    - 自动满足unitary，因为XOR是自逆操作
  *
- * 2. In-place操作（如Add_UInt_UInt_InPlace、Add_ConstUInt）：
+ * 2. In-place操作（如Add_UInt_UInt_InPlace、Add_ConstUInt_InPlace）：
  *    - 结果直接修改输入寄存器
  *    - 需要显式实现dagger()方法来保证可逆性
  *    - 通常使用模运算实现逆操作：y = (y + (2^N - x)) % 2^N
@@ -197,13 +197,18 @@ namespace qram_simulator
 	 * @par 示例
 	 * @code
 	 * // 4位寄存器，初始值 0b1010
-	 * ShiftLeft("reg", 1);  // 结果: 0b0101 (循环左移1位)
-	 * ShiftLeft("reg", 2);  // 结果: 0b1010 (循环左移2位)
+	 * ShiftLeft_InPlace("reg", 1);  // 结果: 0b0101 (循环左移1位)
+	 * ShiftLeft_InPlace("reg", 2);  // 结果: 0b1010 (循环左移2位)
 	 * @endcode
 	 */
-	struct ShiftLeft : BaseOperator {
+	struct ShiftLeft_InPlace : BaseOperator {
 		using BaseOperator::operator();
-		using BaseOperator::dag;
+				/**  应用dagger操作（调用ShiftRight_InPlace）*/
+		void dag(std::vector<System>& state) const;
+#ifdef USE_CUDA
+		/**  CUDA应用dagger操作 */
+		void dag(CuSparseState& state) const;
+#endif
 
 		/** @brief 寄存器 ID */
 		size_t register_1;
@@ -219,7 +224,7 @@ namespace qram_simulator
 		 * @param d 移位位数
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		ShiftLeft(std::string_view reg1, size_t d)
+		ShiftLeft_InPlace(std::string_view reg1, size_t d)
 			:register_1(System::get(reg1)), digit(d)
 		{
 			/* Type check */
@@ -238,7 +243,7 @@ namespace qram_simulator
 		 * @param d 移位位数
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		ShiftLeft(size_t reg1, size_t d)
+		ShiftLeft_InPlace(size_t reg1, size_t d)
 			:register_1(reg1), digit(d)
 		{
 			/* Type check */
@@ -283,12 +288,17 @@ namespace qram_simulator
 	 * @par 示例
 	 * @code
 	 * // 4位寄存器，初始值 0b1010
-	 * ShiftRight("reg", 1);  // 结果: 0b0101 (循环右移1位)
+	 * ShiftRight_InPlace("reg", 1);  // 结果: 0b0101 (循环右移1位)
 	 * @endcode
 	 */
-	struct ShiftRight : BaseOperator {
+	struct ShiftRight_InPlace : BaseOperator {
 		using BaseOperator::operator();
-		using BaseOperator::dag;
+				/**  应用dagger操作（调用ShiftLeft_InPlace）*/
+		void dag(std::vector<System>& state) const;
+#ifdef USE_CUDA
+		/**  CUDA应用dagger操作 */
+		void dag(CuSparseState& state) const;
+#endif
 
 		/** @brief 寄存器 ID */
 		size_t register_1;
@@ -304,7 +314,7 @@ namespace qram_simulator
 		 * @param d 移位位数
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		ShiftRight(std::string_view reg1, size_t d)
+		ShiftRight_InPlace(std::string_view reg1, size_t d)
 			:register_1(System::get(reg1)), digit(d)
 		{
 			/* Type check */
@@ -323,7 +333,7 @@ namespace qram_simulator
 		 * @param d 移位位数
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		ShiftRight(size_t reg1, size_t d)
+		ShiftRight_InPlace(size_t reg1, size_t d)
 			:register_1(reg1), digit(d)
 		{
 			/* Type check */
@@ -440,20 +450,18 @@ namespace qram_simulator
 
 	/**
 	 * @brief 累加乘常量操作（In-place）
-	 * @details 实现 in-place 累加乘法：res += lhs * mult
+	 * @details 实现 in-place 累加乘法：res += lhs * mult (mod 2^N)
+	 *         注意：lhs寄存器不会被修改，只有res被更新。
 	 *
 	 * 这是一个in-place操作，需要显式实现dagger来保证unitary。
-	 * dagger实现：res += (2^N - lhs * mult) mod 2^N
+	 * Forward:  res += lhs * mult (mod 2^N)  [lhs不变]
+	 * Dagger:   res -= lhs * mult (mod 2^N)  [lhs不变]
 	 *
-	 * @note Unitary性质：通过模运算保证可逆性
-	 * @note 数据类型：建议lhs和res都为UnsignedInteger
+	 * @note Unitary性质：lhs不变，仅res通过模加/模减更新，双射性由lhs值域保证
+	 * @note 数据类型：lhs和res都应为UnsignedInteger
 	 * @note 溢出行为：结果按res寄存器大小模2^N回绕
 	 *
 	 * @pre res寄存器必须有足够位数存储结果
-	 * @pre 当mult * max(lhs)可能溢出时，dagger操作需要特别注意
-	 *
-	 * @warning 此操作的unitary性依赖于正确的dagger实现。如果mult * lhs
-	 *          在应用和dagger时溢出行为不一致，可能导致非unitary。
 	 *
 	 * @par 示例
 	 * @code
@@ -462,10 +470,10 @@ namespace qram_simulator
 	 * Init_Unsafe(lhs, 2);  // lhs = 2
 	 * Init_Unsafe(res, 3);  // res = 3
 	 * // res = 3 + (2 * 4) = 11
-	 * Add_Mult_UInt_ConstUInt("lhs", 4, "res");
+	 * Add_Mult_UInt_ConstUInt_InPlace("lhs", 4, "res");
 	 * @endcode
 	 */
-	struct Add_Mult_UInt_ConstUInt : BaseOperator {
+	struct Add_Mult_UInt_ConstUInt_InPlace : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -487,7 +495,7 @@ namespace qram_simulator
 		 * @param reg_out 输出寄存器名称（结果累加至此）
 		 * @throws 当寄存器类型不是UnsignedInteger时抛出异常
 		 */
-		Add_Mult_UInt_ConstUInt(std::string_view reg_in, size_t mult, std::string_view reg_out)
+		Add_Mult_UInt_ConstUInt_InPlace(std::string_view reg_in, size_t mult, std::string_view reg_out)
 			: mult_int(mult), lhs(System::get(reg_in)), res(System::get(reg_out))
 		{
 			/* Type check */
@@ -505,7 +513,7 @@ namespace qram_simulator
 		 * @param reg_out 输出寄存器 ID（结果累加至此）
 		 * @throws 当寄存器类型不是UnsignedInteger时抛出异常
 		 */
-		Add_Mult_UInt_ConstUInt(size_t reg_in, size_t mult, size_t reg_out)
+		Add_Mult_UInt_ConstUInt_InPlace(size_t reg_in, size_t mult, size_t reg_out)
 			: mult_int(mult), lhs(reg_in), res(reg_out)
 		{
 			/* Type check */
@@ -547,11 +555,11 @@ namespace qram_simulator
 	 * @brief 模乘运算
 	 * @details 计算 |y⟩ → |y * a^(2^x) mod N⟩
 	 *
-	 * 当 a 和 N 互质时，Mod_Mult_UInt_ConstUInt 是酉操作。
+	 * 当 a 和 N 互质时，Mod_Mult_UInt_ConstUInt_InPlace 是酉操作。
 	 *
-	 * @section Mod_Mult_unitary Mod_Mult_UInt_ConstUInt 幺正性说明
+	 * @section Mod_Mult_unitary Mod_Mult_UInt_ConstUInt_InPlace 幺正性说明
 	 *
-	 * Mod_Mult_UInt_ConstUInt 的幺正性条件：
+	 * Mod_Mult_UInt_ConstUInt_InPlace 的幺正性条件：
 	 * 1. a 和 N 必须互质（gcd(a, N) = 1）
 	 * 2. 当满足条件时，逆操作为 y * a^(2^x*(N-2)) mod N（费马小定理）
 	 *
@@ -560,11 +568,11 @@ namespace qram_simulator
 	 * @code
 	 * auto reg = System::add_register("y", UnsignedInteger, 4);
 	 * auto cond = System::add_register("ctrl", Boolean, 1);
-	 * Mod_Mult_UInt_ConstUInt(reg, 7, 2, 15).conditioned_by_all_ones(cond)(state);
+	 * Mod_Mult_UInt_ConstUInt_InPlace(reg, 7, 2, 15).conditioned_by_all_ones(cond)(state);
 	 * // 计算: y = y * 7^4 mod 15 = y * 4 mod 15
 	 * @endcode
 	 */
-	struct Mod_Mult_UInt_ConstUInt : BaseOperator {
+	struct Mod_Mult_UInt_ConstUInt_InPlace : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -593,7 +601,7 @@ namespace qram_simulator
 		 * @param N 模数
 		 * @throws 当 a 和 N 不互质时抛出异常
 		 */
-		Mod_Mult_UInt_ConstUInt(std::string_view reg_name, uint64_t a, uint64_t x, uint64_t N);
+		Mod_Mult_UInt_ConstUInt_InPlace(std::string_view reg_name, uint64_t a, uint64_t x, uint64_t N);
 
 		/**
 		 * @brief 构造函数（ID版本）
@@ -603,7 +611,7 @@ namespace qram_simulator
 		 * @param N 模数
 		 * @throws 当 a 和 N 不互质时抛出异常
 		 */
-		Mod_Mult_UInt_ConstUInt(size_t reg_id, uint64_t a, uint64_t x, uint64_t N);
+		Mod_Mult_UInt_ConstUInt_InPlace(size_t reg_id, uint64_t a, uint64_t x, uint64_t N);
 
 		/**
 		 * @brief 执行模乘运算
@@ -937,12 +945,12 @@ namespace qram_simulator
 	 * auto reg = System::add_register("reg", UnsignedInteger, 4);
 	 * Init_Unsafe(reg, 12);  // reg = 12
 	 * // reg = (12 + 3) % 16 = 15
-	 * Add_ConstUInt("reg", 3);
+	 * Add_ConstUInt_InPlace("reg", 3);
 	 * // dagger: reg = (15 + 13) % 16 = 12 (恢复原值)
 	 * op.dag(state);
 	 * @endcode
 	 */
-	struct Add_ConstUInt : BaseOperator {
+	struct Add_ConstUInt_InPlace : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -960,7 +968,7 @@ namespace qram_simulator
 		 * @param add 加数常量
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		Add_ConstUInt(std::string_view reg_in_, size_t add) :
+		Add_ConstUInt_InPlace(std::string_view reg_in_, size_t add) :
 			reg_in(System::get(reg_in_)), add_int(add)
 		{
 			/* Type check */
@@ -977,7 +985,7 @@ namespace qram_simulator
 		 * @param add 加数常量
 		 * @throws 当寄存器类型不是整数类型时抛出异常
 		 */
-		Add_ConstUInt(size_t reg_in, size_t add)
+		Add_ConstUInt_InPlace(size_t reg_in, size_t add)
 			: reg_in(reg_in), add_int(add)
 		{
 			/* Type check */
@@ -1324,12 +1332,12 @@ namespace qram_simulator
 	 * Init_Unsafe(lhs, 8);  // lhs = 8
 	 * Init_Unsafe(rhs, 6);  // rhs = 6
 	 * // lhs = (8 + 6) % 16 = 14
-	 * AddAssign_AnyInt_AnyInt("lhs", "rhs");
+	 * AddAssign_AnyInt_AnyInt_InPlace("lhs", "rhs");
 	 * // dagger: lhs = (14 - 6) % 16 = 8 (恢复原值)
 	 * op.dag(state);
 	 * @endcode
 	 */
-	struct AddAssign_AnyInt_AnyInt : BaseOperator
+	struct AddAssign_AnyInt_AnyInt_InPlace : BaseOperator
 	{
 		using BaseOperator::operator();
 		using BaseOperator::dag;
@@ -1357,7 +1365,7 @@ namespace qram_simulator
 		 * @param reg_lhs 左操作数寄存器名称
 		 * @param reg_rhs 右操作数寄存器名称
 		 */
-		AddAssign_AnyInt_AnyInt(std::string_view reg_lhs, std::string_view reg_rhs)
+		AddAssign_AnyInt_AnyInt_InPlace(std::string_view reg_lhs, std::string_view reg_rhs)
 			: lhs_id(System::get(reg_lhs)), rhs_id(System::get(reg_rhs)),
 			lhs_size(System::size_of(lhs_id)), rhs_size(System::size_of(rhs_id)),
 			lhs_type(System::type_of(lhs_id)), rhs_type(System::type_of(rhs_id))
@@ -1376,7 +1384,7 @@ namespace qram_simulator
 		 * @param reg_lhs 左操作数寄存器 ID
 		 * @param reg_rhs 右操作数寄存器 ID
 		 */
-		AddAssign_AnyInt_AnyInt(size_t reg_lhs, size_t reg_rhs)
+		AddAssign_AnyInt_AnyInt_InPlace(size_t reg_lhs, size_t reg_rhs)
 			: lhs_id(reg_lhs), rhs_id(reg_rhs),
 			lhs_size(System::size_of(lhs_id)), rhs_size(System::size_of(rhs_id)),
 			lhs_type(System::type_of(lhs_id)), rhs_type(System::type_of(rhs_id))

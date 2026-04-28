@@ -23,8 +23,8 @@ Example:
 from __future__ import annotations
 import collections.abc
 import typing
-__all__: list[str] = ['AddAssign_AnyInt_AnyInt', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt', 'Add_Mult_UInt_ConstUInt', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_Int_Int', 'FlipBools', 'General', 'GetMid_UInt_UInt', 'GetRotateAngle_Int_Int', 'GlobalPhase_Int', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_PartialQubit', 'Init_Unsafe', 'Less_UInt_UInt', 'Mod_Mult_UInt_ConstUInt', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'Mult_UInt_ConstUInt', 'Normalize', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'RXgate_Bool', 'RYgate_Bool', 'RZgate_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SXgate_Bool', 'SelfAdjointOperator', 'Sgate_Bool', 'ShiftLeft', 'ShiftRight', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_Int', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'Tgate_Bool', 'U2gate_Bool', 'U3gate_Bool', 'UnsignedInteger', 'ViewNormalization', 'Xgate_Bool', 'Ygate_Bool', 'ZeroConditionalPhaseFlip', 'Zgate_Bool', 'combine_systems', 'inverseQFT', 'merge_system', 'remove_system', 'split_systems', 'stateprep_unitary_build_schmidt']
-class AddAssign_AnyInt_AnyInt(BaseOperator):
+__all__: list[str] = ['AddAssign_AnyInt_AnyInt_InPlace', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt_InPlace', 'Add_Mult_UInt_ConstUInt_InPlace', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_Int_Int', 'FlipBools', 'General', 'GetMid_UInt_UInt', 'GetRotateAngle_Int_Int', 'GlobalPhase_Int', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_PartialQubit', 'Init_Unsafe', 'Less_UInt_UInt', 'Mod_Mult_UInt_ConstUInt_InPlace', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'Mult_UInt_ConstUInt', 'Normalize', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'RXgate_Bool', 'RYgate_Bool', 'RZgate_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SXgate_Bool', 'SelfAdjointOperator', 'Sgate_Bool', 'ShiftLeft_InPlace', 'ShiftRight_InPlace', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_Int', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'Tgate_Bool', 'U2gate_Bool', 'U3gate_Bool', 'UnsignedInteger', 'ViewNormalization', 'Xgate_Bool', 'Ygate_Bool', 'ZeroConditionalPhaseFlip', 'Zgate_Bool', 'combine_systems', 'inverseQFT', 'merge_system', 'remove_system', 'split_systems', 'stateprep_unitary_build_schmidt']
+class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, input_reg: str, output_reg: str) -> None:
         ...
@@ -48,7 +48,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_all_ones(self, cond: str) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -60,7 +60,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -72,7 +72,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -84,7 +84,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -96,7 +96,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -109,7 +109,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -122,7 +122,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -135,7 +135,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -148,7 +148,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_nonzeros(self, cond: str) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -163,7 +163,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -178,7 +178,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -193,7 +193,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -208,7 +208,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -221,7 +221,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -234,7 +234,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -247,7 +247,7 @@ class AddAssign_AnyInt_AnyInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -AddAssign_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -290,7 +290,7 @@ class AddRegisterWithHadamard:
         ...
     def __init__(self, name: str, type: StateStorageType, size: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class Add_ConstUInt(BaseOperator):
+class Add_ConstUInt_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, input_reg: str, add: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
@@ -314,7 +314,7 @@ class Add_ConstUInt(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Add_ConstUInt:
+    def conditioned_by_all_ones(self, cond: str) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -326,7 +326,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Add_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -338,7 +338,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -350,7 +350,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -362,7 +362,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -375,7 +375,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -388,7 +388,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -401,7 +401,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -414,7 +414,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Add_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: str) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -429,7 +429,7 @@ class Add_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Add_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -444,7 +444,7 @@ class Add_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -459,7 +459,7 @@ class Add_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -474,7 +474,7 @@ class Add_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -487,7 +487,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -500,7 +500,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -513,7 +513,7 @@ class Add_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -524,6 +524,13 @@ class Add_ConstUInt(BaseOperator):
         
         Returns:
             Self, for method chaining.
+        """
+    def dag(self, state: SparseState) -> None:
+        """
+        Apply the adjoint (inverse) of this operation.
+
+        Args:
+            state: The quantum state to operate on.
         """
     @property
     def condition_variable_all_ones(self) -> list[int]:
@@ -537,7 +544,7 @@ class Add_ConstUInt(BaseOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class Add_Mult_UInt_ConstUInt(BaseOperator):
+class Add_Mult_UInt_ConstUInt_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, input_reg: str, multiplier: typing.SupportsInt | typing.SupportsIndex, output_reg: str) -> None:
         ...
@@ -561,7 +568,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, cond: str) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -573,7 +580,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -585,7 +592,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -597,7 +604,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -609,7 +616,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -622,7 +629,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -635,7 +642,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -648,7 +655,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -661,7 +668,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: str) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -676,7 +683,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -691,7 +698,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -706,7 +713,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -721,7 +728,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -734,7 +741,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -747,7 +754,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -760,7 +767,7 @@ class Add_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -Add_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -4846,7 +4853,7 @@ class Less_UInt_UInt(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class Mod_Mult_UInt_ConstUInt(BaseOperator):
+class Mod_Mult_UInt_ConstUInt_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, reg: str, a: typing.SupportsInt | typing.SupportsIndex, x: typing.SupportsInt | typing.SupportsIndex, N: typing.SupportsInt | typing.SupportsIndex) -> None:
         """
@@ -4880,7 +4887,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, cond: str) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -4892,7 +4899,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -4904,7 +4911,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -4916,7 +4923,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -4928,7 +4935,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -4941,7 +4948,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -4954,7 +4961,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -4967,7 +4974,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -4980,7 +4987,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: str) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -4995,7 +5002,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -5010,7 +5017,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -5025,7 +5032,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -5040,7 +5047,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -5053,7 +5060,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -5066,7 +5073,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -5079,7 +5086,7 @@ class Mod_Mult_UInt_ConstUInt(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mod_Mult_UInt_ConstUInt:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -Mod_Mult_UInt_ConstUInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -7789,7 +7796,7 @@ class Sgate_Bool(Phase_Bool):
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
-class ShiftLeft(BaseOperator):
+class ShiftLeft_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, reg: str, shift_bits: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
@@ -7813,7 +7820,7 @@ class ShiftLeft(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> ShiftLeft:
+    def conditioned_by_all_ones(self, cond: str) -ShiftLeft_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -7825,7 +7832,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> ShiftLeft:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -7837,7 +7844,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -7849,7 +7856,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> ShiftLeft:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -7861,7 +7868,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -7874,7 +7881,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftLeft:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -ShiftLeft_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -7887,7 +7894,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -7900,7 +7907,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftLeft:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -ShiftLeft_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -7913,7 +7920,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> ShiftLeft:
+    def conditioned_by_nonzeros(self, cond: str) -ShiftLeft_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -7928,7 +7935,7 @@ class ShiftLeft(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> ShiftLeft:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -7943,7 +7950,7 @@ class ShiftLeft(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -7958,7 +7965,7 @@ class ShiftLeft(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> ShiftLeft:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -7973,7 +7980,7 @@ class ShiftLeft(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -7986,7 +7993,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftLeft:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -7999,7 +8006,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftLeft:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftLeft_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8012,7 +8019,7 @@ class ShiftLeft(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftLeft:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -ShiftLeft_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8023,6 +8030,13 @@ class ShiftLeft(BaseOperator):
         
         Returns:
             Self, for method chaining.
+        """
+    def dag(self, state: SparseState) -> None:
+        """
+        Apply the adjoint (inverse) of this operation.
+
+        Args:
+            state: The quantum state to operate on.
         """
     @property
     def condition_variable_all_ones(self) -> list[int]:
@@ -8036,7 +8050,7 @@ class ShiftLeft(BaseOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class ShiftRight(BaseOperator):
+class ShiftRight_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, reg: str, shift_bits: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
@@ -8060,7 +8074,7 @@ class ShiftRight(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> ShiftRight:
+    def conditioned_by_all_ones(self, cond: str) -ShiftRight_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -8072,7 +8086,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> ShiftRight:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -ShiftRight_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -8084,7 +8098,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -8096,7 +8110,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> ShiftRight:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -ShiftRight_InPlace:
         """
         Condition this operation on registers where all bits are 1.
         
@@ -8108,7 +8122,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -8121,7 +8135,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftRight:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -ShiftRight_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -8134,7 +8148,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -8147,7 +8161,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftRight:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -ShiftRight_InPlace:
         """
         Condition this operation on a specific bit position.
         
@@ -8160,7 +8174,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> ShiftRight:
+    def conditioned_by_nonzeros(self, cond: str) -ShiftRight_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -8175,7 +8189,7 @@ class ShiftRight(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> ShiftRight:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -ShiftRight_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -8190,7 +8204,7 @@ class ShiftRight(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -8205,7 +8219,7 @@ class ShiftRight(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> ShiftRight:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -ShiftRight_InPlace:
         """
         Condition this operation on registers with nonzero values.
         
@@ -8220,7 +8234,7 @@ class ShiftRight(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8233,7 +8247,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftRight:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -ShiftRight_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8246,7 +8260,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> ShiftRight:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -ShiftRight_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8259,7 +8273,7 @@ class ShiftRight(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> ShiftRight:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -ShiftRight_InPlace:
         """
         Condition this operation on registers holding a specific value.
         
@@ -8270,6 +8284,13 @@ class ShiftRight(BaseOperator):
         
         Returns:
             Self, for method chaining.
+        """
+    def dag(self, state: SparseState) -> None:
+        """
+        Apply the adjoint (inverse) of this operation.
+
+        Args:
+            state: The quantum state to operate on.
         """
     @property
     def condition_variable_all_ones(self) -> list[int]:

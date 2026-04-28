@@ -41,7 +41,7 @@ namespace qram_simulator {
 				for (size_t k = 0; k < addr_size; ++k) {
 					auto target = SplitRegister(work_qubit, "rotation", 1)(state);
 					std::get<1>(System::name_register_map[System::get("rotation")]) = Boolean;
-					Add_ConstUInt("addr_parent", pow2(k) - 1)(state);
+					Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent")(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Xgate_Bool("addr_child", 0)(state);
@@ -61,9 +61,9 @@ namespace qram_simulator {
 					}
 					else
 					{
-						ShiftLeft("addr_parent", 1)(state);
+						ShiftLeft_InPlace("addr_parent", 1)(state);
 						Xgate_Bool("addr_parent", 0)(state);
-						Add_ConstUInt("addr_child", 1)(state);
+						Add_ConstUInt_InPlace("addr_child", 1)(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 						GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
@@ -75,19 +75,19 @@ namespace qram_simulator {
 						GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
-						Add_ConstUInt("addr_child", 1).dag(state);
+						Add_ConstUInt_InPlace("addr_child", 1).dag(state);
 						Xgate_Bool("addr_parent", 0)(state);
-						ShiftRight("addr_parent", 1)(state);
+						ShiftRight_InPlace("addr_parent", 1)(state);
 					}
 					Xgate_Bool("addr_child", 0)(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent").dag(state);
-					Add_ConstUInt("addr_parent", pow2(k) - 1).dag(state);
+					Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state);
 					//StatePrint(0, 10)(state);
 					CombineRegister(work_qubit, "rotation")(state);
-					ShiftLeft(work_qubit, 1)(state);
+					ShiftLeft_InPlace(work_qubit, 1)(state);
 				}
-				ShiftRight(work_qubit, 1)(state);
+				ShiftRight_InPlace(work_qubit, 1)(state);
 				RemoveRegister("addr_parent")(state);
 				RemoveRegister("data_parent")(state);
 				RemoveRegister("addr_child")(state);
@@ -111,12 +111,12 @@ namespace qram_simulator {
 				size_t n_digit = System::size_of("div_result");
 				auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func_inv(value, n_digit); };
 
-				ShiftLeft(work_qubit, 1)(state);
+				ShiftLeft_InPlace(work_qubit, 1)(state);
 				for (size_t k = 0; k <= addr_size - 1; ++k) {
-					ShiftRight(work_qubit, 1)(state);
+					ShiftRight_InPlace(work_qubit, 1)(state);
 					auto target = SplitRegister(work_qubit, "rotation", 1)(state);
 					std::get<1>(System::name_register_map[System::get("rotation")]) = Boolean;
-					Add_ConstUInt("addr_parent", pow2(addr_size - 1 - k) - 1)(state);
+					Add_ConstUInt_InPlace("addr_parent", pow2(addr_size - 1 - k) - 1)(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent")(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Xgate_Bool("addr_child", 0)(state);
@@ -138,9 +138,9 @@ namespace qram_simulator {
 					}
 					else
 					{
-						ShiftLeft("addr_parent", 1)(state);
+						ShiftLeft_InPlace("addr_parent", 1)(state);
 						Xgate_Bool("addr_parent", 0)(state);
-						Add_ConstUInt("addr_child", 1)(state);
+						Add_ConstUInt_InPlace("addr_child", 1)(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 						GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
@@ -154,14 +154,14 @@ namespace qram_simulator {
 						GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
-						Add_ConstUInt("addr_child", 1).dag(state);
+						Add_ConstUInt_InPlace("addr_child", 1).dag(state);
 						Xgate_Bool("addr_parent", 0)(state);
-						ShiftRight("addr_parent", 1)(state);
+						ShiftRight_InPlace("addr_parent", 1)(state);
 					}
 					Xgate_Bool("addr_child", 0)(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent").dag(state);
-					Add_ConstUInt("addr_parent", pow2(addr_size - 1 - k) - 1).dag(state);
+					Add_ConstUInt_InPlace("addr_parent", pow2(addr_size - 1 - k) - 1).dag(state);
 					CombineRegister(work_qubit, "rotation")(state);
 
 				}

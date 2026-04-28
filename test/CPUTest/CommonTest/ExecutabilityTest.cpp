@@ -45,10 +45,14 @@ int test_split_register() {
 
 int test_plusoneandoverflow() {
 	using POAO = block_encoding::block_encoding_tridiagonal::PlusOneAndOverflow;
-	std::vector<size_t> truth_table1 = check_inplace_unitarity<POAO>(true);
-	fmt::print("Truth table: {}\n", truth_table1);
-	std::vector<size_t> truth_table2 = check_inplace_unitarity<POAO>(false);
-	fmt::print("Truth table: {}\n", truth_table2);
+	// 2-bit main_reg + 1-bit overflow = 3 total bits
+	auto factory = [](std::vector<size_t> ids) -> POAO {
+		return POAO{System::name_of(ids[0]), System::name_of(ids[1])};
+	};
+	std::vector<size_t> truth_table1 = check_inplace_unitarity<POAO>({2, 1}, factory, true);
+	fmt::print("Truth table (dagger first): {}\n", truth_table1);
+	std::vector<size_t> truth_table2 = check_inplace_unitarity<POAO>({2, 1}, factory, false);
+	fmt::print("Truth table (forward first): {}\n", truth_table2);
 
 	System::clear();
 	return 0;
