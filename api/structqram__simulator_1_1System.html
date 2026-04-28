@@ -140,6 +140,18 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a73078438d910010433ab38a6758f6628" id="r_a73078438d910010433ab38a6758f6628"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#a73078438d910010433ab38a6758f6628">register_name</a> (std::string name, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">idx</a>)</td></tr>
+<tr class="memdesc:a73078438d910010433ab38a6758f6628"><td class="mdescLeft">&#160;</td><td class="mdescRight">注册名称到哈希索引  <br /></td></tr>
+<tr class="separator:a73078438d910010433ab38a6758f6628"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfd4079ce98370f11641cf600aeda1f1" id="r_adfd4079ce98370f11641cf600aeda1f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#adfd4079ce98370f11641cf600aeda1f1">unregister_name</a> (std::string_view name)</td></tr>
+<tr class="memdesc:adfd4079ce98370f11641cf600aeda1f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">从哈希索引中移除名称  <br /></td></tr>
+<tr class="separator:adfd4079ce98370f11641cf600aeda1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae637f75089e522b426d41d4c19b092ee" id="r_ae637f75089e522b426d41d4c19b092ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#ae637f75089e522b426d41d4c19b092ee">invalidate_name_index</a> ()</td></tr>
+<tr class="memdesc:ae637f75089e522b426d41d4c19b092ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">使哈希索引失效（MoveRegister 等操作后调用）  <br /></td></tr>
+<tr class="separator:ae637f75089e522b426d41d4c19b092ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc0104a38c60d99bbc82fe87384744be" id="r_acc0104a38c60d99bbc82fe87384744be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#acc0104a38c60d99bbc82fe87384744be">rebuild_name_index</a> ()</td></tr>
+<tr class="memdesc:acc0104a38c60d99bbc82fe87384744be"><td class="mdescLeft">&#160;</td><td class="mdescRight">重建哈希索引（惰性触发）  <br /></td></tr>
+<tr class="separator:acc0104a38c60d99bbc82fe87384744be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2d064220564ba9717086c2bbdbde61e" id="r_aa2d064220564ba9717086c2bbdbde61e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#aa2d064220564ba9717086c2bbdbde61e">clear</a> ()</td></tr>
 <tr class="memdesc:aa2d064220564ba9717086c2bbdbde61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除寄存器分配信息  <br /></td></tr>
 <tr class="separator:aa2d064220564ba9717086c2bbdbde61e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,6 +245,12 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a0575b28ca0b09efb2e66beb311ffe30d" id="r_a0575b28ca0b09efb2e66beb311ffe30d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> std::vector&lt; <a class="el" href="namespaceqram__simulator.html#aa542fbc9f15a8d96ddf2283cfce7e2a8">StateInfoType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#a0575b28ca0b09efb2e66beb311ffe30d">name_register_map</a></td></tr>
 <tr class="memdesc:a0575b28ca0b09efb2e66beb311ffe30d"><td class="mdescLeft">&#160;</td><td class="mdescRight">寄存器信息映射表  <br /></td></tr>
 <tr class="separator:a0575b28ca0b09efb2e66beb311ffe30d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c347de20ef70115b179aaf56d48bdbf" id="r_a1c347de20ef70115b179aaf56d48bdbf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> std::unordered_map&lt; std::string, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#a1c347de20ef70115b179aaf56d48bdbf">name_to_index</a></td></tr>
+<tr class="memdesc:a1c347de20ef70115b179aaf56d48bdbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">名称→索引的哈希索引（O(1) 查找）  <br /></td></tr>
+<tr class="separator:a1c347de20ef70115b179aaf56d48bdbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e7d083978c17f333509e26c7d3cee44" id="r_a7e7d083978c17f333509e26c7d3cee44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#a7e7d083978c17f333509e26c7d3cee44">name_index_valid</a> = <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">true</a></td></tr>
+<tr class="memdesc:a7e7d083978c17f333509e26c7d3cee44"><td class="mdescLeft">&#160;</td><td class="mdescRight">哈希索引是否有效（MoveRegister 等操作会使其失效）  <br /></td></tr>
+<tr class="separator:a7e7d083978c17f333509e26c7d3cee44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa62df84dacdfd478c1fc375d50c2c67f" id="r_aa62df84dacdfd478c1fc375d50c2c67f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">uint64_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1System.html#aa62df84dacdfd478c1fc375d50c2c67f">reg_status_bitmap</a> = 0</td></tr>
 <tr class="memdesc:aa62df84dacdfd478c1fc375d50c2c67f"><td class="mdescLeft">&#160;</td><td class="mdescRight">寄存器状态位图  <br /></td></tr>
 <tr class="separator:aa62df84dacdfd478c1fc375d50c2c67f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -742,6 +760,33 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ae637f75089e522b426d41d4c19b092ee" name="ae637f75089e522b426d41d4c19b092ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae637f75089e522b426d41d4c19b092ee">&#9670;&#160;</a></span>invalidate_name_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a> qram_simulator::System::invalidate_name_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>使哈希索引失效（MoveRegister 等操作后调用） </p>
+
+</div>
+</div>
 <a id="aaa8cf9c865668c9c0bfde30f68718128" name="aaa8cf9c865668c9c0bfde30f68718128"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaa8cf9c865668c9c0bfde30f68718128">&#9670;&#160;</a></span>last_register() <span class="overload">[1/2]</span></h2>
 
@@ -895,6 +940,71 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>是否相等 </dd></dl>
+
+</div>
+</div>
+<a id="acc0104a38c60d99bbc82fe87384744be" name="acc0104a38c60d99bbc82fe87384744be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc0104a38c60d99bbc82fe87384744be">&#9670;&#160;</a></span>rebuild_name_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a> qram_simulator::System::rebuild_name_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>重建哈希索引（惰性触发） </p>
+
+</div>
+</div>
+<a id="a73078438d910010433ab38a6758f6628" name="a73078438d910010433ab38a6758f6628"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73078438d910010433ab38a6758f6628">&#9670;&#160;</a></span>register_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a> qram_simulator::System::register_name </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a>&#160;</td>
+          <td class="paramname"><em>idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>注册名称到哈希索引 </p>
 
 </div>
 </div>
@@ -1437,6 +1547,34 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="adfd4079ce98370f11641cf600aeda1f1" name="adfd4079ce98370f11641cf600aeda1f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfd4079ce98370f11641cf600aeda1f1">&#9670;&#160;</a></span>unregister_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">static</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">void</a> qram_simulator::System::unregister_name </td>
+          <td>(</td>
+          <td class="paramtype">std::string_view&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>从哈希索引中移除名称 </p>
+
+</div>
+</div>
 <a id="a6e695affcf81a2db82e0f56d3b0bf031" name="a6e695affcf81a2db82e0f56d3b0bf031"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e695affcf81a2db82e0f56d3b0bf031">&#9670;&#160;</a></span>update_max_size()</h2>
 
@@ -1584,6 +1722,30 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a7e7d083978c17f333509e26c7d3cee44" name="a7e7d083978c17f333509e26c7d3cee44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e7d083978c17f333509e26c7d3cee44">&#9670;&#160;</a></span>name_index_valid</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a> qram_simulator::System::name_index_valid = <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">true</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>哈希索引是否有效（MoveRegister 等操作会使其失效） </p>
+
+</div>
+</div>
 <a id="a0575b28ca0b09efb2e66beb311ffe30d" name="a0575b28ca0b09efb2e66beb311ffe30d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0575b28ca0b09efb2e66beb311ffe30d">&#9670;&#160;</a></span>name_register_map</h2>
 
@@ -1605,6 +1767,30 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>寄存器信息映射表 </p>
+
+</div>
+</div>
+<a id="a1c347de20ef70115b179aaf56d48bdbf" name="a1c347de20ef70115b179aaf56d48bdbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c347de20ef70115b179aaf56d48bdbf">&#9670;&#160;</a></span>name_to_index</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;std::string, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a>&gt; qram_simulator::System::name_to_index</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>名称→索引的哈希索引（O(1) 查找） </p>
 
 </div>
 </div>

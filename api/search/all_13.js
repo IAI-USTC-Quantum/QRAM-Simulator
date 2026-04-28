@@ -5,5 +5,6 @@ var searchData=
   ['unique_5fset_2',['unique_set',['../structqram__simulator_1_1QRAMInputGenerator.html#a6e25c02e4ea5bc4a6d7aa19c02657dbf',1,'qram_simulator::QRAMInputGenerator']]],
   ['unitary性质说明_3',['Unitary性质说明',['../quantum__arithmetic_8h.html#unitary_notes',1,'']]],
   ['unitary_5ft_4',['unitary_t',['../structqram__simulator_1_1Rot__GeneralUnitary.html#a7abe1d64b29f55c4867fbcb10c39d58a',1,'qram_simulator::Rot_GeneralUnitary::unitary_t'],['../structqram__simulator_1_1Rot__GeneralStatePrep.html#a59e94413784f7c12f5ca6f3714d8500f',1,'qram_simulator::Rot_GeneralStatePrep::unitary_t']]],
-  ['update_5fmax_5fsize_5',['update_max_size',['../structqram__simulator_1_1System.html#a6e695affcf81a2db82e0f56d3b0bf031',1,'qram_simulator::System']]]
+  ['unregister_5fname_5',['unregister_name',['../structqram__simulator_1_1System.html#adfd4079ce98370f11641cf600aeda1f1',1,'qram_simulator::System']]],
+  ['update_5fmax_5fsize_6',['update_max_size',['../structqram__simulator_1_1System.html#a6e695affcf81a2db82e0f56d3b0bf031',1,'qram_simulator::System']]]
 ];
