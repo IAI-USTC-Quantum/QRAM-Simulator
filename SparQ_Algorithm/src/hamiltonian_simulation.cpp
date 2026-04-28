@@ -327,7 +327,7 @@ namespace qram_simulator {
 			// Cancel extra offset 
 			// |sparse_offset>|k>|l + SearchResult (l+offset)> ->
 			// |sparse_offset>|k>|l + SearchResult (l)> ->
-			AddAssign_AnyInt_AnyInt(l, sparse_offset).dag(system_states);
+			AddAssign_AnyInt_AnyInt_InPlace(l, sparse_offset).dag(system_states);
 		}
 
 		void CondRot_General_Bool_QW::operate(size_t l, size_t r, std::vector<System>& state, walk_angle_function_t func) const

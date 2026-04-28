@@ -438,7 +438,7 @@ class TestQDAFidelityAgainstReference:
             # pos 版本精度稍低
             assert 0.99 < f < 1.001, f"Reference pos value {i} = {f} out of range"
 
-    @pytest.mark.skip(reason="WalkS fidelity test requires full quantum circuit implementation")
+    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_walks_fidelity_tridiagonal(self, fresh_system):
         """测试 Tridiagonal 版本的 WalkS fidelity。
 
@@ -475,7 +475,7 @@ class TestQDAFidelityAgainstReference:
             #     assert abs(fidelity - expected) < 1e-5
             #     compare_index += 1
 
-    @pytest.mark.skip(reason="QRAM WalkS fidelity test requires full implementation")
+    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_walks_fidelity_via_qram(self, fresh_system):
         """测试 QRAM 版本的 WalkS fidelity。
 

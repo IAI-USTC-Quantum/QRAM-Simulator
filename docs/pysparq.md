@@ -185,11 +185,11 @@ ps.Add_UInt_UInt_InPlace("a", "b")(state)
 ps.Add_UInt_UInt_InPlace("a", "b").dag(state)
 ```
 
-#### `Add_ConstUInt(reg, constant)`
+#### `Add_ConstUInt_InPlace(reg, constant)`
 Add constant to register (in-place).
 
 ```python
-ps.Add_ConstUInt("counter", 1)(state)  # counter += 1
+ps.Add_ConstUInt_InPlace("counter", 1)(state)  # counter += 1
 ```
 
 #### `Mult_UInt_ConstUInt(input_reg, multiplier, output_reg)`
@@ -199,12 +199,13 @@ Multiply by constant (out-of-place): `output ^= input * multiplier`
 ps.Mult_UInt_ConstUInt("a", 3, "triple_a")(state)
 ```
 
-#### `ShiftLeft(reg, shift_bits)` / `ShiftRight(reg, shift_bits)`
-Cyclic shift operations.
+#### `ShiftLeft_InPlace(reg, shift_bits)` / `ShiftRight_InPlace(reg, shift_bits)`
+Cyclic shift operations. They are each other's dagger.
 
 ```python
-ps.ShiftLeft("data", 2)(state)   # Left shift by 2 bits
-ps.ShiftRight("data", 2)(state)  # Right shift by 2 bits (inverse of left)
+ps.ShiftLeft_InPlace("data", 2)(state)   # Left shift by 2 bits
+ps.ShiftRight_InPlace("data", 2)(state)  # Right shift by 2 bits (inverse of left)
+ps.ShiftLeft_InPlace("data", 2).dag(state)  # Use .dag() to undo
 ```
 
 #### `FlipBools(reg)`

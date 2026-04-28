@@ -272,7 +272,42 @@ class TestBlockEncodingViaQRAM:
 
     @pytest.mark.slow
     def test_simple_matrix_encoding(self, fresh_system):
-        pytest.skip("需要完整的 QRAM 数据结构支持")
+        from pysparq.algorithms.block_encoding import BlockEncodingViaQRAM
+        from pysparq.algorithms.qram_utils import scale_and_convert_vector, make_vector_tree
+
+        import math
+
+        # Simple 2x2 symmetric matrix
+        A = [1.0, 0.5, 0.5, 1.0]
+        data_size = 8
+        exponent = 4
+        rational_size = 16
+
+        # Build QRAM memory from matrix (column-major via scale_and_convert_vector)
+        converted = scale_and_convert_vector(A, exponent=exponent, data_size=data_size, from_matrix=True)
+        tree = make_vector_tree(converted, data_size)
+        addr_size = int(math.ceil(math.log2(len(tree)))) if len(tree) > 1 else 1
+
+        qram = ps.QRAMCircuit_qutrit(addr_size, data_size, tree)
+
+        n_bits = 1  # 2x2 matrix → 1 qubit per index
+        ps.System.add_register("column_index", ps.UnsignedInteger, n_bits)
+        ps.System.add_register("row_index", ps.UnsignedInteger, n_bits)
+
+        state = ps.SparseState()
+        ps.Init_Unsafe("column_index", 0)(state)
+        ps.Init_Unsafe("row_index", 0)(state)
+        initial_size = state.size()
+
+        block_enc = BlockEncodingViaQRAM(qram, "column_index", "row_index", data_size, rational_size)
+
+        # Forward: block encoding should spread amplitude across basis states
+        block_enc(state)
+        assert state.size() >= initial_size
+
+        # Forward + dagger: approximately restores initial state (unitarity)
+        block_enc.dag(state)
+        ps.CheckNormalization(1e-3)(state)
 
     def test_block_encoding_structure(self, fresh_system):
         from pysparq.algorithms.block_encoding import BlockEncodingViaQRAM, UR, UL

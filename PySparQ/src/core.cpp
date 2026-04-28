@@ -345,7 +345,9 @@ PYBIND11_MODULE(_core, m)
 	
 			// 调用原有构造函数
 			return new qram_qutrit::QRAMCircuit(addr_size, data_size, std::move(mem)); }),
-			 py::arg("addr_size"), py::arg("data_size"), py::arg("memory"));
+			 py::arg("addr_size"), py::arg("data_size"), py::arg("memory"))
+			.def_readonly("address_size", &qram_qutrit::QRAMCircuit::address_size)
+			.def_readonly("data_size", &qram_qutrit::QRAMCircuit::data_size);
 
 	{
 		using namespace state_prep;
@@ -444,21 +446,21 @@ PYBIND11_MODULE(_core, m)
 			BIND_CONTROLLABLE_METHODS(Swap_Bool_Bool);
 
 	// 位移操作
-	BIND_BASE_OPERATOR(ShiftLeft)
+	BIND_BASE_OPERATOR(ShiftLeft_InPlace)
 		.def(py::init<std::string_view, size_t>(),
 			 py::arg("reg"), py::arg("shift_bits"))
 		.def(py::init<size_t, size_t>(),
 			 py::arg("reg_id"), py::arg("shift_bits"))
+			BIND_DAG_METHODS(ShiftLeft_InPlace)
+			BIND_CONTROLLABLE_METHODS(ShiftLeft_InPlace);
 
-			BIND_CONTROLLABLE_METHODS(ShiftLeft);
-
-	BIND_BASE_OPERATOR(ShiftRight)
+	BIND_BASE_OPERATOR(ShiftRight_InPlace)
 		.def(py::init<std::string_view, size_t>(),
 			 py::arg("reg"), py::arg("shift_bits"))
 		.def(py::init<size_t, size_t>(),
 			 py::arg("reg_id"), py::arg("shift_bits"))
-
-			BIND_CONTROLLABLE_METHODS(ShiftRight);
+			BIND_DAG_METHODS(ShiftRight_InPlace)
+			BIND_CONTROLLABLE_METHODS(ShiftRight_InPlace);
 
 	// 算术运算绑定
 	BIND_SELF_ADJOINT_OPERATOR(Mult_UInt_ConstUInt)
@@ -469,13 +471,21 @@ PYBIND11_MODULE(_core, m)
 
 			BIND_CONTROLLABLE_METHODS(Mult_UInt_ConstUInt);
 
-	BIND_BASE_OPERATOR(Add_Mult_UInt_ConstUInt)
+	BIND_BASE_OPERATOR(Add_Mult_UInt_ConstUInt_InPlace)
 		.def(py::init<std::string_view, size_t, std::string_view>(),
 			 py::arg("input_reg"), py::arg("multiplier"), py::arg("output_reg"))
 		.def(py::init<size_t, size_t, size_t>(),
 			 py::arg("input_reg"), py::arg("multiplier"), py::arg("output_reg"))
-			BIND_DAG_METHODS(Add_Mult_UInt_ConstUInt)
-				BIND_CONTROLLABLE_METHODS(Add_Mult_UInt_ConstUInt);
+			BIND_DAG_METHODS(Add_Mult_UInt_ConstUInt_InPlace)
+				BIND_CONTROLLABLE_METHODS(Add_Mult_UInt_ConstUInt_InPlace);
+
+	BIND_BASE_OPERATOR(Mod_Mult_UInt_ConstUInt_InPlace)
+		.def(py::init<std::string_view, uint64_t, uint64_t, uint64_t>(),
+			 py::arg("reg"), py::arg("a"), py::arg("x"), py::arg("N"))
+		.def(py::init<size_t, uint64_t, uint64_t, uint64_t>(),
+			 py::arg("reg_id"), py::arg("a"), py::arg("x"), py::arg("N"))
+			BIND_DAG_METHODS(Mod_Mult_UInt_ConstUInt_InPlace)
+			BIND_CONTROLLABLE_METHODS(Mod_Mult_UInt_ConstUInt_InPlace);
 
 	BIND_SELF_ADJOINT_OPERATOR(Add_UInt_UInt)
 		.def(py::init<std::string_view, std::string_view, std::string_view>(),
@@ -501,13 +511,13 @@ PYBIND11_MODULE(_core, m)
 
 			BIND_CONTROLLABLE_METHODS(Add_UInt_ConstUInt);
 
-	BIND_BASE_OPERATOR(Add_ConstUInt)
+	BIND_BASE_OPERATOR(Add_ConstUInt_InPlace)
 		.def(py::init<std::string_view, size_t>(),
 			 py::arg("input_reg"), py::arg("add"))
 		.def(py::init<size_t, size_t>(),
 			 py::arg("input_reg"), py::arg("add"))
-
-			BIND_CONTROLLABLE_METHODS(Add_ConstUInt);
+			BIND_DAG_METHODS(Add_ConstUInt_InPlace)
+			BIND_CONTROLLABLE_METHODS(Add_ConstUInt_InPlace);
 
 	// 复杂算术操作
 	BIND_SELF_ADJOINT_OPERATOR(Div_Sqrt_Arccos_Int_Int)
@@ -534,13 +544,13 @@ PYBIND11_MODULE(_core, m)
 
 			BIND_CONTROLLABLE_METHODS(GetRotateAngle_Int_Int);
 
-	BIND_BASE_OPERATOR(AddAssign_AnyInt_AnyInt)
+	BIND_BASE_OPERATOR(AddAssign_AnyInt_AnyInt_InPlace)
 		.def(py::init<std::string_view, std::string_view>(),
 			 py::arg("input_reg"), py::arg("output_reg"))
 		.def(py::init<size_t, size_t>(),
 			 py::arg("input_reg"), py::arg("output_reg"))
-			BIND_DAG_METHODS(AddAssign_AnyInt_AnyInt)
-				BIND_CONTROLLABLE_METHODS(AddAssign_AnyInt_AnyInt);
+			BIND_DAG_METHODS(AddAssign_AnyInt_AnyInt_InPlace)
+				BIND_CONTROLLABLE_METHODS(AddAssign_AnyInt_AnyInt_InPlace);
 
 	// 通用赋值操作
 	BIND_SELF_ADJOINT_OPERATOR(Assign)

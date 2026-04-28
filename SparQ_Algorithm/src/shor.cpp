@@ -162,7 +162,7 @@ namespace qram_simulator
 			for (size_t x = 0; x < size; ++x)
 			{
 				size_t work_reg = AddRegisterWithHadamard("work_reg", UnsignedInteger, 1)(state);
-				Mod_Mult_UInt_ConstUInt(ancilla_reg, a, size - 1 - x, N).conditioned_by_all_ones(work_reg)(state);
+				Mod_Mult_UInt_ConstUInt_InPlace(ancilla_reg, a, size - 1 - x, N).conditioned_by_all_ones(work_reg)(state);
 				for (size_t i = 0; i < res.size(); ++i)
 				{
 					if (res[res.size() - 1 - i] == 1)

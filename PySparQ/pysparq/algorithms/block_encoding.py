@@ -269,8 +269,8 @@ class UR(ControllableOperatorMixin):
         for k in range(self.addr_size):
             ps.SplitRegister(self.column_index, "rotation", 1)(state)
             ps.CombineRegister(self.column_index, "temp_bit")(state)
-            ps.ShiftRight(self.column_index, 1)(state)
-            ps.Add_ConstUInt(self.column_index, pow2(k) - 1)(state)
+            ps.ShiftRight_InPlace(self.column_index, 1)(state)
+            ps.Add_ConstUInt_InPlace(self.column_index, pow2(k) - 1)(state)
             ps.Mult_UInt_ConstUInt(self.column_index, 2, "addr_child")(state)
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.QRAMLoad(self.qram, self.column_index, "data_parent")(state)
@@ -287,13 +287,13 @@ class UR(ControllableOperatorMixin):
             ps.QRAMLoad(self.qram, self.column_index, "data_parent")(state)
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.Mult_UInt_ConstUInt(self.column_index, 2, "addr_child")(state)
-            ps.Add_ConstUInt(self.column_index, pow2(self.addr_size) - pow2(k) + 1)(state)
-            ps.ShiftLeft(self.column_index, 1)(state)
+            ps.Add_ConstUInt_InPlace(self.column_index, pow2(self.addr_size) - pow2(k) + 1)(state)
+            ps.ShiftLeft_InPlace(self.column_index, 1)(state)
             ps.SplitRegister(self.column_index, "temp_bit", 1)(state)
             ps.CombineRegister(self.column_index, "rotation")(state)
-            ps.ShiftLeft(self.column_index, 1)(state)
+            ps.ShiftLeft_InPlace(self.column_index, 1)(state)
 
-        ps.ShiftRight(self.column_index, 1)(state)
+        ps.ShiftRight_InPlace(self.column_index, 1)(state)
 
         ps.RemoveRegister("data_parent")(state)
         ps.RemoveRegister("addr_child")(state)
@@ -315,14 +315,14 @@ class UR(ControllableOperatorMixin):
         n_digit = ps.System.size_of("div_result")
         func_inv = lambda value, _n=n_digit: make_func_inv(value, _n)
 
-        ps.ShiftLeft(self.column_index, 1)(state)
+        ps.ShiftLeft_InPlace(self.column_index, 1)(state)
 
         for k in range(self.addr_size):
-            ps.ShiftRight(self.column_index, 1)(state)
+            ps.ShiftRight_InPlace(self.column_index, 1)(state)
             ps.SplitRegister(self.column_index, "rotation", 1)(state)
             ps.CombineRegister(self.column_index, "temp_bit")(state)
-            ps.ShiftRight(self.column_index, 1)(state)
-            ps.Add_ConstUInt(self.column_index, pow2(self.addr_size - 1 - k) - 1)(state)
+            ps.ShiftRight_InPlace(self.column_index, 1)(state)
+            ps.Add_ConstUInt_InPlace(self.column_index, pow2(self.addr_size - 1 - k) - 1)(state)
             ps.Mult_UInt_ConstUInt(self.column_index, 2, "addr_child")(state)
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
@@ -339,11 +339,11 @@ class UR(ControllableOperatorMixin):
             ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.Mult_UInt_ConstUInt(self.column_index, 2, "addr_child")(state)
-            ps.Add_ConstUInt(
+            ps.Add_ConstUInt_InPlace(
                 self.column_index,
                 pow2(self.addr_size) - pow2(self.addr_size - 1 - k) + 1,
             )(state)
-            ps.ShiftLeft(self.column_index, 1)(state)
+            ps.ShiftLeft_InPlace(self.column_index, 1)(state)
             ps.SplitRegister(self.column_index, "temp_bit", 1)(state)
             ps.CombineRegister(self.column_index, "rotation")(state)
 
@@ -403,8 +403,8 @@ class UL(ControllableOperatorMixin):
 
         for k in range(self.addr_size, 2 * self.addr_size):
             ps.SplitRegister(self.row_index, "rotation", 1)(state)
-            ps.Add_ConstUInt("addr_parent", pow2(k) - 1)(state)
-            ps.Add_Mult_UInt_ConstUInt(
+            ps.Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state)
+            ps.Add_Mult_UInt_ConstUInt_InPlace(
                 self.column_index, pow2(k - self.addr_size), "addr_parent"
             )(state)
             ps.Add_UInt_UInt_InPlace(self.row_index, "addr_parent")(state)
@@ -428,9 +428,9 @@ class UL(ControllableOperatorMixin):
                 ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
             else:
                 # Last iteration: use GetRotateAngle instead of Div
-                ps.ShiftLeft("addr_parent", 1)(state)
+                ps.ShiftLeft_InPlace("addr_parent", 1)(state)
                 ps.Xgate_Bool("addr_parent", 0)(state)
-                ps.Add_ConstUInt("addr_child", 1)(state)
+                ps.Add_ConstUInt_InPlace("addr_child", 1)(state)
                 ps.QRAMLoad(self.qram, "addr_parent", "data_parent")(state)
                 ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
                 ps.GetRotateAngle_Int_Int(
@@ -445,22 +445,22 @@ class UL(ControllableOperatorMixin):
                 )(state)
                 ps.QRAMLoad(self.qram, "addr_parent", "data_parent")(state)
                 ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
-                ps.Add_ConstUInt("addr_child", 1).dag(state)
+                ps.Add_ConstUInt_InPlace("addr_child", 1).dag(state)
                 ps.Xgate_Bool("addr_parent", 0)(state)
-                ps.ShiftRight("addr_parent", 1)(state)
+                ps.ShiftRight_InPlace("addr_parent", 1)(state)
 
             # Uncompute address computation
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state)
             ps.Add_UInt_UInt_InPlace(self.row_index, "addr_parent").dag(state)
-            ps.Add_Mult_UInt_ConstUInt(
+            ps.Add_Mult_UInt_ConstUInt_InPlace(
                 self.column_index, pow2(k - self.addr_size), "addr_parent"
             ).dag(state)
-            ps.Add_ConstUInt("addr_parent", pow2(k) - 1).dag(state)
+            ps.Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state)
             ps.CombineRegister(self.row_index, "rotation")(state)
-            ps.ShiftLeft(self.row_index, 1)(state)
+            ps.ShiftLeft_InPlace(self.row_index, 1)(state)
 
-        ps.ShiftRight(self.row_index, 1)(state)
+        ps.ShiftRight_InPlace(self.row_index, 1)(state)
 
         ps.RemoveRegister("addr_parent")(state)
         ps.RemoveRegister("data_parent")(state)
@@ -481,13 +481,13 @@ class UL(ControllableOperatorMixin):
         n_digit = ps.System.size_of("div_result")
         func_inv = lambda value, _n=n_digit: make_func_inv(value, _n)
 
-        ps.ShiftLeft(self.row_index, 1)(state)
+        ps.ShiftLeft_InPlace(self.row_index, 1)(state)
 
         for k in range(2 * self.addr_size - 1, self.addr_size - 1, -1):
-            ps.ShiftRight(self.row_index, 1)(state)
+            ps.ShiftRight_InPlace(self.row_index, 1)(state)
             ps.SplitRegister(self.row_index, "rotation", 1)(state)
-            ps.Add_ConstUInt("addr_parent", pow2(k) - 1)(state)
-            ps.Add_Mult_UInt_ConstUInt(
+            ps.Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state)
+            ps.Add_Mult_UInt_ConstUInt_InPlace(
                 self.column_index, pow2(k - self.addr_size), "addr_parent"
             )(state)
             ps.Add_UInt_UInt_InPlace(self.row_index, "addr_parent")(state)
@@ -513,9 +513,9 @@ class UL(ControllableOperatorMixin):
                 ps.QRAMLoad(self.qram, "addr_parent", "data_parent")(state)
             else:
                 # Last iteration
-                ps.ShiftLeft("addr_parent", 1)(state)
+                ps.ShiftLeft_InPlace("addr_parent", 1)(state)
                 ps.Xgate_Bool("addr_parent", 0)(state)
-                ps.Add_ConstUInt("addr_child", 1)(state)
+                ps.Add_ConstUInt_InPlace("addr_child", 1)(state)
                 ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
                 ps.QRAMLoad(self.qram, "addr_parent", "data_parent")(state)
                 ps.GetRotateAngle_Int_Int(
@@ -532,18 +532,18 @@ class UL(ControllableOperatorMixin):
                 )(state)
                 ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
                 ps.QRAMLoad(self.qram, "addr_parent", "data_parent")(state)
-                ps.Add_ConstUInt("addr_child", 1).dag(state)
+                ps.Add_ConstUInt_InPlace("addr_child", 1).dag(state)
                 ps.Xgate_Bool("addr_parent", 0)(state)
-                ps.ShiftRight("addr_parent", 1)(state)
+                ps.ShiftRight_InPlace("addr_parent", 1)(state)
 
             # Uncompute address computation
             ps.Xgate_Bool("addr_child", 0)(state)
             ps.Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state)
             ps.Add_UInt_UInt_InPlace(self.row_index, "addr_parent").dag(state)
-            ps.Add_Mult_UInt_ConstUInt(
+            ps.Add_Mult_UInt_ConstUInt_InPlace(
                 self.column_index, pow2(k - self.addr_size), "addr_parent"
             ).dag(state)
-            ps.Add_ConstUInt("addr_parent", pow2(k) - 1).dag(state)
+            ps.Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state)
             ps.CombineRegister(self.row_index, "rotation")(state)
 
         ps.RemoveRegister("addr_parent")(state)

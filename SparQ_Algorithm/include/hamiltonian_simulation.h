@@ -586,7 +586,7 @@ namespace qram_simulator
 				Swap_General_General(reg_col, reg_search_result)(state);
 
 				// |offset>|i>|s_j>|row_addr>|0> 
-				AddAssign_AnyInt_AnyInt(reg_col, "row_addr").dag(state);
+				AddAssign_AnyInt_AnyInt_InPlace(reg_col, "row_addr").dag(state);
 
 				// |offset>|i>|s_j>|0>|0> 
 				GetRowAddr(reg_sparse_offset, reg_row, row_size, "row_addr")(state);
@@ -602,7 +602,7 @@ namespace qram_simulator
 
 				// |offset>|i>|s_j>|0>|0>|row_addr>
 				GetRowAddr(reg_sparse_offset, reg_row, row_size, "row_addr")(state);
-				AddAssign_AnyInt_AnyInt(reg_col, "row_addr")(state);
+				AddAssign_AnyInt_AnyInt_InPlace(reg_col, "row_addr")(state);
 				Swap_General_General(reg_col, reg_search_result)(state);
 				QRAMLoad(qram, reg_search_result, reg_col)(state);
 				//QuantumBinarySearch(qram, "row_addr", row_size, reg_col, reg_search_result)(state);

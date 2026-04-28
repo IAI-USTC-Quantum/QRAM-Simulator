@@ -85,6 +85,52 @@ namespace {
         System::clear();
         return true;
     }
+
+    // Bidirectional round-trip: forward then dagger must restore original
+    template<typename OpType, typename... Args>
+    bool verify_inplace_unitarity_fwd_then_dag(Args&&... args) {
+        System::clear();
+        auto reg1 = System::add_register("reg1", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        auto reg2 = System::add_register("reg2", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        OpType op(std::forward<Args>(args)...);
+        for (size_t v1 = 0; v1 < 4; ++v1) {
+            for (size_t v2 = 0; v2 < 4; ++v2) {
+                std::vector<System> st;
+                st.emplace_back();
+                st[0].get(reg1).value = v1;
+                st[0].get(reg2).value = v2;
+                op(st);      // apply U
+                op.dag(st);  // apply U† — must restore original
+                if (st.size() != 1 || st[0].get(reg1).value != v1 || st[0].get(reg2).value != v2)
+                    return false;
+            }
+        }
+        System::clear();
+        return true;
+    }
+
+    // Bidirectional round-trip: dagger then forward must restore original
+    template<typename OpType, typename... Args>
+    bool verify_inplace_unitarity_dag_then_fwd(Args&&... args) {
+        System::clear();
+        auto reg1 = System::add_register("reg1", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        auto reg2 = System::add_register("reg2", UnsignedInteger, UNITARY_TEST_STATE_SIZE);
+        OpType op(std::forward<Args>(args)...);
+        for (size_t v1 = 0; v1 < 4; ++v1) {
+            for (size_t v2 = 0; v2 < 4; ++v2) {
+                std::vector<System> st;
+                st.emplace_back();
+                st[0].get(reg1).value = v1;
+                st[0].get(reg2).value = v2;
+                op.dag(st);  // apply U†
+                op(st);      // apply U — must restore original
+                if (st.size() != 1 || st[0].get(reg1).value != v1 || st[0].get(reg2).value != v2)
+                    return false;
+            }
+        }
+        System::clear();
+        return true;
+    }
 }
 
 class QuantumArithmeticTest : public ::testing::Test {
@@ -170,7 +216,7 @@ TEST(QuantumArithmeticTest, AddConstUIntInPlace)
     Init_Unsafe(reg, 12)(state);
 
     // 12 + 3 = 15, which fits in 4 bits (max 15)
-    Add_ConstUInt("reg", 3)(state);
+    Add_ConstUInt_InPlace("reg", 3)(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t val = getRegValue(state[0], reg, 4);
@@ -210,7 +256,7 @@ TEST(QuantumArithmeticTest, AddMultUIntConstUInt)
     Init_Unsafe(res_reg, 2)(state);
 
     // res += lhs * constant = 2 + 1 * 2 = 4
-    Add_Mult_UInt_ConstUInt("lhs", 2, "res")(state);
+    Add_Mult_UInt_ConstUInt_InPlace("lhs", 2, "res")(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t res = getRegValue(state[0], res_reg, 4);
@@ -292,7 +338,7 @@ TEST(QuantumArithmeticTest, AddAssignAnyIntAnyInt)
     Init_Unsafe(lhs, 8)(state);
     Init_Unsafe(rhs, 6)(state);
 
-    AddAssign_AnyInt_AnyInt("lhs", "rhs")(state);
+    AddAssign_AnyInt_AnyInt_InPlace("lhs", "rhs")(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t lhs_val = getRegValue(state[0], lhs, 4);
@@ -362,8 +408,8 @@ TEST(QuantumArithmeticTest, AddUIntUIntInPlaceUnitarity)
 // Test Add_ConstUInt unitarity with a few constant values
 TEST(QuantumArithmeticTest, AddConstUIntUnitarity)
 {
-    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt>("reg", 1)));
-    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt>("reg", 3)));
+    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt_InPlace>("reg", 1)));
+    EXPECT_TRUE((verify_single_reg_inplace_unitarity<Add_ConstUInt_InPlace>("reg", 3)));
 }
 
 // Test Mult_UInt_ConstUInt unitarity (out-of-place, self-adjoint)
@@ -436,23 +482,45 @@ TEST(QuantumArithmeticTest, AssignUnitarity)
     System::clear();
 }
 
-// Test ShiftLeft/ShiftRight round-trip (they are daggers of each other)
-TEST(QuantumArithmeticTest, ShiftLeftRightRoundTrip)
+// Test ShiftLeft_InPlace/ShiftRight_InPlace round-trip (they are daggers of each other)
+// Tests forward->.dag() to verify real dag() implementation (not no-op)
+// Test ShiftLeft_InPlace forward→dagger round-trip: U then U† restores original
+// ShiftLeft_InPlace::dag() calls ShiftRight_InPlace
+TEST(QuantumArithmeticTest, ShiftLeftInPlaceDagRoundTrip)
 {
     System::clear();
-    auto reg = System::add_register("reg", UnsignedInteger, 3);  // Reduced from 4
+    auto reg = System::add_register("reg", UnsignedInteger, 3);
 
-    // Reduced test: sample values instead of exhaustive
     for (size_t v : {0, 1, 3, 7}) {
         for (size_t shift = 1; shift <= 3; ++shift) {
-            std::vector<System> state;
-            state.emplace_back();
-            state[0].get(reg).value = v;
-            ShiftLeft left_op("reg", shift);
-            ShiftRight right_op("reg", shift);
-            left_op(state);
-            right_op(state);
-            EXPECT_EQ(state[0].get(reg).value, v);
+            std::vector<System> st;
+            st.emplace_back();
+            st[0].get(reg).value = v;
+            ShiftLeft_InPlace left_op("reg", shift);
+            left_op(st);              // apply U (cyclic left shift)
+            left_op.dag(st);          // apply U† (calls ShiftRight_InPlace: cyclic right shift)
+            EXPECT_EQ(st[0].get(reg).value, v) << "v=" << v << " shift=" << shift;
+        }
+    }
+    System::clear();
+}
+
+// Test ShiftRight_InPlace dagger→forward round-trip: U† then U restores original
+// ShiftRight_InPlace::dag() calls ShiftLeft_InPlace
+TEST(QuantumArithmeticTest, ShiftRightInPlaceDagRoundTrip)
+{
+    System::clear();
+    auto reg = System::add_register("reg", UnsignedInteger, 3);
+
+    for (size_t v : {0, 1, 3, 7}) {
+        for (size_t shift = 1; shift <= 3; ++shift) {
+            std::vector<System> st;
+            st.emplace_back();
+            st[0].get(reg).value = v;
+            ShiftRight_InPlace right_op("reg", shift);
+            right_op.dag(st);         // apply U† (calls ShiftLeft_InPlace: cyclic left shift)
+            right_op(st);             // apply U (cyclic right shift) — restores original
+            EXPECT_EQ(st[0].get(reg).value, v) << "v=" << v << " shift=" << shift;
         }
     }
     System::clear();
@@ -461,13 +529,13 @@ TEST(QuantumArithmeticTest, ShiftLeftRightRoundTrip)
 // Test Add_Mult_UInt_ConstUInt unitarity (in-place with explicit dagger)
 TEST(QuantumArithmeticTest, AddMultUIntConstUIntUnitarity)
 {
-    EXPECT_TRUE((verify_inplace_unitarity<Add_Mult_UInt_ConstUInt>("reg1", 1, "reg2")));
+    EXPECT_TRUE((verify_inplace_unitarity<Add_Mult_UInt_ConstUInt_InPlace>("reg1", 1, "reg2")));
 }
 
 // Test AddAssign_AnyInt_AnyInt unitarity (in-place with explicit dagger)
 TEST(QuantumArithmeticTest, AddAssignAnyIntAnyIntUnitarity)
 {
-    EXPECT_TRUE((verify_inplace_unitarity<AddAssign_AnyInt_AnyInt>("reg1", "reg2")));
+    EXPECT_TRUE((verify_inplace_unitarity<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2")));
 }
 
 // Test Compare_UInt_UInt unitarity (out-of-place, self-adjoint)
@@ -508,10 +576,10 @@ TEST(QuantumArithmeticTest, ModMultUIntConstUInt)
     // Initialize reg = 3
     Init_Unsafe(reg, 3)(state);
 
-    // Apply Mod_Mult_UInt_ConstUInt(reg, 7, 0, 15)
+    // Apply Mod_Mult_UInt_ConstUInt_InPlace(reg, 7, 0, 15)
     // x=0 means opnum = 7^1 mod 15 = 7
     // So y = 3 * 7 mod 15 = 21 mod 15 = 6
-    Mod_Mult_UInt_ConstUInt("reg", 7, 0, 15)(state);
+    Mod_Mult_UInt_ConstUInt_InPlace("reg", 7, 0, 15)(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t val = getRegValue(state[0], reg, 4);
@@ -528,12 +596,12 @@ TEST(QuantumArithmeticTest, ModMultUIntConstUIntWithShift)
     // Initialize reg = 1
     Init_Unsafe(reg, 1)(state);
 
-    // Apply Mod_Mult_UInt_ConstUInt(reg, 7, 2, 15)
+    // Apply Mod_Mult_UInt_ConstUInt_InPlace(reg, 7, 2, 15)
     // x=2 means opnum = 7^4 mod 15
     // 7^2 = 49 mod 15 = 4
     // 7^4 = 4^2 mod 15 = 16 mod 15 = 1
     // So y = 1 * 1 mod 15 = 1
-    Mod_Mult_UInt_ConstUInt("reg", 7, 2, 15)(state);
+    Mod_Mult_UInt_ConstUInt_InPlace("reg", 7, 2, 15)(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t val = getRegValue(state[0], reg, 4);
@@ -553,33 +621,85 @@ TEST(QuantumArithmeticTest, ModMultUIntConstUIntControlled)
     Xgate_Bool("ctrl", 0)(state);
 
     // Apply controlled Mod_Mult_UInt_ConstUInt
-    Mod_Mult_UInt_ConstUInt("reg", 7, 0, 15).conditioned_by_all_ones("ctrl")(state);
+    Mod_Mult_UInt_ConstUInt_InPlace("reg", 7, 0, 15).conditioned_by_all_ones("ctrl")(state);
 
     ASSERT_EQ(state.size(), 1);
     uint64_t val = getRegValue(state[0], reg, 4);
     EXPECT_EQ(val, 6);  // 3 * 7 mod 15 = 6
 }
 
-// Test Mod_Mult_UInt_ConstUInt unitarity (in-place with explicit dagger)
-TEST(QuantumArithmeticTest, ModMultUIntConstUIntUnitarity)
+// Test Mod_Mult_UInt_ConstUInt_InPlace unitarity (in-place with explicit dagger)
+// Tests both forward→dag and dag→forward (bidirectional round-trip)
+TEST(QuantumArithmeticTest, ModMultUIntConstUIntInPlaceUnitarity)
 {
     System::clear();
     constexpr size_t MOD_BITS = 4;  // N=15 requires 4 bits
     auto reg = System::add_register("reg", UnsignedInteger, MOD_BITS);
-    Mod_Mult_UInt_ConstUInt op("reg", 7, 0, 15);  // a=7, x=0, N=15
+    Mod_Mult_UInt_ConstUInt_InPlace op("reg", 7, 0, 15);  // a=7, x=0, N=15
 
     for (size_t v = 0; v < 15; ++v) {
-        std::vector<System> state;
-        state.emplace_back();
-        state[0].get(reg).value = v;
-        // Apply forward
-        op(state);
-        uint64_t after_forward = state[0].get(reg).value;
-        // Apply dag
-        op.dag(state);
-        uint64_t after_dag = state[0].get(reg).value;
-        ASSERT_EQ(state.size(), 1);
-        EXPECT_EQ(after_dag, v) << "v=" << v << ", after_forward=" << after_forward;
+        // Forward→dag round-trip
+        {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(reg).value = v;
+            op(state);
+            op.dag(state);
+            ASSERT_EQ(state.size(), 1);
+            EXPECT_EQ(state[0].get(reg).value, v) << "forward→dag: v=" << v;
+        }
+        // Dag→forward round-trip
+        {
+            std::vector<System> state;
+            state.emplace_back();
+            state[0].get(reg).value = v;
+            op.dag(state);
+            op(state);
+            ASSERT_EQ(state.size(), 1);
+            EXPECT_EQ(state[0].get(reg).value, v) << "dag→forward: v=" << v;
+        }
     }
     System::clear();
+}
+
+// Test AddConstUInt_InPlace bidirectional round-trip (forward→dag and dag→forward)
+TEST(QuantumArithmeticTest, AddConstUIntInPlaceUnitarity)
+{
+    EXPECT_TRUE(verify_single_reg_inplace_unitarity<Add_ConstUInt_InPlace>("reg", 1));
+    EXPECT_TRUE(verify_single_reg_inplace_unitarity<Add_ConstUInt_InPlace>("reg", 3));
+}
+
+// Test Add_Mult_UInt_ConstUInt_InPlace bidirectional (forward→dag and dag→forward)
+// mult must be odd to have a modular inverse (guaranteed bijectivity)
+TEST(QuantumArithmeticTest, AddMultUIntConstUIntInPlaceBidirectional)
+{
+    EXPECT_TRUE(verify_inplace_unitarity_fwd_then_dag<Add_Mult_UInt_ConstUInt_InPlace>("reg1", 3, "reg2"));
+    EXPECT_TRUE(verify_inplace_unitarity_dag_then_fwd<Add_Mult_UInt_ConstUInt_InPlace>("reg1", 3, "reg2"));
+}
+
+// Test AddAssign_AnyInt_AnyInt_InPlace bidirectional (forward→dag and dag→forward)
+TEST(QuantumArithmeticTest, AddAssignAnyIntAnyIntInPlaceBidirectional)
+{
+    EXPECT_TRUE(verify_inplace_unitarity_fwd_then_dag<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
+    EXPECT_TRUE(verify_inplace_unitarity_dag_then_fwd<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
+}
+
+// Generalized check_inplace_unitarity: factory lambda, 3-bit lhs + 3-bit res = 6 bits (64 states)
+// Tests both dagger=true and dagger=false, verifies bijectivity via truth table
+TEST(QuantumArithmeticTest, GeneralizedCheckInplaceUnitarity)
+{
+    auto factory = [](std::vector<size_t> ids) -> Add_Mult_UInt_ConstUInt_InPlace {
+        return Add_Mult_UInt_ConstUInt_InPlace{ids[0], 3, ids[1]};  // lhs, mult (odd), res
+    };
+    // {3, 3} = 3-bit lhs + 3-bit res = 6 total bits = 64 states
+    auto tt_fwd = check_inplace_unitarity<Add_Mult_UInt_ConstUInt_InPlace>({3, 3}, factory, false);
+    auto tt_dag = check_inplace_unitarity<Add_Mult_UInt_ConstUInt_InPlace>({3, 3}, factory, true);
+
+    // Truth table must be a bijection: every output index seen exactly once
+    std::vector<bool> seen_fwd(tt_fwd.size(), false);
+    for (size_t out : tt_fwd)
+        EXPECT_FALSE(seen_fwd[out]) << "Non-bijective forward: " << out << " seen twice", seen_fwd[out] = true;
+    std::vector<bool> seen_dag(tt_dag.size(), false);
+    for (size_t out : tt_dag)
+        EXPECT_FALSE(seen_dag[out]) << "Non-bijective dagger: " << out << " seen twice", seen_dag[out] = true;
 }

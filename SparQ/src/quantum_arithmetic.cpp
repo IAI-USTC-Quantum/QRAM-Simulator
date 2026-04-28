@@ -53,7 +53,7 @@ namespace qram_simulator
 		}
 	}
 
-	void ShiftLeft::operator()(std::vector<System>& state) const
+	void ShiftLeft_InPlace::operator()(std::vector<System>& state) const
 	{
 		size_t size = System::size_of(register_1);
 		//change >= to >
@@ -85,7 +85,7 @@ namespace qram_simulator
 	// high(size-d)-low(d)
 	// low-high
 
-	void ShiftRight::operator()(std::vector<System>& state) const
+	void ShiftRight_InPlace::operator()(std::vector<System>& state) const
 	{
 		size_t size = System::size_of(register_1);
 		//change >= to >
@@ -113,6 +113,16 @@ namespace qram_simulator
 		}
 	}
 
+	void ShiftLeft_InPlace::dag(std::vector<System>& state) const
+	{
+		ShiftRight_InPlace{register_1, digit}(state);
+	}
+
+	void ShiftRight_InPlace::dag(std::vector<System>& state) const
+	{
+		ShiftLeft_InPlace{register_1, digit}(state);
+	}
+
 	void Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
@@ -132,7 +142,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Add_Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	void Add_Mult_UInt_ConstUInt_InPlace::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -143,17 +153,20 @@ namespace qram_simulator
 		{
 			auto& s = state[i];
 #endif
-			//Debug_CheckOverflow(res);
-			//Debug_CheckOverflow(lhs);
+			if (ConditionNotSatisfied(s))
+				continue;
+			auto dim = System::size_of(res);
+			auto dim_val = 1ULL << dim;
 			s.get(res).value += (mult_int * s.GetAs(lhs, uint64_t));
-			//Debug_CheckOverflow(res);
+			s.get(res).value %= dim_val;
 		}
-		}
+	}
 
 
-	void Add_Mult_UInt_ConstUInt::dag(std::vector<System>& state) const
+	void Add_Mult_UInt_ConstUInt_InPlace::dag(std::vector<System>& state) const
 	{
 		auto dim = System::size_of(res);
+		auto dim_val = 1ULL << dim;
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -166,14 +179,16 @@ namespace qram_simulator
 #endif
 			if (ConditionNotSatisfied(s))
 				continue;
-
-			s.get(res).value += (pow2(dim) - mult_int * s.GetAs(lhs, uint64_t));
-			s.get(res).value %= pow2(dim);
+			// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
+			auto lhs_val = s.GetAs(lhs, uint64_t);
+			s.get(res).value += (dim_val - lhs_val * mult_int % dim_val);
+			s.get(res).value %= dim_val;
 		}
 	}
 
 
-	Mod_Mult_UInt_ConstUInt::Mod_Mult_UInt_ConstUInt(std::string_view reg_name, uint64_t a_, uint64_t x_, uint64_t N_)
+
+	Mod_Mult_UInt_ConstUInt_InPlace::Mod_Mult_UInt_ConstUInt_InPlace(std::string_view reg_name, uint64_t a_, uint64_t x_, uint64_t N_)
 		: reg(System::get(reg_name)), a(a_), x(x_), N(N_)
 	{
 		if (std::gcd(a, N) > 1)
@@ -184,7 +199,7 @@ namespace qram_simulator
 			opnum = (opnum * opnum) % N;
 	}
 
-	Mod_Mult_UInt_ConstUInt::Mod_Mult_UInt_ConstUInt(size_t reg_id, uint64_t a_, uint64_t x_, uint64_t N_)
+	Mod_Mult_UInt_ConstUInt_InPlace::Mod_Mult_UInt_ConstUInt_InPlace(size_t reg_id, uint64_t a_, uint64_t x_, uint64_t N_)
 		: reg(reg_id), a(a_), x(x_), N(N_)
 	{
 		if (std::gcd(a, N) > 1)
@@ -195,9 +210,9 @@ namespace qram_simulator
 			opnum = (opnum * opnum) % N;
 	}
 
-	void Mod_Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
+	void Mod_Mult_UInt_ConstUInt_InPlace::operator()(std::vector<System>& state) const
 	{
-		profiler _("Mod_Mult_UInt_ConstUInt");
+		profiler _("Mod_Mult_UInt_ConstUInt_InPlace");
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -217,7 +232,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Mod_Mult_UInt_ConstUInt::dag(std::vector<System>& state) const
+	void Mod_Mult_UInt_ConstUInt_InPlace::dag(std::vector<System>& state) const
 	{
 		profiler _("Mod_Mult_UInt_ConstUInt_dag");
 		// Compute modular inverse using extended Euclidean algorithm
@@ -337,7 +352,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Add_ConstUInt::operator()(std::vector<System>& state) const
+	void Add_ConstUInt_InPlace::operator()(std::vector<System>& state) const
 	{
 		auto dim = System::size_of(reg_in);
 
@@ -359,7 +374,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Add_ConstUInt::dag(std::vector<System>& state) const
+	void Add_ConstUInt_InPlace::dag(std::vector<System>& state) const
 	{
 		auto dim = System::size_of(reg_in);
 
@@ -458,19 +473,19 @@ namespace qram_simulator
 		}
 	}
 
-	void AddAssign_AnyInt_AnyInt::_operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
+	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
 	{
 		lhs += rhs;
 		lhs %= pow2(l_size);
 	}
 
-	void AddAssign_AnyInt_AnyInt::_operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
+	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
 	{
 		lhs -= rhs;
 		lhs %= pow2(l_size);
 	}
 
-	void AddAssign_AnyInt_AnyInt::operator()(std::vector<System>& state) const
+	void AddAssign_AnyInt_AnyInt_InPlace::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -490,7 +505,7 @@ namespace qram_simulator
 		}
 	}
 
-	void AddAssign_AnyInt_AnyInt::dag(std::vector<System>& state) const
+	void AddAssign_AnyInt_AnyInt_InPlace::dag(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
