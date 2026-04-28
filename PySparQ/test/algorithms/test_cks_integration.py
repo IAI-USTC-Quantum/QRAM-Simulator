@@ -383,7 +383,6 @@ class TestQuantumWalkFidelity:
     - 量子游走态与理论 Chebyshev 态的 fidelity >= 0.999
     """
 
-    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_quantum_walk_chebyshev_fidelity(self, fresh_system):
         """测试量子游走态与 Chebyshev 态的一致性。
 
@@ -414,7 +413,6 @@ class TestQuantumWalkFidelity:
             # fidelity = get_fidelity(state_amps, target_amps)
             # assert fidelity >= 0.999, f"Step {step}: fidelity = {fidelity}"
 
-    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_lcu_linear_solver_fidelity(self, fresh_system):
         """测试 LCU 线性求解器的 fidelity。
 

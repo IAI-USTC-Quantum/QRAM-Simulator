@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "qram_circuit_qutrit.h"
 #include "global_macros.h"
 #include "cuda/cuda_utils.cuh"
@@ -223,6 +225,35 @@ namespace qram_simulator
 
 		/** @brief 寄存器信息映射表 */
 		inline static std::vector<StateInfoType> name_register_map;
+
+		/** @brief 名称→索引的哈希索引（O(1) 查找） */
+		inline static std::unordered_map<std::string, size_t> name_to_index;
+
+		/** @brief 哈希索引是否有效（MoveRegister 等操作会使其失效） */
+		inline static bool name_index_valid = true;
+
+		/** @brief 注册名称到哈希索引 */
+		inline static void register_name(std::string name, size_t idx) {
+			name_to_index.emplace(std::move(name), idx);
+		}
+
+		/** @brief 从哈希索引中移除名称 */
+		inline static void unregister_name(std::string_view name) {
+			name_to_index.erase(std::string(name));
+		}
+
+		/** @brief 使哈希索引失效（MoveRegister 等操作后调用） */
+		inline static void invalidate_name_index() { name_index_valid = false; }
+
+		/** @brief 重建哈希索引（惰性触发） */
+		inline static void rebuild_name_index() {
+			name_to_index.clear();
+			for (size_t i = 0; i < name_register_map.size(); ++i) {
+				if (status_of(i)) {
+					name_to_index.emplace(std::string(name_of(i)), i);
+				}
+			}
+		}
 
 		/** @brief 寄存器状态位图 */
 		inline static uint64_t reg_status_bitmap = 0;

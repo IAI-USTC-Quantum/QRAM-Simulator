@@ -712,7 +712,8 @@ class TOperator(ControllableOperatorMixin):
             # Use quantum binary search to find k in the row's sorted column list
             # The search finds the position s_j such that columns[s_j] = k
             qbs = QuantumBinarySearch(
-                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
+                self.addr_size, self.data_size
             )
             qbs(state)
 
@@ -737,7 +738,8 @@ class TOperator(ControllableOperatorMixin):
 
             # Inverse binary search
             qbs = QuantumBinarySearch(
-                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg
+                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
+                self.addr_size, self.data_size
             )
             qbs(state)
 
