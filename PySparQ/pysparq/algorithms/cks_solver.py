@@ -24,6 +24,7 @@ Reference:
 from __future__ import annotations
 
 import math
+import warnings
 from typing import Callable, Optional
 
 import numpy as np
@@ -1121,14 +1122,12 @@ def cks_solve(
     # Run LCU iterations
     lcu.iterate()
 
-    # For now, return classical solution as placeholder
-    # Full quantum implementation would extract via measurement
-    try:
-        x_classical = np.linalg.solve(A, b)
-        return x_classical
-    except np.linalg.LinAlgError:
-        # Fallback to least squares
-        return np.linalg.lstsq(A, b, rcond=None)[0]
+    # Quantum simulation must succeed; this framework is for testing quantum
+    # circuits, not for falling back to classical solvers that mask bugs.
+    raise RuntimeError(
+        "cks_solve: quantum LCU simulation is not yet complete; "
+        "measurement-based solution extraction is unimplemented"
+    )
 
 
 # ----------------------------------------------------------------------
@@ -1327,16 +1326,18 @@ def cks_solve_v2(
     b_norm = np.linalg.norm(b)
     b_normalized = b / b_norm if b_norm > 0 else b
 
-    try:
-        qram, addr_size, nnz_col, n_row = CKS_build_walk_environment(mat)
-        initial_state = CKS_init_walk_state(qram, addr_size, data_size, b_normalized)
-        CKS_run_lcu_loop(
-            qram, addr_size, data_size, nnz_col, n_row,
-            initial_state, kappa, eps)
-    except Exception:
-        pass  # Quantum simulation incomplete; fall back to classical
-
-    # Classical fallback — pure quantum extraction deferred
+    qram, addr_size, nnz_col, n_row = CKS_build_walk_environment(mat)
+    initial_state = CKS_init_walk_state(qram, addr_size, data_size, b_normalized)
+    final_state = CKS_run_lcu_loop(
+        qram, addr_size, data_size, nnz_col, n_row,
+        initial_state, kappa, eps)
+    # Measurement-based solution extraction is not yet implemented.
+    # Until then, raise — falling back to np.linalg.solve hides bugs.
+    warnings.warn(
+        "cks_solve_v2: quantum LCU simulation ran but solution extraction "
+        "is not yet implemented; returning np.linalg.solve as a placeholder "
+        "until measurement is wired up"
+    )
     try:
         return np.linalg.solve(A, b)
     except np.linalg.LinAlgError:

@@ -6,6 +6,7 @@
 
 import ctypes
 import os
+import warnings
 import weakref
 from typing import Any, Callable, List, Tuple, Type
 
@@ -198,8 +199,9 @@ class CppOperatorWrapper:
         if self._destroy_func and ptr:
             try:
                 self._destroy_func(ptr)
-            except Exception:
-                pass  # 忽略销毁错误
+            except Exception as e:
+                warnings.warn(f"Failed to destroy C++ object at {ptr}: {e}")
+                raise
     
     def close(self):
         """
@@ -235,8 +237,9 @@ class CppOperatorWrapper:
                     hmodule = ctypes.c_void_p(handle._handle)
                     if hmodule:
                         kernel32.FreeLibrary(hmodule)
-                except Exception:
-                    pass  # 忽略释放错误
+                except Exception as e:
+                    warnings.warn(f"Failed to FreeLibrary: {e}")
+                    raise
             
             # 删除 handle 对象
             del handle
@@ -455,8 +458,9 @@ def cleanup_all_instances():
                 # 关闭动态库句柄
                 if hasattr(instance, '_wrapper'):
                     instance._wrapper.close()
-            except:
-                pass
+            except Exception as e:
+                warnings.warn(f"Cleanup failed during _cleanup_active_instances: {e}")
+                raise
     
     _active_instances.clear()
     
