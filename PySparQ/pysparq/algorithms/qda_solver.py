@@ -24,6 +24,7 @@ Reference:
 from __future__ import annotations
 
 import math
+import warnings
 from typing import Callable
 
 import numpy as np
@@ -703,13 +704,12 @@ def qda_solve(
     ps.RemoveRegister(anc_UA)(state)
     ps.RemoveRegister(main_reg)(state)
 
-    # Extract solution via measurement
-    # For now, return classical solution as reference
-    try:
-        x_classical = np.linalg.solve(A, b)
-        return x_classical
-    except np.linalg.LinAlgError:
-        return np.linalg.lstsq(A, b, rcond=None)[0]
+    # Quantum simulation must succeed; this framework is for testing quantum
+    # circuits, not for falling back to classical solvers that mask bugs.
+    raise RuntimeError(
+        "qda_solve: quantum walk simulation ran but measurement-based "
+        "solution extraction is not yet implemented"
+    )
 
 
 def create_qda_demo() -> str:

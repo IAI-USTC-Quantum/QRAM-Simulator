@@ -71,3 +71,22 @@ def simple_linear_system():
         return A, b, x_expected
 
     return _create
+
+
+@pytest.fixture
+def fixed_seed_system(fresh_system):
+    """Fresh system with fixed random seed for deterministic regression tests.
+
+    Mirrors the C++ ``random_engine::set_seed(seed)`` pattern from
+    test/CPUTest/CommonTest/CorrectnessTest_Common.inl.
+
+    All quantum simulation in the returned context uses np.random.seed(42),
+    making tests reproducible across runs.  Resets the C++ SparseState system
+    between tests via the ``fresh_system`` fixture from the root conftest.py.
+    """
+    import pysparq as ps
+
+    np.random.seed(42)
+    yield fresh_system
+    ps.System.clear()
+    np.random.seed(None)  # Restore random state

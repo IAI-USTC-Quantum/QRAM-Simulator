@@ -14,6 +14,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import warnings
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -508,8 +509,9 @@ def clear_cache(cache_dir: Optional[str] = None) -> int:
             if os.path.isfile(filepath):
                 os.remove(filepath)
                 count += 1
-        except Exception:
-            pass
+        except Exception as e:
+            warnings.warn(f"Failed to remove cached file {filepath}: {e}")
+            raise
 
     return count
 
