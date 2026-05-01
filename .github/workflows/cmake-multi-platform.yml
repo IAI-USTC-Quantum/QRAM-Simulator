@@ -24,26 +24,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Linux + GCC + C++17
           - name: "Ubuntu + GCC + C++17"
             os: ubuntu-24.04
             build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
             cpp_standard: 17
-          # Linux + GCC + C++20
           - name: "Ubuntu + GCC + C++20"
             os: ubuntu-24.04
             build_type: Release
             c_compiler: gcc
             cpp_compiler: g++
             cpp_standard: 20
-          # Windows + MSVC
           - name: "Windows + MSVC"
             os: windows-latest
             build_type: Release
