@@ -177,33 +177,6 @@ Attributes:
 	        .def(py::init<std::string_view, std::string_view>())
 	        .def(py::init<size_t, size_t>());
 
-	    using CondRot_General_Bool_Cpp = CondRot_General_Bool_fast<std::function<u22_t(size_t)>>;
-
-	    py::class_<CondRot_General_Bool_Cpp, BaseOperator>(m, "CondRot_General_Bool_fast")
-        .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
-                      {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
-					};
-				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
-             py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
-        .def(py::init([](size_t reg_in, size_t reg_out, py::function py_func)
-                      {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
-					};
-				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
-             py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
-
-        //.def_static("_is_diagonal", &CondRot_General_Bool_Cpp::_is_diagonal)
-        //.def_static("_is_off_diagonal", &CondRot_General_Bool_Cpp::_is_off_diagonal)
-
-        .def("operate_pair", &CondRot_General_Bool_Cpp::operate_pair)
-	        .def("operate_alone_zero", &CondRot_General_Bool_Cpp::operate_alone_zero)
-	        .def("operate_alone_one", &CondRot_General_Bool_Cpp::operate_alone_one);
-
     /* dark_magic.h */
     BIND_SELF_ADJOINT_OPERATOR(Normalize, R"doc(
 Normalize the quantum state.

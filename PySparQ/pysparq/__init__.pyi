@@ -103,7 +103,6 @@ from pysparq._core import (
     U3gate_Bool,
     CondRot_Rational_Bool,
     CondRot_Fixed_Bool,
-    CondRot_General_Bool_fast,
     CondRot_General_Bool_QW_fast,
     GetQWRotateAngle_Int_Int_Int,
     PlusOneAndOverflow,
