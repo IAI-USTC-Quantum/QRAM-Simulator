@@ -305,7 +305,7 @@
 <ul class="simple">
 <li><p>高效模拟大规模量子系统的工具（利用稀疏态表示）</p></li>
 <li><p>精确建模 QRAM 电路的行为和噪声影响</p></li>
-<li><p>支持 GPU 加速以获得更高的计算性能</p></li>
+<li><p>CUDA/GPU 后端保留在代码中，但当前 CMake 暂时屏蔽 GPU 构建，默认走 CPU-only 路径</p></li>
 <li><p>提供简洁的 Python API 便于快速原型开发</p></li>
 </ul>
 </section>
@@ -383,7 +383,7 @@
 <li><p>噪声模型：支持去极化和退相干噪声</p></li>
 </ul>
 </li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">CuQRAMCircuit</span></code></strong>（CUDA 版本）：GPU 加速实现</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">CuQRAMCircuit</span></code></strong>（CUDA 版本）：代码保留，当前 CMake 暂时屏蔽 GPU 构建</p></li>
 </ul>
 </section>
 <section id="pysparq-python">

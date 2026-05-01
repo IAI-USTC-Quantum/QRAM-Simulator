@@ -7,8 +7,10 @@ var hierarchy =
       [ "qram_simulator::Add_ConstUInt_InPlace", "structqram__simulator_1_1Add__ConstUInt__InPlace.html", null ],
       [ "qram_simulator::Add_Mult_UInt_ConstUInt_InPlace", "structqram__simulator_1_1Add__Mult__UInt__ConstUInt__InPlace.html", null ],
       [ "qram_simulator::Add_UInt_UInt_InPlace", "structqram__simulator_1_1Add__UInt__UInt__InPlace.html", null ],
-      [ "qram_simulator::CondRot_General_Bool< Callable >", "structqram__simulator_1_1CondRot__General__Bool.html", null ],
-      [ "qram_simulator::CondRot_Rational_Bool", "structqram__simulator_1_1CondRot__Rational__Bool.html", null ],
+      [ "qram_simulator::CondRot_General_Bool_fast< Callable >", "structqram__simulator_1_1CondRot__General__Bool__fast.html", null ],
+      [ "qram_simulator::CondRot_Rational_Bool", "structqram__simulator_1_1CondRot__Rational__Bool.html", [
+        [ "qram_simulator::CondRot_Fixed_Bool", "structqram__simulator_1_1CondRot__Fixed__Bool.html", null ]
+      ] ],
       [ "qram_simulator::GlobalPhase_Int", "structqram__simulator_1_1GlobalPhase__Int.html", null ],
       [ "qram_simulator::Mod_Mult_UInt_ConstUInt_InPlace", "structqram__simulator_1_1Mod__Mult__UInt__ConstUInt__InPlace.html", null ],
       [ "qram_simulator::ModuleInheritance_Test", "structqram__simulator_1_1ModuleInheritance__Test.html", null ],

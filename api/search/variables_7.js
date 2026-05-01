@@ -4,7 +4,7 @@ var searchData=
   ['id1_1',['id1',['../structqram__simulator_1_1Swap__General__General.html#a2e55f8b3e218a095851ad8c726cf8d05',1,'qram_simulator::Swap_General_General::id1'],['../structqram__simulator_1_1SortByKey2.html#aa09bf5733ae89b9a4e949313a57268b3',1,'qram_simulator::SortByKey2::id1']]],
   ['id2_2',['id2',['../structqram__simulator_1_1Swap__General__General.html#ac0fe5cd5cc570265d2db870028b639cf',1,'qram_simulator::Swap_General_General::id2'],['../structqram__simulator_1_1SortByKey2.html#a0566aace30a971f9f59e7c7354bfa5da',1,'qram_simulator::SortByKey2::id2']]],
   ['ids_3',['ids',['../structqram__simulator_1_1ZeroConditionalPhaseFlip.html#adc4f35be36d13321f7949fcc6696c1e2',1,'qram_simulator::ZeroConditionalPhaseFlip']]],
-  ['in_5fid_4',['in_id',['../structqram__simulator_1_1CondRot__General__Bool.html#af1c9f6cefeaebc8ef18dd8f183ebc462',1,'qram_simulator::CondRot_General_Bool']]],
+  ['in_5fid_4',['in_id',['../structqram__simulator_1_1CondRot__General__Bool__fast.html#a8dc6977e9675c9666d3d021fe3a3d92b',1,'qram_simulator::CondRot_General_Bool_fast']]],
   ['input_5fids_5',['input_ids',['../structqram__simulator_1_1CustomArithmetic.html#ab279fb551ee0c48f71884321355c5951',1,'qram_simulator::CustomArithmetic']]],
   ['input_5fsz_6',['input_sz',['../structqram__simulator_1_1QRAMInputGenerator.html#af8f13dbab97e20e417fda1a41e7b3c6b',1,'qram_simulator::QRAMInputGenerator']]],
   ['inverse_7',['inverse',['../structqram__simulator_1_1Reflection__Bool.html#a199ff3542c03fd8e7ccc8bf0c1986fee',1,'qram_simulator::Reflection_Bool']]],

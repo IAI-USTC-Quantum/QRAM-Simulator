@@ -1,0 +1,20 @@
+PySparQ.pysparq.test
+====================
+
+.. py:module:: PySparQ.pysparq.test
+
+.. autoapi-nested-parse::
+
+   Internal test helpers for PySparQ's in-tree tests.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/PySparQ/pysparq/test/conftest/index
+
+

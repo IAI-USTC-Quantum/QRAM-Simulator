@@ -164,8 +164,10 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1Compare__UInt__UInt.html">Compare_UInt_UInt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">无符号整数比较操作（Out-of-place）  <a href="structqram__simulator_1_1Compare__UInt__UInt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1CondRot__General__Bool.html">CondRot_General_Bool</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">通用条件旋转门（单比特）  <a href="structqram__simulator_1_1CondRot__General__Bool.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1CondRot__Fixed__Bool.html">CondRot_Fixed_Bool</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1CondRot__General__Bool__fast.html">CondRot_General_Bool_fast</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">通用条件旋转门（单比特）  <a href="structqram__simulator_1_1CondRot__General__Bool__fast.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structqram__simulator_1_1CondRot__Rational__Bool.html">CondRot_Rational_Bool</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">有理数条件旋转门（单比特）  <a href="structqram__simulator_1_1CondRot__Rational__Bool.html#details">More...</a><br /></td></tr>
@@ -414,6 +416,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aa542fbc9f15a8d96ddf2283cfce7e2a8" id="r_aa542fbc9f15a8d96ddf2283cfce7e2a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#aa542fbc9f15a8d96ddf2283cfce7e2a8">StateInfoType</a> = std::tuple&lt; std::string, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">StateStorageType</a>, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a>, <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">bool</a> &gt;</td></tr>
 <tr class="memdesc:aa542fbc9f15a8d96ddf2283cfce7e2a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">状态信息类型  <br /></td></tr>
 <tr class="separator:aa542fbc9f15a8d96ddf2283cfce7e2a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89e94042d5b23dc8e24253c29df700d2" id="r_a89e94042d5b23dc8e24253c29df700d2"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">typename</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Callable</a>  = std::function&lt;u22_t(uint64_t)&gt;&gt; </td></tr>
+<tr class="memitem:a89e94042d5b23dc8e24253c29df700d2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">using</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#a89e94042d5b23dc8e24253c29df700d2">CondRot_General_Bool</a> = <a class="el" href="structqram__simulator_1_1CondRot__General__Bool__fast.html">CondRot_General_Bool_fast</a>&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Callable</a> &gt;</td></tr>
+<tr class="separator:a89e94042d5b23dc8e24253c29df700d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a481611db111975e01bdc1f4e4665940f" id="r_a481611db111975e01bdc1f4e4665940f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceqram__simulator.html#a481611db111975e01bdc1f4e4665940f">GenericArithmetic</a> = std::function&lt; std::vector&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt;(<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">const</a> std::vector&lt; <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">size_t</a> &gt; &amp;)&gt;</td></tr>
 <tr class="memdesc:a481611db111975e01bdc1f4e4665940f"><td class="mdescLeft">&#160;</td><td class="mdescRight">通用算术函数类型  <br /></td></tr>
 <tr class="separator:a481611db111975e01bdc1f4e4665940f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -601,6 +606,22 @@ Variables</h2></td></tr>
 <div class="textblock"><p>QRAM 稀疏态模拟器命名空间 </p>
 <p>包含所有量子计算模拟相关的类、函数和数据结构 </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="a89e94042d5b23dc8e24253c29df700d2" name="a89e94042d5b23dc8e24253c29df700d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89e94042d5b23dc8e24253c29df700d2">&#9670;&#160;</a></span>CondRot_General_Bool</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">typename</a> <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Callable</a>  = std::function&lt;u22_t(uint64_t)&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">using</a> <a class="el" href="namespaceqram__simulator.html#a89e94042d5b23dc8e24253c29df700d2">qram_simulator::CondRot_General_Bool</a> = <a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">typedef</a> <a class="el" href="structqram__simulator_1_1CondRot__General__Bool__fast.html">CondRot_General_Bool_fast</a>&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fbfd20eec0d0ee2be">Callable</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a481611db111975e01bdc1f4e4665940f" name="a481611db111975e01bdc1f4e4665940f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a481611db111975e01bdc1f4e4665940f">&#9670;&#160;</a></span>GenericArithmetic</h2>
 
@@ -1269,7 +1290,7 @@ template&lt;<a class="el" href="namespaceqram__simulator.html#a851129def8ccc68fb
 </div><div class="memdoc">
 
 <p>比较两个系统是否相等（排除指定键） </p>
-<p>用于 <a class="el" href="structqram__simulator_1_1CondRot__General__Bool.html" title="通用条件旋转门（单比特）">CondRot_General_Bool</a>, CondRot_General_Bool_QW, <a class="el" href="structqram__simulator_1_1Hadamard__Int.html" title="整数 Hadamard 门">Hadamard_Int</a> 等操作 </p><dl class="params"><dt>Parameters</dt><dd>
+<p>用于 CondRot_General_Bool, CondRot_General_Bool_QW, <a class="el" href="structqram__simulator_1_1Hadamard__Int.html" title="整数 Hadamard 门">Hadamard_Int</a> 等操作 </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">a</td><td>第一个系统 </td></tr>
     <tr><td class="paramname">b</td><td>第二个系统 </td></tr>

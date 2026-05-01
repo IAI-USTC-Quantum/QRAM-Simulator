@@ -1,0 +1,27 @@
+PySparQ.pysparq.test.conftest
+=============================
+
+.. py:module:: PySparQ.pysparq.test.conftest
+
+.. autoapi-nested-parse::
+
+   Shared helpers imported by PySparQ's algorithm integration tests.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   PySparQ.pysparq.test.conftest.state_to_amplitude_dict
+
+
+Module Contents
+---------------
+
+.. py:function:: state_to_amplitude_dict(state: pysparq.SparseState, register: str) -> dict[int, complex]
+
+   Aggregate amplitudes by the selected register value.
+
+
