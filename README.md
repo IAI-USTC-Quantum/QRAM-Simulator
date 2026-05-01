@@ -10,6 +10,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub](https://img.shields.io/badge/GitHub-IAI--USTC--Quantum%2FQRAM--Simulator-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/QRAM-Simulator/)
+[![Quantum | AI](https://img.shields.io/badge/Quantum_Computing-AI-00e5ff?style=flat-square)](https://iai-ustc-quantum.github.io/)
 [![CMake on multiple platforms](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml)
 
 > **稀疏态量子模拟器，支持 Register Level Programming**
@@ -1103,21 +1104,20 @@ qram.set_noise_model("depolarizing", 1e-4)  # 对应 C++ qram->set_noise_models(
 ```
 这对评估真实硬件上的算法行为非常重要。
 
-## 贡献者
+## About Us
 
-本项目由 **USTC-IAI 量子计算团队** 开发。
+本项目由 **[IAI-USTC Quantum](https://github.com/IAI-USTC-Quantum)** 开发。
 
-主要开发者：
-- Agony5757 (chenzhaoyun@iai.ustc.edu.cn)
-- RichardSun
-- Itachixc
-- YunJ1e
-- cilysad
-- TMYTiMidlY
+- **GitHub Organization**: [IAI-USTC-Quantum](https://github.com/IAI-USTC-Quantum) — 查看团队的所有开源项目
+- **Documentation**: [iai-ustc-quantum.github.io](https://iai-ustc-quantum.github.io/) — 团队文档与项目主页
+
+IAI-USTC Quantum 是合肥综合性国家科学中心人工智能研究院（Institute of Artificial Intelligence, Hefei Comprehensive National Science Center）量子人工智能团队。
+
+主要开发者：Agony5757 (chenzhaoyun@iai.ustc.edu.cn)、RichardSun、Itachixc、YunJ1e、cilysad、TMYTiMidlY
 
 ## 相关项目
 
-- [QPanda-lite](https://github.com/Agony5757/QPanda-lite) - NISQ 量子计算工具包
+- [UnifiedQuantum](https://github.com/IAI-USTC-Quantum/UnifiedQuantum) - 统一量子计算框架
 
 ## 许可证
 
