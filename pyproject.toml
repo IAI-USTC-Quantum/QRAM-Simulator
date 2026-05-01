@@ -56,7 +56,6 @@ skip = ["*-musllinux_*", "*-win32", "*-macos*"]
 archs = ["x86_64"]
 before-all = "yum install -y libgomp"
 before-build = "bash {project}/.cibuildwheel-hooks/pre-hook.sh"
-after-build = "bash {project}/.cibuildwheel-hooks/post-hook.sh"
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]
