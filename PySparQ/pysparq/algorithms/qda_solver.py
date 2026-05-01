@@ -253,10 +253,8 @@ class BlockEncodingHs(ControllableOperatorMixin):
         # Hadamard on anc_2
         ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
 
-        # Apply block encoding of A
+        # Apply block encoding of A (first pass)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2])(state)
-
-        # Additional operations...
         ps.Xgate_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
         ps.Reflection_Bool(self.anc_2, True).conditioned_by_all_ones(self.anc_1)(state)
 
@@ -283,9 +281,42 @@ class BlockEncodingHs(ControllableOperatorMixin):
         ps.Hadamard_Bool(self.anc_3)(state)
 
     def dag(self, state: ps.SparseState) -> None:
-        """Apply inverse block encoding."""
-        # Inverse of the above circuit
-        raise NotImplementedError("BlockEncodingHs::dag requires full implementation")
+        """Apply inverse block encoding — mirrors C++ Block_Encoding_Hs::impl_dag.
+
+        C++ impl_dag (qda_fundamental.h:98-130):
+        Hadamard → enc_b.dag → reflection → enc_b → anc_4 sequence →
+        enc_A → reflection(anc_2) → X(anc_1) → enc_A.dag →
+        anc_4 sequence → enc_b.dag → reflection → enc_b → Hadamard
+        """
+        ps.Hadamard_Bool(self.anc_3)(state)
+        self.enc_b.dag(state)
+        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
+            [self.anc_1, self.anc_3, self.anc_4]
+        )(state)
+        ps.Xgate_Bool(self.anc_1, 0)(state)
+        self.enc_b(state)
+        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
+        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
+        ps.Xgate_Bool(self.anc_4, 0)(state)
+        self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2])(state)
+        ps.Reflection_Bool(self.anc_2, True).conditioned_by_all_ones(self.anc_1)(state)
+        ps.Xgate_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
+        self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2]).dag(state)
+        ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
+        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
+        ps.Xgate_Bool(self.anc_4, 0)(state)
+        self.enc_b.dag(state)
+        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
+            [self.anc_1, self.anc_3, self.anc_4]
+        )(state)
+        ps.Xgate_Bool(self.anc_1, 0)(state)
+        self.enc_b(state)
+        ps.Hadamard_Bool(self.anc_3)(state)
 
 
 class BlockEncodingHsPD:
@@ -594,9 +625,11 @@ def classical_to_quantum(
 
 # Import factory function from __init__.py
 from . import BlockEncoding
+from .block_encoding import BlockEncodingTridiagonal
 
 # Import StatePreparation from state_preparation module
-from .state_preparation import StatePreparation
+from .state_preparation import StatePreparation, StatePrepViaQRAM
+from .qram_utils import make_vector_tree, scale_and_convert_vector
 
 
 # ==============================================================================
@@ -608,7 +641,7 @@ def qda_solve(
     A: np.ndarray,
     b: np.ndarray,
     kappa: float | None = None,
-    p: float = 0.5,
+    p: float = 1.3,
     eps: float = 0.01,
     step_rate: float = 1.0,
 ) -> np.ndarray:
@@ -639,70 +672,51 @@ def qda_solve(
         the solution extraction. A full quantum implementation
         would use measurement and post-selection.
     """
-    # Clear previous state
+    A_arr = np.asarray(A, dtype=np.float64)
+    b_arr = np.asarray(b, dtype=np.float64)
+
     ps.System.clear()
 
-    # Classical preprocessing
-    A_q, b_q, recover = classical_to_quantum(A, b)
-
-    # Estimate condition number if not provided
+    A_q, b_q, recover = classical_to_quantum(A_arr, b_arr)
     if kappa is None:
         try:
-            kappa = np.linalg.cond(A_q)
+            kappa = float(np.linalg.cond(A_q))
         except np.linalg.LinAlgError:
             kappa = 10.0
 
-    # Compute step count
-    # From the paper: O(κ log(κ/ε)) steps
-    STEP_CONSTANT = 2305
-    steps = int(step_rate * STEP_CONSTANT * kappa)
-    if steps % 2 != 0:
-        steps += 1
-
-    print(f"QDA parameters: kappa={kappa:.2f}, p={p}, eps={eps}, steps={steps}")
-
-    # Create block encoding and state preparation
     n = A_q.shape[0]
-    n_bits = int(math.log2(n)) + 1
-
-    enc_A = BlockEncoding(A_q)
-    enc_b = StatePreparation(b_q)
-
-    # Create quantum state
-    state = ps.SparseState()
-
-    # Add registers
+    n_bits = int(math.log2(n))
     main_reg = "main"
     anc_UA = "anc_UA"
     anc_1, anc_2, anc_3, anc_4 = "anc_1", "anc_2", "anc_3", "anc_4"
 
+    state = ps.SparseState()
     ps.AddRegister(main_reg, ps.UnsignedInteger, n_bits)(state)
-    ps.AddRegister(anc_UA, ps.UnsignedInteger, n_bits)(state)
+    ps.AddRegister(anc_UA, ps.UnsignedInteger, 2)(state)
     ps.AddRegister(anc_1, ps.Boolean, 1)(state)
     ps.AddRegister(anc_2, ps.Boolean, 1)(state)
     ps.AddRegister(anc_3, ps.Boolean, 1)(state)
     ps.AddRegister(anc_4, ps.Boolean, 1)(state)
 
-    # Initialize state with |b>
-    # ... state preparation ...
+    enc_A = BlockEncoding(A_q.real, main_reg=main_reg, anc_UA=anc_UA)
+    prep_data_size = 32
+    prep_rational_size = min(50, prep_data_size * 2)
+    b_encoded = scale_and_convert_vector(
+        b_q.real, prep_data_size - 2, prep_data_size, from_matrix=False
+    )
+    qram_b = ps.QRAMCircuit_qutrit(
+        n_bits + 1, prep_data_size, make_vector_tree(b_encoded, prep_data_size)
+    )
+    enc_b = StatePrepViaQRAM(qram_b, main_reg, prep_data_size, prep_rational_size)
+    steps = max(1, int(step_rate * max(1.0, kappa) * max(1.0, math.log(max(kappa / eps, math.e)))))
 
-    # Apply walk sequence at discretization points
-    # s values: s_0 = 0, s_1, s_2, ..., s_N = 1
-    for i in range(min(10, steps)):  # Limit iterations for demo
-        s = i / max(1, steps - 1)
-        walk = WalkS(
+    for i in range(steps):
+        s = i / steps
+        WalkS(
             enc_A, enc_b, main_reg, anc_UA, anc_1, anc_2, anc_3, anc_4,
-            s, kappa, p
-        )
-        # walk(state)  # Would apply walk in full implementation
-
-    # Clean up registers
-    ps.RemoveRegister(anc_4)(state)
-    ps.RemoveRegister(anc_3)(state)
-    ps.RemoveRegister(anc_2)(state)
-    ps.RemoveRegister(anc_1)(state)
-    ps.RemoveRegister(anc_UA)(state)
-    ps.RemoveRegister(main_reg)(state)
+            s, kappa, p,
+        )(state)
+        ps.ClearZero()(state)
 
     # Quantum simulation must succeed; this framework is for testing quantum
     # circuits, not for falling back to classical solvers that mask bugs.

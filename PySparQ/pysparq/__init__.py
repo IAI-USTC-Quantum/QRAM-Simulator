@@ -151,6 +151,10 @@ from pysparq._core import (
     U3gate_Bool,
     CondRot_Rational_Bool,
     CondRot_General_Bool,
+    CondRot_General_Bool_QW,
+    QuantumBinarySearchFast,
+    GetRowAddr,
+    GetDataAddr,
     PlusOneAndOverflow,
     # Utilities
     split_systems,

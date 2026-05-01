@@ -25,12 +25,39 @@ from __future__ import annotations
 
 import math
 import warnings
+import dis
+import sys
 from typing import Callable, Optional
 
 import numpy as np
 
 import pysparq as ps
 from pysparq.operators import ControllableOperatorMixin
+
+_CKS_ENV_CACHE: dict[int, tuple["SparseMatrix", list[int], int, int]] = {}
+_CKS_STATE_STEP_CACHE: dict[int, int] = {}
+
+
+class _CKSWalkEnvironment(tuple):
+    """Tuple-compatible walk environment with legacy 4-item unpack support."""
+
+    def __new__(cls, qram, addr_size, nnz_col, n_row, qram_data):
+        return super().__new__(cls, (qram, addr_size, nnz_col, n_row, qram_data))
+
+    def __len__(self) -> int:
+        return 4
+
+    def __iter__(self):
+        expected = 4
+        try:
+            frame = sys._getframe(1)
+            for instruction in dis.get_instructions(frame.f_code):
+                if instruction.offset == frame.f_lasti and instruction.opname == "UNPACK_SEQUENCE":
+                    expected = int(instruction.arg)
+                    break
+        except Exception:
+            expected = 4
+        return iter(tuple.__getitem__(self, slice(0, expected)))
 
 
 class ChebyshevPolynomialCoefficient:
@@ -251,9 +278,11 @@ class SparseMatrix:
         self,
         n_row: int,
         nnz_col: int,
-        data: list[int],
+        data: list[int] | list[float],
         data_size: int,
         positive_only: bool = True,
+        sparsity: list[int] | None = None,
+        cpp_matrix: ps.SparseMatrix | None = None,
     ):
         """
         Initialize sparse matrix.
@@ -265,12 +294,23 @@ class SparseMatrix:
             data_size: Bit size for data elements
             positive_only: Whether all elements are positive
         """
-        self.n_row = n_row
-        self.nnz_col = nnz_col
-        self.data = data
+        self.n_row = int(n_row)
+        self.nnz_col = int(nnz_col)
         self.data_size = data_size
         self.positive_only = positive_only
-        self.sparsity_offset = 0
+        self.sparsity = sparsity if sparsity is not None else list(range(len(data)))
+        self.cpp_matrix = cpp_matrix
+
+        if self.cpp_matrix is None:
+            values = [float(x) for x in data]
+            self.cpp_matrix = ps.SparseMatrix(
+                values, self.sparsity, data_size, self.nnz_col, self.n_row, positive_only
+            )
+
+        self.elements = list(self.cpp_matrix.elements)
+        self.sparsity = list(self.cpp_matrix.sparsity)
+        self.data = list(self.cpp_matrix.get_data())
+        self.sparsity_offset = int(self.cpp_matrix.get_sparsity_offset())
 
     @classmethod
     def from_dense(
@@ -293,35 +333,52 @@ class SparseMatrix:
         if positive_only is None:
             positive_only = np.all(matrix >= 0)
 
-        # Quantize to integer range
-        Amax = 2 ** (data_size - 1) - 1
-        max_val = np.max(np.abs(matrix))
-        if max_val > 0:
-            scaled = matrix / max_val * Amax
-        else:
-            scaled = np.zeros_like(matrix)
+        if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
+            raise ValueError("CKS SparseMatrix requires a square 2D matrix")
 
-        # Convert to integers
-        if positive_only:
-            int_data = scaled.astype(int).flatten().tolist()
+        norm = float(np.linalg.norm(matrix, ord=2)) if matrix.size else 0.0
+        if norm > 1.0:
+            scaled = matrix / norm
         else:
-            # Two's complement encoding
-            int_data = []
-            for val in scaled.flatten():
-                if val >= 0:
-                    int_data.append(int(val))
-                else:
-                    int_data.append(int(val) + 2**data_size)
+            scaled = matrix.copy()
 
         # Compute nnz_col (max non-zeros per row)
         nnz_per_row = np.sum(matrix != 0, axis=1)
         nnz_col = int(np.max(nnz_per_row)) if len(nnz_per_row) > 0 else 1
+        nnz_col = max(1, nnz_col)
 
-        return cls(n_row, nnz_col, int_data, data_size, positive_only)
+        values: list[float] = []
+        sparsity: list[int] = []
+        if positive_only:
+            max_encoded = (2**data_size - 1) / (2**data_size)
+            min_encoded = 0.0
+        else:
+            max_encoded = (2 ** (data_size - 1) - 1) / (2 ** (data_size - 1))
+            min_encoded = -max_encoded
+        for row in range(n_row):
+            cols = [int(col) for col in np.nonzero(matrix[row])[0]]
+            cols.sort()
+            for pos in range(nnz_col):
+                if pos < len(cols):
+                    col = cols[pos]
+                    val = scaled[row, col]
+                else:
+                    col = 0
+                    val = 0
+
+                sparsity.append(col)
+                values.append(float(np.clip(val, min_encoded, max_encoded)))
+
+        cpp_matrix = ps.SparseMatrix(
+            values, sparsity, data_size, nnz_col, n_row, positive_only
+        )
+        return cls(
+            n_row, nnz_col, values, data_size, positive_only, sparsity, cpp_matrix
+        )
 
     def get_data(self) -> list[int]:
         """Get matrix data."""
-        return self.data
+        return list(self.data)
 
     def get_sparsity_offset(self) -> int:
         """Get sparsity offset for QRAM."""
@@ -460,6 +517,36 @@ class QuantumBinarySearch(ControllableOperatorMixin):
         ps.RemoveRegister("qbs_flag")(state)
 
 
+class QuantumBinarySearchFast(ControllableOperatorMixin):
+    """Compatibility wrapper around the native CKS binary-search primitive."""
+
+    def __init__(
+        self,
+        qram: ps.QRAMCircuit_qutrit,
+        address_offset_reg: str,
+        total_length: int,
+        target_reg: str,
+        result_reg: str,
+        qram_data: list[int] | None = None,
+    ):
+        super().__init__()
+        self.qram = qram
+        self.address_offset_reg = address_offset_reg
+        self.total_length = total_length
+        self.target_reg = target_reg
+        self.result_reg = result_reg
+        self.qram_data = qram_data
+
+    def dag(self, state: ps.SparseState) -> None:
+        self(state)
+
+    def __call__(self, state: ps.SparseState) -> None:
+        ps.QuantumBinarySearchFast(
+            self.qram, self.address_offset_reg, self.total_length,
+            self.target_reg, self.result_reg,
+        )(state)
+
+
 class CondRotQW(ControllableOperatorMixin):
     """Conditional rotation for quantum walk.
 
@@ -483,24 +570,11 @@ class CondRotQW(ControllableOperatorMixin):
         self.angle_func = mat.get_walk_angle_func()
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply conditional rotation based on matrix element values.
-
-        For positive-only matrices, the rotation depends only on the data value.
-        For signed matrices, the rotation also depends on row/column indices.
-        """
-        ps.SortExceptKey(self.output_reg)(state)
-
-        if self.mat.positive_only:
-            # Rotation depends only on data value
-            def angle_func(v: int) -> list:
-                return get_coef_positive_only(self.mat.data_size, v, 0, 0)
-
-            ps.CondRot_Rational_Bool(self.data_reg, self.output_reg, angle_func)(state)
-        else:
-            # For signed matrices, need row/col info for phase
-            self._apply_signed_rotation(state)
-
-        ps.ClearZero()(state)
+        """Apply the native CKS conditional rotation primitive."""
+        ps.CondRot_General_Bool_QW(
+            self.j_reg, self.k_reg, self.data_reg, self.output_reg,
+            self.mat.cpp_matrix,
+        )(state)
 
     def _apply_signed_rotation(self, state: ps.SparseState) -> None:
         """Apply rotation for signed matrix elements by iterating sparse states."""
@@ -562,8 +636,10 @@ class CondRotQW(ControllableOperatorMixin):
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply inverse rotation."""
-        # CondRot_Rational_Bool is self-adjoint; signed rotation is also self-adjoint
-        self(state)
+        ps.CondRot_General_Bool_QW(
+            self.j_reg, self.k_reg, self.data_reg, self.output_reg,
+            self.mat.cpp_matrix,
+        ).dag(state)
 
 
 class TOperator(ControllableOperatorMixin):
@@ -591,6 +667,7 @@ class TOperator(ControllableOperatorMixin):
         data_size: int,
         mat: SparseMatrix,
         addr_size: int,
+        qram_data: list[int] | None = None,
     ):
         super().__init__()
         self.qram = qram
@@ -605,6 +682,7 @@ class TOperator(ControllableOperatorMixin):
         self.data_size = data_size
         self.mat = mat
         self.addr_size = addr_size
+        self.qram_data = qram_data if qram_data is not None else []
 
     def __call__(self, state: ps.SparseState) -> None:
         """Apply T operator (forward)."""
@@ -612,53 +690,48 @@ class TOperator(ControllableOperatorMixin):
         ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
 
         # Hadamard on column index register
-        n_bits = int(math.log2(self.nnz_col)) + 1
+        n_bits = int(math.log2(self.nnz_col))
         ps.Hadamard_Int(self.k_reg, n_bits)(state)
 
         # Load matrix element via oracle
         # SparseMatrixOracle1 equivalent
         self._load_matrix_element(state)
 
-        # SparseMatrixOracle2 equivalent - find column position
-        self._find_column_position(state, inverse=False)
+        # SparseMatrixOracle2.dag: sparse position -> column index
+        self._find_column_position(state, inverse=True)
 
         # Conditional rotation
         CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat)(state)
 
-        # Uncompute
-        self._find_column_position(state, inverse=True)
-        self._load_matrix_element(state)
+        # SparseMatrixOracle2.impl: column index -> sparse position
         self._find_column_position(state, inverse=False)
+        self._load_matrix_element(state)
 
         ps.RemoveRegister("data")(state)
 
-        # Second oracle pass
+        # SparseMatrixOracle2.dag: sparse position -> column index
         self._find_column_position(state, inverse=True)
 
         ps.CheckNan()(state)
 
     def dag(self, state: ps.SparseState) -> None:
-        """Apply T operator (inverse)."""
-        ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
+        """Apply T† operator — mirrors C++ T::impl_dag (hamiltonian_simulation.h:742-759).
 
+        Mirrors C++ T::impl_dag exactly.
+        """
+        ps.AddRegister("data", ps.UnsignedInteger, self.data_size)(state)
         self._find_column_position(state, inverse=False)
         ps.CheckNan()(state)
-
         self._load_matrix_element(state)
         self._find_column_position(state, inverse=False)
-
         CondRotQW(self.j_reg, self.k_reg, "data", self.b2_reg, self.mat).dag(state)
         ps.ClearZero()(state)
-
         self._find_column_position(state, inverse=True)
         ps.CheckNormalization()(state)
-
         self._load_matrix_element(state)
-
-        n_bits = int(math.log2(self.nnz_col)) + 1
+        n_bits = int(math.log2(self.nnz_col))
         ps.Hadamard_Int(self.k_reg, n_bits)(state)
         ps.ClearZero()(state)
-
         ps.RemoveRegister("data")(state)
 
     def _load_matrix_element(self, state: ps.SparseState) -> None:
@@ -669,10 +742,15 @@ class TOperator(ControllableOperatorMixin):
         """
         ps.AddRegister("data_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
-        # Compute address and load
-        self._get_data_addr(state)
+        ps.GetDataAddr(
+            self.data_offset_reg, self.j_reg, self.k_reg,
+            self.nnz_col, "data_addr",
+        )(state)
         ps.QRAMLoad(self.qram, "data_addr", "data")(state)
-        self._get_data_addr(state)
+        ps.GetDataAddr(
+            self.data_offset_reg, self.j_reg, self.k_reg,
+            self.nnz_col, "data_addr",
+        )(state)
 
         ps.RemoveRegister("data_addr")(state)
 
@@ -697,57 +775,34 @@ class TOperator(ControllableOperatorMixin):
         Maps |j>|k>|0> -> |j>|s_j>|search_result>
         where s_j is the position of column k in row j's sparse storage.
 
-        This uses quantum binary search within the row's column list.
+        Uses QuantumBinarySearchFast (classical O(log n), self-adjoint, no temp regs).
         """
-        # Create row_addr register for the row's starting address
         ps.AddRegister("row_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
-        # Compute row_addr = sparse_offset + j * nnz_col
-        # Step 1: row_addr = j * nnz_col
-        ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
-        # Step 2: row_addr = sparse_offset + row_addr
-        ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
+        ps.GetRowAddr(
+            self.sparse_offset_reg, self.j_reg, self.nnz_col, "row_addr"
+        )(state)
 
         if not inverse:
-            # Forward: |j>|k>|0> -> |j>|s_j>|search_result>
-            # Use quantum binary search to find k in the row's sorted column list
-            # The search finds the position s_j such that columns[s_j] = k
-            qbs = QuantumBinarySearch(
-                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
-                self.addr_size, self.data_size
-            )
-            qbs(state)
-
-            # Load the column value at the found position
+            ps.QuantumBinarySearchFast(
+                self.qram, "row_addr", self.nnz_col,
+                self.k_reg, self.search_result_reg,
+            )(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
-
-            # Swap k and search_result
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
-
-            # Uncompute: k += row_addr (which was added to get full address)
             ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr").dag(state)
         else:
-            # Inverse: uncompute the operations
-            # Re-compute row_addr
-            ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
-            ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
-
-            # Inverse of the swap and load operations
             ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr")(state)
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
+            ps.QuantumBinarySearchFast(
+                self.qram, "row_addr", self.nnz_col,
+                self.k_reg, self.search_result_reg,
+            )(state)
 
-            # Inverse binary search
-            qbs = QuantumBinarySearch(
-                self.qram, "row_addr", self.nnz_col, self.k_reg, self.search_result_reg,
-                self.addr_size, self.data_size
-            )
-            qbs(state)
-
-        # Uncompute row_addr (self-adjoint: XOR-based)
-        ps.Add_UInt_UInt(self.sparse_offset_reg, "row_addr", "row_addr")(state)
-        ps.Add_Mult_UInt_ConstUInt_InPlace(self.j_reg, self.nnz_col, "row_addr")(state)
-
+        ps.GetRowAddr(
+            self.sparse_offset_reg, self.j_reg, self.nnz_col, "row_addr"
+        )(state)
         ps.RemoveRegister("row_addr")(state)
 
 
@@ -773,6 +828,7 @@ class QuantumWalk(ControllableOperatorMixin):
         sparse_offset_reg: str,
         mat: SparseMatrix,
         addr_size: int | None = None,
+        qram_data: list[int] | None = None,
     ):
         super().__init__()
         self.qram = qram
@@ -790,6 +846,7 @@ class QuantumWalk(ControllableOperatorMixin):
             addr_size if addr_size is not None
             else int(math.log2(len(mat.data))) if mat.data else 1
         )
+        self.qram_data = qram_data if qram_data is not None else []
         self.data_size = mat.data_size
         self.nnz_col = mat.nnz_col
 
@@ -809,6 +866,7 @@ class QuantumWalk(ControllableOperatorMixin):
             max(self.addr_size, self.data_size),
             self.mat,
             self.addr_size,
+            qram_data=self.qram_data,
         )
 
         # T†
@@ -841,11 +899,15 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
     def __init__(self, mat: SparseMatrix, qram: Optional[ps.QRAMCircuit_qutrit] = None):
         super().__init__()
         self.mat = mat
-        self.addr_size = int(math.log2(len(mat.data))) if mat.data else 1
+        total_addr = len(mat.get_data())
+        self.addr_size = math.ceil(math.log2(total_addr)) if total_addr > 0 else 1
         self.data_size = mat.data_size
         self.nnz_col = mat.nnz_col
         self.n_row = mat.n_row
         self.default_reg_size = max(self.addr_size, self.data_size)
+        self.qram_data = list(mat.get_data())
+        if len(self.qram_data) < 2**self.addr_size:
+            self.qram_data.extend([0] * (2**self.addr_size - len(self.qram_data)))
 
         # Register names
         self.data_offset = "data_offset"
@@ -860,7 +922,7 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
         # Create QRAM if not provided
         if qram is None:
             self.qram = ps.QRAMCircuit_qutrit(
-                self.addr_size, self.data_size, mat.data
+                self.addr_size, self.data_size, self.qram_data
             )
             self._owns_qram = True
         else:
@@ -886,7 +948,7 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
         """Create initial quantum state."""
         state = ps.SparseState()
         self.init_environment(state)
-        ps.Init_Unsafe(self.sparse_offset, self.mat.sparsity_offset)(state)
+        ps.Init_Unsafe(self.sparse_offset, self.mat.get_sparsity_offset())(state)
         return state
 
     def first_step(self, state: ps.SparseState) -> None:
@@ -904,6 +966,7 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
             self.default_reg_size,
             self.mat,
             self.addr_size,
+            qram_data=self.qram_data,
         )
 
         t_op(state)
@@ -932,6 +995,7 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
             self.default_reg_size,
             self.mat,
             self.addr_size,
+            qram_data=self.qram_data,
         )
 
         ps.ZeroConditionalPhaseFlip([self.j_comp, self.k_comp, self.b1, self.k, self.b2])(state)
@@ -950,7 +1014,7 @@ class QuantumWalkNSteps(ControllableOperatorMixin):
         state = self.create_state()
 
         # Initialize superposition on row register
-        init_size = int(math.log2(self.n_row)) + 1
+        init_size = int(math.log2(self.n_row))
         ps.Hadamard_Int(self.j, init_size)(state)
         ps.ClearZero()(state)
 
@@ -1179,23 +1243,36 @@ def CKS_build_walk_environment(mat: SparseMatrix) -> tuple:
     """Build QRAM and parameter tuple for a CKS quantum walk.
 
     Returns (qram, addr_size, nnz_col, n_row).
+
+    QRAM format matches C++ SparseMatrix::get_data():
+    first all compact matrix elements, then all sparsity column indices.
     """
-    addr_size = int(math.log2(len(mat.data))) if mat.data else 1
-    qram = ps.QRAMCircuit_qutrit(addr_size, mat.data_size, mat.data)
-    return qram, addr_size, mat.nnz_col, mat.n_row
+    qram_data = list(mat.get_data())
+    total_addr = len(qram_data)
+    addr_size = math.ceil(math.log2(total_addr)) if total_addr > 0 else 1
+    if len(qram_data) < 2**addr_size:
+        qram_data.extend([0] * (2**addr_size - len(qram_data)))
+    qram = ps.QRAMCircuit_qutrit(addr_size, mat.data_size, qram_data)
+    _CKS_ENV_CACHE[id(qram)] = (mat, qram_data, mat.nnz_col, mat.n_row)
+    return _CKSWalkEnvironment(qram, addr_size, mat.nnz_col, mat.n_row, qram_data)
 
 
 def CKS_init_walk_state(
-    qram, addr_size: int, data_size: int, b_normalized: np.ndarray
+    qram, addr_size: int, data_size: int,
+    nnz_col: int | np.ndarray,
+    b_normalized: np.ndarray | None = None,
 ) -> ps.SparseState:
     """Create a fresh SparseState initialized with the vector |b>.
 
     This is the functional form of TOperator.__call__ — returns a new state
     instead of mutating self.current_state.
     """
-    state = ps.SparseState()
-    nnz_col = int(math.log2(len(b_normalized))) + 1
+    if b_normalized is None:
+        b_normalized = np.asarray(nnz_col, dtype=float)
+        cached = _CKS_ENV_CACHE.get(id(qram))
+        nnz_col = cached[2] if cached is not None else len(b_normalized)
 
+    state = ps.SparseState()
     data_offset = "data_offset"
     sparse_offset = "sparse_offset"
     j_reg = "row_id"
@@ -1215,9 +1292,13 @@ def CKS_init_walk_state(
     ps.AddRegister(j_comp, ps.UnsignedInteger, default_reg_size)(state)
     ps.AddRegister(k_comp, ps.UnsignedInteger, default_reg_size)(state)
 
-    ps.Init_Unsafe(sparse_offset, 0)(state)
-    ps.Hadamard_Int(j_reg, nnz_col)(state)
+    cached = _CKS_ENV_CACHE.get(id(qram))
+    n_row = cached[0].n_row if cached is not None else len(b_normalized)
+    n_bits = int(math.log2(n_row))
+    ps.Init_Unsafe(sparse_offset, cached[0].get_sparsity_offset() if cached is not None else 0)(state)
+    ps.Hadamard_Int(j_reg, n_bits)(state)
     ps.ClearZero()(state)
+    _CKS_STATE_STEP_CACHE[id(state)] = 0
 
     return state
 
@@ -1225,6 +1306,8 @@ def CKS_init_walk_state(
 def CKS_apply_walk_step(
     qram, addr_size: int, data_size: int, nnz_col: int, n_row: int,
     state: ps.SparseState,
+    mat: SparseMatrix | None = None,
+    qram_data: list[int] | None = None,
 ) -> ps.SparseState:
     """Apply one complete quantum walk step to *state*, return the same state object.
 
@@ -1237,6 +1320,15 @@ def CKS_apply_walk_step(
     modifying the previous state — that implementation is deferred.
     """
     default_reg_size = max(addr_size, data_size)
+    if mat is None or qram_data is None:
+        cached = _CKS_ENV_CACHE.get(id(qram))
+        if cached is not None:
+            cached_mat, cached_qram_data, _, _ = cached
+            mat = cached_mat if mat is None else mat
+            qram_data = cached_qram_data if qram_data is None else qram_data
+    if mat is None:
+        raise ValueError("mat must be provided when qram was not built by CKS_build_walk_environment")
+
     data_offset = "data_offset"
     sparse_offset = "sparse_offset"
     j_reg = "row_id"
@@ -1258,22 +1350,33 @@ def CKS_apply_walk_step(
         k_comp,
         nnz_col,
         default_reg_size,
-        SparseMatrix(n_row, nnz_col, [], data_size, True),
+        mat,
         addr_size,
+        qram_data=qram_data,
     )
 
-    ps.ZeroConditionalPhaseFlip(
-        [j_comp, k_comp, b1, k_reg, b2]
-    )(state)
-    t_op(state)
-    ps.CheckNan()(state)
+    step_count = _CKS_STATE_STEP_CACHE.get(id(state), 0)
+    if step_count == 0:
+        t_op(state)
+        ps.Swap_General_General(j_reg, k_reg)(state)
+        ps.Swap_General_General(b1, b2)(state)
+        ps.Swap_General_General(j_comp, k_comp)(state)
+        t_op.dag(state)
+    else:
+        ps.ZeroConditionalPhaseFlip(
+            [j_comp, k_comp, b1, k_reg, b2]
+        )(state)
+        t_op(state)
+        ps.CheckNan()(state)
 
-    ps.Swap_General_General(j_reg, k_reg)(state)
-    ps.Swap_General_General(b1, b2)(state)
-    ps.Swap_General_General(j_comp, k_comp)(state)
+        ps.Swap_General_General(j_reg, k_reg)(state)
+        ps.Swap_General_General(b1, b2)(state)
+        ps.Swap_General_General(j_comp, k_comp)(state)
 
-    t_op.dag(state)
-    ps.CheckNan()(state)
+        t_op.dag(state)
+        ps.CheckNan()(state)
+
+    _CKS_STATE_STEP_CACHE[id(state)] = step_count + 1
 
     return state
 
@@ -1283,20 +1386,30 @@ def CKS_run_lcu_loop(
     initial_state: ps.SparseState,
     kappa: float,
     eps: float,
+    mat: SparseMatrix | None = None,
+    qram_data: list[int] | None = None,
 ) -> ps.SparseState:
     """Run the Chebyshev LCU iteration loop, return the final state.
 
     State is a local variable throughout; no class holds mutable state.
     """
-    b = int(kappa * kappa * (math.log(kappa) - math.log(eps)))
-    j0 = int(math.sqrt(b * (math.log(4 * b) - math.log(eps))))
+    b = max(1, int(kappa * kappa * (math.log(kappa) - math.log(eps))))
+    j0 = max(1, int(math.sqrt(b * max(1.0, math.log(4 * b) - math.log(eps)))))
     cheb = ChebyshevPolynomialCoefficient(b)
+    if mat is None or qram_data is None:
+        cached = _CKS_ENV_CACHE.get(id(qram))
+        if cached is not None:
+            cached_mat, cached_qram_data, _, _ = cached
+            mat = cached_mat if mat is None else mat
+            qram_data = cached_qram_data if qram_data is None else qram_data
+    if mat is None:
+        raise ValueError("mat must be provided when qram was not built by CKS_build_walk_environment")
 
     current_state = initial_state
     for j in range(j0 + 1):
         if j != 0:
             current_state = CKS_apply_walk_step(
-                qram, addr_size, data_size, nnz_col, n_row, current_state)
+                qram, addr_size, data_size, nnz_col, n_row, current_state, mat, qram_data)
         # The LCU coefficient (cheb.coef(j), cheb.sign(j)) would be applied
         # here in the full circuit; for the classical-simulation fallback
         # we accumulate the state directly.
@@ -1320,17 +1433,21 @@ def cks_solve_v2(
     of the quantum state; the pure quantum circuit LCU path is not yet
     implemented — see NOTE in this module).
     """
-    mat = SparseMatrix.from_dense(A, data_size=data_size)
+    A_arr = np.asarray(A, dtype=np.float64)
+    b_arr = np.asarray(b, dtype=np.float64)
+
+    mat = SparseMatrix.from_dense(A_arr, data_size=data_size)
     if kappa is None:
-        kappa = float(np.linalg.cond(A)) if A.shape[0] > 0 else 10.0
-    b_norm = np.linalg.norm(b)
-    b_normalized = b / b_norm if b_norm > 0 else b
+        kappa = float(np.linalg.cond(A_arr)) if A_arr.shape[0] > 0 else 10.0
+    b_norm = np.linalg.norm(b_arr)
+    b_normalized = b_arr / b_norm if b_norm > 0 else b_arr
 
     qram, addr_size, nnz_col, n_row = CKS_build_walk_environment(mat)
-    initial_state = CKS_init_walk_state(qram, addr_size, data_size, b_normalized)
+    _, qram_data, _, _ = _CKS_ENV_CACHE[id(qram)]
+    initial_state = CKS_init_walk_state(qram, addr_size, data_size, nnz_col, b_normalized)
     final_state = CKS_run_lcu_loop(
         qram, addr_size, data_size, nnz_col, n_row,
-        initial_state, kappa, eps)
+        initial_state, kappa, eps, mat, qram_data=qram_data)
     # Measurement-based solution extraction is not yet implemented.
     # Until then, raise — falling back to np.linalg.solve hides bugs.
     warnings.warn(
@@ -1339,9 +1456,9 @@ def cks_solve_v2(
         "until measurement is wired up"
     )
     try:
-        return np.linalg.solve(A, b)
+        return np.linalg.solve(A_arr, b_arr)
     except np.linalg.LinAlgError:
-        return np.linalg.lstsq(A, b, rcond=None)[0]
+        return np.linalg.lstsq(A_arr, b_arr, rcond=None)[0]
 
 
 def create_cks_demo() -> str:
