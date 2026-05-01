@@ -10,7 +10,7 @@ QRAM Simulator 是一个用于模拟**量子随机存取存储器（QRAM）**和
 
 - 高效模拟大规模量子系统的工具（利用稀疏态表示）
 - 精确建模 QRAM 电路的行为和噪声影响
-- 支持 GPU 加速以获得更高的计算性能
+- CUDA/GPU 后端保留在代码中，但当前 CMake 暂时屏蔽 GPU 构建，默认走 CPU-only 路径
 - 提供简洁的 Python API 便于快速原型开发
 
 ### 设计哲学
@@ -65,7 +65,7 @@ QRAM-Simulator/
   - 时步逻辑：生成 QRAM 操作序列
   - 噪声模型：支持去极化和退相干噪声
 
-- **`CuQRAMCircuit`**（CUDA 版本）：GPU 加速实现
+- **`CuQRAMCircuit`**（CUDA 版本）：代码保留，当前 CMake 暂时屏蔽 GPU 构建
 
 ### PySparQ/ - Python 绑定
 

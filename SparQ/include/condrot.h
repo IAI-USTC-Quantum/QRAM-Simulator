@@ -61,7 +61,7 @@ namespace qram_simulator
 	 * @brief 有理数条件旋转门（单比特）
 	 * @details 基于有理数输入寄存器的值对布尔输出寄存器进行条件旋转
 	 */
-	struct CondRot_Rational_Bool : BaseOperator {
+		struct CondRot_Rational_Bool : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -114,8 +114,15 @@ namespace qram_simulator
 		 * @brief 应用 dagger 操作
 		 * @param state 系统状态向量
 		 */
-		void dag(std::vector<System>& state) const;
-	};
+			void dag(std::vector<System>& state) const;
+		};
+
+		struct CondRot_Fixed_Bool : CondRot_Rational_Bool
+		{
+			using CondRot_Rational_Bool::operator();
+			using CondRot_Rational_Bool::dag;
+			using CondRot_Rational_Bool::CondRot_Rational_Bool;
+		};
 
 	/**
 	 * @brief 通用条件旋转门（单比特）
@@ -123,7 +130,7 @@ namespace qram_simulator
 	 * @tparam Callable 角度计算函数类型
 	 */
 	template<typename Callable = std::function<u22_t(uint64_t)>>
-	struct CondRot_General_Bool : BaseOperator {
+	struct CondRot_General_Bool_fast : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -143,7 +150,7 @@ namespace qram_simulator
 		 * @param angle_function 角度计算函数
 		 * @throws 当类型不匹配或输出寄存器大小不为1时抛出异常
 		 */
-		CondRot_General_Bool(std::string_view reg_in, std::string_view reg_out, Callable angle_function)
+		CondRot_General_Bool_fast(std::string_view reg_in, std::string_view reg_out, Callable angle_function)
 			: in_id(System::get(reg_in)), out_id(System::get(reg_out)), func(angle_function)
 		{
 			/* Type check */
@@ -162,7 +169,7 @@ namespace qram_simulator
 		 * @param reg_out 输出寄存器 ID
 		 * @param angle_function 角度计算函数
 		 */
-		CondRot_General_Bool(size_t reg_in, size_t reg_out, Callable angle_function)
+		CondRot_General_Bool_fast(size_t reg_in, size_t reg_out, Callable angle_function)
 			: in_id(reg_in), out_id(reg_out), func(angle_function)
 		{
 			/* Type check */
@@ -307,5 +314,8 @@ namespace qram_simulator
 		void operator()(CuSparseState& s) const;
 #endif
 	};
+
+	template<typename Callable = std::function<u22_t(uint64_t)>>
+	using CondRot_General_Bool = CondRot_General_Bool_fast<Callable>;
 
 }

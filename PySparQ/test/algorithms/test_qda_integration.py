@@ -17,6 +17,11 @@ import math
 from typing import Callable
 
 import pysparq as ps
+from pysparq.algorithms.block_encoding import (
+    BlockEncodingTridiagonal,
+    BlockEncodingViaQRAM,
+)
+from pysparq.algorithms.qram_utils import make_vector_tree, scale_and_convert_vector
 from pysparq.algorithms.qda_solver import (
     compute_fs,
     compute_rotation_matrix,
@@ -24,6 +29,8 @@ from pysparq.algorithms.qda_solver import (
     dolph_chebyshev,
     compute_fourier_coeffs,
     calculate_angles,
+    StatePrepViaQRAM,
+    WalkS,
 )
 
 
@@ -86,6 +93,50 @@ def compute_kappa(A: np.ndarray) -> float:
         return max_eig / min_eig
     except np.linalg.LinAlgError:
         return 10.0
+
+
+def snapshot_state(state: ps.SparseState) -> dict[tuple[tuple[str, int], ...], complex]:
+    """Record the complete sparse basis state for fidelity-style comparisons."""
+    snapshot: dict[tuple[tuple[str, int], ...], complex] = {}
+    for basis in state.basis_states:
+        key = tuple(
+            (ps.System.name_of(reg_id), int(basis.get(reg_id).value))
+            for reg_id in range(ps.System.get_activated_register_size())
+        )
+        snapshot[key] = basis.amplitude
+    return snapshot
+
+
+def state_fidelity(
+    lhs: dict[tuple[tuple[str, int], ...], complex],
+    rhs: dict[tuple[tuple[str, int], ...], complex],
+) -> float:
+    """Compute fidelity between two full sparse-state snapshots."""
+    overlap = 0j
+    for key in set(lhs) | set(rhs):
+        overlap += np.conj(lhs.get(key, 0j)) * rhs.get(key, 0j)
+    return float(abs(overlap) ** 2)
+
+
+def assert_unitary_roundtrip(
+    state: ps.SparseState,
+    walk: WalkS,
+    *,
+    min_intermediate_size: int = 1,
+) -> None:
+    """Apply a primitive walk and its dagger, then compare with the start state."""
+    before = snapshot_state(state)
+    walk(state)
+    ps.ClearZero()(state)
+    ps.CheckNormalization(1e-7)(state)
+    assert state.size() >= min_intermediate_size
+
+    walk.dag(state)
+    ps.ClearZero()(state)
+    ps.CheckNormalization(1e-7)(state)
+
+    fidelity = state_fidelity(before, snapshot_state(state))
+    assert fidelity > 1 - 1e-10
 
 
 # ==============================================================================
@@ -438,50 +489,91 @@ class TestQDAFidelityAgainstReference:
             # pos 版本精度稍低
             assert 0.99 < f < 1.001, f"Reference pos value {i} = {f} out of range"
 
-    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_walks_fidelity_tridiagonal(self, fresh_system):
-        """测试 Tridiagonal 版本的 WalkS fidelity。
+        """测试 Tridiagonal 版本的 WalkS primitive round-trip fidelity。
 
         对应 C++ QDA_Poiseuille_Tridiagonal_test:
-        逐帧验证 fidelity 与参考值差异 < 1e-5
+        使用 Hadamard_Int_Full 作为 Encb，并用 BlockEncodingTridiagonal
+        组合 WalkS。这里验证 Python 的 primitive 序列可正向执行、保持归一化，
+        且显式 dagger 能把完整稀疏态恢复到初态。
         """
         nqubit = 4
         alpha, beta = 1.0, 1.0
         p = 0.5
-        step_rate = 1.0
 
-        # 生成 Poiseuille 矩阵
         A = generate_poiseuille_matrix(2**nqubit, alpha, beta)
         A = normalize_matrix(A)
         kappa = compute_kappa(A)
 
-        # 计算步数
-        STEP_CONSTANT = 2305
-        steps = int(step_rate * STEP_CONSTANT * kappa)
-        if steps % 2 != 0:
-            steps += 1
+        state = ps.SparseState()
+        ps.AddRegister("main_reg", ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister("anc_UA", ps.UnsignedInteger, 4)(state)
+        ps.AddRegister("anc_1", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_2", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_3", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_4", ps.Boolean, 1)(state)
+        ps.Hadamard_Int_Full("main_reg")(state)
 
-        # 迭代并与参考值对比
-        compare_index = 0
-        for n in range(min(steps, len(QDA_FIDELITY_REFERENCE_TRI_NEG) * 2)):
-            s = n / steps
+        enc_A = BlockEncodingTridiagonal("main_reg", "anc_UA", alpha, beta)
+        enc_b = ps.Hadamard_Int_Full("main_reg")
+        walk = WalkS(
+            enc_A, enc_b, "main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
+            s=0.25, kappa=kappa, p=p,
+        )
 
-            # TODO: 实现 WalkS 执行并获取 fidelity
-            # walk = WalkS_Tridiagonal(A, b, s, kappa, p, alpha, beta)
-            # fidelity = walk.get_fidelity()
+        assert_unitary_roundtrip(state, walk, min_intermediate_size=2**nqubit)
 
-            # if (n + 1) % 2 == 0:
-            #     expected = QDA_FIDELITY_REFERENCE_TRI_NEG[compare_index]
-            #     assert abs(fidelity - expected) < 1e-5
-            #     compare_index += 1
-
-    @pytest.mark.skip(reason="cks_solver.py TOperator has fundamental porting bugs (#76)")
     def test_walks_fidelity_via_qram(self, fresh_system):
-        """测试 QRAM 版本的 WalkS fidelity。
+        """测试 QRAM 版本的 WalkS primitive round-trip fidelity。
 
         对应 C++ QDA_Poiseuille_via_QRAM_test。
         """
-        pass
+        nqubit = 2
+        alpha, beta = 1.0, 1.0
+        p = 0.5
+        data_size = 16
+        rational_size = 17
+        exponent = 8
+
+        A = generate_poiseuille_matrix(2**nqubit, alpha, beta)
+        A = normalize_matrix(A)
+        kappa = compute_kappa(A)
+        b = np.ones(2**nqubit, dtype=float)
+        b = b / np.linalg.norm(b)
+
+        conv_A = scale_and_convert_vector(A.reshape(-1), exponent, data_size)
+        conv_b = scale_and_convert_vector(b, exponent, data_size, from_matrix=False)
+        qram_A = ps.QRAMCircuit_qutrit(
+            nqubit * 2 + 1,
+            data_size,
+            make_vector_tree(conv_A, data_size),
+        )
+        qram_b = ps.QRAMCircuit_qutrit(
+            nqubit + 1,
+            data_size,
+            make_vector_tree(conv_b, data_size),
+        )
+
+        state = ps.SparseState()
+        ps.AddRegister("main_reg", ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister("anc_UA", ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister("anc_1", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_2", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_3", ps.Boolean, 1)(state)
+        ps.AddRegister("anc_4", ps.Boolean, 1)(state)
+
+        enc_A = BlockEncodingViaQRAM(
+            qram_A, "main_reg", "anc_UA", data_size, rational_size
+        )
+        enc_b = StatePrepViaQRAM(qram_b, "main_reg", data_size, rational_size)
+        enc_b(state)
+
+        walk = WalkS(
+            enc_A, enc_b, "main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
+            s=0.25, kappa=kappa, p=p,
+        )
+
+        assert_unitary_roundtrip(state, walk, min_intermediate_size=2**nqubit)
 
 
 # ==============================================================================

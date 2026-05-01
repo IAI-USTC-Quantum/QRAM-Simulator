@@ -2,6 +2,33 @@
 
 ## What changed
 
+### 0. QDA/CKS primitive-level parity
+
+The Python QDA and CKS paths are intended to mirror the C++ algorithms by
+composing low-level PySparQ primitives.  They should not bypass the Python
+implementation by binding an entire C++ solver.
+
+For QDA, `WalkS` combines Python-side block encoding, state preparation,
+reflections, controlled rotations, and global phase operations in the same
+register layout used by the C++ `Walk_s_Tridiagonal` and `Walk_s_via_QRAM`
+families.  The active integration tests now run both primitive compositions
+and verify that `walk` followed by `walk.dag` restores the full sparse state.
+
+For CKS, the Python implementation uses the C++ `SparseMatrix` QRAM layout and
+binds only the missing primitive operations needed to reproduce the walk:
+`QuantumBinarySearchFast`, `GetRowAddr`, `GetDataAddr`,
+`GetQWRotateAngle_Int_Int_Int`, and `CondRot_Fixed_Bool`.  `TOperator`,
+`CKS_apply_walk_step`, and the LCU loop are still assembled in Python.  The
+older simulator-friendly direct conditional rotation is exported with a
+`_fast` suffix and kept as a compatibility path for signed/complex CKS matrix
+elements until the phase-decomposition adapter is completed.
+
+Solver-level result extraction is not complete.  `qda_solve()` raises after
+the quantum walk sequence because measurement/post-selection readout is not
+implemented.  `cks_solve_v2()` runs the quantum walk/LCU path, emits a warning,
+and currently returns `np.linalg.solve` only as an explicit placeholder for the
+unimplemented measurement readout.
+
 ### 1. `ControllableOperatorMixin` (`pysparq/operators/condition_mixin.py`)
 
 Sixteen classes across five algorithm files each duplicated the same four-method
@@ -43,8 +70,9 @@ local variable through three helpers:
 - `CKS_apply_walk_step(...)` → `SparseState` (mutates in-place, returns same object)
 - `CKS_run_lcu_loop(...)` → `SparseState`
 
-Currently falls back to `np.linalg.solve` because the pure-quantum LCU of
-`W, W², …, W^{j₀}` is not yet implemented.  The NOTE below explains why.
+Currently runs the primitive walk/LCU path, then warns and returns
+`np.linalg.solve` as a placeholder because measurement-based solution
+extraction is not yet implemented.  The NOTE below explains why.
 
 #### `make_tree_and_qram(distribution, *, data_size=8, rational_size=None, work_reg=None) -> (StatePrepViaQRAM, QRAMCircuit_qutrit, str)`
 

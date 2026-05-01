@@ -5,6 +5,7 @@
 
 #include "BindUtils.h"
 #include "BlockEncoding/block_encoding_tridiagonal.h"
+#include "hamiltonian_simulation.h"
 
 PYBIND11_MODULE(_core, m)
 {
@@ -40,7 +41,17 @@ Example:
 
     py::class_<SparseMatrix>(m, "SparseMatrix")
         .def(py::init<>())
-        .def(py::init<const std::vector<double> &, const std::vector<size_t> &, size_t, size_t, size_t, bool>());
+        .def(py::init<const std::vector<double> &, const std::vector<size_t> &, size_t, size_t, size_t, bool>(),
+             py::arg("elements"), py::arg("sparsity"), py::arg("data_size"),
+             py::arg("nnz_col"), py::arg("n_row"), py::arg("positive_only"))
+        .def("get_data", &SparseMatrix::get_data)
+        .def("get_sparsity_offset", &SparseMatrix::get_sparsity_offset)
+        .def_readonly("elements", &SparseMatrix::elements)
+        .def_readonly("sparsity", &SparseMatrix::sparsity)
+        .def_readonly("positive_only", &SparseMatrix::positive_only)
+        .def_readonly("data_size", &SparseMatrix::data_size)
+        .def_readonly("nnz_col", &SparseMatrix::nnz_col)
+        .def_readonly("n_row", &SparseMatrix::n_row);
 
     py::enum_<StateStorageType>(m, "StateStorageType")
         .value("General", StateStorageType::General)
@@ -158,36 +169,13 @@ Attributes:
         .def("__str__",  [](const SparseState& self) { return self.to_string(1); })
         .def("__repr__", [](const SparseState& self) { return self.to_string(1); });
 
-    /* condrot.h */
-    BIND_BASE_OPERATOR(CondRot_Rational_Bool)
-        .def(py::init<std::string_view, std::string_view>());
+	    /* condrot.h */
+	    BIND_BASE_OPERATOR(CondRot_Rational_Bool)
+	        .def(py::init<std::string_view, std::string_view>());
 
-    using CondRot_General_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
-
-    py::class_<CondRot_General_Bool_Cpp, BaseOperator>(m, "CondRot_General_Bool")
-        .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
-                      {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
-					};
-				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
-             py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
-        .def(py::init([](size_t reg_in, size_t reg_out, py::function py_func)
-                      {
-				auto cpp_func = [py_func](size_t x) -> u22_t {
-					py::object result = py_func(x);
-					auto arr = result.cast<std::array<std::complex<double>, 4>>(); return u22_t(arr);
-					};
-				return new CondRot_General_Bool_Cpp(reg_in, reg_out, cpp_func); }),
-             py::arg("reg_in"), py::arg("reg_out"), py::arg("angle_function"))
-
-        //.def_static("_is_diagonal", &CondRot_General_Bool_Cpp::_is_diagonal)
-        //.def_static("_is_off_diagonal", &CondRot_General_Bool_Cpp::_is_off_diagonal)
-
-        .def("operate_pair", &CondRot_General_Bool_Cpp::operate_pair)
-        .def("operate_alone_zero", &CondRot_General_Bool_Cpp::operate_alone_zero)
-        .def("operate_alone_one", &CondRot_General_Bool_Cpp::operate_alone_one);
+	    BIND_BASE_OPERATOR(CondRot_Fixed_Bool)
+	        .def(py::init<std::string_view, std::string_view>())
+	        .def(py::init<size_t, size_t>());
 
     /* dark_magic.h */
     BIND_SELF_ADJOINT_OPERATOR(Normalize, R"doc(
@@ -886,6 +874,22 @@ Example:
              py::arg("reg"), py::arg("matrix"))
         .def(py::init<size_t, u22_t>(),
              py::arg("reg_id"), py::arg("matrix"))
+        .def(py::init([](std::string_view reg, size_t digit, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg, digit, u22_t(matrix));
+             }),
+             py::arg("reg"), py::arg("digit"), py::arg("matrix"))
+        .def(py::init([](size_t reg_id, size_t digit, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg_id, digit, u22_t(matrix));
+             }),
+             py::arg("reg_id"), py::arg("digit"), py::arg("matrix"))
+        .def(py::init([](std::string_view reg, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg, u22_t(matrix));
+             }),
+             py::arg("reg"), py::arg("matrix"))
+        .def(py::init([](size_t reg_id, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg_id, u22_t(matrix));
+             }),
+             py::arg("reg_id"), py::arg("matrix"))
             BIND_CONTROLLABLE_METHODS(Rot_Bool);
 
     BIND_BASE_OPERATOR(Ygate_Bool)
@@ -980,60 +984,43 @@ Example:
          }
     }
 
-    // {
-    //      using namespace CKS;
+    {
+         using namespace CKS;
 
-    //      /*py::class_<walk_angle_function_t>(m, "WalkAngleFunction")
-    //           .def(py::init<>())
-    //           .def("__call__", &walk_angle_function_t::operator())
-    //           ;
+	         BIND_BASE_OPERATOR_SUBNAME(CondRot_General_Bool_QW, CondRot_General_Bool_QW_fast)
+	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
+	                  py::arg("j"), py::arg("k"), py::arg("reg_in"), py::arg("reg_out"), py::arg("mat"))
+	                 BIND_DAG_METHODS(CondRot_General_Bool_QW);
 
-    //      m.def("CKS_make_func", &make_func, py::arg("mat"));
-    //      m.def("CKS_make_func_inv", &make_func_inv, py::arg("mat"));
+	         BIND_SELF_ADJOINT_OPERATOR(GetQWRotateAngle_Int_Int_Int)
+	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
+	                  py::arg("data"), py::arg("row"), py::arg("col"), py::arg("out"), py::arg("mat"))
+	             .def(py::init<size_t, size_t, size_t, size_t, const SparseMatrix *>(),
+	                  py::arg("data"), py::arg("row"), py::arg("col"), py::arg("out"), py::arg("mat"))
+	                 BIND_CONTROLLABLE_METHODS(GetQWRotateAngle_Int_Int_Int);
 
-    //      BIND_BASE_OPERATOR(CondRot_General_Bool_QW)
-    //           .def(py::init(
-    //                [](py::str j, py::str k, py::str reg_in, py::str reg_out, py::function pyfunc)
-    //                {
-    //                     auto j_str = j.cast<std::string>();
-    //                     auto k_str = k.cast<std::string>();
-    //                     auto reg_in_str = reg_in.cast<std::string>();
-    //                     auto reg_out_str = reg_out.cast<std::string>();
+         BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearchFast)
+             .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, std::string_view, std::string_view>(),
+                  py::arg("qram"), py::arg("address_offset_register"), py::arg("total_length"),
+                  py::arg("target_register"), py::arg("result_register"))
+             .def(py::init<qram_qutrit::QRAMCircuit *, size_t, size_t, size_t, size_t>(),
+                  py::arg("qram"), py::arg("address_offset_register"), py::arg("total_length"),
+                  py::arg("target_register"), py::arg("result_register"));
 
-    //                     auto cpp_func = [pyfunc](size_t value, size_t row_id, size_t col_id) -> u22_t
-    //                          {
-    //                               py::gil_scoped_acquire acquire;
-    //                               return pyfunc(value, row_id, col_id).cast<u22_t>();
-    //                          };
-    //                     return new CondRot_General_Bool_QW(j_str, k_str, reg_in_str, reg_out_str, cpp_func);
-    //                }
-    //           ))
-    //           ;*/
+         BIND_SELF_ADJOINT_OPERATOR(GetRowAddr)
+             .def(py::init<std::string_view, std::string_view, size_t, std::string_view>(),
+                  py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"))
+             .def(py::init<int, int, size_t, int>(),
+                  py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"));
 
-    //      BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearch)
-    //          .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, std::string_view, std::string_view>(),
-    //               py::arg("qram"), py::arg("column_index"), py::arg("address_offset_register_name"), py::arg("target_register_name"), py::arg("result_register_name"))
-    //          .def(py::init<qram_qutrit::QRAMCircuit *, size_t, size_t, size_t, size_t>(),
-    //               py::arg("qram"), py::arg("column_index"), py::arg("address_offset_register_id"), py::arg("target_register_id"), py::arg("result_register_id"));
-
-    //      BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearchFast)
-    //          .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, std::string_view, std::string_view>(),
-    //               py::arg("qram"), py::arg("column_index"), py::arg("address_offset_register_name"), py::arg("target_register_name"), py::arg("result_register_name"))
-    //          .def(py::init<qram_qutrit::QRAMCircuit *, size_t, size_t, size_t, size_t>(),
-    //               py::arg("qram"), py::arg("column_index"), py::arg("address_offset_register_id"), py::arg("target_register_id"), py::arg("result_register_id"));
-
-    //      BIND_SELF_ADJOINT_OPERATOR(GetRowAddr)
-    //          .def(py::init<std::string_view, std::string_view, size_t, std::string_view>(),
-    //               py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"))
-    //          .def(py::init<size_t, size_t, size_t, size_t>(),
-    //               py::arg("reg_offset"), py::arg("reg_row"), py::arg("row_size"), py::arg("reg_row_offset"));
-
-    //      BIND_SELF_ADJOINT_OPERATOR(GetDataAddr)
-    //          .def(py::init<std::string_view, std::string_view, std::string_view, size_t, std::string_view>(),
-    //               py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col_sparse"), py::arg("row_sz"), py::arg("reg_data_offset"))
-    //          .def(py::init<size_t, size_t, size_t, size_t, size_t>(),
-    //               py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col_sparse"), py::arg("row_sz"), py::arg("reg_data_offset"));
-    // }
+         BIND_SELF_ADJOINT_OPERATOR(GetDataAddr)
+             .def(py::init<std::string_view, std::string_view, std::string_view, size_t, std::string_view>(),
+                  py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col_sparse"),
+                  py::arg("row_size"), py::arg("reg_data_offset"))
+             .def(py::init<size_t, size_t, size_t, size_t, size_t>(),
+                  py::arg("reg_offset"), py::arg("reg_row"), py::arg("reg_col_sparse"),
+                  py::arg("row_size"), py::arg("reg_data_offset"));
+    }
 }
 
 #ifdef __GNUC__

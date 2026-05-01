@@ -38,9 +38,6 @@ namespace qram_simulator {
 					AddRegister("temp_bit", Boolean, 1)(state);
 					AddRegister("div_result", Rational, rational_size)(state);
 
-					size_t n_digit = System::size_of("div_result");
-					auto func = [n_digit] HOST_DEVICE (uint64_t value) { return make_func(value, n_digit); };
-
 					for (size_t k = 0; k < addr_size; ++k) {
 						auto target = SplitRegister(column_index, "rotation", 1)(state);
 						CombineRegister(column_index, "temp_bit")(state);
@@ -56,7 +53,7 @@ namespace qram_simulator {
 							profiler _("U_R::CondRot");
 							// size_t original_size = state.size();
 							// fmt::print("U_R original_size {}\n", original_size);
-							CondRot_General_Bool("div_result", "rotation", func)(state);
+							CondRot_Fixed_Bool("div_result", "rotation")(state);
 						}
 						ClearZero()(state);
 						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
@@ -90,9 +87,6 @@ namespace qram_simulator {
 					AddRegister("temp_bit", Boolean, 1)(state);
 					AddRegister("div_result", Rational, rational_size)(state);
 
-					size_t n_digit = System::size_of("div_result");
-					auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func_inv(value, n_digit); };
-
 					ShiftLeft_InPlace(column_index, 1)(state);
 					for (size_t k = 0; k < addr_size; ++k) {
 						ShiftRight_InPlace(column_index, 1)(state);
@@ -110,7 +104,7 @@ namespace qram_simulator {
 							profiler _("U_R::CondRot::dag");
 							// size_t original_size = state.size();
 							// fmt::print("U_R original_size {}\n", original_size);
-							CondRot_General_Bool("div_result", "rotation", func)(state);
+							CondRot_Fixed_Bool("div_result", "rotation").dag(state);
 						}
 						ClearZero()(state);
 						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
@@ -164,9 +158,6 @@ namespace qram_simulator {
 					AddRegister("data_child", SignedInteger, data_size)(state);
 					AddRegister("div_result", Rational, rational_size)(state);
 
-					size_t n_digit = System::size_of("div_result");
-					auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func(value, n_digit); };
-
 					for (size_t k = addr_size; k < 2 * addr_size; ++k) {
 						auto target = SplitRegister(row_index, "rotation", 1)(state);
 						std::get<1>(System::name_register_map[System::get("rotation")]) = Boolean;
@@ -184,7 +175,7 @@ namespace qram_simulator {
 								profiler _("U_L::CondRot");
 								// size_t original_size = state.size();
 								// fmt::print("U_L original_size {}\n", original_size);
-								CondRot_General_Bool("div_result", "rotation", func)(state);
+								CondRot_Fixed_Bool("div_result", "rotation")(state);
 							}
 							Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
@@ -200,7 +191,7 @@ namespace qram_simulator {
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 							{
 								profiler _("U_L::CondRot");
-								CondRot_General_Bool("div_result", "rotation", func)(state);
+								CondRot_Fixed_Bool("div_result", "rotation")(state);
 							}
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);
 							QRAMLoad(qram, "addr_parent", "data_parent")(state);
@@ -236,9 +227,6 @@ namespace qram_simulator {
 					AddRegister("data_child", SignedInteger, data_size)(state);
 					AddRegister("div_result", Rational, rational_size)(state);
 
-					size_t n_digit = System::size_of("div_result");
-					auto func = [n_digit] HOST_DEVICE(uint64_t value) { return make_func_inv(value, n_digit); };
-
 					ShiftLeft_InPlace(row_index, 1)(state);
 					for (size_t k = 2 * addr_size - 1; k >= addr_size; --k) {
 						ShiftRight_InPlace(row_index, 1)(state);
@@ -256,7 +244,7 @@ namespace qram_simulator {
 							Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
 							{
 								profiler _("U_L::CondRot::dag");
-								CondRot_General_Bool("div_result", "rotation", func)(state);
+								CondRot_Fixed_Bool("div_result", "rotation").dag(state);
 							}
 							ClearZero()(state);
 							Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
@@ -275,7 +263,7 @@ namespace qram_simulator {
 								profiler _("U_L::CondRot::dag");
 								// size_t original_size = state.size();
 								// fmt::print("U_L original_size {}\n", original_size);
-								CondRot_General_Bool("div_result", "rotation", func)(state);
+								CondRot_Fixed_Bool("div_result", "rotation").dag(state);
 							}
 							ClearZero()(state);
 							GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(state);

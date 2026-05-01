@@ -24,8 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 # Enable testing
 enable_testing()
 
-include(CheckLanguage)
-check_language(CUDA)
+option(QRAM_ENABLE_CUDA "Enable CUDA GPU support" OFF)
 
 if(CACHED_REGISTER_SIZE)
     add_compile_definitions(CACHED_REGISTER_SIZE=${CACHED_REGISTER_SIZE})
@@ -33,18 +32,11 @@ endif()
 
 add_compile_definitions(FMT_UNICODE=0)
 
-if(CMAKE_CUDA_COMPILER)
-    enable_language(CUDA)
-    message(STATUS "CUDA Toolkit found, version ${CMAKE_CUDA_COMPILER_VERSION}")
-    set(CUDA_FOUND TRUE)
-    # message(STATUS "${CUDA_FOUND}")
-
-    include_directories(${PROJECT_SOURCE_DIR}/Common/include/cuda
-                        ${CUDA_INCLUDE_DIRS})
-        
-else()
-    message(STATUS "CUDA not found - building without GPU support")
+if(QRAM_ENABLE_CUDA)
+    message(STATUS "CUDA support is temporarily disabled for the CondRot primitive refactor")
 endif()
+set(CUDA_FOUND FALSE)
+message(STATUS "CUDA support disabled - building CPU-only")
 
 option(CMAKE_BUILD_TYPE "Release")
 

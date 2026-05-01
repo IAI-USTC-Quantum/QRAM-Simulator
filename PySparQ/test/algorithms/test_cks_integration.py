@@ -530,10 +530,10 @@ class TestCKSRegressionTest:
     def test_walk_environment_deterministic(self, fixed_seed_system):
         """CKS_build_walk_environment is deterministic with fixed seed.
 
-        Uses a 4x4 identity matrix so len(mat.data)=16=2^4 (valid power-of-2
-        for QRAMCircuit_qutrit).  addr_size = int(log2(16)) = 4.
+        Uses a 4x4 identity matrix.  The CKS path uses C++ SparseMatrix's
+        compact QRAM layout, so data contains 4 nonzero values plus 4 sparsity
+        entries, and addr_size = ceil(log2(8)) = 3.
         """
-        import pysparq as ps
         from pysparq.algorithms.cks_solver import (
             CKS_build_walk_environment,
             SparseMatrix,
@@ -543,7 +543,8 @@ class TestCKSRegressionTest:
         mat = SparseMatrix.from_dense(A, data_size=8)
         qram, addr_size, nnz_col, n_row = CKS_build_walk_environment(mat)
         # These values are deterministic (no random component)
-        assert addr_size == 4, f"expected addr_size=4, got {addr_size}"
+        assert len(mat.get_data()) == 8
+        assert addr_size == 3, f"expected addr_size=3, got {addr_size}"
         assert nnz_col == 1, f"expected nnz_col=1 (identity), got {nnz_col}"
         assert n_row == 4, f"expected n_row=4, got {n_row}"
 

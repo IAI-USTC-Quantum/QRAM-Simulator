@@ -52,6 +52,7 @@ int main()
 		TEST(QRAMQutrit_FidelityTest);
 
 		/* Chebyshev test */
+		System::clear();
 		TEST(Chebyshev_test);
 
 		/* Linear solver test */
@@ -87,4 +88,3 @@ int main()
 
 	return 0;
 }
-

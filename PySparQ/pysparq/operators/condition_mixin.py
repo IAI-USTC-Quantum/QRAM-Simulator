@@ -64,6 +64,22 @@ class ControllableOperatorMixin:
     def condition_bits(self, value: list) -> None:
         object.__setattr__(self, '__condition_bits', value)
 
+    @property
+    def _condition_regs(self) -> list:
+        return self.condition_regs
+
+    @_condition_regs.setter
+    def _condition_regs(self, value: list) -> None:
+        self.condition_regs = value
+
+    @property
+    def _condition_bits(self) -> list:
+        return self.condition_bits
+
+    @_condition_bits.setter
+    def _condition_bits(self, value: list) -> None:
+        self.condition_bits = value
+
     def conditioned_by_nonzeros(self, cond: str | int | list) -> Self:
         object.__setattr__(
             self,

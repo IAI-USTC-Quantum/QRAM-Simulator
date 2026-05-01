@@ -210,8 +210,8 @@ namespace qram_simulator {
 			}
 		}
 
-		void GetDataAddr::operator()(std::vector<System>& state) const
-		{
+			void GetDataAddr::operator()(std::vector<System>& state) const
+			{
 #ifdef SINGLE_THREAD
 			for (auto& s : state)
 			{
@@ -225,10 +225,45 @@ namespace qram_simulator {
 					s.GetAs(offset_id, uint64_t) +
 					row_sz * s.GetAs(row_id, uint64_t) +
 					s.GetAs(col_sparse_id, uint64_t);
+				}
 			}
-		}
 
-		SparseMatrixOracle1::SparseMatrixOracle1(
+			void GetQWRotateAngle_Int_Int_Int::operator()(std::vector<System>& state) const
+			{
+	#ifdef SINGLE_THREAD
+				for (auto& s : state)
+				{
+	#else
+	#pragma omp parallel for
+				for (int i = 0; i < state.size(); ++i)
+				{
+					auto& s = state[i];
+	#endif
+					if (ConditionNotSatisfied(s))
+						continue;
+
+					uint64_t v = s.GetAs(data_id, uint64_t);
+					double ratio;
+					if (mat->positive_only)
+					{
+						uint64_t Amax_real = pow2(mat->data_size) - 1;
+						v = v % (Amax_real + 1);
+						ratio = v * 1.0 / Amax_real;
+					}
+					else
+					{
+						uint64_t Amax_real = pow2(mat->data_size - 1) - 1;
+						v = v % pow2(mat->data_size);
+						int64_t v_real = get_complement(v, mat->data_size);
+						ratio = std::abs(v_real) * 1.0 / Amax_real;
+					}
+					ratio = std::max(0.0, std::min(1.0, ratio));
+					double out = std::acos(std::sqrt(ratio)) / pi / 2;
+					s.get(out_id).value ^= get_rational(out, System::size_of(out_id));
+				}
+			}
+
+			SparseMatrixOracle1::SparseMatrixOracle1(
 			qram_qutrit::QRAMCircuit* qram_,
 			std::string_view reg_offset_,
 			std::string_view reg_row_,
@@ -330,7 +365,7 @@ namespace qram_simulator {
 			AddAssign_AnyInt_AnyInt_InPlace(l, sparse_offset).dag(system_states);
 		}
 
-		void CondRot_General_Bool_QW::operate(size_t l, size_t r, std::vector<System>& state, walk_angle_function_t func) const
+			void CondRot_General_Bool_QW::operate(size_t l, size_t r, std::vector<System>& state, walk_angle_function_t func) const
 		{
 			size_t n = r - l;
 			constexpr size_t full_size = 2;
@@ -344,21 +379,21 @@ namespace qram_simulator {
 			size_t row_id = state[l].GetAs(j_id, uint64_t);
 			size_t col_id = state[l].GetAs(k_id, uint64_t);
 
-			u22_t mat = func(v, row_id, col_id);
+			u22_t rot_mat = func(v, row_id, col_id);
 
-			if (_is_diagonal(mat))
-			{
-				_operate_diagonal(l, r, state, mat);
+				if (_is_diagonal(rot_mat))
+				{
+					_operate_diagonal(l, r, state, rot_mat);
+				}
+				else if (_is_off_diagonal(rot_mat))
+				{
+					_operate_off_diagonal(l, r, state, rot_mat);
+				}
+				else
+				{
+					_operate_general(l, r, state, rot_mat);
+				}
 			}
-			else if (_is_off_diagonal(mat))
-			{
-				_operate_off_diagonal(l, r, state, mat);
-			}
-			else
-			{
-				_operate_general(l, r, state, mat);
-			}
-		}
 
 		bool CondRot_General_Bool_QW::_is_diagonal(const u22_t &data)
 		{

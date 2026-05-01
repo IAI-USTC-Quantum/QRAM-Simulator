@@ -14,12 +14,14 @@ CPU 构建
    cmake .. -DCMAKE_BUILD_TYPE=Release
    make -j$(nproc)
 
-GPU 构建（需要 CUDA 12+）
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+GPU 构建
+^^^^^^^^
+
+CUDA/GPU 后端当前在 CMake 中临时屏蔽；即使传入 GPU 相关选项，也会构建 CPU-only 版本。
 
 .. code-block:: bash
 
-   cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_CUDA=ON
+   cmake .. -DCMAKE_BUILD_TYPE=Release -DQRAM_ENABLE_CUDA=ON
    make -j$(nproc)
 
 Python 绑定

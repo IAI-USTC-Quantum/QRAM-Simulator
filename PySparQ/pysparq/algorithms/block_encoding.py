@@ -31,7 +31,7 @@ import numpy as np
 import pysparq as ps
 from pysparq.operators import ControllableOperatorMixin
 
-from pysparq.algorithms.qram_utils import make_func, make_func_inv, pow2
+from pysparq.algorithms.qram_utils import pow2
 
 
 # ==============================================================================
@@ -263,9 +263,6 @@ class UR(ControllableOperatorMixin):
         ps.AddRegister("temp_bit", ps.Boolean, 1)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
 
-        n_digit = ps.System.size_of("div_result")
-        func = lambda value, _n=n_digit: make_func(value, _n)
-
         for k in range(self.addr_size):
             ps.SplitRegister(self.column_index, "rotation", 1)(state)
             ps.CombineRegister(self.column_index, "temp_bit")(state)
@@ -277,7 +274,7 @@ class UR(ControllableOperatorMixin):
             ps.QRAMLoad(self.qram, "addr_child", "data_child")(state)
             ps.Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state)
 
-            ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+            ps.CondRot_Fixed_Bool("div_result", "rotation")(state)
 
             ps.ClearZero()(state)
 
@@ -312,9 +309,6 @@ class UR(ControllableOperatorMixin):
         ps.AddRegister("temp_bit", ps.Boolean, 1)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
 
-        n_digit = ps.System.size_of("div_result")
-        func_inv = lambda value, _n=n_digit: make_func_inv(value, _n)
-
         ps.ShiftLeft_InPlace(self.column_index, 1)(state)
 
         for k in range(self.addr_size):
@@ -329,7 +323,7 @@ class UR(ControllableOperatorMixin):
             ps.QRAMLoad(self.qram, self.column_index, "data_parent")(state)
             ps.Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state)
 
-            ps.CondRot_General_Bool("div_result", "rotation", func_inv)(state)
+            ps.CondRot_Fixed_Bool("div_result", "rotation").dag(state)
 
             ps.ClearZero()(state)
 
@@ -398,9 +392,6 @@ class UL(ControllableOperatorMixin):
         ps.AddRegister("data_child", ps.SignedInteger, self.data_size)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
 
-        n_digit = ps.System.size_of("div_result")
-        func = lambda value, _n=n_digit: make_func(value, _n)
-
         for k in range(self.addr_size, 2 * self.addr_size):
             ps.SplitRegister(self.row_index, "rotation", 1)(state)
             ps.Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state)
@@ -418,7 +409,7 @@ class UL(ControllableOperatorMixin):
                     state
                 )
 
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation")(state)
 
                 # Uncompute
                 ps.Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(
@@ -437,7 +428,7 @@ class UL(ControllableOperatorMixin):
                     "data_parent", "data_child", "div_result"
                 )(state)
 
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation")(state)
 
                 # Uncompute
                 ps.GetRotateAngle_Int_Int(
@@ -478,9 +469,6 @@ class UL(ControllableOperatorMixin):
         ps.AddRegister("data_child", ps.SignedInteger, self.data_size)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
 
-        n_digit = ps.System.size_of("div_result")
-        func_inv = lambda value, _n=n_digit: make_func_inv(value, _n)
-
         ps.ShiftLeft_InPlace(self.row_index, 1)(state)
 
         for k in range(2 * self.addr_size - 1, self.addr_size - 1, -1):
@@ -501,7 +489,7 @@ class UL(ControllableOperatorMixin):
                     state
                 )
 
-                ps.CondRot_General_Bool("div_result", "rotation", func_inv)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation").dag(state)
 
                 ps.ClearZero()(state)
 
@@ -522,7 +510,7 @@ class UL(ControllableOperatorMixin):
                     "data_parent", "data_child", "div_result"
                 )(state)
 
-                ps.CondRot_General_Bool("div_result", "rotation", func_inv)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation").dag(state)
 
                 ps.ClearZero()(state)
 
