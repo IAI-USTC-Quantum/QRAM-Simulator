@@ -292,6 +292,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
@@ -509,8 +510,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_destroy_func</span> <span class="ow">and</span> <span class="n">ptr</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_destroy_func</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>  <span class="c1"># 忽略销毁错误</span></div>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to destroy C++ object at </span><span class="si">{</span><span class="n">ptr</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span></div>
 
     
 <div class="viewcode-block" id="CppOperatorWrapper.close">
@@ -549,8 +551,9 @@
                     <span class="n">hmodule</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">_handle</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">hmodule</span><span class="p">:</span>
                         <span class="n">kernel32</span><span class="o">.</span><span class="n">FreeLibrary</span><span class="p">(</span><span class="n">hmodule</span><span class="p">)</span>
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                    <span class="k">pass</span>  <span class="c1"># 忽略释放错误</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to FreeLibrary: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span>
             
             <span class="c1"># 删除 handle 对象</span>
             <span class="k">del</span> <span class="n">handle</span>
@@ -788,8 +791,9 @@
                 <span class="c1"># 关闭动态库句柄</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;_wrapper&#39;</span><span class="p">):</span>
                     <span class="n">instance</span><span class="o">.</span><span class="n">_wrapper</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleanup failed during _cleanup_active_instances: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span>
     
     <span class="n">_active_instances</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
     
