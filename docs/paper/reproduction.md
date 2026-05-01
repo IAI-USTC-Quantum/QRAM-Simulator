@@ -6,7 +6,7 @@
 
 - **标题**: Efficient Simulation of Quantum Random Access Memory
 - **arXiv**: [2503.13832](https://arxiv.org/abs/2503.13832)
-- **代码仓库**: https://github.com/Agony5757/QRAM-Simulator
+- **代码仓库**: https://github.com/IAI-USTC-Quantum/QRAM-Simulator
 
 ## 环境准备
 
@@ -21,7 +21,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/Agony5757/QRAM-Simulator.git
+git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 
 # 创建构建目录
