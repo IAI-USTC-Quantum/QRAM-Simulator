@@ -364,15 +364,15 @@ QRAM-Simulator/
 |------|------------|----------------|--------|
 | **Grover** | `Experiments/Grover/GroverTest.cpp` | `PySparQ/pysparq/algorithms/grover.py` | ✅ 完整复刻 |
 | **Shor** | `Experiments/Shor/ShorTest.cpp` | `PySparQ/pysparq/algorithms/shor.py` | ✅ 完整复刻 |
-| **QDA** | `Experiments/QDA/QDATest/QDATest.cpp` | `PySparQ/pysparq/algorithms/qda_solver.py` | ⚠️ 骨架已建，部分子模块为占位 |
-| **CKS** | `Experiments/CKS/HamiltonianSimulationTest.cpp` | `PySparQ/pysparq/algorithms/cks_solver.py` | ⚠️ 骨架已建，部分子模块为占位 |
+| **QDA** | `Experiments/QDA/QDATest/QDATest.cpp` | `PySparQ/pysparq/algorithms/qda_solver.py` | ✅ primitive 级转译，解读出后处理待补 |
+| **CKS** | `Experiments/CKS/HamiltonianSimulationTest.cpp` | `PySparQ/pysparq/algorithms/cks_solver.py` | ✅ primitive 级转译，LCU 解读出后处理待补 |
 | **QFT** | `Experiments/QFT/QFTTest.cpp` | ❌ 无独立模块 | ❌ 尚未实现 |
 | **GHZ** | `Experiments/GHZ/GHZTest.cpp` | ❌ 无 | ❌ 尚未实现 |
 | **QCNN** | `Experiments/QCNN/QCNNTest.cpp`（已被 `#if false` 禁用） | ❌ 无 | ❌ 尚未实现 |
 
 **关键发现：**
 - Grover 和 Shor 实现了完整的一一对应，是目前 PySparQ 算法库中最完整的两个实现
-- QDA 和 CKS 建立了正确的类层次结构，核心数学公式（插值函数、Chebyshev 多项式等）已转译，但底层量子操作细节仍有占位符
+- QDA 和 CKS 的 Python 实现不直接调用 C++ solver，而是组合 PySparQ 底层 primitive 来复刻 C++ 的寄存器级流程；当前未完成的是测量、post-selection 和线性系统解向量读出
 - QFT、GHZ 的 C++ 实现较简单，可作为接下来补全的优先目标
 - QCNN 在 C++ 侧已被禁用，需要先在 C++ 侧恢复再转译到 Python
 
@@ -645,6 +645,8 @@ def shor_postprocess(meas: int, size: int, a: int, N: int) -> Tuple[int, int]:
 
 QDA（Quantum Discrete Adiabatic）利用离散绝热定理求解线性系统 Ax = b，达到 O(κ log(κ/ε)) 的最优规模（κ 为条件数）。
 
+PySparQ 版本按 C++ `Walk_s_Tridiagonal` 和 `Walk_s_via_QRAM` 的寄存器级结构实现：矩阵块编码、`StatePrepViaQRAM`、`Hadamard_Int_Full`、反射、受控旋转和全局相位都由 Python 侧调用底层 primitive 组合完成。它不会把整个 QDA solver 作为一个 C++ 绑定来绕过 Python 实现。当前 `qda_solve()` 会执行量子 walk 序列；由于测量和 post-selection 读出尚未接上，运行完成后会显式抛出 `RuntimeError`，避免用经典 `np.linalg.solve` 掩盖算法路径中的错误。
+
 核心思路：
 ```
 H(s) = (1-f(s))·H₀ + f(s)·H₁   （插值哈密顿量）
@@ -765,6 +767,8 @@ vector<double> weights = ComputeFourierCoeffs(epsilon_, l_);
 
 CKS 算法利用 Chebyshev 多项式逼近和量子游走，在稀疏矩阵条件下达到 O(κ log(κ/ε)) 的复杂度，比 HHL 类算法有更好的常数因子。
 
+PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`CondRot_General_Bool_QW`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver。`cks_solve_v2()` 目前会先跑量子 LCU/walk 路径，再以 warning 标明测量读出未完成，并临时返回经典解作为占位。
+
 核心流程：
 ```
 1. Chebyshev 多项式系数 c_j = erfc((j+0.5)/√b) * 2
@@ -871,6 +875,8 @@ class QuantumWalk:
 for (int i = 0; i < 99; ++i)
     QuantumWalk(qram, j, b1, k, b2, j_comp, k_comp, ...)(system_states);
 ```
+
+CKS 的 fidelity 测试与 C++ `automatic_Chebyshev_test` 对齐时，需要按 C++ 逻辑只比较 post-selection 后的目标寄存器，并使用 `SparseMatrix` 实际编码出的稠密矩阵表示（包含 `nnz_col` 归一化），不能直接拿原始输入矩阵 `A / ||A||` 做目标态。
 
 #### 6.5 LCU 容器（cks_solver.py 第 843–930 行）
 

@@ -897,6 +897,22 @@ Example:
              py::arg("reg"), py::arg("matrix"))
         .def(py::init<size_t, u22_t>(),
              py::arg("reg_id"), py::arg("matrix"))
+        .def(py::init([](std::string_view reg, size_t digit, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg, digit, u22_t(matrix));
+             }),
+             py::arg("reg"), py::arg("digit"), py::arg("matrix"))
+        .def(py::init([](size_t reg_id, size_t digit, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg_id, digit, u22_t(matrix));
+             }),
+             py::arg("reg_id"), py::arg("digit"), py::arg("matrix"))
+        .def(py::init([](std::string_view reg, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg, u22_t(matrix));
+             }),
+             py::arg("reg"), py::arg("matrix"))
+        .def(py::init([](size_t reg_id, const std::array<complex_t, 4>& matrix) {
+                 return Rot_Bool(reg_id, u22_t(matrix));
+             }),
+             py::arg("reg_id"), py::arg("matrix"))
             BIND_CONTROLLABLE_METHODS(Rot_Bool);
 
     BIND_BASE_OPERATOR(Ygate_Bool)
