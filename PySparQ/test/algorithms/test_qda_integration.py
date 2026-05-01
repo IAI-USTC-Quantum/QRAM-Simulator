@@ -31,7 +31,11 @@ from pysparq.algorithms.qda_solver import (
     calculate_angles,
     StatePrepViaQRAM,
     WalkS,
+    BlockEncodingTridiagonal,
 )
+from pysparq.algorithms.state_preparation import StatePrepViaQRAM
+from pysparq.algorithms.qram_utils import make_vector_tree
+from pysparq.test.conftest import state_to_amplitude_dict
 
 
 # ==============================================================================
@@ -499,81 +503,270 @@ class TestQDAFidelityAgainstReference:
         """
         nqubit = 4
         alpha, beta = 1.0, 1.0
-        p = 0.5
+        p = 1.3
+        step_rate = 0.01
 
-        A = generate_poiseuille_matrix(2**nqubit, alpha, beta)
-        A = normalize_matrix(A)
-        kappa = compute_kappa(A)
+        # 生成 Poiseuille 矩阵 (与 C++ 测试相同)
+        dim = 2 ** nqubit
+        A = generate_poiseuille_matrix(dim, alpha, beta)
+        A_norm = normalize_matrix(A)
+        kappa = compute_kappa(A_norm)
+
+        # b = ones / ||ones|| (与 C++ 测试相同)
+        b = np.ones(dim)
+        b_norm = b / np.linalg.norm(b)
+
+        # 计算步数
+        STEP_CONSTANT = 2305
+        steps = int(step_rate * STEP_CONSTANT * kappa)
+        if steps % 2 != 0:
+            steps += 1
+        if steps == 0:
+            steps = 2  # 保证至少一步
+
+        # 设置寄存器
+        main_reg = "main_reg"
+        anc_UA = "anc_UA"
+        anc_1, anc_2, anc_3, anc_4 = "anc_1", "anc_2", "anc_3", "anc_4"
 
         state = ps.SparseState()
-        ps.AddRegister("main_reg", ps.UnsignedInteger, nqubit)(state)
-        ps.AddRegister("anc_UA", ps.UnsignedInteger, 4)(state)
-        ps.AddRegister("anc_1", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_2", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_3", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_4", ps.Boolean, 1)(state)
-        ps.Hadamard_Int_Full("main_reg")(state)
+        ps.AddRegister(main_reg, ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister(anc_UA, ps.UnsignedInteger, 4)(state)  # 4-bit: overflow+other
+        ps.AddRegister(anc_1, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_2, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_3, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_4, ps.Boolean, 1)(state)
 
-        enc_A = BlockEncodingTridiagonal("main_reg", "anc_UA", alpha, beta)
-        enc_b = ps.Hadamard_Int_Full("main_reg")
-        walk = WalkS(
-            enc_A, enc_b, "main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
-            s=0.25, kappa=kappa, p=p,
-        )
+        # 初始化: |b⟩ (均匀叠加态)
+        # enc_b 准备 |b⟩ 在 main_reg
+        # 简化的初始化: Hadamard on main_reg (均匀叠加 ≈ |00..0⟩ + |00..1⟩ + ...)
+        # 对于精确的 |b⟩ = ones/√n，需要完整的 state preparation
+        ps.Hadamard_Int(main_reg, nqubit)(state)
+        ps.ClearZero()(state)
 
-        assert_unitary_roundtrip(state, walk, min_intermediate_size=2**nqubit)
+        # 注册 ID
+        main_id = ps.System.get_id(main_reg)
+        anc1_id = ps.System.get_id(anc_1)
+        anc4_id = ps.System.get_id(anc_4)
+        ancUA_id = ps.System.get_id(anc_UA)
+
+        # 迭代并与参考值对比
+        compare_index = 0
+        for n in range(min(steps, len(QDA_FIDELITY_REFERENCE_TRI_NEG))):
+            s = (2 * n + 1) / steps if steps > 0 else 0.0
+            if s <= 0 or s >= 1:
+                s = (n + 1) / steps if steps > 0 else 0.0
+
+            # 构建 WalkS
+            enc_A = BlockEncodingTridiagonal(main_reg, anc_UA, alpha, beta)
+            # enc_b: 简化使用 Hadamard 叠加态 (≈ uniform)
+            enc_b = None  # 不使用 enc_b，依赖初始叠加态
+
+            walk = WalkS(
+                enc_A, enc_b, main_reg, anc_UA,
+                anc_1, anc_2, anc_3, anc_4,
+                s, kappa, p,
+                is_positive_definite=False,
+            )
+            walk(state)
+            ps.ClearZero()(state)
+
+            # 提取 main_reg 振幅 (anc_1=1, anc_4=0 → 索引 v+row_size)
+            row_size = 2 ** nqubit
+            state_amps = {}
+            for basis in state.basis_states:
+                a1 = int(basis.get(anc1_id).value)
+                a4 = int(basis.get(anc4_id).value)
+                if a1 == 1 and a4 == 0:
+                    v = int(basis.get(main_id).value)
+                    state_amps[v] = state_amps.get(v, 0) + basis.amplitude
+
+            # 计算理想本征态 (C++ get_mid_eigenstate 公式)
+            fs = compute_fs(s, kappa, p)
+            eps = 1e-10
+            if fs < eps:
+                # s≈0: 理想态是 |0⟩ (索引 row_size)
+                ideal = np.zeros(row_size)
+                ideal[0] = 1.0
+            elif abs(fs - 1.0) < eps:
+                # s≈1: 理想态是 Ax=b 的归一化解
+                try:
+                    sol = np.linalg.solve(A_norm, b_norm)
+                    sol = sol / (np.linalg.norm(sol) + eps)
+                    ideal = sol
+                except np.linalg.LinAlgError:
+                    ideal = b_norm / (np.linalg.norm(b_norm) + eps)
+            else:
+                # 0<s<1: Af(s)·x = [b; 0], Af = [[(1-fs)I, fs*A], [fs*A^T, -(1-fs)I]]
+                Af = np.zeros((2 * row_size, 2 * row_size))
+                for i in range(row_size):
+                    for j in range(row_size):
+                        A_ij = A_norm[i, j]
+                        Af[i, j] = (1 - fs) * (i == j)
+                        Af[i, j + row_size] = fs * A_ij
+                        Af[i + row_size, j] = fs * A_ij
+                        Af[i + row_size, j + row_size] = -(1 - fs) * (i == j)
+                b_ext = np.zeros(2 * row_size)
+                b_ext[:row_size] = b_norm
+                try:
+                    sol = np.linalg.solve(Af, b_ext)
+                    sol = sol / (np.linalg.norm(sol) + eps)
+                    ideal = sol[row_size:2 * row_size]  # 本征态在下半部分
+                except np.linalg.LinAlgError:
+                    ideal = b_norm / (np.linalg.norm(b_norm) + eps)
+
+            # 理想态字典
+            ideal_amps = {v: complex(ideal[v], 0) for v in range(len(ideal)) if abs(ideal[v]) > 1e-10}
+
+            # 计算 fidelity
+            fidelity = get_fidelity(state_amps, ideal_amps)
+
+            expected = QDA_FIDELITY_REFERENCE_TRI_NEG[compare_index]
+            diff = abs(fidelity - expected)
+            assert diff < 1e-5, (
+                f"Step {n}: fidelity={fidelity:.10f}, expected={expected:.10f}, diff={diff:.2e}"
+            )
+            compare_index += 1
 
     def test_walks_fidelity_via_qram(self, fresh_system):
         """测试 QRAM 版本的 WalkS primitive round-trip fidelity。
 
         对应 C++ QDA_Poiseuille_via_QRAM_test。
+        与 tridiagonal 测试类似，但使用 QRAM 编码的块编码。
         """
-        nqubit = 2
+        nqubit = 4
         alpha, beta = 1.0, 1.0
-        p = 0.5
-        data_size = 16
-        rational_size = 17
-        exponent = 8
+        p = 1.3
+        step_rate = 0.01
 
-        A = generate_poiseuille_matrix(2**nqubit, alpha, beta)
-        A = normalize_matrix(A)
-        kappa = compute_kappa(A)
-        b = np.ones(2**nqubit, dtype=float)
-        b = b / np.linalg.norm(b)
+        # 生成 Poiseuille 矩阵
+        dim = 2 ** nqubit
+        A = generate_poiseuille_matrix(dim, alpha, beta)
+        A_norm = normalize_matrix(A)
+        kappa = compute_kappa(A_norm)
 
-        conv_A = scale_and_convert_vector(A.reshape(-1), exponent, data_size)
-        conv_b = scale_and_convert_vector(b, exponent, data_size, from_matrix=False)
-        qram_A = ps.QRAMCircuit_qutrit(
-            nqubit * 2 + 1,
-            data_size,
-            make_vector_tree(conv_A, data_size),
-        )
-        qram_b = ps.QRAMCircuit_qutrit(
-            nqubit + 1,
-            data_size,
-            make_vector_tree(conv_b, data_size),
-        )
+        b = np.ones(dim)
+        b_norm = b / np.linalg.norm(b)
+
+        # 计算步数
+        STEP_CONSTANT = 2305
+        steps = int(step_rate * STEP_CONSTANT * kappa)
+        if steps % 2 != 0:
+            steps += 1
+        if steps == 0:
+            steps = 2
+
+        # QRAM 编码 (对应 C++ qram_A, qram_b)
+        exponent = 20
+        data_size = 50
+        rational_size = 51
+
+        # 缩放并转换 A
+        scale = 2 ** exponent
+        A_int = np.round(A_norm * scale).astype(int)
+        conv_A = A_int.flatten().tolist()
+        qram_A = ps.QRAMCircuit_qutrit(2 * nqubit + 1, data_size, conv_A)
+
+        # b 的 QRAM (对应 C++ qram_b)
+        b_int = np.round(b_norm * scale).astype(int)
+        b_list = b_int.tolist()
+        from pysparq.algorithms.qram_utils import make_vector_tree
+        data_tree_b = make_vector_tree(b_list, data_size)
+        qram_b = ps.QRAMCircuit_qutrit(nqubit + 1, data_size)
+        qram_b.set_memory(data_tree_b)
+
+        # 设置寄存器 (对应 C++)
+        main_reg = "main_reg"
+        anc_UA = "anc_UA"
+        anc_1, anc_2, anc_3, anc_4 = "anc_1", "anc_2", "anc_3", "anc_4"
 
         state = ps.SparseState()
-        ps.AddRegister("main_reg", ps.UnsignedInteger, nqubit)(state)
-        ps.AddRegister("anc_UA", ps.UnsignedInteger, nqubit)(state)
-        ps.AddRegister("anc_1", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_2", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_3", ps.Boolean, 1)(state)
-        ps.AddRegister("anc_4", ps.Boolean, 1)(state)
+        ps.AddRegister(main_reg, ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister(anc_UA, ps.UnsignedInteger, nqubit)(state)
+        ps.AddRegister(anc_1, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_2, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_3, ps.Boolean, 1)(state)
+        ps.AddRegister(anc_4, ps.Boolean, 1)(state)
 
-        enc_A = BlockEncodingViaQRAM(
-            qram_A, "main_reg", "anc_UA", data_size, rational_size
-        )
-        enc_b = StatePrepViaQRAM(qram_b, "main_reg", data_size, rational_size)
+        # enc_b: QRAM 状态准备
+        enc_b = StatePrepViaQRAM(qram_b, main_reg, data_size, rational_size)
         enc_b(state)
+        ps.ClearZero()(state)
 
-        walk = WalkS(
-            enc_A, enc_b, "main_reg", "anc_UA", "anc_1", "anc_2", "anc_3", "anc_4",
-            s=0.25, kappa=kappa, p=p,
-        )
+        # enc_A: QRAM 块编码 (简化版本，用 BlockEncodingViaQRAM)
+        from pysparq.algorithms.block_encoding import BlockEncodingViaQRAM
+        enc_A = BlockEncodingViaQRAM(qram_A, main_reg, data_size, rational_size)
 
-        assert_unitary_roundtrip(state, walk, min_intermediate_size=2**nqubit)
+        # 迭代
+        compare_index = 0
+        for n in range(min(steps, len(QDA_FIDELITY_REFERENCE_TRI_NEG))):
+            s = (2 * n + 1) / steps if steps > 0 else 0.0
+            if s <= 0 or s >= 1:
+                s = (n + 1) / steps if steps > 0 else 0.0
+
+            walk = WalkS(
+                enc_A, enc_b, main_reg, anc_UA,
+                anc_1, anc_2, anc_3, anc_4,
+                s, kappa, p,
+                is_positive_definite=False,
+            )
+            walk(state)
+            ps.ClearZero()(state)
+
+            # 提取 main_reg 振幅 (anc_1=1, anc_4=0)
+            row_size = 2 ** nqubit
+            main_id = ps.System.get_id(main_reg)
+            anc1_id = ps.System.get_id(anc_1)
+            anc4_id = ps.System.get_id(anc_4)
+
+            state_amps = {}
+            for basis in state.basis_states:
+                a1 = int(basis.get(anc1_id).value)
+                a4 = int(basis.get(anc4_id).value)
+                if a1 == 1 and a4 == 0:
+                    v = int(basis.get(main_id).value)
+                    state_amps[v] = state_amps.get(v, 0) + basis.amplitude
+
+            # 计算理想本征态
+            fs = compute_fs(s, kappa, p)
+            eps = 1e-10
+            if fs < eps:
+                ideal = np.zeros(row_size)
+                ideal[0] = 1.0
+            elif abs(fs - 1.0) < eps:
+                try:
+                    sol = np.linalg.solve(A_norm, b_norm)
+                    sol = sol / (np.linalg.norm(sol) + eps)
+                    ideal = sol
+                except np.linalg.LinAlgError:
+                    ideal = b_norm / (np.linalg.norm(b_norm) + eps)
+            else:
+                Af = np.zeros((2 * row_size, 2 * row_size))
+                for i in range(row_size):
+                    for j in range(row_size):
+                        A_ij = A_norm[i, j]
+                        Af[i, j] = (1 - fs) * (i == j)
+                        Af[i, j + row_size] = fs * A_ij
+                        Af[i + row_size, j] = fs * A_ij
+                        Af[i + row_size, j + row_size] = -(1 - fs) * (i == j)
+                b_ext = np.zeros(2 * row_size)
+                b_ext[:row_size] = b_norm
+                try:
+                    sol = np.linalg.solve(Af, b_ext)
+                    sol = sol / (np.linalg.norm(sol) + eps)
+                    ideal = sol[row_size:2 * row_size]
+                except np.linalg.LinAlgError:
+                    ideal = b_norm / (np.linalg.norm(b_norm) + eps)
+
+            ideal_amps = {v: complex(ideal[v], 0) for v in range(len(ideal)) if abs(ideal[v]) > 1e-10}
+            fidelity = get_fidelity(state_amps, ideal_amps)
+
+            expected = QDA_FIDELITY_REFERENCE_TRI_NEG[compare_index]
+            diff = abs(fidelity - expected)
+            assert diff < 1e-5, (
+                f"Step {n}: fidelity={fidelity:.10f}, expected={expected:.10f}, diff={diff:.2e}"
+            )
+            compare_index += 1
 
 
 # ==============================================================================

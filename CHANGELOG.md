@@ -7,40 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.1.1] - 2026-05-01
 
 ### Added
-- 项目架构文档 ARCHITECTURE.md（已移至 `docs/architecture.md`）
-- 变更日志 CHANGELOG.md
-- 完善的 README.md，包含复现说明
-- 为 PySparQ 核心类添加文档字符串（System, SparseState, QRAMLoad, QFT, Add_UInt_UInt 等）
-- 为可控方法添加共享文档字符串（conditioned_by_nonzeros, conditioned_by_all_ones 等）
+- **PySparQ/core.cpp**: Native C++ bindings for CKS primitives:
+  `CondRot_General_Bool_QW`, `QuantumBinarySearchFast`, `GetRowAddr`,
+  `GetDataAddr`; `SparseMatrix` named constructor arguments and
+  read-only properties (`nnz_col`, `n_row`, `data_size`, `sparsity`)
+- **PySparQ/pysparq/__init__.py**: Export 4 new CKS primitives
+- **PySparQ/pysparq/algorithms/cks_solver.py**: Full refactor:
+  `_CKSWalkEnvironment` class with bytecode-based unpacking, global caches
+  (`_CKS_ENV_CACHE`, `_CKS_STATE_STEP_CACHE`), `SparseMatrix.from_dense()`
+  with L2-normalization, `TOperator` oracle call order aligned to C++,
+  `QuantumWalkNSteps` power-of-two padding
+- **PySparQ/pysparq/algorithms/qda_solver.py**: `BlockEncodingHs.dag()`
+  implemented (21-operation reverse sequence); `qda_solve()` rewritten
+  with correct `n_bits` and step formula
+- **PySparQ/test/algorithms/test_cks_integration.py**: Full end-to-end
+  quantum walk execution against C++ reference matrices
+- **PySparQ/test/algorithms/test_qda_integration.py**: `WalkS` fidelity
+  tests against C++ `CorrectnessTest_QDA_CompareList.inl` reference values
 
 ### Changed
-- 文档结构优化
-- CI 存根验证现在会在不同步时失败（不再只是警告）
-- 添加 pre-commit hook 验证存根文件同步
-- GitHub Actions 现在持久化 ccache（Linux）和 sccache（Windows）缓存
-- GitHub Actions 添加 pip 缓存支持
-- Python CI 矩阵从 [3.9, 3.11, 3.12] 更新为 [3.10, 3.12, 3.13]
-- PyPI wheel 构建从 cp39-313 更新为 cp310-313
-- `pybind11_stubgen` 从运行时依赖移至可选开发依赖
-
-### Removed
-- Python 3.9 支持（最低版本现为 3.10）
-- 根目录 `all_test.sh`（未在 CI 中使用）
-- 根目录 `stubgen.py`（CI 直接使用 `pybind11-stubgen`）
-- 根目录 `IMPLEMENTATION_REPORT.md`（历史文档）
-- 根目录 `README_pypi.md`（未使用；`pyproject.toml` 已指定 `README.md`）
-- 根目录 `ARCHITECTURE.md`（已移至 `docs/architecture.md`）
-- `pyqsparse/` 目录（旧版存根输出）
+- **PySparQ/src/qda_algo.cpp**: Conditional rotation primitives refactored
+  to `CondRot_Fixed_Bool` and `CondRot_General_Bool_fast`; old
+  function-based API removed
+- **PySparQ/**: `block_encoding.py`, `state_preparation.py`,
+  `dynamic_operator/compiler.py`, `dynamic_operator/operator_wrapper.py`
+  updated to new condrot API
+- **SparQ/src/condrot.cpp**: Internal condrot implementation aligned
+- **SparQ_Algorithm/**: `hamiltonian_simulation.h/cpp` aligned with new
+  condrot API
+- **docs/paper/reproduction.md**: Updated CUDA build instructions;
+  upstream repo URL fixed
+- **CONTRIBUTING.md**: Updated clone instructions to upstream;
+  added `uv venv` guidance
+- **CLAUDE.md**: Added CKS/QDA Python porting status and open issues
 
 ### Fixed
-- `compile_operator` 编译的算子作用于 `SparseState` 时触发段错误（#67）：通过 `state._cpp_ptr()` 获取 C++ 对象地址，并修复 wrapper 跨实例共享问题
+- **PySparQ/src/qda_algo.cpp**: Trailing newline added
+
+### Removed
+- **PySparQ/**: Old function-based conditional rotation Python API
+  hidden from `__init__.py`
+
+### Documentation
+- **docs/paper/reproduction.md**: Fix repository URL from fork to upstream
+- **CONTRIBUTING.md**: Fix clone URL from fork to upstream
+- **CLAUDE.md**: Add CKS/QDA Python porting status and known open issues
 
 ---
 
-## [1.0.0] - 2025-04-15
+## [0.1.0] - 2025-04-15
 
 ### Added
 
@@ -152,7 +170,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | 版本 | 日期 | 主要更新 |
 |------|------|----------|
-| 1.0.0 | 2025-04-15 | 首次发布，包含完整的 QRAM 模拟器、稀疏态模拟核心、Python 绑定和实验代码 |
+| 0.1.1 | 2026-05-01 | CKS/QDA Python primitive alignment, native C++ bindings, integration tests activated |
+| 0.1.0 | 2025-04-15 | 首次发布，包含完整的 QRAM 模拟器、稀疏态模拟核心、Python 绑定和实验代码 |
 
 ---
 

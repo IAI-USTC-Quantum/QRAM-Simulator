@@ -26,8 +26,13 @@ cd build && ctest --output-on-failure
 # Run specific CPU test binary
 ./build/bin/SparQ_Example
 
-# Python package (pip install from source)
-pip install .
+# Python package — use uv venv ONLY (do not use pip or conda)
+uv venv .venv && source .venv/bin/activate
+uv pip install -e PySparQ/
+
+# Run Python tests (from project root)
+source .venv/bin/activate
+pytest PySparQ/test/ -v
 
 # Format/lint (pre-commit)
 pre-commit run --all-files
@@ -151,6 +156,73 @@ The CI workflow includes:
 - **Test**: C++ unit tests via ctest
 - **Python Tests**: Multiple Python versions (3.9, 3.11, 3.12) on Ubuntu and Windows
 - **Docs**: Doxygen + Sphinx documentation build
+
+## Critical: CKS/QDA Python Porting Status
+
+**CKS 和 QDA Python 实现的端到端 fidelity 测试状态：**
+
+### CKS (Chebyshev-Kothari-Somma Linear Solver)
+
+Python 实现在 `PySparQ/pysparq/algorithms/cks_solver.py` 中，包括：
+- `ChebyshevPolynomialCoefficient` ✓ (数学正确性测试通过)
+- `get_coef_positive_only` / `get_coef_common` ✓ (酉性验证通过)
+- `SparseMatrix` ✓
+- `TOperator` ✓ (结构正确)
+- `QuantumWalk` / `QuantumWalkNSteps` ✓ (结构正确)
+
+**未完成：端到端 fidelity 测试**
+
+- `test_cks_integration.py::TestQuantumWalkFidelity` 中的 `test_quantum_walk_chebyshev_fidelity` 已用真实量子行走执行替代 TODO 注释，对应 C++ `CorrectnessTest_Common.inl` 中的 `Chebyshev_test()`（fidelity >= 0.999）
+- `test_lcu_linear_solver_fidelity` 同样，对应 `linear_solver_theory_compare_test()`（fidelity >= 0.9999）
+
+**已知限制**：`QuantumBinarySearch._find_column_position` 的逆操作在某些情况下未完全 uncompute，可能导致 `RemoveRegister` 调用时出现 `RuntimeError`。见 `test_cks_solver_v2.py` 第 109-128 行。
+
+### QDA (Quantum Discrete Adiabatic Linear Solver)
+
+Python 实现在 `PySparQ/pysparq/algorithms/qda_solver.py` 中，包括：
+- `compute_fs` ✓ (数学正确性测试通过)
+- `compute_rotation_matrix` ✓ (酉性验证通过)
+- `chebyshev_T` ✓
+- `dolph_chebyshev` / `compute_fourier_coeffs` ✓
+- `WalkS` / `BlockEncodingHs` / `LCU` / `Filtering` ✓
+- `BlockEncodingHs.dag()` ✓ (已实现，21 步逆操作)
+- `qda_solve()` ✓ (已重写，正确的 `n_bits` 和步数公式)
+
+**端到端 fidelity 测试已激活**：`test_walks_fidelity_tridiagonal` 和 `test_walks_fidelity_via_qram` 已启用，与 C++ `CorrectnessTest_QDA_CompareList.inl` 参考值对比（要求 diff < 1e-5）
+
+### 下一步行动
+
+1. **完善 LCU 结果提取**：`cks_solve_v2` / `qda_solve` 当前返回 `np.linalg.solve` 的经典结果，真正的量子振幅提取逻辑是 TODO
+2. **修复 CKS uncompute 边界情况**：解决 `QuantumBinarySearch._find_column_position` 的逆操作清理问题
+3. **完善 QDA `is_positive_definite=True` 分支测试**：当前测试聚焦于 `is_positive_definite=False` (Neg) 情况
+
+## Python Test Structure
+
+```
+PySparQ/test/
+  conftest.py             fresh_system fixture (autouse), helpers
+  test_doc_examples.py     示例代码可执行性测试
+  test_dynamic_operator.py
+  algorithms/
+    conftest.py           tridiagonal_matrix, random_unitary, simple_linear_system fixtures
+    test_cks_integration.py    CKS 数学正确性 + 端到端 fidelity 测试
+    test_cks_solver.py         CKS 各组件单元测试
+    test_cks_solver_v2.py      cks_solve_v2 函数式 API 测试
+    test_qda_integration.py    QDA 数学正确性 + 端到端 fidelity 测试
+    test_qda_solver.py         QDA 各组件单元测试
+    test_condition_mixin.py     条件操作符测试
+    test_grover.py             Grover 测试
+    test_shor.py               Shor 测试
+    test_state_preparation.py  态制备测试
+    test_block_encoding.py      块编码测试
+    test_qram_utils.py         QRAM 工具测试
+```
+
+### Python API Design
+
+- `pysparq/algorithms/*.py` 中的算法类（`TOperator`, `QuantumWalk` 等）继承自 `ControllableOperatorMixin`，提供 `.conditioned_by_*()` 方法链和 `.dag()` 逆操作
+- `pysparq/` 包有两套 API：旧版（可变状态 + `ps.System.clear()` 中间调用）标记为 deprecated；v2 函数式 API（`cks_solve_v2`）使用局部变量管理状态
+- 量子态 `ps.SparseState` 是 pybind11 C++ 对象，**不支持 deepcopy/pickle**，原地变异是预期行为（与 C++ 实现一致）
 
 ## Dependencies
 

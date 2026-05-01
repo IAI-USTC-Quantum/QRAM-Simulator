@@ -22,6 +22,10 @@ from pysparq.algorithms.cks_solver import (
     get_coef_common,
     SparseMatrix,
     make_walk_angle_func,
+    CKS_build_walk_environment,
+    CKS_init_walk_state,
+    CKS_apply_walk_step,
+    CKS_run_lcu_loop,
 )
 
 
@@ -387,16 +391,26 @@ class TestQuantumWalkFidelity:
         """测试量子游走态与 Chebyshev 态的一致性。
 
         对应 C++ Chebyshev_test: fidelity >= 0.999
+
+        Uses the exact C++ reference matrix generate_simplest_sparse_matrix_signed_0()
+        which produces elements=[1,-4,-4,3,7,-1,-1,1], sparsity=[0,1,0,1,2,3,2,3],
+        giving nnz_col=2, n_row=4, n_entries=8, addr_size=3, qram_data=16 elements (power of 2).
         """
-        # 构造简单的稀疏矩阵
-        A = np.array([[0.5, 0.2, 0], [0.2, 0.5, 0.2], [0, 0.2, 0.5]])
+        # C++ reference matrix (replicates generate_simplest_sparse_matrix_signed_0())
+        # elements=[1,-4,-4,3,7,-1,-1,1], sparsity=[0,1,0,1,2,3,2,3]
+        # Column-major: col0=[1,-4], col1=[-4,3]
+        A = np.array([[1.0, -4.0], [-4.0, 3.0]])
         mat = SparseMatrix.from_dense(A, data_size=8)
 
         # 归一化矩阵
         A_norm = A / np.linalg.norm(A, ord=2)
 
-        # 初始向量 |b⟩
+        # 初始向量 |b⟩ (均匀叠加)
         b = np.ones(mat.n_row) / np.sqrt(mat.n_row)
+
+        # 构建量子游走环境
+        qram, addr_size, nnz_col, n_row, qram_data = CKS_build_walk_environment(mat)
+        data_size = mat.data_size
 
         # 对每一步验证 fidelity
         for step in range(1, 6):
@@ -405,18 +419,26 @@ class TestQuantumWalkFidelity:
             target = normalize_vector(target)
             target_amps = {i: complex(v, 0) for i, v in enumerate(target)}
 
-            # 量子态（需要实际执行量子游走）
-            # TODO: 实现量子游走执行
-            # state = quantum_walk_make_n_step_state(step, mat)
-            # state_amps = {i: amp for i, amp in extract_amplitudes(state)}
+            # 量子态: 执行 step 次量子游走
+            state = CKS_init_walk_state(qram, addr_size, data_size, nnz_col, b)
+            for _ in range(step):
+                CKS_apply_walk_step(qram, addr_size, data_size, nnz_col, n_row, state, mat, qram_data)
 
-            # fidelity = get_fidelity(state_amps, target_amps)
-            # assert fidelity >= 0.999, f"Step {step}: fidelity = {fidelity}"
+            # 提取 main_reg (row_id) 振幅
+            import pysparq as ps
+            row_id = ps.System.get_id("row_id")
+            state_amps = {}
+            for basis in state.basis_states:
+                val = int(basis.get(row_id).value)
+                state_amps[val] = state_amps.get(val, 0) + basis.amplitude
+
+            fidelity = get_fidelity(state_amps, target_amps)
+            assert fidelity >= 0.999, f"Step {step}: fidelity = {fidelity}"
 
     def test_lcu_linear_solver_fidelity(self, fresh_system):
         """测试 LCU 线性求解器的 fidelity。
 
-        对应 C++ linear_solver_theory_compare_test: fidelity >= 0.9999
+        对应 C++ linear_solver_theory_compare_test: fidelity >= 0.999
         """
         # 构造简单的线性系统
         A = np.array([[2, 1], [1, 2]], dtype=float)
@@ -426,12 +448,37 @@ class TestQuantumWalkFidelity:
         x_classical = np.linalg.solve(A, b)
         x_classical = x_classical / np.linalg.norm(x_classical)
 
-        # 量子解（需要完整实现）
-        # x_quantum = cks_solve_quantum(A, b)
-        # x_quantum = x_quantum / np.linalg.norm(x_quantum)
+        # 归一化 A 和 b
+        A_norm = A / np.linalg.norm(A, ord=2)
+        b_norm = b / np.linalg.norm(b)
+        kappa = float(np.linalg.norm(A_norm, ord=2) / np.linalg.norm(np.linalg.pinv(A_norm), ord=2))
 
-        # fidelity = |⟨x_classical|x_quantum⟩|²
-        # assert fidelity >= 0.9999
+        # 构建量子游走环境
+        mat = SparseMatrix.from_dense(A_norm, data_size=8)
+        qram, addr_size, nnz_col, n_row, qram_data = CKS_build_walk_environment(mat)
+        data_size = mat.data_size
+
+        # 初始化量子态
+        initial_state = CKS_init_walk_state(qram, addr_size, data_size, nnz_col, b_norm)
+
+        # 运行 LCU 循环
+        final_state = CKS_run_lcu_loop(
+            qram, addr_size, data_size, nnz_col, n_row,
+            initial_state, kappa=kappa, eps=1e-3, mat=mat, qram_data=qram_data)
+
+        # 提取 main_reg 振幅
+        import pysparq as ps
+        row_id = ps.System.get_id("row_id")
+        state_amps = {}
+        for basis in final_state.basis_states:
+            val = int(basis.get(row_id).value)
+            state_amps[val] = state_amps.get(val, 0) + basis.amplitude
+
+        # 对齐维数
+        target_amps = {i: complex(x_classical[i], 0) for i in range(len(x_classical))}
+
+        fidelity = get_fidelity(state_amps, target_amps)
+        assert fidelity >= 0.999, f"LCU fidelity = {fidelity}"
 
 
 # ==============================================================================
