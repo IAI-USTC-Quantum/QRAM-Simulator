@@ -7,7 +7,7 @@ namespace qram_simulator
 	namespace CKS {
 		using walk_angle_function_t = std::function<u22_t(uint64_t, size_t row, size_t col)>;
 
-		HOST_DEVICE	inline void _get_coef_positive_only(size_t mat_data_size, size_t v, size_t row, size_t col, double* mat)
+			HOST_DEVICE	inline void _get_coef_positive_only(size_t mat_data_size, size_t v, size_t row, size_t col, double* mat)
 		{
 			uint64_t Amax_real = pow2(mat_data_size) - 1;
 			v = v % (Amax_real + 1);
@@ -141,47 +141,84 @@ namespace qram_simulator
 			return mat;
 		}
 
-		inline walk_angle_function_t make_func(const SparseMatrix& mat)
-		{
-			size_t mat_data_size = mat.data_size;
-			if (mat.positive_only)
+			inline u22_t make_qw_rotation_matrix(const SparseMatrix& mat, uint64_t v, size_t row, size_t col)
 			{
-				auto func = [mat_data_size] HOST_DEVICE	(uint64_t v, size_t row, size_t col)
-					{
-						return _get_coef_positive_only(mat_data_size, v, row, col);
-					};
-				return func;
+				if (mat.positive_only)
+					return _get_coef_positive_only(mat.data_size, v, row, col);
+				return _get_coef_common(mat.data_size, v, row, col);
 			}
-			else
+
+			inline u22_t make_qw_rotation_matrix_inv(const SparseMatrix& mat, uint64_t v, size_t row, size_t col)
 			{
-				auto func = [mat_data_size] HOST_DEVICE	(uint64_t v, size_t row, size_t col)
+				if (mat.positive_only)
+					return _get_coef_positive_only_inv(mat.data_size, v, row, col);
+				return _get_coef_common_inv(mat.data_size, v, row, col);
+			}
+
+			inline walk_angle_function_t make_func(const SparseMatrix& mat)
+			{
+				size_t mat_data_size = mat.data_size;
+				if (mat.positive_only)
+				{
+					auto func = [mat_data_size] HOST_DEVICE(uint64_t v, size_t row, size_t col)
+						{
+							return _get_coef_positive_only(mat_data_size, v, row, col);
+						};
+					return func;
+				}
+				auto func = [mat_data_size] HOST_DEVICE(uint64_t v, size_t row, size_t col)
 					{
 						return _get_coef_common(mat_data_size, v, row, col);
 					};
 				return func;
 			}
-		}
 
-		inline walk_angle_function_t make_func_inv(const SparseMatrix& mat)
-		{
-			size_t mat_data_size = mat.data_size;
-			if (mat.positive_only)
+			inline walk_angle_function_t make_func_inv(const SparseMatrix& mat)
 			{
-				auto func = [mat_data_size] HOST_DEVICE	(uint64_t v, size_t row, size_t col)
-					{
-						return _get_coef_positive_only_inv(mat_data_size, v, row, col);
-					};
-				return func;
-			}
-			else
-			{
-				auto func = [mat_data_size] HOST_DEVICE (uint64_t v, size_t row, size_t col)
+				size_t mat_data_size = mat.data_size;
+				if (mat.positive_only)
+				{
+					auto func = [mat_data_size] HOST_DEVICE(uint64_t v, size_t row, size_t col)
+						{
+							return _get_coef_positive_only_inv(mat_data_size, v, row, col);
+						};
+					return func;
+				}
+				auto func = [mat_data_size] HOST_DEVICE(uint64_t v, size_t row, size_t col)
 					{
 						return _get_coef_common_inv(mat_data_size, v, row, col);
 					};
 				return func;
 			}
-		}
+
+			struct GetQWRotateAngle_Int_Int_Int : SelfAdjointOperator
+			{
+				using SelfAdjointOperator::operator();
+				using SelfAdjointOperator::dag;
+
+				size_t data_id;
+				size_t row_id;
+				size_t col_id;
+				size_t out_id;
+				const SparseMatrix* mat;
+				ClassControllable
+
+				GetQWRotateAngle_Int_Int_Int(
+					std::string_view data_, std::string_view row_, std::string_view col_,
+					std::string_view out_, const SparseMatrix* mat_)
+					: data_id(System::get(data_)), row_id(System::get(row_)),
+					col_id(System::get(col_)), out_id(System::get(out_)), mat(mat_)
+				{
+				}
+
+				GetQWRotateAngle_Int_Int_Int(
+					size_t data_, size_t row_, size_t col_, size_t out_, const SparseMatrix* mat_)
+					: data_id(data_), row_id(row_), col_id(col_), out_id(out_), mat(mat_)
+				{
+				}
+
+				void operator()(std::vector<System>& state) const;
+			};
 
 		// Chebyshev approach
 		struct ChebyshevPolynomialCoefficient
@@ -684,8 +721,6 @@ namespace qram_simulator
 			std::string reg_search_result;
 			size_t nnz_col;
 			size_t data_size;
-			//walk_angle_function_t func;
-			//walk_angle_function_t func_inv;
 			const SparseMatrix* mat;
 
 			T(qram_qutrit::QRAMCircuit* qram_,

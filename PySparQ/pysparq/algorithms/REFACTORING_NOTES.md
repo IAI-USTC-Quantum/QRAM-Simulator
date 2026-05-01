@@ -16,9 +16,12 @@ and verify that `walk` followed by `walk.dag` restores the full sparse state.
 
 For CKS, the Python implementation uses the C++ `SparseMatrix` QRAM layout and
 binds only the missing primitive operations needed to reproduce the walk:
-`CondRot_General_Bool_QW`, `QuantumBinarySearchFast`, `GetRowAddr`, and
-`GetDataAddr`.  `TOperator`, `CKS_apply_walk_step`, and the LCU loop are still
-assembled in Python.
+`QuantumBinarySearchFast`, `GetRowAddr`, `GetDataAddr`,
+`GetQWRotateAngle_Int_Int_Int`, and `CondRot_Fixed_Bool`.  `TOperator`,
+`CKS_apply_walk_step`, and the LCU loop are still assembled in Python.  The
+older simulator-friendly direct conditional rotation is exported with a
+`_fast` suffix and kept as a compatibility path for signed/complex CKS matrix
+elements until the phase-decomposition adapter is completed.
 
 Solver-level result extraction is not complete.  `qda_solve()` raises after
 the quantum walk sequence because measurement/post-selection readout is not

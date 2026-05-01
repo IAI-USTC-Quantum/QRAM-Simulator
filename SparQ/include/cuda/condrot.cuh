@@ -118,7 +118,7 @@ namespace qram_simulator {
 	}
 
 	template<typename Callable>
-	void CondRot_General_Bool<Callable>::operator()(CuSparseState& state) const
+	void CondRot_General_Bool_fast<Callable>::operator()(CuSparseState& state) const
 	{
 		profiler _("CondRot_General_Bool cuda");
 		using namespace condrot_general_gpu_detail;

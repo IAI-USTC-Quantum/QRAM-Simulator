@@ -567,79 +567,44 @@ class CondRotQW(ControllableOperatorMixin):
         self.data_reg = data_reg
         self.output_reg = output_reg
         self.mat = mat
-        self.angle_func = mat.get_walk_angle_func()
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply the native CKS conditional rotation primitive."""
-        ps.CondRot_General_Bool_QW(
-            self.j_reg, self.k_reg, self.data_reg, self.output_reg,
-            self.mat.cpp_matrix,
+        """Apply the CKS conditional rotation as arithmetic + fixed rotation."""
+        if not self.mat.positive_only:
+            ps.CondRot_General_Bool_QW_fast(
+                self.j_reg, self.k_reg, self.data_reg, self.output_reg,
+                self.mat.cpp_matrix,
+            )(state)
+            return
+
+        ps.AddRegister("qw_angle", ps.Rational, self.mat.data_size)(state)
+        ps.GetQWRotateAngle_Int_Int_Int(
+            self.data_reg, self.j_reg, self.k_reg, "qw_angle", self.mat.cpp_matrix,
         )(state)
-
-    def _apply_signed_rotation(self, state: ps.SparseState) -> None:
-        """Apply rotation for signed matrix elements by iterating sparse states."""
-        j_id = ps.System.get_id(self.j_reg)
-        k_id = ps.System.get_id(self.k_reg)
-        data_id = ps.System.get_id(self.data_reg)
-        out_id = ps.System.get_id(self.output_reg)
-
-        # Group basis states by all registers except output_reg
-        groups = {}
-        for idx, basis in enumerate(state.basis_states):
-            key = []
-            for reg_id in range(len(basis.registers)):
-                if reg_id != out_id:
-                    key.append(basis.get(reg_id).value)
-            key = tuple(key)
-            if key not in groups:
-                groups[key] = []
-            groups[key].append(idx)
-
-        # For each group, apply the 2x2 rotation
-        for key, indices in groups.items():
-            if len(indices) == 2:
-                i0, i1 = indices
-                b0 = state.basis_states[i0]
-                b1 = state.basis_states[i1]
-
-                v = b0.get(data_id).value
-                row = b0.get(j_id).value
-                col = b0.get(k_id).value
-                mat = self.angle_func(v, row, col)
-
-                a, b = b0.amplitude, b1.amplitude
-                state.basis_states[i0].amplitude = a * mat[0] + b * mat[1]
-                state.basis_states[i1].amplitude = a * mat[2] + b * mat[3]
-            elif len(indices) == 1:
-                idx = indices[0]
-                basis = state.basis_states[idx]
-                v = basis.get(data_id).value
-                row = basis.get(j_id).value
-                col = basis.get(k_id).value
-                mat = self.angle_func(v, row, col)
-
-                is_one = basis.get(out_id).value != 0
-                if is_one:
-                    new_amp = basis.amplitude * mat[1]
-                    old_amp = basis.amplitude * mat[3]
-                else:
-                    old_amp = basis.amplitude * mat[0]
-                    new_amp = basis.amplitude * mat[2]
-
-                state.basis_states[idx].amplitude = old_amp
-
-                if abs(new_amp) > 1e-15:
-                    new_basis = basis.copy()
-                    new_basis.amplitude = new_amp
-                    new_basis.get(out_id).value = 1 if not is_one else 0
-                    state.basis_states.append(new_basis)
+        ps.CondRot_Fixed_Bool("qw_angle", self.output_reg)(state)
+        ps.GetQWRotateAngle_Int_Int_Int(
+            self.data_reg, self.j_reg, self.k_reg, "qw_angle", self.mat.cpp_matrix,
+        )(state)
+        ps.RemoveRegister("qw_angle")(state)
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply inverse rotation."""
-        ps.CondRot_General_Bool_QW(
-            self.j_reg, self.k_reg, self.data_reg, self.output_reg,
-            self.mat.cpp_matrix,
-        ).dag(state)
+        if not self.mat.positive_only:
+            ps.CondRot_General_Bool_QW_fast(
+                self.j_reg, self.k_reg, self.data_reg, self.output_reg,
+                self.mat.cpp_matrix,
+            ).dag(state)
+            return
+
+        ps.AddRegister("qw_angle", ps.Rational, self.mat.data_size)(state)
+        ps.GetQWRotateAngle_Int_Int_Int(
+            self.data_reg, self.j_reg, self.k_reg, "qw_angle", self.mat.cpp_matrix,
+        )(state)
+        ps.CondRot_Fixed_Bool("qw_angle", self.output_reg).dag(state)
+        ps.GetQWRotateAngle_Int_Int_Int(
+            self.data_reg, self.j_reg, self.k_reg, "qw_angle", self.mat.cpp_matrix,
+        )(state)
+        ps.RemoveRegister("qw_angle")(state)
 
 
 class TOperator(ControllableOperatorMixin):

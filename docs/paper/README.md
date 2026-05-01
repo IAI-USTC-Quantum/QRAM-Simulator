@@ -26,7 +26,7 @@
 
 将 Register Level Programming 拓展为通用稀疏态模拟器，并提供 Python 接口 (PySparQ)。
 
-**核心贡献**：通用稀疏态模拟器、扩展算法库（QFT、Grover、QDA、QCNN 等）、PySparQ Python API、GPU 加速
+**核心贡献**：通用稀疏态模拟器、扩展算法库（QFT、Grover、QDA、QCNN 等）、PySparQ Python API、保留 CUDA 后端代码（当前 CMake 暂时屏蔽 GPU 构建）
 
 **实验代码**：
 

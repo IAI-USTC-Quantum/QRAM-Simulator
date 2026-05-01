@@ -169,13 +169,17 @@ Attributes:
         .def("__str__",  [](const SparseState& self) { return self.to_string(1); })
         .def("__repr__", [](const SparseState& self) { return self.to_string(1); });
 
-    /* condrot.h */
-    BIND_BASE_OPERATOR(CondRot_Rational_Bool)
-        .def(py::init<std::string_view, std::string_view>());
+	    /* condrot.h */
+	    BIND_BASE_OPERATOR(CondRot_Rational_Bool)
+	        .def(py::init<std::string_view, std::string_view>());
 
-    using CondRot_General_Bool_Cpp = CondRot_General_Bool<std::function<u22_t(size_t)>>;
+	    BIND_BASE_OPERATOR(CondRot_Fixed_Bool)
+	        .def(py::init<std::string_view, std::string_view>())
+	        .def(py::init<size_t, size_t>());
 
-    py::class_<CondRot_General_Bool_Cpp, BaseOperator>(m, "CondRot_General_Bool")
+	    using CondRot_General_Bool_Cpp = CondRot_General_Bool_fast<std::function<u22_t(size_t)>>;
+
+	    py::class_<CondRot_General_Bool_Cpp, BaseOperator>(m, "CondRot_General_Bool_fast")
         .def(py::init([](std::string_view reg_in, std::string_view reg_out, py::function py_func)
                       {
 				auto cpp_func = [py_func](size_t x) -> u22_t {
@@ -197,8 +201,8 @@ Attributes:
         //.def_static("_is_off_diagonal", &CondRot_General_Bool_Cpp::_is_off_diagonal)
 
         .def("operate_pair", &CondRot_General_Bool_Cpp::operate_pair)
-        .def("operate_alone_zero", &CondRot_General_Bool_Cpp::operate_alone_zero)
-        .def("operate_alone_one", &CondRot_General_Bool_Cpp::operate_alone_one);
+	        .def("operate_alone_zero", &CondRot_General_Bool_Cpp::operate_alone_zero)
+	        .def("operate_alone_one", &CondRot_General_Bool_Cpp::operate_alone_one);
 
     /* dark_magic.h */
     BIND_SELF_ADJOINT_OPERATOR(Normalize, R"doc(
@@ -1010,10 +1014,17 @@ Example:
     {
          using namespace CKS;
 
-         BIND_BASE_OPERATOR(CondRot_General_Bool_QW)
-             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
-                  py::arg("j"), py::arg("k"), py::arg("reg_in"), py::arg("reg_out"), py::arg("mat"))
-                 BIND_DAG_METHODS(CondRot_General_Bool_QW);
+	         BIND_BASE_OPERATOR_SUBNAME(CondRot_General_Bool_QW, CondRot_General_Bool_QW_fast)
+	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
+	                  py::arg("j"), py::arg("k"), py::arg("reg_in"), py::arg("reg_out"), py::arg("mat"))
+	                 BIND_DAG_METHODS(CondRot_General_Bool_QW);
+
+	         BIND_SELF_ADJOINT_OPERATOR(GetQWRotateAngle_Int_Int_Int)
+	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
+	                  py::arg("data"), py::arg("row"), py::arg("col"), py::arg("out"), py::arg("mat"))
+	             .def(py::init<size_t, size_t, size_t, size_t, const SparseMatrix *>(),
+	                  py::arg("data"), py::arg("row"), py::arg("col"), py::arg("out"), py::arg("mat"))
+	                 BIND_CONTROLLABLE_METHODS(GetQWRotateAngle_Int_Int_Int);
 
          BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearchFast)
              .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, std::string_view, std::string_view>(),

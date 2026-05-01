@@ -88,7 +88,7 @@ ps.Add_UInt_UInt("a", "b", "out")(state)
 | **模拟规模** | 可达 64+ 量子比特（特定结构） | 通常 20-30 量子比特 | 类似 Qiskit | 类似 Qiskit |
 | **算术电路** | 原生寄存器操作 | 需分解为门 | 需分解为门 | 需分解为门 |
 | **QRAM 支持** | 原生支持 | 无原生支持 | 无原生支持 | 无原生支持 |
-| **GPU 加速** | CUDA 支持 | 有限支持 | 有限支持 | 有限支持 |
+| **GPU 加速** | 暂时屏蔽（CPU-only） | 有限支持 | 有限支持 | 有限支持 |
 
 ### 何时使用 QRAM-Simulator？
 
@@ -115,8 +115,8 @@ pip install pysparq
 - Python 3.10 – 3.13
 - NumPy
 
-**可选（推荐）**：
-- CUDA 12.0+ （用于 GPU 加速）
+**GPU 支持**：
+- CUDA/GPU 后端当前在 CMake 中临时屏蔽，默认只构建 CPU 路径；等 CondRot primitive 重构稳定后再恢复。
 
 ### 5 分钟上手示例
 
@@ -214,8 +214,7 @@ mkdir build && cd build
 # 配置（CPU 版本）
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
-# 配置（CUDA 版本，可选）
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_CUDA=ON
+# GPU/CUDA 后端当前暂缓，CMake 会构建 CPU-only 版本
 
 # 编译
 make -j$(nproc)
@@ -306,7 +305,7 @@ Add_UInt_UInt(addr_id, data_id, addr_id)(state);  // addr = addr + data = 3+5 = 
 - **通用稀疏态模拟器**：支持 QFT、Grover、哈密顿量模拟、量子微分算法（QDA）、QCNN 等多种算法
 - **PySparQ**：通过 pybind11 提供完整 Python API，`pip install pysparq` 即可使用
 - **扩展算法库**：状态准备、块编码、量子游走、线性系统求解等高层算法
-- **GPU 加速**：CUDA 后端支持大规模并行稀疏态运算
+- **CPU-only 构建**：CUDA/GPU 后端当前暂时屏蔽，待 CondRot primitive 重构稳定后恢复
 
 **对应代码**：`SparQ/`、`SparQ_Algorithm/`、`PySparQ/`、`Experiments/QFT/`、`Experiments/Grover/`、`Experiments/QDA/`、`Experiments/QCNN/`
 
@@ -767,7 +766,7 @@ vector<double> weights = ComputeFourierCoeffs(epsilon_, l_);
 
 CKS 算法利用 Chebyshev 多项式逼近和量子游走，在稀疏矩阵条件下达到 O(κ log(κ/ε)) 的复杂度，比 HHL 类算法有更好的常数因子。
 
-PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`CondRot_General_Bool_QW`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver。`cks_solve_v2()` 目前会先跑量子 LCU/walk 路径，再以 warning 标明测量读出未完成，并临时返回经典解作为占位。
+PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`GetQWRotateAngle_Int_Int_Int`、`CondRot_Fixed_Bool`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver。模拟器友好的旧条件旋转保留为 `_fast` 后缀。`cks_solve_v2()` 目前会先跑量子 LCU/walk 路径，再以 warning 标明测量读出未完成，并临时返回经典解作为占位。
 
 核心流程：
 ```

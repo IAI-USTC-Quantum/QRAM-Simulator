@@ -29,8 +29,6 @@ from pysparq.operators import ControllableOperatorMixin
 
 from pysparq.algorithms.qram_utils import (
     get_complement,
-    make_func,
-    make_func_inv,
     make_vector_tree,
     pow2,
 )
@@ -79,9 +77,6 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
         ps.AddRegister("data_child", ps.SignedInteger, self.data_size)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
 
-        n_digit = ps.System.size_of("div_result")
-        func = lambda value: make_func(value, n_digit)
-
         for k in range(self.addr_size):
             ps.SplitRegister(self.work_qubit, "rotation", 1)(state)
             ps.System.set_register_type("rotation", ps.Boolean)
@@ -97,7 +92,7 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
                 ps.Div_Sqrt_Arccos_Int_Int(
                     "data_child", "data_parent", "div_result"
                 )(state)
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation")(state)
                 ps.ClearZero()(state)
                 # Uncompute
                 ps.Div_Sqrt_Arccos_Int_Int(
@@ -115,7 +110,7 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
                 ps.GetRotateAngle_Int_Int(
                     "data_parent", "data_child", "div_result"
                 )(state)
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation")(state)
                 ps.ClearZero()(state)
                 # Uncompute
                 ps.GetRotateAngle_Int_Int(
@@ -148,17 +143,13 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
         """Apply the inverse (adjoint) state-preparation operator.
 
         Ported from ``State_Prep_via_QRAM::impl_dag()``.  The loop runs
-        in reverse order and uses ``make_func_inv`` for the rotation
-        matrices.
+        in reverse order and applies the fixed rational rotation dagger.
         """
         ps.AddRegister("addr_parent", ps.UnsignedInteger, self.addr_size + 1)(state)
         ps.AddRegister("addr_child", ps.UnsignedInteger, self.addr_size + 1)(state)
         ps.AddRegister("data_parent", ps.SignedInteger, self.data_size)(state)
         ps.AddRegister("data_child", ps.SignedInteger, self.data_size)(state)
         ps.AddRegister("div_result", ps.Rational, self.rational_size)(state)
-
-        n_digit = ps.System.size_of("div_result")
-        func = lambda value: make_func_inv(value, n_digit)
 
         ps.ShiftLeft_InPlace(self.work_qubit, 1)(state)
 
@@ -179,7 +170,7 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
                 ps.Div_Sqrt_Arccos_Int_Int(
                     "data_child", "data_parent", "div_result"
                 )(state)
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation").dag(state)
                 ps.ClearZero()(state)
                 # Uncompute
                 ps.Div_Sqrt_Arccos_Int_Int(
@@ -197,7 +188,7 @@ class StatePrepViaQRAM(ControllableOperatorMixin):
                 ps.GetRotateAngle_Int_Int(
                     "data_parent", "data_child", "div_result"
                 )(state)
-                ps.CondRot_General_Bool("div_result", "rotation", func)(state)
+                ps.CondRot_Fixed_Bool("div_result", "rotation").dag(state)
                 ps.ClearZero()(state)
                 # Uncompute
                 ps.GetRotateAngle_Int_Int(
@@ -350,11 +341,14 @@ class StatePreparation:
         )
         norm = math.sqrt(total)
 
-        addr_reg = ps.System.get_id("addr_parent")
+        try:
+            addr_reg = ps.System.get_id("stateprep_work")
+        except RuntimeError:
+            addr_reg = ps.System.get_id("addr_parent")
         fid = complex(0, 0)
 
         for basis in self._state.basis_states:
-            idx = basis.get(addr_reg).value
+            idx = basis.get(addr_reg).value % len(self.dist)
             target_amp = get_complement(self.dist[idx], self.data_size) / norm
             prepared_amp = basis.amplitude
             fid += target_amp * prepared_amp
@@ -380,12 +374,13 @@ class StatePreparation:
         ps.System.clear()
 
         addr_sz = self.qubit_number + 1
-        ps.System.add_register("addr_parent", ps.UnsignedInteger, addr_sz)
+        work_reg = "stateprep_work"
+        ps.System.add_register(work_reg, ps.UnsignedInteger, addr_sz)
 
         self._state = ps.SparseState()
 
         state_prep_op = StatePrepViaQRAM(
-            self.qram, "addr_parent", self.data_size, self.rational_size
+            self.qram, work_reg, self.data_size, self.rational_size
         )
         state_prep_op(self._state)
 
@@ -423,7 +418,7 @@ def make_tree_and_qram(
     # Convert floats to integers for QRAM storage.
     # Scale so the largest value fits within the positive range of data_size bits.
     float_max = max(abs(v) for v in dist_list) if dist_list else 1.0
-    scale = (1 << (data_size - 1)) / float_max if float_max > 0 else 1
+    scale = ((1 << (data_size - 1)) - 1) / float_max if float_max > 0 else 1
     int_dist = [int(round(v * scale)) for v in dist_list]
 
     tree = make_vector_tree(int_dist, data_size)
@@ -431,7 +426,7 @@ def make_tree_and_qram(
     if qram is None:
         qram = ps.QRAMCircuit_qutrit(n_qubits + 1, data_size, tree)
     if work_reg is None:
-        work_reg = "addr_parent"
+        work_reg = "stateprep_work"
     ps.System.add_register(work_reg, ps.UnsignedInteger, n_qubits + 1)
     op = StatePrepViaQRAM(qram, work_reg, data_size, rational_size)
     return op, qram, work_reg

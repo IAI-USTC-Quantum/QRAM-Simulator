@@ -15,7 +15,7 @@
 - **操作系统**: Linux (推荐 Ubuntu 20.04+), Windows (Visual Studio 2019+), macOS
 - **编译器**: GCC 9+, Clang 10+, MSVC 2019+
 - **CMake**: 3.15+
-- **可选**: CUDA 12.0+ (用于 GPU 加速实验)
+- **GPU**: CUDA/GPU 后端当前在 CMake 中临时屏蔽，实验复现默认使用 CPU-only 构建
 
 ### 构建步骤
 
@@ -265,9 +265,9 @@ A: 取决于参数设置：
 
 ### Q: 如何启用 GPU 加速？
 
-A: 构建时启用 CUDA：
+A: 当前不能启用。CUDA/GPU 后端暂时在 CMake 中屏蔽；下面的选项会被记录为请求，但仍构建 CPU-only 版本：
 ```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_CUDA=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DQRAM_ENABLE_CUDA=ON
 ```
 
 ### Q: 输出文件在哪里？
