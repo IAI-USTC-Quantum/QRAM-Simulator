@@ -1,22 +1,29 @@
 name: CMake on multiple platforms
 
+# Build CI: runs on code changes (ignores doc-only changes)
 on:
   push:
     branches: [ "main", "develop" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
+      - 'docs/**'
   pull_request:
     branches: [ "main", "develop" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
+      - 'docs/**'
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ============================================================================
-  # Main build job
-  # ============================================================================
-  build:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -208,76 +215,3 @@ jobs:
         else
           echo "No Python tests found"
         fi
-
-  # ============================================================================
-  # Documentation build job
-  # ============================================================================
-  docs:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'true'
-
-    - id: setup-python
-      name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install Documentation Dependencies
-      run: |
-        "${{ env.pythonLocation }}/bin/python" -m pip install -r docs/sphinx/requirements.txt
-        sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1 cmake ninja-build g++ python3-dev
-
-    - name: Install pysparq for notebook execution
-      run: |
-        "${{ env.pythonLocation }}/bin/python" -m pip install --no-cache-dir .
-
-    - name: Generate Doxygen Documentation
-      run: doxygen Doxyfile
-
-    - name: Build Sphinx Documentation
-      run: |
-        cd docs/sphinx
-        make html
-
-    - name: Upload documentation artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: documentation
-        path: |
-          docs/api/html/
-          docs/sphinx/build/html/
-        retention-days: 30
-
-    - name: Prepare Pages directory
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        mkdir -p pages-deploy
-
-        # Landing page
-        cp docs/index.html pages-deploy/index.html
-
-        # Sphinx docs (Python API)
-        mkdir -p pages-deploy/python
-        cp -r docs/sphinx/build/html/* pages-deploy/python/
-
-        # Doxygen docs (C++ API)
-        mkdir -p pages-deploy/api
-        cp -r docs/api/html/* pages-deploy/api/
-
-        # Other docs
-        cp docs/architecture.md pages-deploy/
-        cp docs/operators.md pages-deploy/
-        cp docs/README.md pages-deploy/
-
-    - name: Deploy to GitHub Pages
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: pages-deploy/
-        publish_branch: gh-pages
