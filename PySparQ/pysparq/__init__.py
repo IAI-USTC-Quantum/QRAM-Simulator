@@ -367,7 +367,11 @@ def test_import() -> None:
 
 
 # --------------------------------------------------------------------
-# Algorithm v2 functions (functional API)
+# Algorithm utilities
 # --------------------------------------------------------------------
-from pysparq.algorithms.cks_solver import cks_solve_v2
 from pysparq.algorithms.state_preparation import make_tree_and_qram
+from pysparq.algorithms.qda_solver import (
+    qda_solve,
+    qda_solve_tridiagonal,
+    qda_solve_via_qram,
+)

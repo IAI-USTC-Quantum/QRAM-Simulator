@@ -623,9 +623,7 @@ def classical_to_quantum(
 # Block Encoding - Import from modules
 # ==============================================================================
 
-# Import factory function from __init__.py
-from . import BlockEncoding
-from .block_encoding import BlockEncodingTridiagonal
+from .block_encoding import BlockEncodingTridiagonal, BlockEncodingViaQRAM
 
 # Import StatePreparation from state_preparation module
 from .state_preparation import StatePreparation, StatePrepViaQRAM
@@ -637,7 +635,94 @@ from .qram_utils import make_vector_tree, scale_and_convert_vector
 # ==============================================================================
 
 
-def qda_solve(
+def qda_solve_tridiagonal(
+    A: np.ndarray,
+    b: np.ndarray,
+    kappa: float | None = None,
+    p: float = 1.3,
+    eps: float = 0.01,
+    step_rate: float = 1.0,
+) -> np.ndarray:
+    """Solve Ax = b using QDA algorithm with tridiagonal block encoding.
+
+    Args:
+        A: Input matrix (must be tridiagonal)
+        b: Right-hand side vector
+        kappa: Condition number estimate (computed if None)
+        p: Schedule parameter (p < 1 for optimal scaling)
+        eps: Desired precision
+        step_rate: Multiplier for step count
+
+    Returns:
+        Solution vector x
+
+    Note:
+        This uses BlockEncodingTridiagonal for efficient encoding of
+        tridiagonal matrices.
+    """
+    from .block_encoding import _is_tridiagonal, _extract_tridiagonal_params
+
+    A_arr = np.asarray(A, dtype=np.float64)
+    b_arr = np.asarray(b, dtype=np.float64)
+
+    if not _is_tridiagonal(A_arr):
+        raise ValueError(
+            "qda_solve_tridiagonal requires a tridiagonal matrix. "
+            "Use qda_solve_via_qram for general matrices."
+        )
+
+    alpha, beta = _extract_tridiagonal_params(A_arr)
+
+    ps.System.clear()
+
+    A_q, b_q, recover = classical_to_quantum(A_arr, b_arr)
+    if kappa is None:
+        try:
+            kappa = float(np.linalg.cond(A_q))
+        except np.linalg.LinAlgError:
+            kappa = 10.0
+
+    n = A_q.shape[0]
+    n_bits = int(math.log2(n))
+    main_reg = "main"
+    anc_UA = "anc_UA"
+    anc_1, anc_2, anc_3, anc_4 = "anc_1", "anc_2", "anc_3", "anc_4"
+
+    state = ps.SparseState()
+    ps.AddRegister(main_reg, ps.UnsignedInteger, n_bits)(state)
+    ps.AddRegister(anc_UA, ps.UnsignedInteger, 2)(state)
+    ps.AddRegister(anc_1, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_2, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_3, ps.Boolean, 1)(state)
+    ps.AddRegister(anc_4, ps.Boolean, 1)(state)
+
+    enc_A = BlockEncodingTridiagonal(main_reg=main_reg, anc_UA=anc_UA, alpha=alpha, beta=beta)
+    prep_data_size = 32
+    prep_rational_size = min(50, prep_data_size * 2)
+    b_encoded = scale_and_convert_vector(
+        b_q.real, prep_data_size - 2, prep_data_size, from_matrix=False
+    )
+    qram_b = ps.QRAMCircuit_qutrit(
+        n_bits + 1, prep_data_size, make_vector_tree(b_encoded, prep_data_size)
+    )
+    enc_b = StatePrepViaQRAM(qram_b, main_reg, prep_data_size, prep_rational_size)
+    steps = max(1, int(step_rate * max(1.0, kappa) * max(1.0, math.log(max(kappa / eps, math.e)))))
+
+    for i in range(steps):
+        s = i / steps
+        WalkS(
+            enc_A, enc_b, main_reg, anc_UA, anc_1, anc_2, anc_3, anc_4,
+            s, kappa, p,
+        )(state)
+        ps.ClearZero()(state)
+
+    raise RuntimeError(
+        "qda_solve_tridiagonal: quantum walk simulation ran but measurement-based "
+        "solution extraction is not yet implemented"
+    )
+
+
+def qda_solve_via_qram(
     A: np.ndarray,
     b: np.ndarray,
     kappa: float | None = None,
@@ -698,7 +783,7 @@ def qda_solve(
     ps.AddRegister(anc_3, ps.Boolean, 1)(state)
     ps.AddRegister(anc_4, ps.Boolean, 1)(state)
 
-    enc_A = BlockEncoding(A_q.real, main_reg=main_reg, anc_UA=anc_UA)
+    enc_A = BlockEncodingViaQRAM(main_reg, anc_UA, A_q.real, 32)
     prep_data_size = 32
     prep_rational_size = min(50, prep_data_size * 2)
     b_encoded = scale_and_convert_vector(
@@ -721,9 +806,50 @@ def qda_solve(
     # Quantum simulation must succeed; this framework is for testing quantum
     # circuits, not for falling back to classical solvers that mask bugs.
     raise RuntimeError(
-        "qda_solve: quantum walk simulation ran but measurement-based "
+        "qda_solve_via_qram: quantum walk simulation ran but measurement-based "
         "solution extraction is not yet implemented"
     )
+
+
+def qda_solve(
+    A: np.ndarray,
+    b: np.ndarray,
+    kappa: float | None = None,
+    p: float = 1.3,
+    eps: float = 0.01,
+    step_rate: float = 1.0,
+) -> np.ndarray:
+    """Solve Ax = b using QDA algorithm (auto-detects matrix type).
+
+    This is a convenience dispatcher that selects the appropriate QDA variant:
+
+    - ``qda_solve_tridiagonal`` for tridiagonal matrices (efficient,
+      uses BlockEncodingTridiagonal)
+    - ``qda_solve_via_qram`` for general sparse matrices (uses
+      BlockEncodingViaQRAM)
+
+    Args:
+        A: Input matrix
+        b: Right-hand side vector
+        kappa: Condition number estimate (computed if None)
+        p: Schedule parameter (p < 1 for optimal scaling)
+        eps: Desired precision
+        step_rate: Multiplier for step count
+
+    Returns:
+        Solution vector x
+
+    Example:
+        >>> A = np.array([[2, 1], [1, 2]], dtype=float)
+        >>> b = np.array([1, 1], dtype=float)
+        >>> x = qda_solve(A, b, kappa=2.0)
+    """
+    from .block_encoding import _is_tridiagonal
+
+    if _is_tridiagonal(A):
+        return qda_solve_tridiagonal(A, b, kappa=kappa, p=p, eps=eps, step_rate=step_rate)
+    else:
+        return qda_solve_via_qram(A, b, kappa=kappa, p=p, eps=eps, step_rate=step_rate)
 
 
 def create_qda_demo() -> str:

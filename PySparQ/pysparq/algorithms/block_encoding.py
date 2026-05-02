@@ -637,6 +637,46 @@ class BlockEncodingViaQRAM(ControllableOperatorMixin):
 
 
 # ==============================================================================
+# Matrix utility functions
+# ==============================================================================
+
+
+def _is_tridiagonal(A: np.ndarray, tol: float = 1e-10) -> bool:
+    """Check if matrix is tridiagonal.
+
+    A matrix is tridiagonal if all non-zero elements are on the main
+    diagonal or the first super/sub-diagonals.
+    """
+    A = np.asarray(A, dtype=float)
+    n = A.shape[0]
+    for i in range(n):
+        for j in range(n):
+            if abs(i - j) > 1 and abs(A[i, j]) > tol:
+                return False
+    return True
+
+
+def _extract_tridiagonal_params(A: np.ndarray) -> tuple[float, float]:
+    """Extract alpha (diagonal) and beta (off-diagonal) from tridiagonal matrix.
+
+    The matrix is assumed to be of the form alpha*I + beta*T where T has
+    ones on the first sub- and super-diagonal.
+    """
+    A = np.asarray(A, dtype=float)
+    alpha = A[0, 0]
+
+    off_diag_sum = 0.0
+    off_diag_count = 0
+    n = A.shape[0]
+    for i in range(n - 1):
+        off_diag_sum += abs(A[i, i + 1]) + abs(A[i + 1, i])
+        off_diag_count += 2
+
+    beta = off_diag_sum / off_diag_count if off_diag_count > 0 else 0.0
+    return alpha, beta
+
+
+# ==============================================================================
 # Demo
 # ==============================================================================
 

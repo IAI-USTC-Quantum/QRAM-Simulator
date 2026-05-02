@@ -191,6 +191,12 @@ namespace qram_simulator
 				return func;
 			}
 
+			// =============================================================================
+			// Primitive + Composite Operators
+			// These classes inherit BaseOperator or SelfAdjointOperator and directly
+			// manipulate quantum state. They are composed by the flow-control classes below.
+			// =============================================================================
+
 			struct GetQWRotateAngle_Int_Int_Int : SelfAdjointOperator
 			{
 				using SelfAdjointOperator::operator();
@@ -243,6 +249,8 @@ namespace qram_simulator
 		};
 
 		/* For quantum walk */
+		// Note: CondRot_General_Bool_QW is kept for future specialized use but not exported to Python.
+		// Current code uses GetQWRotateAngle + CondRot_Fixed_Bool instead.
 		struct CondRot_General_Bool_QW : BaseOperator
 		{
 			using BaseOperator::operator();
@@ -756,7 +764,11 @@ namespace qram_simulator
 					reg_j, reg_k, reg_search_result, nnz_col).dag(system_states);
 
 				// |j>��|s_k>|d[j,k]> -> |j>��|s_k>|d[j,k]>(a|0>+b|1>)
-				CondRot_General_Bool_QW(reg_j, reg_k, "data", reg_b2, mat)(system_states);
+				// Two-step equivalent of CondRot_General_Bool_QW: compute angle then apply fixed rotation
+				GetQWRotateAngle_Int_Int_Int("data", reg_j, reg_k, "rotation", mat)(system_states);
+				CondRot_Fixed_Bool("rotation", reg_b2)(system_states);
+				GetQWRotateAngle_Int_Int_Int("data", reg_j, reg_k, "rotation", mat)(system_states);
+				RemoveRegister("rotation")(system_states);
 
 				// |j>��|s_k>(a|0>+b|1>) -> |j>��|k>(a|0>+b|1>)
 				SparseMatrixOracle2(qram, reg_sparse_offset,
@@ -791,7 +803,11 @@ namespace qram_simulator
 				SparseMatrixOracle2(qram, reg_sparse_offset,
 					reg_j, reg_k, reg_search_result, nnz_col)(system_states);
 
-				CondRot_General_Bool_QW(reg_j, reg_k, "data", reg_b2, mat).dag(system_states);
+				// Two-step inverse of CondRot_General_Bool_QW: self-adjoint angle + inverse fixed rotation
+				GetQWRotateAngle_Int_Int_Int("data", reg_j, reg_k, "rotation", mat)(system_states);
+				CondRot_Fixed_Bool("rotation", reg_b2).dag(system_states);
+				GetQWRotateAngle_Int_Int_Int("data", reg_j, reg_k, "rotation", mat)(system_states);
+				RemoveRegister("rotation")(system_states);
 				ClearZero()(system_states);
 
 				SparseMatrixOracle2(qram, reg_sparse_offset,
@@ -810,6 +826,12 @@ namespace qram_simulator
 
 			COMPOSITE_OPERATION
 		};
+
+		// =============================================================================
+		// Flow-Control / Algorithm Classes
+		// These classes orchestrate operators and manage state for algorithm execution.
+		// They own registers and coordinate quantum operations for testing/verification.
+		// =============================================================================
 
 		struct QuantumWalk : BaseOperator
 		{

@@ -225,7 +225,31 @@ def qda_solve(
     eps: float = ...,
     step_rate: float = ...,
 ) -> np.ndarray:
-    """Solve Ax = b using QDA algorithm."""
+    """Solve Ax = b using QDA algorithm (auto-detects matrix type)."""
+    ...
+
+
+def qda_solve_tridiagonal(
+    A: np.ndarray,
+    b: np.ndarray,
+    kappa: float | None = ...,
+    p: float = ...,
+    eps: float = ...,
+    step_rate: float = ...,
+) -> np.ndarray:
+    """Solve Ax = b using QDA algorithm with tridiagonal block encoding."""
+    ...
+
+
+def qda_solve_via_qram(
+    A: np.ndarray,
+    b: np.ndarray,
+    kappa: float | None = ...,
+    p: float = ...,
+    eps: float = ...,
+    step_rate: float = ...,
+) -> np.ndarray:
+    """Solve Ax = b using QDA algorithm via QRAM block encoding."""
     ...
 
 

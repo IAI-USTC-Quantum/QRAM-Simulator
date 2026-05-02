@@ -34,8 +34,8 @@ from .block_encoding import (
 # StatePreparation from separate module
 from .state_preparation import StatePreparation, make_tree_and_qram
 
-# CKS v2
-from .cks_solver import cks_solve_v2
+# QDA (Quantum Discrete Adiabatic) linear solver
+from .qda_solver import qda_solve, qda_solve_tridiagonal, qda_solve_via_qram
 
 import numpy as np
 
@@ -47,6 +47,7 @@ def BlockEncoding(A: np.ndarray, **kwargs):
     - BlockEncodingTridiagonal for tridiagonal matrices
     - BlockEncodingViaQRAM for general sparse matrices
     """
+    from .block_encoding import _is_tridiagonal, _extract_tridiagonal_params
     if _is_tridiagonal(A):
         alpha, beta = _extract_tridiagonal_params(A)
         return BlockEncodingTridiagonal(
@@ -64,40 +65,15 @@ def BlockEncoding(A: np.ndarray, **kwargs):
         )
 
 
-def _is_tridiagonal(A: np.ndarray, tol: float = 1e-10) -> bool:
-    """Check if matrix is tridiagonal."""
-    A = np.asarray(A, dtype=float)
-    n = A.shape[0]
-    for i in range(n):
-        for j in range(n):
-            if abs(i - j) > 1 and abs(A[i, j]) > tol:
-                return False
-    return True
-
-
-def _extract_tridiagonal_params(A: np.ndarray) -> tuple:
-    """Extract alpha (diagonal) and beta (off-diagonal) from tridiagonal matrix."""
-    A = np.asarray(A, dtype=float)
-    n = A.shape[0]
-    alpha = A[0, 0]
-
-    off_diag_sum = 0.0
-    off_diag_count = 0
-    for i in range(n - 1):
-        off_diag_sum += abs(A[i, i + 1]) + abs(A[i + 1, i])
-        off_diag_count += 2
-
-    beta = off_diag_sum / off_diag_count if off_diag_count > 0 else 0.0
-    return alpha, beta
-
-
 __all__ = [
     "BlockEncoding",
     "BlockEncodingTridiagonal",
     "BlockEncodingViaQRAM",
     "StatePreparation",
-    "cks_solve_v2",
     "make_tree_and_qram",
+    "qda_solve",
+    "qda_solve_tridiagonal",
+    "qda_solve_via_qram",
 ]
 
 __version__ = "0.1.0"

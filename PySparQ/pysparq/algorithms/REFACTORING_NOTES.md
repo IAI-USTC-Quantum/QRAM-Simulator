@@ -2,6 +2,18 @@
 
 ## What changed
 
+### Issue #84: `cks_solve_v2` Removal (2026-05-02)
+
+Per issue #84 (`代码重构需求`), `cks_solve_v2` and its helper functions
+(`CKS_build_walk_environment`, `CKS_init_walk_state`, `CKS_apply_walk_step`,
+`CKS_run_lcu_loop`) have been removed from the public API. The full linear-solver
+end-to-end test is not currently needed and the implementation was incomplete
+(returned `np.linalg.solve` as a placeholder).
+
+The CKS component classes (`ChebyshevPolynomialCoefficient`, `SparseMatrix`,
+`QuantumBinarySearch`, `CondRotQW`, `TOperator`, `QuantumWalk`, `QuantumWalkNSteps`,
+`LCUContainer`) remain available.
+
 ### 0. QDA/CKS primitive-level parity
 
 The Python QDA and CKS paths are intended to mirror the C++ algorithms by

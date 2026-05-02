@@ -987,10 +987,8 @@ Example:
     {
          using namespace CKS;
 
-	         BIND_BASE_OPERATOR_SUBNAME(CondRot_General_Bool_QW, CondRot_General_Bool_QW_fast)
-	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
-	                  py::arg("j"), py::arg("k"), py::arg("reg_in"), py::arg("reg_out"), py::arg("mat"))
-	                 BIND_DAG_METHODS(CondRot_General_Bool_QW);
+	         // CondRot_General_Bool_QW is no longer exported to Python; use GetQWRotateAngle_Int_Int_Int + CondRot_Fixed_Bool instead.
+	         // BIND_BASE_OPERATOR_SUBNAME(CondRot_General_Bool_QW, CondRot_General_Bool_QW_fast) ... // REMOVED per issue #84
 
 	         BIND_SELF_ADJOINT_OPERATOR(GetQWRotateAngle_Int_Int_Int)
 	             .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view, const SparseMatrix *>(),
