@@ -766,7 +766,7 @@ vector<double> weights = ComputeFourierCoeffs(epsilon_, l_);
 
 CKS 算法利用 Chebyshev 多项式逼近和量子游走，在稀疏矩阵条件下达到 O(κ log(κ/ε)) 的复杂度，比 HHL 类算法有更好的常数因子。
 
-PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`GetQWRotateAngle_Int_Int_Int`、`CondRot_Fixed_Bool`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver，也不暴露用户传入 Python function 的旧泛化 CondRot API。`cks_solve_v2()` 目前会先跑量子 LCU/walk 路径，再以 warning 标明测量读出未完成，并临时返回经典解作为占位。
+PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`GetQWRotateAngle_Int_Int_Int`、`CondRot_Fixed_Bool`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver，也不暴露用户传入 Python function 的旧泛化 CondRot API。
 
 核心流程：
 ```

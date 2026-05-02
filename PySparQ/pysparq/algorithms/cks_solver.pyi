@@ -315,17 +315,3 @@ class LCUContainer:
     def iterate(self) -> bool: ...
 
 
-def cks_solve(
-    A: np.ndarray,
-    b: np.ndarray,
-    kappa: Optional[float] = ...,
-    eps: float = ...,
-    data_size: int = ...,
-) -> np.ndarray:
-    """Solve Ax = b using CKS quantum linear solver."""
-    ...
-
-
-def create_cks_demo() -> str:
-    """Generate a demo script for CKS solver."""
-    ...

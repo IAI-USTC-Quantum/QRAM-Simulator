@@ -181,3 +181,18 @@ SparQ 的算子按功能分为以下几大类：
      - ``debugger.h``
 
 各类算子的详细 API 和用法请参阅 :ref:`算子参考 <算子参考>` 章节。
+
+概念：算子与流程控制类
+----------------------
+
+SparQ 的代码中区分两类不同层次的概念：
+
+**算子（Operator）** 继承 ``BaseOperator`` 或 ``SelfAdjointOperator``，直接操控量子态（``SparseState``），与量子算法和量子线路高度相关。例如 ``CondRot_Fixed_Bool``、``T``（CKS 中的态制备算子）、``SparseMatrixOracle1`` 等。
+
+**流程控制类（Flow-Control / Algorithm Classes）** 不直接操控量子态，而是持有寄存器、编排算子执行、管理状态初始化和迭代。它们的职责是 **测试和验证** 量子过程是否正确，而非实现量子门。例如：
+
+- ``QuantumWalkNSteps``（CKS）：管理多步量子游走，注册创建和环境初始化
+- ``LCU_Container``（CKS）：管理 Chebyshev LCU 迭代循环
+- ``WalkS``（QDA）：在 QDA 算法中协调块编码和态制备
+
+这种区分的意义在于：算子是可组合、可测试的最小单元；流程控制类则是将算子串联起来用于特定算法流程的粘合剂。流程控制类不应继承 ``Operator`` 基类，因为它们的职责是 **编排** 而非 **作用**。
