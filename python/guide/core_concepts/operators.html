@@ -300,27 +300,28 @@
 <nav class="contents this-will-duplicate-information-and-it-is-still-useful-here local" id="id4">
 <p class="topic-title">目录</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#id5" id="id17">两阶段模型</a></p></li>
-<li><p><a class="reference internal" href="#id6" id="id18">构造参数</a></p>
+<li><p><a class="reference internal" href="#id5" id="id24">两阶段模型</a></p></li>
+<li><p><a class="reference internal" href="#id6" id="id25">构造参数</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id7" id="id19">寄存器标识</a></p></li>
-<li><p><a class="reference internal" href="#id8" id="id20">常量参数</a></p></li>
-<li><p><a class="reference internal" href="#id9" id="id21">超参数</a></p></li>
-<li><p><a class="reference internal" href="#id10" id="id22">位索引与角度</a></p></li>
+<li><p><a class="reference internal" href="#id7" id="id26">寄存器标识</a></p></li>
+<li><p><a class="reference internal" href="#id8" id="id27">常量参数</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id28">超参数</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id29">位索引与角度</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id11" id="id23">作用方式</a></p>
+<li><p><a class="reference internal" href="#id11" id="id30">作用方式</a></p>
 <ul>
-<li><p><a class="reference internal" href="#id12" id="id24">直接作用</a></p></li>
-<li><p><a class="reference internal" href="#id13" id="id25">逆作用</a></p></li>
-<li><p><a class="reference internal" href="#id14" id="id26">条件作用</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id31">直接作用</a></p></li>
+<li><p><a class="reference internal" href="#id13" id="id32">逆作用</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id33">条件作用</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#id15" id="id27">算子分类</a></p></li>
+<li><p><a class="reference internal" href="#id15" id="id34">算子分类</a></p></li>
+<li><p><a class="reference internal" href="#id16" id="id35">概念：算子与流程控制类</a></p></li>
 </ul>
 </nav>
 <section id="id5">
-<h2><a class="toc-backref" href="#id17" role="doc-backlink">两阶段模型</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id24" role="doc-backlink">两阶段模型</a><a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
 <p>SparQ 的算子遵循 <strong>构造 → 作用</strong> 的两阶段模型：</p>
 <ol class="arabic simple">
 <li><p><strong>构造阶段</strong> — 指定算子作用于哪些寄存器以及相关参数。此阶段不涉及任何量子态。</p></li>
@@ -350,10 +351,10 @@
 </ul>
 </section>
 <section id="id6">
-<h2><a class="toc-backref" href="#id18" role="doc-backlink">构造参数</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id25" role="doc-backlink">构造参数</a><a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
 <p>构造参数决定了算子的行为，通常包括以下几类：</p>
 <section id="id7">
-<h3><a class="toc-backref" href="#id19" role="doc-backlink">寄存器标识</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id26" role="doc-backlink">寄存器标识</a><a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
 <p>几乎所有算子都需要指定目标寄存器。可以用名称字符串或下标整数：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 使用名称（推荐）</span>
 <span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
@@ -364,7 +365,7 @@
 </div>
 </section>
 <section id="id8">
-<h3><a class="toc-backref" href="#id20" role="doc-backlink">常量参数</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id27" role="doc-backlink">常量参数</a><a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
 <p>部分算子接受经典常量作为参数，例如加法中的常数、乘法中的乘数：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 常量加法：指定常数 7</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Add_ConstUInt</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
@@ -375,11 +376,11 @@
 </div>
 </section>
 <section id="id9">
-<h3><a class="toc-backref" href="#id21" role="doc-backlink">超参数</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id28" role="doc-backlink">超参数</a><a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
 <p>一些高级算子需要算法层面的超参数，例如哈密顿量模拟中的 <span class="math notranslate nohighlight">\(\kappa`（条件数）、:math:\)</span>epsilon`（精度），或 QDA 中的步长参数 <span class="math notranslate nohighlight">\(s\)</span>。</p>
 </section>
 <section id="id10">
-<h3><a class="toc-backref" href="#id22" role="doc-backlink">位索引与角度</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id29" role="doc-backlink">位索引与角度</a><a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
 <p>单量子比特门需要指定作用在寄存器中的哪一位，旋转门需要指定旋转角度：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 在寄存器 &quot;q&quot; 的第 0 位作用 X 门</span>
 <span class="n">ps</span><span class="o">.</span><span class="n">Xgate_Bool</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -391,9 +392,9 @@
 </section>
 </section>
 <section id="id11">
-<h2><a class="toc-backref" href="#id23" role="doc-backlink">作用方式</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id30" role="doc-backlink">作用方式</a><a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h2>
 <section id="id12">
-<h3><a class="toc-backref" href="#id24" role="doc-backlink">直接作用</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id31" role="doc-backlink">直接作用</a><a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
 <p>构造后通过函数调用语法 <code class="docutils literal notranslate"><span class="pre">op(state)</span></code> 将算子施加到 <code class="docutils literal notranslate"><span class="pre">SparseState</span></code>：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Hadamard_Int</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
@@ -401,7 +402,7 @@
 </div>
 </section>
 <section id="id13">
-<h3><a class="toc-backref" href="#id25" role="doc-backlink">逆作用</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id32" role="doc-backlink">逆作用</a><a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
 <p>对于 <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> 派生的算子，使用 <code class="docutils literal notranslate"><span class="pre">dag()</span></code> 执行逆变换：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ShiftLeft</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">op</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>       <span class="c1"># 左移 2 位</span>
@@ -411,7 +412,7 @@
 <p>对于 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code>，再次调用 <code class="docutils literal notranslate"><span class="pre">op(state)</span></code> 即为逆操作（<span class="math notranslate nohighlight">\(U^\dagger = U\)</span>）。</p>
 </section>
 <section id="id14">
-<h3><a class="toc-backref" href="#id26" role="doc-backlink">条件作用</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<h3><a class="toc-backref" href="#id33" role="doc-backlink">条件作用</a><a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
 <p>所有算子支持链式条件方法，实现受控操作：</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">)</span>
 
@@ -425,11 +426,11 @@
 </section>
 </section>
 <section id="id15">
-<h2><a class="toc-backref" href="#id27" role="doc-backlink">算子分类</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<h2><a class="toc-backref" href="#id34" role="doc-backlink">算子分类</a><a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
 <p>SparQ 的算子按功能分为以下几大类：</p>
-<div class="table-wrapper docutils container" id="id16">
-<table class="docutils align-default" id="id16">
-<caption><span class="caption-text">算子分类概览</span><a class="headerlink" href="#id16" title="链接到此表格。">¶</a></caption>
+<div class="table-wrapper docutils container" id="id23">
+<table class="docutils align-default" id="id23">
+<caption><span class="caption-text">算子分类概览</span><a class="headerlink" href="#id23" title="链接到此表格。">¶</a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>分类</p></th>
 <th class="head"><p>说明</p></th>
@@ -493,6 +494,18 @@
 </table>
 </div>
 <p>各类算子的详细 API 和用法请参阅 <a class="reference internal" href="../../operators/index.html#id15"><span class="std std-ref">算子参考</span></a> 章节。</p>
+</section>
+<section id="id16">
+<h2><a class="toc-backref" href="#id35" role="doc-backlink">概念：算子与流程控制类</a><a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h2>
+<p>SparQ 的代码中区分两类不同层次的概念：</p>
+<p><strong>算子（Operator）</strong> 继承 <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> 或 <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code>，直接操控量子态（<code class="docutils literal notranslate"><span class="pre">SparseState</span></code>），与量子算法和量子线路高度相关。例如 <code class="docutils literal notranslate"><span class="pre">CondRot_Fixed_Bool</span></code>、<code class="docutils literal notranslate"><span class="pre">T``（CKS</span> <span class="pre">中的态制备算子）、``SparseMatrixOracle1</span></code> 等。</p>
+<p><strong>流程控制类（Flow-Control / Algorithm Classes）</strong> 不直接操控量子态，而是持有寄存器、编排算子执行、管理状态初始化和迭代。它们的职责是 <strong>测试和验证</strong> 量子过程是否正确，而非实现量子门。例如：</p>
+<ul class="simple">
+<li><p><a href="#id17"><span class="problematic" id="id18">``</span></a>QuantumWalkNSteps``（CKS）：管理多步量子游走，注册创建和环境初始化</p></li>
+<li><p><a href="#id19"><span class="problematic" id="id20">``</span></a>LCU_Container``（CKS）：管理 Chebyshev LCU 迭代循环</p></li>
+<li><p><a href="#id21"><span class="problematic" id="id22">``</span></a>WalkS``（QDA）：在 QDA 算法中协调块编码和态制备</p></li>
+</ul>
+<p>这种区分的意义在于：算子是可组合、可测试的最小单元；流程控制类则是将算子串联起来用于特定算法流程的粘合剂。流程控制类不应继承 <code class="docutils literal notranslate"><span class="pre">Operator</span></code> 基类，因为它们的职责是 <strong>编排</strong> 而非 <strong>作用</strong>。</p>
 </section>
 </section>
 
@@ -567,6 +580,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#id15">算子分类</a></li>
+<li><a class="reference internal" href="#id16">概念：算子与流程控制类</a></li>
 </ul>
 </li>
 </ul>

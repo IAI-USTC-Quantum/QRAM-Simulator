@@ -726,7 +726,37 @@
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">step_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using QDA algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using QDA algorithm (auto-detects matrix type).&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="qda_solve_tridiagonal">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.qda_solve_tridiagonal">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qda_solve_tridiagonal</span><span class="p">(</span>
+    <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">step_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using QDA algorithm with tridiagonal block encoding.&quot;&quot;&quot;</span>
+    <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="qda_solve_via_qram">
+<a class="viewcode-back" href="../../../../autoapi/PySparQ/pysparq/algorithms/qda_solver/index.html#PySparQ.pysparq.algorithms.qda_solver.qda_solve_via_qram">[文档]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qda_solve_via_qram</span><span class="p">(</span>
+    <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">step_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve Ax = b using QDA algorithm via QRAM block encoding.&quot;&quot;&quot;</span>
     <span class="o">...</span></div>
 
 

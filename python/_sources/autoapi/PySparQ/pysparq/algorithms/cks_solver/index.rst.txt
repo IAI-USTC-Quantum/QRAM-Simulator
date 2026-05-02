@@ -30,8 +30,6 @@ Functions
 
 .. autoapisummary::
 
-   PySparQ.pysparq.algorithms.cks_solver.cks_solve
-   PySparQ.pysparq.algorithms.cks_solver.create_cks_demo
    PySparQ.pysparq.algorithms.cks_solver.get_coef_common
    PySparQ.pysparq.algorithms.cks_solver.get_coef_positive_only
    PySparQ.pysparq.algorithms.cks_solver.make_walk_angle_func
@@ -498,16 +496,6 @@ Module Contents
 
    .. py:attribute:: sparse_offset_reg
       :type:  str
-
-
-.. py:function:: cks_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: Optional[float] = ..., eps: float = ..., data_size: int = ...) -> numpy.ndarray
-
-   Solve Ax = b using CKS quantum linear solver.
-
-
-.. py:function:: create_cks_demo() -> str
-
-   Generate a demo script for CKS solver.
 
 
 .. py:function:: get_coef_common(mat_data_size: int, v: int, row: int, col: int) -> list[complex]

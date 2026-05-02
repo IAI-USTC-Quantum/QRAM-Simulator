@@ -37,6 +37,8 @@ Functions
    PySparQ.pysparq.algorithms.qda_solver.create_qda_demo
    PySparQ.pysparq.algorithms.qda_solver.dolph_chebyshev
    PySparQ.pysparq.algorithms.qda_solver.qda_solve
+   PySparQ.pysparq.algorithms.qda_solver.qda_solve_tridiagonal
+   PySparQ.pysparq.algorithms.qda_solver.qda_solve_via_qram
 
 
 Module Contents
@@ -336,6 +338,16 @@ Module Contents
 
 .. py:function:: qda_solve(A: numpy.ndarray, b: numpy.ndarray, kappa: float | None = ..., p: float = ..., eps: float = ..., step_rate: float = ...) -> numpy.ndarray
 
-   Solve Ax = b using QDA algorithm.
+   Solve Ax = b using QDA algorithm (auto-detects matrix type).
+
+
+.. py:function:: qda_solve_tridiagonal(A: numpy.ndarray, b: numpy.ndarray, kappa: float | None = ..., p: float = ..., eps: float = ..., step_rate: float = ...) -> numpy.ndarray
+
+   Solve Ax = b using QDA algorithm with tridiagonal block encoding.
+
+
+.. py:function:: qda_solve_via_qram(A: numpy.ndarray, b: numpy.ndarray, kappa: float | None = ..., p: float = ..., eps: float = ..., step_rate: float = ...) -> numpy.ndarray
+
+   Solve Ax = b using QDA algorithm via QRAM block encoding.
 
 
