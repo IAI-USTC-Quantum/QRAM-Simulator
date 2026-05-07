@@ -1932,6 +1932,68 @@ namespace qram_simulator
 	 * @note Unitary性质：自伴算子（U^† = U），因为使用XOR实现
 	 * @note 约束：func必须是确定性的纯函数，否则无法保证unitary
 	 *
+	 * ────────────────────────────────────────────────────────────────────────
+	 * @par 设计备注：CustomArithmetic 的"模拟器特权"语义与未来演进方向
+	 *
+	 * 当前实现是一个**"模拟器特权"原语**：它直接在 SparseState 的每个基态上
+	 * 调用 host C++ / Python 回调 func，把 f(x) XOR 到输出寄存器。这等价于
+	 * 一个理想化的 oracle U_f|x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩，但**没有对应的物理量子
+	 * 电路** —— 真实硬件无法"读出基态值再调用任意函数"。因此：
+	 *
+	 *   1. CustomArithmetic 仅在稀疏态模拟器中有意义；
+	 *   2. 任何"将算法 lower 到物理后端 / Clifford+T / OriginIR"的 pass 都
+	 *      不应该把 CustomArithmetic 作为合法目标原语；
+	 *   3. 上层 DSL（如 qec_compiler/dsl_runtime/dsl）不应允许 YAML composite
+	 *      直接引用 CustomArithmetic，否则编译出来的电路无法被物理执行。
+	 *
+	 * @par 未来演进：建立 quantum-libm + 智能 lowering 策略
+	 *
+	 * 类比 C 标准库：math.h 的 sin/exp/log 并不是 CPU 指令，而是 libm 用
+	 * 一组小型 ALU 原子（+, −, ×, ÷, FMA, sqrt）+ 区间归约 + 多项式逼近
+	 * + 查表实现的软件库。同样地，量子里我们应当：
+	 *
+	 *   ┌──────────────────────────────────────────────────────────────────┐
+	 *   │ Tier 0 — 量子算术 ISA：                                          │
+	 *   │   QAdd / QSub / QMul / QDiv / QMod / QShift / QSwap / Toffoli /  │
+	 *   │   多控 X、Cliff+T 基底等已有原语                                 │
+	 *   ├──────────────────────────────────────────────────────────────────┤
+	 *   │ Tier 1 — 倒数 / 平方根 / 模逆（Newton 迭代 over Tier 0）          │
+	 *   ├──────────────────────────────────────────────────────────────────┤
+	 *   │ Tier 2 — 初等函数：sin/cos/exp/log via 区间归约 + 多项式 +        │
+	 *   │   QROM 查系数表 + Horner（全部 Tier 0 / Tier 1 拼接）             │
+	 *   ├──────────────────────────────────────────────────────────────────┤
+	 *   │ Tier 3 — 黑盒查找表：QROM / SELECT-SWAP（Babbush et al. 2018）    │
+	 *   │   适用于离散小定义域；展开为 O(2^n) 多控 X 链                     │
+	 *   └──────────────────────────────────────────────────────────────────┘
+	 *
+	 * 在此架构下，CustomArithmetic 不再是终点，而是一个 trait 接口：
+	 *
+	 *   - 它接受用户提供的 func 与定义域 / 精度 / 目标后端 等元信息；
+	 *   - 一个**智能 lowering 策略选择器**根据这些信息选择落地路径：
+	 *       * 定义域 ≤ 2^k（k 较小，典型 k ≤ 8） → QROM 展开
+	 *       * func 是多项式 / 解析光滑函数 → 多项式逼近 + Horner
+	 *       * func 是模幂 / 模乘等结构化算术 → 直接用 Mod_Mult 等专用原语
+	 *       * 仅模拟器目标且 func 难以分解 → 保留为 host 回调（即当前行为）
+	 *   - 选择器不必是一段简单代码，而是一个考虑 N（位宽）、ε（误差预算）、
+	 *     T-count 预算、是否容错等多维约束的 cost 模型。
+	 *
+	 * @par 关于 Shor (mod-pow) 的特别说明
+	 *
+	 * Shor 算法里的 controlled modular exponentiation **不应该**走
+	 * CustomArithmetic 这条路 —— 它本质上是 controlled-Mod_Mult 链
+	 * (in-place 操作)，而 CustomArithmetic 的 XOR 语义只描述
+	 * out-of-place 的 |x⟩|y⟩→|x⟩|y⊕f(x)⟩，并且 LUT 展开会让 Shor
+	 * 无法 scale 到 2048 bit。正确做法是直接调
+	 * Mod_Mult_UInt_ConstUInt_InPlace，按 j = 0..2n-1 累乘
+	 * a^(2^j) mod N，每个被 work_reg 的第 j 位 controlled。Shor 的
+	 * lowering 优化（windowed arithmetic、Beauregard、Häner-Roetteler-
+	 * Soeken 等）均建立在这条 in-place 链上而非 LUT 上。
+	 *
+	 * @warning 在该架构落地之前，请把 CustomArithmetic 视为
+	 *          "simulator-only oracle"，不要在面向物理硬件的算法描述
+	 *          (DSL composite、IR codegen pass) 中引用它。
+	 * ────────────────────────────────────────────────────────────────────────
+	 *
 	 * @pre 输入和输出寄存器数量必须在构造函数中正确指定
 	 * @pre func必须是确定性的（相同的输入总是产生相同的输出）
 	 * @pre 所有寄存器必须是激活状态
