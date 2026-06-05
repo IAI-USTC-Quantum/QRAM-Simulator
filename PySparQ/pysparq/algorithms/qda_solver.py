@@ -221,10 +221,13 @@ class BlockEncodingHs(ControllableOperatorMixin):
         self.R_s = compute_rotation_matrix(fs)
 
     def __call__(self, state: ps.SparseState) -> None:
-        """Apply block encoding of H(s)."""
-        # Simplified implementation of the circuit from C++ code
-        # Full implementation would use SPLIT_BY_CONDITIONS pattern
+        """Apply block encoding of H(s).
 
+        Ports the 25-gate circuit from C++ ``Block_Encoding_Hs::impl``
+        (qda_fundamental.h:62-96).  The outer ``SPLIT_BY_CONDITIONS`` /
+        ``MERGE_BY_CONDITIONS`` machinery is handled implicitly by
+        ``ControllableOperatorMixin``.
+        """
         # Hadamard on anc_3
         ps.Hadamard_Bool(self.anc_3)(state)
 
