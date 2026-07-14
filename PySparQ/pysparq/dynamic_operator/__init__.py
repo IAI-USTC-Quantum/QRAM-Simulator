@@ -1,4 +1,21 @@
-"""PySparQ 动态算子扩展模块 - 提供运行时编译和加载自定义 C++ 算子的功能。"""
+"""PySparQ 动态算子扩展模块 - 提供运行时编译和加载自定义 C++ 算子的功能。
+
+.. warning::
+   ``compile_operator()`` 只是把用户提供的 ``operator()``/``dag()`` 编译为共享库
+   并用 ctypes 调用；编译成功仅代表代码可以通过 C++ 类型检查，**不代表**、也
+   **不能**静态或动态地证明该算子是酉的（unitary）或 ``operator()``/``dag()``
+   互为逆运算。凡是自行覆盖寄存器、清零寄存器实现 ``dag()``、或以其他方式破坏
+   信息的实现都能顺利通过编译。
+
+   因此，本仓库支持的 QCFD 路径（QECC.Lang 驱动的 qfvm/qnls/qham）**禁止**使用
+   ``compile_operator`` 编译得到的动态算子。所有语义必须通过具名、可静态检查的
+   PySparQ 内建算子（或由内建算子组合而成的 Python 组合算子）表达，并通过
+   ``pysparq.conformance`` 提供的一致性测试矩阵（任意非零输出、穷举/抽样基态、
+   碰撞检测、叠加线性性、正/负/多重控制、forward+dagger 与 dagger+forward
+   恒等）验证。``compile_operator`` 仍然是通用（不局限于 QCFD）的运行时算子
+   编译工具，可用于原型验证、教学或与 QCFD 无关的实验，但不应被视为已通过任何
+   酉性证明。
+"""
 
 from typing import List, Tuple, Type, Optional
 
@@ -64,6 +81,14 @@ def compile_operator(
     这是一个高级函数，将用户提供的 C++ 代码编译为共享库，
     并包装为可直接在 Python 中使用的算子类。动态算子可以
     像原生 PySparQ 算子一样应用于 SparseState。
+
+    Warning:
+        编译成功只表示 ``operator()``/``dag()`` 通过了 C++ 类型检查，
+        **不构成任何酉性证明**：本函数既不静态也不动态验证生成的算子是
+        酉的，或者 ``dag()`` 确实是 ``operator()`` 的逆。因此支持的 QCFD
+        路径（QECC.Lang 驱动的 qfvm/qnls/qham）禁止使用本函数编译的动态
+        算子；QCFD 语义必须使用具名的 PySparQ 内建算子并通过
+        ``pysparq.conformance`` 的一致性测试矩阵验证。
 
     Args:
         name: 算子类名。必须是有效的 Python 类名，且必须与 C++ 代码中的类名匹配。

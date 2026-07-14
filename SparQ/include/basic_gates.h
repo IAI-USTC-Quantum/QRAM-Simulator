@@ -597,6 +597,12 @@ namespace qram_simulator
 		 * @param state 系统状态向量
 		 */
 		void operator()(std::vector<System>& state) const;
+
+		/**
+		 * @brief 应用 dagger 操作
+		 * @param state 系统状态向量
+		 */
+		void dag(std::vector<System>& state) const;
 	};
 
 	/**

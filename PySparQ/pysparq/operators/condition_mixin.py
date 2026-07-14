@@ -29,6 +29,10 @@ class ControllableOperatorMixin:
         conditioned_by_bit(reg, pos)    -> self
         clear_conditions()             -> self
 
+    Repeated calls of one condition kind replace that kind's existing set.
+    Use a list overload when the operator supports conjunctive conditions of
+    the same kind; different condition kinds are combined with logical AND.
+
     Subclasses MUST implement __call__(self, state) -> None.
     Subclasses SHOULD implement dag(self, state) -> None
     if the operator is not self-adjoint.

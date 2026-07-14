@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **SparQ/include/measurement.h**, **SparQ/src/measurement.cpp**: First-class
+  seedable sparse-state operations for a dynamic executor: `MeasureZ`
+  (projective Z-basis measurement: Born-rule sampling + collapse +
+  renormalize), `Reset` (measurement + classical conditioned flip to a
+  target value), `Probability` (read-only Born-rule query + full
+  single-register outcome distribution)
+- **PySparQ/core.cpp**: pybind11 bindings for `MeasureZ`, `Reset`,
+  `Probability`, and the global seedable RNG (`set_seed`, `get_seed`,
+  `reseed`, `time_seed`)
+- **PySparQ/pysparq/conformance.py**: Reusable semantic conformance harness
+  (arbitrary nonzero outputs, basis-exhaustive/spot-sampled coverage,
+  output-collision detection, superposition linearity, positive/negative/
+  multi-register controls, forward+dagger and dagger+forward identity)
+- **PySparQ/test/test_semantic_conformance.py**: Conformance matrix applied
+  to representative built-ins (`Add_UInt_UInt`, `Add_UInt_UInt_InPlace`,
+  `Assign`, `Compare_UInt_UInt`, `CustomArithmetic`, `Swap_General_General`,
+  `Xgate_Bool`, `FlipBools`, `QRAMLoad`), plus a negative-control test
+  proving the harness rejects a destructive overwrite/clearing-dagger
+  implementation
+- **PySparQ/test/test_measurement.py**: `MeasureZ`/`Reset`/`Probability`
+  tests, including determinism under `set_seed` and Born-rule cross-checks
+  against a dense-state reference
+- **PySparQ/pysparq/conformance.py**: `assert_collision_free_for_output_starts`
+  strengthens collision detection for `xor_into` operators by re-checking
+  injectivity with the output register(s) seeded at several arbitrary
+  (including nonzero) starting values, not only the conventional
+  clean/zero-ancilla start; applied to `Add_UInt_UInt`, `Assign`,
+  `Compare_UInt_UInt`, `CustomArithmetic`, and `QRAMLoad` in
+  `test_semantic_conformance.py`, plus a negative-control test proving it
+  rejects the destructive overwrite implementation at nonzero starts too
+- **PySparQ/test/test_measurement.py**: `TestMeasureZNormalizationValidation`
+  and `TestRegisterValidation` cover the C++ hardening below (non-normalized
+  input rejection, unknown/out-of-range/inactive/duplicate register
+  rejection, out-of-width-range Reset target/Probability value rejection)
+
+### Fixed
+- **SparQ/include/measurement.h**, **SparQ/src/measurement.cpp**:
+  - `MeasureZ` now validates that the input state's total Born-rule
+    probability is finite and within `kNormalizationThreshold` (`1e-5`,
+    matching `CheckNormalization`'s default) of 1.0 before sampling, and
+    raises instead of silently biasing towards/falling back to the last
+    branch when a caller passes a non-normalized state. `Reset` inherits
+    this guard since it delegates to `MeasureZ`.
+  - `MeasureZ`/`Reset`/`Probability` constructors now validate every
+    register name/id: unknown names and out-of-range or inactive
+    (removed) ids raise `invalid_argument` instead of silently resolving
+    to `SIZE_MAX`/an unchecked id (previously undefined behavior on use);
+    duplicate registers within one call (e.g. `Reset(["a", "a"], [1, 2])`)
+    are rejected instead of silently applying a contradictory target.
+  - `Reset` targets and `Probability` values are validated against
+    `System::size_of(id)` and now raise `invalid_argument` if they do not
+    fit the register's bit width, instead of being silently truncated.
+
+### Changed
+- **SparQ/include/basic_components.h**, **SparQ/src/basic_components.cpp**:
+  CPU basis-state register storage now uses `std::vector<StateStorage>`.
+  `CACHED_REGISTER_SIZE` is the initial reserved block rather than a hard CPU
+  limit; storage grows on demand and removed slots are reused. CUDA retains
+  its fixed layout and 64-register ceiling required by device kernels and
+  their `uint64_t` active-register bitmap.
+- **PySparQ/pysparq/dynamic_operator/__init__.py**,
+  **PySparQ/pysparq/dynamic_operator/README.md**: Documented that
+  `compile_operator()` cannot prove unitarity and is forbidden on the
+  supported QCFD path (QECC.Lang-driven qfvm/qnls/qham); QCFD semantics
+  must use named PySparQ built-ins validated by `pysparq.conformance`
+- **README.md**: Documented the new seedable measurement/reset/probability
+  API in the Register Level key-API section
+
+---
+
 ## [0.1.1] - 2026-05-01
 
 ### Added

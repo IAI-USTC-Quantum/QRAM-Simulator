@@ -115,12 +115,16 @@ namespace qram_simulator
 
 	void ShiftLeft_InPlace::dag(std::vector<System>& state) const
 	{
-		ShiftRight_InPlace{register_1, digit}(state);
+		ShiftRight_InPlace inverse{register_1, digit};
+		copy_control_conditions_to(inverse);
+		inverse(state);
 	}
 
 	void ShiftRight_InPlace::dag(std::vector<System>& state) const
 	{
-		ShiftLeft_InPlace{register_1, digit}(state);
+		ShiftLeft_InPlace inverse{register_1, digit};
+		copy_control_conditions_to(inverse);
+		inverse(state);
 	}
 
 	void Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const

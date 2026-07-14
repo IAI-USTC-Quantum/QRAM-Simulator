@@ -283,8 +283,10 @@ namespace qram_simulator
 		 */
 		void _validate_registers(size_t addr_, size_t data_) const
 		{
-			if (addr_ >= System::CachedRegisterSize ||
-				data_ >= System::CachedRegisterSize)
+			if (addr_ >= System::name_register_map.size() ||
+				data_ >= System::name_register_map.size() ||
+				!System::status_of(addr_) ||
+				!System::status_of(data_))
 			{
 				throw_invalid_input();
 			}

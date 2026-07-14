@@ -27,6 +27,8 @@ enable_testing()
 option(QRAM_ENABLE_CUDA "Enable CUDA GPU support" OFF)
 
 if(CACHED_REGISTER_SIZE)
+    # CPU: initial std::vector reservation, not a hard register limit.
+    # CUDA: fixed device layout and therefore still a hard limit (<= 64).
     add_compile_definitions(CACHED_REGISTER_SIZE=${CACHED_REGISTER_SIZE})
 endif()
 

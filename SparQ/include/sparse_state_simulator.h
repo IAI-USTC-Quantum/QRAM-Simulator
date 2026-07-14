@@ -20,6 +20,7 @@
 #include "hadamard.h"
 #include "partial_trace.h"
 #include "dark_magic.h"
+#include "measurement.h"
 
 namespace qram_simulator
 {

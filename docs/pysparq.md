@@ -17,7 +17,7 @@ PySparQ is the Python binding for the QRAM-Simulator's sparse-state quantum circ
 
 ```bash
 # Clone the repository
-git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
+git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
 cd QRAM-Simulator
 
 # Install dependencies

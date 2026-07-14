@@ -70,6 +70,7 @@ Doxygen 配置文件位于项目根目录的 `Doxyfile`，主要配置包括：
 
 ## 持续集成
 
-API 文档生成已集成到 CI 流程中，每次提交到 main/develop 分支时自动构建。
+CPU C++ 与 PySparQ 测试已集成到 Gitea Actions，每次提交到
+main/develop 分支或创建 Pull Request 时自动运行。
 
-查看 CI 配置: `.github/workflows/cmake-multi-platform.yml`
+查看 CI 配置: `.gitea/workflows/ci.yml`

@@ -221,12 +221,16 @@ namespace qram_simulator {
 
     void Rot_GeneralStatePrep::operator()(CuSparseState& state) const
     {
-        rot_general(state);
+        auto controlled_rotation = rot_general;
+        copy_control_conditions_to(controlled_rotation);
+        controlled_rotation(state);
     }
 
     void Rot_GeneralStatePrep::dag(CuSparseState& state) const
     {
-        rot_general.dag(state);
+        auto controlled_rotation = rot_general;
+        copy_control_conditions_to(controlled_rotation);
+        controlled_rotation.dag(state);
     }
 
 } // namespace qram_simulator

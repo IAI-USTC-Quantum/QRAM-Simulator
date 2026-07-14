@@ -64,6 +64,7 @@ namespace qram_simulator {
 		 * @param state 系统状态向量
 		 */
 		void operator()(std::vector<System>& state) const;
+
 	};
 
 	/**
@@ -121,6 +122,7 @@ namespace qram_simulator {
 		 * @param state 系统状态向量
 		 */
 		void operator()(std::vector<System>& state) const;
+
 	};
 
 	/**

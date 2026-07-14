@@ -147,25 +147,25 @@
 	}\
 	inline auto& conditioned_by_all_ones(std::string_view cond)\
 	{\
-		clear_control_nonzeros();\
+		clear_control_all_ones();\
 		condition_variable_all_ones.push_back(System::get(cond));\
 		return *this;\
 	}\
     inline auto& conditioned_by_all_ones(const std::vector<std::string_view> &conds)\
 	{\
-		clear_control_nonzeros();\
+		clear_control_all_ones();\
 		for (auto &cond : conds) condition_variable_all_ones.push_back(System::get(cond));\
 		return *this;\
 	}\
 	inline auto& conditioned_by_all_ones(size_t cond)\
 	{\
-		clear_control_nonzeros();\
+		clear_control_all_ones();\
 		condition_variable_all_ones.push_back(cond);\
 		return *this; \
 	}\
     inline auto& conditioned_by_all_ones(const std::vector<size_t> &conds)\
 	{\
-		clear_control_nonzeros();\
+		clear_control_all_ones();\
 		condition_variable_all_ones = conds;\
 		return *this;\
 	}
@@ -272,7 +272,15 @@
 	ClassControllableNonzeros\
 	ClassControllableAllOnes\
 	ClassControllableByBit\
-	ClassControllableByValue
+	ClassControllableByValue\
+	template <typename Operator>\
+	inline void copy_control_conditions_to(Operator& target) const\
+	{\
+		target.condition_variable_nonzeros = condition_variable_nonzeros;\
+		target.condition_variable_all_ones = condition_variable_all_ones;\
+		target.condition_variable_by_bit = condition_variable_by_bit;\
+		target.condition_variable_by_value = condition_variable_by_value;\
+	}
 
 // #define SELF_ADJOINT inline void dag(std::vector<System>& state) const { (*this)(state); }
 // #define SELF_ADJOINT_NONCONST inline void dag(std::vector<System>& state) { (*this)(state); }

@@ -185,8 +185,15 @@ namespace qram_simulator
 			auto& s = state[i];
 #endif
 			auto& value = s.get(first_pos).value;
-			value <<= second_size;
-			value += s.get(second_pos).value;
+			const uint64_t first_mask =
+				first_size == 64 ? ~uint64_t{0} : pow2(first_size) - 1;
+			const uint64_t second_mask =
+				second_size == 64 ? ~uint64_t{0} : pow2(second_size) - 1;
+			const uint64_t first_value = value & first_mask;
+			const uint64_t second_value = s.get(second_pos).value & second_mask;
+			value = second_size == 64
+				? second_value
+				: (first_value << second_size) | second_value;
 		}
 		System::remove_register(second_name);
 		return first_pos;

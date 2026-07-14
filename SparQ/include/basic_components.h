@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <unordered_map>
+#include <vector>
 
 #include "qram_circuit_qutrit.h"
 #include "global_macros.h"
@@ -216,11 +218,18 @@ namespace qram_simulator
 	struct System 
 	{
 #ifdef CACHED_REGISTER_SIZE
-		/** @brief 缓存寄存器大小 */
-		constexpr static size_t CachedRegisterSize = CACHED_REGISTER_SIZE;
+		/** @brief CPU 初始预分配容量 / CUDA 固定容量 */
+		constexpr static size_t InitialRegisterCapacity = CACHED_REGISTER_SIZE;
 #else
-		/** @brief 默认缓存寄存器大小 */
-		constexpr static size_t CachedRegisterSize = 40;
+		/** @brief 默认初始预分配容量 */
+		constexpr static size_t InitialRegisterCapacity = 64;
+#endif
+		/** @brief 兼容旧代码；CPU 下该值不再是寄存器数量上限 */
+		constexpr static size_t CachedRegisterSize = InitialRegisterCapacity;
+#ifdef USE_CUDA
+		static_assert(
+			CachedRegisterSize <= 64,
+			"CUDA builds require CachedRegisterSize <= 64");
 #endif
 
 		/** @brief 寄存器信息映射表 */
@@ -255,7 +264,7 @@ namespace qram_simulator
 			}
 		}
 
-		/** @brief 寄存器状态位图 */
+		/** @brief 寄存器状态位图（CUDA 快速路径；CPU 状态以 StateInfoType 为准） */
 		inline static uint64_t reg_status_bitmap = 0;
 
 		/** @brief 最大量子比特数统计 */
@@ -276,26 +285,57 @@ namespace qram_simulator
 		/** @brief 状态振幅 */
 		complex_t amplitude = 1.0;
 
-		/** @brief 寄存器存储数组 */
+		/** @brief CUDA 设备路径要求固定、可平凡复制的寄存器布局 */
+#ifdef USE_CUDA
 		std::array<StateStorage, CachedRegisterSize> registers;
+#else
+		/** @brief CPU 寄存器存储；预分配后按需动态增长 */
+		std::vector<StateStorage> registers;
+#endif
 
 		/**
 		 * @brief 获取指定位置的状态组件（非 const 版本）
 		 * @param id 寄存器 ID
 		 * @return 状态存储的引用
 		 */
+#ifdef USE_CUDA
 		HOST_DEVICE StateStorage& get(size_t id) {
 			return registers[id];
 		}
+#else
+		StateStorage& get(size_t id) {
+			if (id >= name_register_map.size())
+				throw std::runtime_error("Register not found.");
+			ensure_register_count(id + 1);
+			return registers[id];
+		}
+#endif
 
 		/**
 		 * @brief 获取指定位置的状态组件（const 版本）
 		 * @param id 寄存器 ID
 		 * @return 状态存储的 const 引用
 		 */
+#ifdef USE_CUDA
 		HOST_DEVICE const StateStorage& get(size_t id) const {
 			return registers[id];
 		}
+#else
+		const StateStorage& get(size_t id) const {
+			if (id >= name_register_map.size() || id >= registers.size())
+				throw std::runtime_error("Register not found.");
+			return registers[id];
+		}
+
+		/**
+		 * @brief 确保 CPU 基态拥有至少 count 个寄存器槽位
+		 * @param count 所需寄存器槽位数
+		 */
+		void ensure_register_count(size_t count) {
+			if (registers.size() < count)
+				registers.resize(count);
+		}
+#endif
 
 		/**
 		 * @brief 清除寄存器分配信息
@@ -493,7 +533,19 @@ namespace qram_simulator
 		/**
 		 * @brief 构造函数
 		 */
+#ifdef USE_CUDA
 		HOST_DEVICE System() {}
+#else
+		System()
+			: registers(name_register_map.size())
+		{
+			const size_t reserve_count =
+				InitialRegisterCapacity > name_register_map.size()
+				? InitialRegisterCapacity
+				: name_register_map.size();
+			registers.reserve(reserve_count);
+		}
+#endif
 
 		/**
 		 * @brief 小于比较运算符

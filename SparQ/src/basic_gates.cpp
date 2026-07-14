@@ -352,7 +352,9 @@ namespace qram_simulator
 
 	void Rot_Bool::dag(std::vector<System>& state) const
 	{
-		Rot_Bool(id, digit, mat.dagger())(state);		
+		Rot_Bool inverse(id, digit, mat.dagger());
+		copy_control_conditions_to(inverse);
+		inverse(state);
 	}
 
 	//void Rot_Bool::display() const
@@ -642,6 +644,13 @@ namespace qram_simulator
 			}
 		}
 
+	}
+
+	void RZgate_Bool::dag(std::vector<System>& state) const
+	{
+		RZgate_Bool inverse(id, digit, -angle);
+		copy_control_conditions_to(inverse);
+		inverse(state);
 	}
 
 	//void RZgate_Bool::display() const

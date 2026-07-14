@@ -50,7 +50,7 @@
 
 1. **克隆仓库**
    ```bash
-   git clone https://github.com/your-username/QRAM-Simulator.git
+   git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
    cd QRAM-Simulator
    ```
 
@@ -68,6 +68,9 @@
    ```bash
    cmake .. -DCMAKE_BUILD_TYPE=Release -DCACHED_REGISTER_SIZE=32
    ```
+   `CACHED_REGISTER_SIZE` 在 CPU 构建中只控制每个基态最初预留的寄存器
+   槽位数；`std::vector` 会在需要时继续增长。它仅在 CUDA 构建中仍是固定
+   容量。
 
 4. **编译**
    ```bash
@@ -154,14 +157,12 @@ QState qramLoad(const QState& address, const QState& data);
 
 ## Pull Request 流程
 
-### 1. Fork 仓库
-
-点击 GitHub 页面的 "Fork" 按钮，将仓库复制到你的账户下。
+### 1. 克隆 Gitea 仓库
 
 ### 2. 创建功能分支
 
 ```bash
-git clone https://github.com/your-username/QRAM-Simulator.git
+git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
 cd QRAM-Simulator
 git checkout -b feature/your-feature-name
 ```

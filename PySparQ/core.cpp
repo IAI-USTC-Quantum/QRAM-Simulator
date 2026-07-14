@@ -378,6 +378,108 @@ Example:
         .def("__call__",
              (double (PartialTraceSelectRange::*)(SparseState &) const) & PartialTraceSelectRange::operator(), py::arg("state"));
 
+    /* random_engine.h — seedable global RNG used by MeasureZ/Reset/PartialTrace* */
+    m.def("set_seed", [](long long seed) { random_engine::set_seed(static_cast<seed_t>(seed)); },
+          py::arg("seed"),
+          "Seed the global random engine used by measurement/reset/PartialTrace.\n\n"
+          "Call before MeasureZ/Reset (or PartialTrace/PartialTraceSelect*) to make\n"
+          "their sampled outcomes reproducible, which is required for deterministic\n"
+          "replay/testing of a dynamic executor.\n\n"
+          "Example:\n"
+          "    ps.set_seed(12345)\n"
+          "    outcome, prob = ps.MeasureZ('q')(state)");
+
+    m.def("get_seed", []() { return static_cast<long long>(random_engine::get_seed()); },
+          "Return the current seed of the global random engine.");
+
+    m.def("reseed", []() { return static_cast<long long>(random_engine::get_instance().reseed()); },
+          "Reseed the global random engine from its own randomness and return the new seed.");
+
+    m.def("time_seed", []() { return static_cast<long long>(random_engine::time_seed()); },
+          "Seed the global random engine from the current wall-clock time and return the seed.\n\n"
+          "Use set_seed() instead when reproducibility is required.");
+
+    /* measurement.h */
+    // MeasureZ 绑定：可播种的投影式 Z 基测量（坍缩+重新归一化）
+    py::class_<MeasureZ>(m, "MeasureZ", R"doc(
+Projective Z-basis (computational basis) measurement.
+
+Samples an outcome for one or more registers according to the Born rule,
+using the seedable global random engine (see set_seed()). Collapses the
+state onto the sampled branch and renormalizes it in place.
+
+This operation is non-unitary and irreversible (no dag()).
+
+Example:
+    ps.set_seed(0)
+    outcome, prob = ps.MeasureZ("q")(state)
+)doc")
+        .def(py::init<const std::vector<std::string> &>(), py::arg("register_names"))
+        .def(py::init<const std::vector<size_t> &>(), py::arg("register_ids"))
+        .def(py::init<std::string_view>(), py::arg("register_name"))
+        .def(py::init<size_t>(), py::arg("register_id"))
+        .def_readonly("registers", &MeasureZ::registers)
+        .def("__call__",
+             (std::pair<std::vector<uint64_t>, double> (MeasureZ::*)(SparseState &) const) & MeasureZ::operator(),
+             py::arg("state"));
+
+    // Reset 绑定：测量 + 经典条件翻转，将寄存器强制复位到给定经典值
+    py::class_<Reset>(m, "Reset", R"doc(
+Reset one or more registers to a definite classical value (default 0).
+
+Implemented as measurement (collapse + renormalize) followed by a
+deterministic classical correction, matching hardware active-reset and
+OriginIR-ext RESET semantics. Returns the pre-reset measured outcome.
+
+Example:
+    ps.set_seed(0)
+    measured = ps.Reset("q")(state)   # reset "q" to 0
+    measured = ps.Reset("q", 3)(state)  # reset "q" to 3
+)doc")
+        .def(py::init<const std::vector<std::string> &>(), py::arg("register_names"))
+        .def(py::init<const std::vector<std::string> &, const std::vector<uint64_t> &>(),
+             py::arg("register_names"), py::arg("targets"))
+        .def(py::init<const std::vector<size_t> &>(), py::arg("register_ids"))
+        .def(py::init<const std::vector<size_t> &, const std::vector<uint64_t> &>(),
+             py::arg("register_ids"), py::arg("targets"))
+        .def(py::init<std::string_view, uint64_t>(), py::arg("register_name"), py::arg("target") = 0)
+        .def(py::init<size_t, uint64_t>(), py::arg("register_id"), py::arg("target") = 0)
+        .def_readonly("registers", &Reset::registers)
+        .def_readonly("target_values", &Reset::target_values)
+        .def("__call__",
+             (std::vector<uint64_t> (Reset::*)(SparseState &) const) & Reset::operator(), py::arg("state"));
+
+    // Probability 绑定：只读 Born 概率查询，不改变状态
+    py::class_<Probability>(m, "Probability", R"doc(
+Read-only Born-rule probability query (does not modify the state).
+
+Computes the probability that the given register(s) hold the given
+value(s). Useful for QIF/QWHILE-style dynamic branching conditions and
+for Born-rule conformance checks against a dense-state reference.
+
+Example:
+    p = ps.Probability("q", 5)(state)
+    dist = ps.Probability.distribution(state, "q")  # full outcome distribution
+)doc")
+        .def(py::init<const std::map<std::string_view, uint64_t> &>(), py::arg("name_value_map"))
+        .def(py::init<const std::map<size_t, uint64_t> &>(), py::arg("id_value_map"))
+        .def(py::init<const std::vector<std::string> &, const std::vector<uint64_t> &>(),
+             py::arg("register_names"), py::arg("target_values"))
+        .def(py::init<const std::vector<size_t> &, const std::vector<uint64_t> &>(),
+             py::arg("register_ids"), py::arg("target_values"))
+        .def(py::init<std::string_view, uint64_t>(), py::arg("register_name"), py::arg("value"))
+        .def(py::init<size_t, uint64_t>(), py::arg("register_id"), py::arg("value"))
+        .def_readonly("registers", &Probability::registers)
+        .def_readonly("values", &Probability::values)
+        .def("__call__",
+             (double (Probability::*)(const SparseState &) const) & Probability::operator(), py::arg("state"))
+        .def_static("distribution",
+             (std::map<uint64_t, double> (*)(const SparseState &, size_t)) & Probability::distribution,
+             py::arg("state"), py::arg("register_id"))
+        .def_static("distribution",
+             (std::map<uint64_t, double> (*)(const SparseState &, std::string_view)) & Probability::distribution,
+             py::arg("state"), py::arg("register_name"));
+
     /* qft.h */
     // 绑定QFT
     BIND_BASE_OPERATOR(QFT, R"doc(
@@ -754,7 +856,8 @@ Example:
         .def(py::init<std::string_view, const std::vector<std::complex<double>> &>(),
              py::arg("reg"), py::arg("state_vector"))
         .def(py::init<size_t, const std::vector<std::complex<double>> &>(),
-             py::arg("reg_id"), py::arg("state_vector"));
+             py::arg("reg_id"), py::arg("state_vector"))
+            BIND_CONTROLLABLE_METHODS(Rot_GeneralStatePrep);
 
     // 辅助函数绑定
     m.def("stateprep_unitary_build_schmidt", &stateprep_unitary_build_schmidt,

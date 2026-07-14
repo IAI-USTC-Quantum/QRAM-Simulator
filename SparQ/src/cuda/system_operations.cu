@@ -129,17 +129,32 @@ namespace qram_simulator {
 	struct CombineRegisterFunctor {
 		size_t first_pos;
 		size_t second_pos;
+		size_t first_size;
 		size_t second_size;
 
-		CombineRegisterFunctor(size_t first, size_t second, size_t second_size)
-			: first_pos(first), second_pos(second), second_size(second_size)
+		CombineRegisterFunctor(
+			size_t first,
+			size_t second,
+			size_t first_size,
+			size_t second_size)
+			: first_pos(first),
+			  second_pos(second),
+			  first_size(first_size),
+			  second_size(second_size)
 		{}
 
 		__host__ __device__
 		void operator()(System& s) const {
 			auto& value = CuGet(s, first_pos).value;
-			value <<= second_size;
-			value += CuGet(s, second_pos).value;
+			const uint64_t first_mask =
+				first_size == 64 ? ~uint64_t{0} : pow2(first_size) - 1;
+			const uint64_t second_mask =
+				second_size == 64 ? ~uint64_t{0} : pow2(second_size) - 1;
+			const uint64_t first_value = value & first_mask;
+			const uint64_t second_value = CuGet(s, second_pos).value & second_mask;
+			value = second_size == 64
+				? second_value
+				: (first_value << second_size) | second_value;
 		}
 	};
 
@@ -162,7 +177,7 @@ namespace qram_simulator {
 		std::get<2>(System::name_register_map[first_pos]) = combine_size;
 		
 		thrust::for_each(state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-			CombineRegisterFunctor(first_pos, second_pos, second_size)
+			CombineRegisterFunctor(first_pos, second_pos, first_size, second_size)
 		);
 
 		System::remove_register(second_name);

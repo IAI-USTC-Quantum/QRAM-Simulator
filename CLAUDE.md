@@ -91,22 +91,23 @@ This repository is supported by two papers with distinct contributions:
 - **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, Register Level Programming paradigm, sparse state optimization, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`, `Experiments/ErrorFiltration/`
 - **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim), PySparQ Python API, GPU acceleration. Code: `SparQ/`, `SparQ_Algorithm/`, `PySparQ/`
 
-## GitHub Pages
+## Documentation
 
-Doxygen documentation is auto-deployed on push to `main`:
+The upstream project documentation remains available on GitHub Pages:
 - **Landing page**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/` (source: `docs/index.html`)
 - **C++ API docs**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (source: Doxygen → `docs/api/html/`)
-- Deployed via `peaceiris/actions-gh-pages` to `gh-pages` branch (see `.github/workflows/cmake-multi-platform.yml`, `docs` job)
+
+The Gitea repository runs CPU C++ and Python validation through
+`.gitea/workflows/ci.yml`.
 
 ## Git Workflow
 
-**IMPORTANT: Never push directly to the upstream repo. Always work on fork and submit PRs.**
+**IMPORTANT: Push active development only to the Gitea origin. Never push to
+the GitHub upstream remote.**
 
 Repository role:
-- `origin` → personal fork (`Agony5757/QRAM-Simulator`), active development
-- Upstream (`IAI-USTC-Quantum/QRAM-Simulator`) — PR target, accessed via `gh` CLI (no `upstream` git remote configured)
-
-Cross-repo operations (sync, PR) rely on `gh` CLI rather than a git upstream remote.
+- `origin` → `git@git.chenzhaoyun.com:agony/QRAM-Simulator.git`
+- `upstream` → `git@github.com:IAI-USTC-Quantum/QRAM-Simulator.git`
 
 ### CI Verification Before Submitting to Upstream
 

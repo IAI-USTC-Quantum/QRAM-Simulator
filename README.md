@@ -8,12 +8,15 @@
 [![arXiv:SparQ](https://img.shields.io/badge/SparQ-arXiv%3A2503%2E15118-6f42c1.svg)](https://arxiv.org/abs/2503.15118)
 [![PyPI](https://img.shields.io/pypi/v/pysparq.svg)](https://pypi.org/project/pysparq/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GitHub](https://img.shields.io/badge/GitHub-IAI--USTC--Quantum%2FQRAM--Simulator-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
+[![Gitea](https://img.shields.io/badge/Gitea-agony%2FQRAM--Simulator-609926?logo=gitea)](https://git.chenzhaoyun.com/agony/QRAM-Simulator)
+[![Upstream GitHub](https://img.shields.io/badge/upstream-IAI--USTC--Quantum-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/QRAM-Simulator/)
 [![Quantum | AI](https://img.shields.io/badge/Quantum_Computing-AI-00e5ff?style=flat-square)](https://iai-ustc-quantum.github.io/)
-[![CMake on multiple platforms](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml)
+[![Gitea Actions](https://git.chenzhaoyun.com/agony/QRAM-Simulator/actions/workflows/ci.yml/badge.svg?branch=main)](https://git.chenzhaoyun.com/agony/QRAM-Simulator/actions)
 
 > **稀疏态量子模拟器，支持 Register Level Programming**
+>
+> 当前开发仓库位于 Gitea；GitHub 仓库作为上游来源保留。
 
 ## 双软件架构
 
@@ -39,6 +42,10 @@
 | **算术运算** | 编译成量子门序列 | 直接对寄存器值进行算术操作 |
 | **开发模式** | 自底向上（从门电路构建） | 自顶向下（先写高层模块再细化） |
 | **QAdder 实现** | 分解为数百个量子门 | 直接调用加法器，自动门分解 |
+
+CPU 基态中的寄存器槽位由 `std::vector` 管理：启动时预留一块容量，
+随后随算法工作寄存器数量按需增长，不设固定 CPU 寄存器数量上限；被删除的
+槽位会优先复用。单个寄存器仍使用 `uint64_t`，因此宽度上限保持 64 bit。
 
 ### 自顶向下开发流程
 
@@ -197,6 +204,13 @@ ps.Zgate_Bool(reg, pos)              # Z 门
 # QRAM 操作
 ps.QRAMLoad(qram, addr_reg, data_reg)      # QRAM 加载
 ps.QRAMLoadFast(qram, addr_reg, data_reg)  # 快速版本
+
+# 可播种的测量 / 复位 / 概率查询（面向动态执行器：mid-circuit MEASURE/RESET/QIF）
+ps.set_seed(seed)                          # 播种全局随机数引擎，使采样结果可复现
+outcome, prob = ps.MeasureZ(reg)(state)    # 投影式 Z 基测量：坍缩 + 重新归一化
+measured = ps.Reset(reg, target=0)(state)  # 测量 + 经典条件翻转，强制复位到 target
+p = ps.Probability(reg, value)(state)      # 只读 Born 概率查询，不改变状态
+dist = ps.Probability.distribution(state, reg)  # 单寄存器完整结果分布（只读）
 ```
 
 ## QRAM-Simulator C++ API
@@ -205,7 +219,7 @@ ps.QRAMLoadFast(qram, addr_reg, data_reg)  # 快速版本
 
 ```bash
 # 克隆仓库
-git clone https://github.com/Agony5757/QRAM-Simulator.git
+git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
 cd QRAM-Simulator
 
 # 创建构建目录

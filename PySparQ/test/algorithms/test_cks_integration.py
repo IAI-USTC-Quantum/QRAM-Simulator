@@ -22,10 +22,6 @@ from pysparq.algorithms.cks_solver import (
     get_coef_common,
     SparseMatrix,
     make_walk_angle_func,
-    CKS_build_walk_environment,
-    CKS_init_walk_state,
-    CKS_apply_walk_step,
-    CKS_run_lcu_loop,
 )
 
 
@@ -379,6 +375,13 @@ class TestFidelityCalculation:
 # ==============================================================================
 
 
+@pytest.mark.skip(
+    reason=(
+        "The functional CKS walk helpers were intentionally removed from "
+        "the public API in the issue-84 refactor; a replacement circuit API "
+        "has not been implemented yet."
+    )
+)
 class TestQuantumWalkFidelity:
     """量子游走 fidelity 集成测试。
 
@@ -575,25 +578,20 @@ class TestCKSRegressionTest:
         assert mat1.positive_only == mat2.positive_only
 
     def test_walk_environment_deterministic(self, fixed_seed_system):
-        """CKS_build_walk_environment is deterministic with fixed seed.
+        """The compact matrix QRAM layout is deterministic with fixed seed.
 
-        Uses a 4x4 identity matrix.  The CKS path uses C++ SparseMatrix's
-        compact QRAM layout, so data contains 4 nonzero values plus 4 sparsity
-        entries, and addr_size = ceil(log2(8)) = 3.
+        A 4x4 identity matrix contains 4 nonzero values plus 4 sparsity
+        entries, so addr_size = ceil(log2(8)) = 3.
         """
-        from pysparq.algorithms.cks_solver import (
-            CKS_build_walk_environment,
-            SparseMatrix,
-        )
-
         A = np.eye(4)
         mat = SparseMatrix.from_dense(A, data_size=8)
-        qram, addr_size, nnz_col, n_row = CKS_build_walk_environment(mat)
+        qram_data = mat.get_data()
+        addr_size = math.ceil(math.log2(len(qram_data)))
         # These values are deterministic (no random component)
-        assert len(mat.get_data()) == 8
+        assert len(qram_data) == 8
         assert addr_size == 3, f"expected addr_size=3, got {addr_size}"
-        assert nnz_col == 1, f"expected nnz_col=1 (identity), got {nnz_col}"
-        assert n_row == 4, f"expected n_row=4, got {n_row}"
+        assert mat.nnz_col == 1
+        assert mat.n_row == 4
 
     def test_chebyshev_vs_classical_polynomial(self, fixed_seed_system):
         """Python chebyshev_n matches classical T_n(A)@b for multiple steps.
@@ -617,23 +615,17 @@ class TestCKSRegressionTest:
             assert target.shape == expected.shape
 
     def test_multi_run_same_seed_same_result(self, fixed_seed_system):
-        """Two CKS_build_walk_environment calls with same seed produce identical results.
+        """Two compact matrix encodings with the same seed are identical.
 
         This is the Python equivalent of C++ regression tests that verify
         random_engine::set_seed(seed) makes simulation deterministic.
         """
-        from pysparq.algorithms.cks_solver import (
-            CKS_build_walk_environment,
-            SparseMatrix,
-        )
-
         A = np.eye(4)
-        mat = SparseMatrix.from_dense(A, data_size=8)
-
-        qram1, addr1, nnz1, nr1 = CKS_build_walk_environment(mat)
+        mat1 = SparseMatrix.from_dense(A, data_size=8)
         np.random.seed(42)  # reset seed explicitly
-        qram2, addr2, nnz2, nr2 = CKS_build_walk_environment(mat)
+        mat2 = SparseMatrix.from_dense(A, data_size=8)
 
-        assert addr1 == addr2
-        assert nnz1 == nnz2
-        assert nr1 == nr2
+        assert mat1.get_data() == mat2.get_data()
+        assert mat1.sparsity == mat2.sparsity
+        assert mat1.nnz_col == mat2.nnz_col
+        assert mat1.n_row == mat2.n_row

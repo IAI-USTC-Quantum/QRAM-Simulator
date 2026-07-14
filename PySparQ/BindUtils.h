@@ -20,6 +20,9 @@ namespace pysparq_docs {
 
 inline constexpr const char* DOC_CONDITIONED_BY_NONZEROS =
     "Condition this operation on registers with nonzero values.\n\n"
+    "Calling this method replaces prior nonzero-register conditions. Pass the\n"
+    "list overload to require several registers simultaneously; conditions of\n"
+    "different kinds are combined with logical AND.\n\n"
     "Args:\n"
     "    cond: Register name (str) or ID (int) to condition on.\n"
     "    conds: List of register names or IDs for multi-condition.\n\n"
@@ -30,6 +33,9 @@ inline constexpr const char* DOC_CONDITIONED_BY_NONZEROS =
 
 inline constexpr const char* DOC_CONDITIONED_BY_ALL_ONES =
     "Condition this operation on registers where all bits are 1.\n\n"
+    "Calling this method replaces prior all-ones conditions. Pass the list\n"
+    "overload to require several registers simultaneously; conditions of\n"
+    "different kinds are combined with logical AND.\n\n"
     "Args:\n"
     "    cond: Register name (str) or ID (int) to condition on.\n"
     "    conds: List of register names or IDs for multi-condition.\n\n"
@@ -38,6 +44,9 @@ inline constexpr const char* DOC_CONDITIONED_BY_ALL_ONES =
 
 inline constexpr const char* DOC_CONDITIONED_BY_BIT =
     "Condition this operation on a specific bit position.\n\n"
+    "Calling this method replaces prior bit conditions. Pass the list-of-pairs\n"
+    "overload to require several bits simultaneously; conditions of different\n"
+    "kinds are combined with logical AND.\n\n"
     "Args:\n"
     "    cond: Register name (str) or ID (int).\n"
     "    pos: Bit position to check (0-indexed).\n"
@@ -47,6 +56,9 @@ inline constexpr const char* DOC_CONDITIONED_BY_BIT =
 
 inline constexpr const char* DOC_CONDITIONED_BY_VALUE =
     "Condition this operation on registers holding a specific value.\n\n"
+    "Calling this method replaces prior value conditions. Pass the list-of-pairs\n"
+    "overload to require several values simultaneously; conditions of different\n"
+    "kinds are combined with logical AND.\n\n"
     "Args:\n"
     "    cond: Register name (str) or ID (int).\n"
     "    pos: Value to match.\n"

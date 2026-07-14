@@ -114,7 +114,6 @@ namespace qram_simulator
 		System::update_max_size(state.size());
 	}
 
-
 	inverseQFT::inverseQFT(std::string_view reg_in)
 	{
 		id = System::get(reg_in);
@@ -323,14 +322,14 @@ namespace qram_simulator
 			}
 		}
 
-		// ·Ö½×¶Î²¢ÐÐ¼ÆËã
+		// ï¿½Ö½×¶Î²ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½
 		for (size_t s = 0; s < n_digits; ++s) {
 			profiler _("fft");
 			const size_t m = pow2(s + 1);
 			const size_t m2 = m >> 1;
 			const size_t w_step = full_size >> (s + 1);
 
-			// ¶¯Ì¬µ÷Õû²¢ÐÐÁ£¶È
+			// ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			const size_t chunk_size = (s < n_digits / 2)
 				? (full_size / (m << 3))
 				: (full_size / (m << 2));
@@ -339,7 +338,7 @@ namespace qram_simulator
 #pragma omp parallel for schedule(dynamic, chunk_size)
 #endif
 			for (int64_t k = 0; k < full_size; k += m) {
-				// ¾Ö²¿±äÁ¿±ÜÃâÎ±¹²Ïí
+				// ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½ï¿½
 				complex_t u, t;
 				uint64_t idx1, idx2;
 
@@ -349,7 +348,7 @@ namespace qram_simulator
 					idx2 = k + j + m2;
 
 					u = amps[idx1];
-					t = amps[idx2] * w;  // SIMD¿ÉÄÜ×Ô¶¯ÏòÁ¿»¯
+					t = amps[idx2] * w;  // SIMDï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 					amps[idx1] = u + t;
 					amps[idx2] = u - t;

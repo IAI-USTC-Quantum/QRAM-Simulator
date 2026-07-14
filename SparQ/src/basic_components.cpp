@@ -147,6 +147,7 @@ namespace qram_simulator
 		name_index_valid = true;
 		temporal_registers.clear();
 		reusable_registers.clear();
+		reg_status_bitmap = 0;
 		max_qubit_count = 0;
 		max_register_count = 0;
 		max_system_size = 0;
@@ -194,7 +195,7 @@ namespace qram_simulator
 
 		size_t id = get_last_activated_register();
 
-		return registers[id];
+		return get(id);
 	}
 
 	const StateStorage& System::last_register() const
@@ -204,7 +205,7 @@ namespace qram_simulator
 
 		size_t id = get_last_activated_register();
 
-		return registers[id];
+		return get(id);
 	}
 
 	void System::update_max_size(size_t new_size)
@@ -309,7 +310,7 @@ namespace qram_simulator
 		{
 			if (System::status_of(i))
 			{
-				auto& reg = registers[i];
+				const auto& reg = get(i);
 				ret += reg.to_string(name_register_map[i]);
 			}
 		}
@@ -318,48 +319,50 @@ namespace qram_simulator
 
 	void System::add_register_status_bitmap(size_t pos)
 	{
-		reg_status_bitmap |= pow2(pos);
+		if (pos < 64)
+			reg_status_bitmap |= pow2(pos);
 	}
 
 	void System::remove_register_status_bitmap(size_t pos)
 	{
-		reg_status_bitmap -= pow2(pos);
+		if (pos < 64)
+			reg_status_bitmap &= ~pow2(pos);
 	}
 
 	size_t System::add_register(std::string_view name, StateStorageType type, size_t size)
 	{
-		if (name_register_map.size() >= CachedRegisterSize)
+		if (!reusable_registers.empty())
 		{
-			// try to reuse the space
-			if (reusable_registers.size() == 0)
-				// all spaces are run out
-				throw_general_runtime_error("All spaces are run out when adding new register.");
-			else {
-				size_t reg_id = reusable_registers.back();
-				// Remove old name from hash index if present
-				if (status_of(reg_id))
-					unregister_name(name_of(reg_id));
-				name_register_map[reg_id] = { std::string(name), type, size, true };
-				register_name(std::string(name), reg_id);
-				reusable_registers.pop_back();
-				add_register_status_bitmap(reg_id);
-				return reg_id;
-			}
-		}
-		else {
-			name_register_map.emplace_back(name, type, size, true);
-			if (get_qubit_count() > max_qubit_count)
-				max_qubit_count = get_qubit_count();
-			if (get_activated_register_size() > max_register_count)
-				max_register_count = get_activated_register_size();
-
-			size_t reg_id = name_register_map.size() - 1;
+			size_t reg_id = reusable_registers.back();
+			name_register_map[reg_id] = { std::string(name), type, size, true };
 			register_name(std::string(name), reg_id);
+			reusable_registers.pop_back();
 			add_register_status_bitmap(reg_id);
+			max_qubit_count = std::max(max_qubit_count, get_qubit_count());
+			max_register_count = std::max(
+				max_register_count,
+				get_activated_register_size());
 			return reg_id;
 		}
 
-		return SIZE_MAX;
+#ifdef USE_CUDA
+		if (name_register_map.size() >= CachedRegisterSize)
+		{
+			throw_general_runtime_error(
+				"All spaces are run out when adding new CUDA register.");
+		}
+#endif
+
+		name_register_map.emplace_back(name, type, size, true);
+		max_qubit_count = std::max(max_qubit_count, get_qubit_count());
+		max_register_count = std::max(
+			max_register_count,
+			get_activated_register_size());
+
+		size_t reg_id = name_register_map.size() - 1;
+		register_name(std::string(name), reg_id);
+		add_register_status_bitmap(reg_id);
+		return reg_id;
 	}
 
 	size_t System::add_register_synchronous(
@@ -414,7 +417,7 @@ namespace qram_simulator
 			auto& s = state[i];
 #endif
 			// Warning: Unchecked removal.
-			s.registers[id].value = 0;
+			s.get(id).value = 0;
 
 			// FOR DEBUG
 			/*s.registers[id] = s.last_register();
@@ -448,8 +451,8 @@ namespace qram_simulator
 		{
 			if (!status_of(i))
 				continue;
-			auto& regl = registers[i];
-			auto& regr = rhs.registers[i];
+			const auto& regl = get(i);
+			const auto& regr = rhs.get(i);
 			if (regl < regr) return true;
 			if (regr < regl) return false;
 		}
@@ -462,8 +465,8 @@ namespace qram_simulator
 		{
 			if (!status_of(i))
 				continue;
-			auto& regl = registers[i];
-			auto& regr = rhs.registers[i];
+			const auto& regl = get(i);
+			const auto& regr = rhs.get(i);
 			if (regl == regr)
 				continue;
 			else
@@ -490,7 +493,7 @@ namespace qram_simulator
 		{
 			if (System::status_of(i))
 			{
-				auto& reg = registers[i];
+				const auto& reg = get(i);
 				ret += reg.to_io_string(name_register_map[i]);
 			}
 		}
