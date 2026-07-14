@@ -108,3 +108,23 @@ def test_repeated_all_ones_condition_replaces_the_previous_register():
     op.conditioned_by_all_ones("b")
 
     assert op.condition_variable_all_ones == [ps.System.get_id("b")]
+
+
+def test_flip_bools_keeps_values_width_bounded_for_value_controls():
+    ps.System.clear()
+    state = ps.SparseState()
+    ps.AddRegister("flag", ps.Boolean, 1)(state)
+    ps.AddRegister("word", ps.UnsignedInteger, 3)(state)
+    ps.AddRegister("target", ps.Boolean, 1)(state)
+
+    ps.FlipBools("flag")(state)
+    ps.FlipBools("word")(state)
+
+    flag_id = ps.System.get_id("flag")
+    word_id = ps.System.get_id("word")
+    assert state.basis_states[0].get(flag_id).value == 1
+    assert state.basis_states[0].get(word_id).value == 0b111
+
+    ps.Xgate_Bool("target", 0).conditioned_by_value("flag", 1)(state)
+    target_id = ps.System.get_id("target")
+    assert state.basis_states[0].get(target_id).value == 1

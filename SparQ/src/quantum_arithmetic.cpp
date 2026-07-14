@@ -18,7 +18,9 @@ namespace qram_simulator
 				continue;
 
 			auto& reg = s.get(id);
-			reg.value = ~reg.value;
+			const auto size = System::size_of(id);
+			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			reg.value = (~reg.value) & mask;
 		}
 	}
 
