@@ -81,6 +81,12 @@ Note:
     for dense superposition states.
 )doc");
     sparse_state.def(py::init<>(), "Create an empty sparse quantum state")
+        .def(py::init<const SparseState &>(), py::arg("other"),
+             "Copy amplitude/register values from another sparse state. "
+             "The System register namespace remains process-global.")
+        .def("clone", [](const SparseState& self) { return SparseState(self); },
+             "Copy amplitude/register values. The System register namespace "
+             "remains process-global.")
         .def("_cpp_ptr", [](SparseState& self) { return reinterpret_cast<std::uintptr_t>(&self); },
                     "Return the raw C++ SparseState* address as uintptr_t.");
 

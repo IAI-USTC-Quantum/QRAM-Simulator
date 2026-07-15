@@ -71,3 +71,23 @@ TEST_F(RegisterStorageTest, SynchronousGrowthPreservesValuesAndReusesSlots)
 	EXPECT_EQ(state[0].get(reused).value, 0);
 	EXPECT_EQ(state[0].get(register_count - 1).value, 1);
 }
+
+TEST_F(RegisterStorageTest, ConstAccessGrowsStateCreatedBeforeRegistration)
+{
+	System basis;
+	const size_t register_count = System::InitialRegisterCapacity + 137;
+	for (size_t index = 0; index < register_count; ++index)
+	{
+		System::add_register(
+			"r" + std::to_string(index),
+			General,
+			1);
+	}
+
+	const System& const_basis = basis;
+	const auto& first = const_basis.get(0);
+	const auto* first_address = &first;
+	EXPECT_EQ(const_basis.get(register_count - 1).value, 0);
+	EXPECT_EQ(first_address, &const_basis.get(0));
+	EXPECT_EQ(basis.registers.size(), register_count);
+}

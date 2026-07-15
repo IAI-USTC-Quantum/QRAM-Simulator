@@ -232,6 +232,31 @@ class TestProbability:
         assert state.size() == 1
 
 
+def test_sparse_state_clone_is_independent():
+    ps.System.clear()
+    try:
+        state = ps.SparseState()
+        ps.AddRegister("q", ps.StateStorageType.Boolean, 1)(state)
+
+        cloned = state.clone()
+        copied = ps.SparseState(state)
+        ps.Xgate_Bool("q", 0)(cloned)
+
+        assert ps.Probability("q", 0)(state) == pytest.approx(1.0)
+        assert ps.Probability("q", 0)(copied) == pytest.approx(1.0)
+        assert ps.Probability("q", 1)(cloned) == pytest.approx(1.0)
+
+        ps.Xgate_Bool("q", 0)(state)
+        assert ps.Probability("q", 0)(copied) == pytest.approx(1.0)
+        ps.Xgate_Bool("q", 0)(copied)
+        ps.Xgate_Bool("q", 0)(state)
+        assert ps.Probability("q", 0)(state) == pytest.approx(1.0)
+        assert ps.Probability("q", 1)(copied) == pytest.approx(1.0)
+        assert ps.Probability("q", 1)(cloned) == pytest.approx(1.0)
+    finally:
+        ps.System.clear()
+
+
 class TestMeasureZNormalizationValidation:
     """Review hardening (1): MeasureZ must validate the input state's total
     Born-rule probability instead of silently sampling against `[0, 1)`

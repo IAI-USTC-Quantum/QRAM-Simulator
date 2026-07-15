@@ -290,7 +290,7 @@ namespace qram_simulator
 		std::array<StateStorage, CachedRegisterSize> registers;
 #else
 		/** @brief CPU 寄存器存储；预分配后按需动态增长 */
-		std::vector<StateStorage> registers;
+		mutable std::vector<StateStorage> registers;
 #endif
 
 		/**
@@ -306,7 +306,7 @@ namespace qram_simulator
 		StateStorage& get(size_t id) {
 			if (id >= name_register_map.size())
 				throw std::runtime_error("Register not found.");
-			ensure_register_count(id + 1);
+			ensure_register_count(name_register_map.size());
 			return registers[id];
 		}
 #endif
@@ -322,16 +322,19 @@ namespace qram_simulator
 		}
 #else
 		const StateStorage& get(size_t id) const {
-			if (id >= name_register_map.size() || id >= registers.size())
+			if (id >= name_register_map.size())
 				throw std::runtime_error("Register not found.");
+			ensure_register_count(name_register_map.size());
 			return registers[id];
 		}
 
 		/**
 		 * @brief 确保 CPU 基态拥有至少 count 个寄存器槽位
+		 * @details get() 会一次同步到当前完整寄存器表，避免同一操作连续
+		 *          获取多个寄存器引用时由后续 vector 扩容使先前引用失效。
 		 * @param count 所需寄存器槽位数
 		 */
-		void ensure_register_count(size_t count) {
+		void ensure_register_count(size_t count) const {
 			if (registers.size() < count)
 				registers.resize(count);
 		}
