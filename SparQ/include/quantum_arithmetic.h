@@ -690,6 +690,8 @@ namespace qram_simulator
 		Add_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
 			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
 		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(lhs) != UnsignedInteger ||
@@ -708,6 +710,8 @@ namespace qram_simulator
 		Add_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
 			: lhs(lhs_), rhs(rhs_), res(res_)
 		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(lhs) != UnsignedInteger ||
@@ -743,10 +747,9 @@ namespace qram_simulator
 	 * @note 数据类型：lhs和rhs都应该是UnsignedInteger
 	 * @note 溢出行为：结果按rhs寄存器大小模2^N回绕
 	 *
-	 * @pre lhs和rhs寄存器应该是相同大小（推荐）
 	 * @pre lhs和rhs必须是激活状态
 	 *
-	 * @warning 如果lhs和rhs大小不同，较小的值会被截断，可能导致非unitary行为
+	 * @note lhs和rhs可以大小不同；lhs按整数读取，rhs按自身位宽做模加法。
 	 *
 	 * @par 示例
 	 * @code
@@ -781,13 +784,12 @@ namespace qram_simulator
 		Add_UInt_UInt_InPlace(std::string_view lhs_, std::string_view rhs_)
 			:lhs(System::get(lhs_)), rhs(System::get(rhs_))
 		{
+			if (lhs == rhs)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(lhs) != UnsignedInteger ||
 				System::type_of(rhs) != UnsignedInteger)
-				throw_invalid_input();
-			/* Size check - warn if sizes don't match */
-			if (System::size_of(lhs) != System::size_of(rhs))
 				throw_invalid_input();
 #endif
 		}
@@ -801,13 +803,12 @@ namespace qram_simulator
 		Add_UInt_UInt_InPlace(size_t lhs_, size_t rhs_)
 			: lhs(lhs_), rhs(rhs_)
 		{
+			if (lhs == rhs)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(lhs) != UnsignedInteger ||
 				System::type_of(rhs) != UnsignedInteger)
-				throw_invalid_input();
-			/* Size check - warn if sizes don't match */
-			if (System::size_of(lhs) != System::size_of(rhs))
 				throw_invalid_input();
 #endif
 		}
@@ -1489,6 +1490,8 @@ namespace qram_simulator
 		Assign(std::string_view reg1, std::string_view reg2)
 			:register_1(System::get(reg1)), register_2(System::get(reg2))
 		{
+			if (register_1 == register_2)
+				throw_invalid_input();
 		}
 
 		/**
@@ -1499,6 +1502,8 @@ namespace qram_simulator
 		Assign(size_t reg1, size_t reg2)
 			:register_1(reg1), register_2(reg2)
 		{
+			if (register_1 == register_2)
+				throw_invalid_input();
 		}
 
 		ClassControllable
@@ -1578,6 +1583,10 @@ namespace qram_simulator
 			: left_id(System::get(left_register)), right_id(System::get(right_register)),
 			compare_less_id(System::get(compare_less)), compare_equal_id(System::get(compare_equal))
 		{
+			if (compare_less_id == compare_equal_id ||
+				compare_less_id == left_id || compare_less_id == right_id ||
+				compare_equal_id == left_id || compare_equal_id == right_id)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(left_id) != UnsignedInteger ||
@@ -1600,6 +1609,10 @@ namespace qram_simulator
 			:left_id(lreg), right_id(rreg),
 			compare_less_id(compare_less), compare_equal_id(compare_equal)
 		{
+			if (compare_less_id == compare_equal_id ||
+				compare_less_id == left_id || compare_less_id == right_id ||
+				compare_equal_id == left_id || compare_equal_id == right_id)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::type_of(left_id) != UnsignedInteger ||
@@ -1769,6 +1782,8 @@ namespace qram_simulator
 		{
 			id1 = System::get(regname1);
 			id2 = System::get(regname2);
+			if (id1 == id2)
+				throw_invalid_input();
 
 			/* Type check */
 #ifndef QRAM_Release
@@ -1785,6 +1800,8 @@ namespace qram_simulator
 		Swap_General_General(size_t regname1, size_t regname2)
 			: id1(regname1), id2(regname2)
 		{
+			if (id1 == id2)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
 			if (System::size_of(id1) != System::size_of(id2))

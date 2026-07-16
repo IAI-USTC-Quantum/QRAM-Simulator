@@ -295,7 +295,10 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 
-			s.get(res).value ^= (s.GetAs(lhs, uint64_t) + s.GetAs(rhs, uint64_t));
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			result = (result ^ (s.GetAs(lhs, uint64_t) + s.GetAs(rhs, uint64_t))) & mask;
 		}
 	}
 
@@ -313,13 +316,17 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 
-			s.get(rhs).value += s.GetAs(lhs, uint64_t);
+			auto& result = s.get(rhs).value;
+			const auto size = System::size_of(rhs);
+			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			result = (result + s.GetAs(lhs, uint64_t)) & mask;
 		}
 	}
 
 	void Add_UInt_UInt_InPlace::dag(std::vector<System>& state) const
 	{
-		auto dim = System::size_of(rhs);
+		const auto size = System::size_of(rhs);
+		const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -333,8 +340,8 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 
-			s.get(rhs).value += (pow2(dim) - s.GetAs(lhs, uint64_t));
-			s.get(rhs).value = s.get(rhs).value % pow2(dim);
+			auto& result = s.get(rhs).value;
+			result = (result - s.GetAs(lhs, uint64_t)) & mask;
 		}
 	}
 
@@ -547,7 +554,9 @@ namespace qram_simulator
 
 			auto& reg1 = s.get(register_1);
 			auto& reg2 = s.get(register_2);
-			reg2.value ^= reg1.value;
+			const auto size = System::size_of(register_2);
+			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			reg2.value = (reg2.value ^ reg1.value) & mask;
 
 		}
 	}

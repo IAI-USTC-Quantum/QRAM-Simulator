@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "consumer_snapshots": {
+    "qecc_lang": {
+      "revision": "b8a5ed81a1867d999cbe11be7441e7afc00109fa",
+      "scope": "src/qecc_lang/**/*.py"
+    },
+    "quantum_cfd_qfvm": {
+      "revision": "b64a4fec8c860e531a381a26c4275e0f6865a797",
+      "scope": [
+        "algorithms/qfvm/qecclang/native_roe_gates.py",
+        "algorithms/qfvm/qecclang/qfvm_oracles.py",
+        "qcfd_common/qecclang/qram_qda.py",
+        "qcfd_common/qlinsolve/qda.py"
+      ]
+    }
+  },
+  "observed_qecc_lang_runtime_symbols": [
+    "AddAssign_AnyInt_AnyInt_InPlace",
+    "AddRegister",
+    "Add_ConstUInt_InPlace",
+    "Add_Mult_UInt_ConstUInt_InPlace",
+    "Add_UInt_ConstUInt",
+    "Add_UInt_UInt",
+    "Add_UInt_UInt_InPlace",
+    "Assign",
+    "CheckNan",
+    "CheckNormalization",
+    "ClearZero",
+    "CombineRegister",
+    "Compare_UInt_UInt",
+    "CondRot_Fixed_Bool",
+    "CondRot_General_Bool",
+    "CondRot_General_Bool_QW_fast",
+    "CondRot_Rational_Bool",
+    "CustomArithmetic",
+    "Div_Sqrt_Arccos_Int_Int",
+    "FlipBools",
+    "GetDataAddr",
+    "GetMid_UInt_UInt",
+    "GetQWRotateAngle_Int_Int_Int",
+    "GetRotateAngle_Int_Int",
+    "GetRowAddr",
+    "GlobalPhase_Int",
+    "Hadamard_Int_Full",
+    "Hadamard_PartialQubit",
+    "Init_Unsafe",
+    "Less_UInt_UInt",
+    "ModMul",
+    "Mod_Mult_UInt_ConstUInt_InPlace",
+    "MoveBackRegister",
+    "Mult_UInt_ConstUInt",
+    "Normalize",
+    "PartialTrace",
+    "PartialTraceSelect",
+    "PartialTraceSelectRange",
+    "Phase_Bool",
+    "PlusOneAndOverflow",
+    "Pop",
+    "Prob",
+    "Push",
+    "QFT",
+    "QRAMCircuit_qutrit",
+    "QRAMLoad",
+    "QRAMLoadFast",
+    "RXgate_Bool",
+    "RYgate_Bool",
+    "RZgate_Bool",
+    "RangeConditionalPhaseFlip",
+    "Reflection_Bool",
+    "RemoveRegister",
+    "Rot_Bool",
+    "Rot_GeneralStatePrep",
+    "Rot_GeneralUnitary",
+    "SXgate_Bool",
+    "Sgate_Bool",
+    "ShiftLeft_InPlace",
+    "ShiftRight_InPlace",
+    "SortExceptKey",
+    "SortExceptKeyHadamard",
+    "SparseMatrix",
+    "SparseState",
+    "SplitRegister",
+    "Sqrt_Div_Arccos_Int_Int",
+    "StatePrint",
+    "StatePrintDisplay",
+    "StateStorageType",
+    "Swap_Bool_Bool",
+    "Swap_General_General",
+    "System",
+    "Tgate_Bool",
+    "U2gate_Bool",
+    "U3gate_Bool",
+    "ViewNormalization",
+    "Xgate_Bool",
+    "Ygate_Bool",
+    "ZeroConditionalPhaseFlip"
+  ],
+  "observed_qfvm_runtime_symbols": [
+    "Add_ConstUInt_InPlace",
+    "BlockEncodingTridiagonal",
+    "BlockEncodingViaQRAM",
+    "Boolean",
+    "ClearZero",
+    "GlobalPhase_Int",
+    "Hadamard_Int_Full",
+    "Probability",
+    "QRAMCircuit_qutrit",
+    "Rot_GeneralStatePrep",
+    "SparseState",
+    "StatePrepViaQRAM",
+    "StateStorageType",
+    "System",
+    "UnsignedInteger",
+    "WalkS",
+    "classical_to_quantum",
+    "make_vector_tree",
+    "scale_and_convert_vector"
+  ],
+  "accepted_reversible_operations": [
+    {"symbol": "Add_UInt_UInt", "contract": "xor_into", "consumers": ["qecc_lang"]},
+    {"symbol": "Assign", "contract": "xor_into", "consumers": ["qecc_lang"]},
+    {"symbol": "Compare_UInt_UInt", "contract": "xor_into", "consumers": ["qecc_lang"]},
+    {
+      "symbol": "Add_UInt_UInt_InPlace",
+      "contract": "inplace_bijective",
+      "consumers": ["qecc_lang"]
+    },
+    {
+      "symbol": "Swap_General_General",
+      "contract": "inplace_bijective",
+      "consumers": ["qecc_lang"]
+    },
+    {
+      "symbol": "Swap_Bool_Bool",
+      "contract": "inplace_bijective",
+      "consumers": ["qecc_lang"]
+    },
+    {"symbol": "Xgate_Bool", "contract": "inplace_bijective", "consumers": ["qecc_lang"]},
+    {"symbol": "FlipBools", "contract": "inplace_bijective", "consumers": ["qecc_lang"]},
+    {
+      "symbol": "QRAMLoad",
+      "contract": "xor_into",
+      "consumers": ["qecc_lang", "quantum_cfd_qfvm"]
+    },
+    {"symbol": "QRAMLoadFast", "contract": "xor_into", "consumers": ["qecc_lang"]}
+  ],
+  "accepted_wrappers": [
+    "dag",
+    "conditioned_by_nonzeros",
+    "conditioned_by_all_ones",
+    "conditioned_by_bit",
+    "conditioned_by_value"
+  ],
+  "accepted_qda_boundary": [
+    "compute_fs",
+    "compute_rotation_matrix",
+    "BlockEncodingTridiagonal",
+    "WalkS",
+    "classical_to_quantum",
+    "make_vector_tree",
+    "scale_and_convert_vector"
+  ],
+  "accepted_cks_boundary": [
+    "ChebyshevPolynomialCoefficient",
+    "get_coef_positive_only",
+    "get_coef_common",
+    "make_walk_angle_func",
+    "SparseMatrix"
+  ],
+  "compile_operator_boundary": {
+    "qecc_lang_src_matches": 0,
+    "supported_qfvm_scope_matches": 0,
+    "excluded_legacy_oracle_files": [
+      "algorithms/qfvm/qecclang/fvm_a_oracle.py",
+      "algorithms/qfvm/qecclang/euler_roe_oracle.py",
+      "qcfd_common/qecclang/fixed_point.py"
+    ],
+    "claim": "compile_operator is not accepted as quantum semantics on the frozen supported paths"
+  },
+  "claim_limit": "QDA evidence covers consumed helpers, block encodings and selected walk outputs; CKS evidence covers consumed helpers and sparse encoding, not whole-solver correctness."
+}
