@@ -216,11 +216,17 @@ namespace qram_simulator
 
 	QRAMLoadFast::QRAMLoadFast(const qram_qutrit::QRAMCircuit* qram_, size_t reg1, size_t reg2)
 		:qram(qram_), register_addr(reg1), register_data(reg2)
-	{ }
+	{
+		if (qram == nullptr || register_addr == register_data)
+			throw_invalid_input();
+	}
 
 	QRAMLoadFast::QRAMLoadFast(const qram_qutrit::QRAMCircuit* qram_, std::string_view reg1, std::string_view reg2)
 		:qram(qram_), register_addr(System::get(reg1)), register_data(System::get(reg2))
-	{ }
+	{
+		if (qram == nullptr || register_addr == register_data)
+			throw_invalid_input();
+	}
 
 	void QRAMLoadFast::noise_free_impl(std::vector<System>& state) const
 	{

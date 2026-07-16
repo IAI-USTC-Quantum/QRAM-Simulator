@@ -50,6 +50,8 @@ namespace qram_simulator
 			: register_addr(reg1), register_data(reg2)
 		{
 			qram = qram_;
+			if (qram == nullptr || register_addr == register_data)
+				throw_invalid_input();
 
 			/* Type check */
 #ifndef QRAM_Release
