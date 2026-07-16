@@ -29,3 +29,34 @@ def test_combine_masks_one_bit_sentinel_values():
         assert state.basis_states[0].get(state_id).value == expected
     finally:
         ps.System.clear()
+
+
+def test_split_combine_masks_sentinels_for_multiple_basis_states():
+    ps.System.clear()
+    try:
+        state = ps.SparseState()
+        ps.AddRegister("seed", ps.StateStorageType.General, 2)(state)
+        ps.Hadamard_Int_Full("seed")(state)
+        ps.AddRegister("packed", ps.StateStorageType.General, 12)(state)
+        for digit in (0, 1, 5, 7, 11):
+            ps.Xgate_Bool("packed", digit)(state)
+
+        packed_id = ps.System.get_id("packed")
+        low_id = ps.SplitRegister("packed", "low", 5)(state)
+        for basis in state.basis_states:
+            assert basis.get(packed_id).value == 0b1000101
+            assert basis.get(low_id).value == 0b00011
+
+        ps.CombineRegister("packed", "low")(state)
+        for basis in state.basis_states:
+            assert basis.get(packed_id).value == 0b100010100011
+
+        assert ps.AddRegister(
+            "recycled_low",
+            ps.StateStorageType.General,
+            5,
+        )(state) == low_id
+        for basis in state.basis_states:
+            assert basis.get(low_id).value == 0
+    finally:
+        ps.System.clear()
