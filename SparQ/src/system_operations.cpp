@@ -147,8 +147,10 @@ namespace qram_simulator
 			auto& s = state[i];
 #endif
 			auto& value = s.get(first_pos).value;
-			s.get(second_pos).value = value & (pow2(second_size) - 1);
-			value >>= second_size;
+			const uint64_t second_mask =
+				second_size == 64 ? ~uint64_t{0} : pow2(second_size) - 1;
+			s.get(second_pos).value = value & second_mask;
+			value = second_size == 64 ? 0 : value >> second_size;
 		}
 
 		return second_pos;

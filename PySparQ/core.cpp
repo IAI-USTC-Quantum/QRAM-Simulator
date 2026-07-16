@@ -114,13 +114,17 @@ Attributes:
         .def_readonly_static("max_system_size", &System::max_system_size)
         .def_readonly_static("temporal_registers", &System::temporal_registers)
         .def_readonly_static("reusable_registers", &System::reusable_registers)
-        .def("get", (StateStorage & (System::*)(size_t)) & System::get)
-        .def("get", (const StateStorage &(System::*)(size_t) const) & System::get)
+        .def("get", (StateStorage & (System::*)(size_t)) & System::get,
+             py::return_value_policy::reference_internal)
+        .def("get", (const StateStorage &(System::*)(size_t) const) & System::get,
+             py::return_value_policy::reference_internal)
         .def_static("clear", &System::clear)
         .def_static("get_qubit_count", &System::get_qubit_count)
         .def_static("get_activated_register_size", &System::get_activated_register_size)
-        .def("last_register", (StateStorage & (System::*)()) & System::last_register)
-        .def("last_register", (const StateStorage &(System::*)() const) & System::last_register)
+        .def("last_register", (StateStorage & (System::*)()) & System::last_register,
+             py::return_value_policy::reference_internal)
+        .def("last_register", (const StateStorage &(System::*)() const) & System::last_register,
+             py::return_value_policy::reference_internal)
         .def_static("update_max_size", &System::update_max_size)
         .def_static("get_id", (size_t (*)(std::string_view))&System::get)
         .def_static("get_register_info", &System::get_register_info)
@@ -143,6 +147,8 @@ Attributes:
         .def_static("remove_register", (void (*)(std::string_view))&System::remove_register)
         .def_static("remove_register_synchronous", (void (*)(size_t, std::vector<System> &))&System::remove_register_synchronous)
         .def_static("remove_register_synchronous", (void (*)(std::string_view, std::vector<System> &))&System::remove_register_synchronous)
+        .def_static("remove_register_synchronous", (void (*)(size_t, SparseState &))&System::remove_register_synchronous)
+        .def_static("remove_register_synchronous", (void (*)(std::string_view, SparseState &))&System::remove_register_synchronous)
         .def("__less__", &System::operator<)
         .def("__eq__", &System::operator==)
         .def("__ne__", &System::operator!=)
