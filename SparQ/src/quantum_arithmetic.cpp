@@ -2,6 +2,13 @@
 
 namespace qram_simulator
 {
+	namespace
+	{
+		uint64_t width_mask(size_t width)
+		{
+			return width == 64 ? ~uint64_t{0} : pow2(width) - 1;
+		}
+	}
 
 	void FlipBools::operator()(std::vector<System>& state) const
 	{
@@ -19,7 +26,7 @@ namespace qram_simulator
 
 			auto& reg = s.get(id);
 			const auto size = System::size_of(id);
-			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			const auto mask = width_mask(size);
 			reg.value = (~reg.value) & mask;
 		}
 	}
@@ -131,6 +138,7 @@ namespace qram_simulator
 
 	void Mult_UInt_ConstUInt::operator()(std::vector<System>& state) const
 	{
+		const auto mask = width_mask(System::size_of(res));
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{
@@ -144,12 +152,13 @@ namespace qram_simulator
 				continue;
 
 			auto& reg_out = s.get(res);
-			reg_out.value ^= (s.GetAs(lhs, uint64_t) * mult_int);
+			reg_out.value = (reg_out.value ^ (s.GetAs(lhs, uint64_t) * mult_int)) & mask;
 		}
 	}
 
 	void Add_Mult_UInt_ConstUInt_InPlace::operator()(std::vector<System>& state) const
 	{
+		const auto mask = width_mask(System::size_of(res));
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{
@@ -161,18 +170,15 @@ namespace qram_simulator
 #endif
 			if (ConditionNotSatisfied(s))
 				continue;
-			auto dim = System::size_of(res);
-			auto dim_val = 1ULL << dim;
-			s.get(res).value += (mult_int * s.GetAs(lhs, uint64_t));
-			s.get(res).value %= dim_val;
+			auto& result = s.get(res).value;
+			result = (result + mult_int * s.GetAs(lhs, uint64_t)) & mask;
 		}
 	}
 
 
 	void Add_Mult_UInt_ConstUInt_InPlace::dag(std::vector<System>& state) const
 	{
-		auto dim = System::size_of(res);
-		auto dim_val = 1ULL << dim;
+		const auto mask = width_mask(System::size_of(res));
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -186,9 +192,8 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 			// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
-			auto lhs_val = s.GetAs(lhs, uint64_t);
-			s.get(res).value += (dim_val - lhs_val * mult_int % dim_val);
-			s.get(res).value %= dim_val;
+			auto& result = s.get(res).value;
+			result = (result - s.GetAs(lhs, uint64_t) * mult_int) & mask;
 		}
 	}
 
@@ -297,7 +302,7 @@ namespace qram_simulator
 
 			auto& result = s.get(res).value;
 			const auto size = System::size_of(res);
-			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			const auto mask = width_mask(size);
 			result = (result ^ (s.GetAs(lhs, uint64_t) + s.GetAs(rhs, uint64_t))) & mask;
 		}
 	}
@@ -318,7 +323,7 @@ namespace qram_simulator
 
 			auto& result = s.get(rhs).value;
 			const auto size = System::size_of(rhs);
-			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			const auto mask = width_mask(size);
 			result = (result + s.GetAs(lhs, uint64_t)) & mask;
 		}
 	}
@@ -347,6 +352,7 @@ namespace qram_simulator
 
 	void Add_UInt_ConstUInt::operator()(std::vector<System>& state) const
 	{
+		const auto mask = width_mask(System::size_of(res));
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{
@@ -360,14 +366,13 @@ namespace qram_simulator
 				continue;
 
 			auto& reg_out = s.get(res);
-			reg_out.value ^= (s.GetAs(lhs, uint64_t) + add_int);
-			//Debug_CheckOverflow(res);
+			reg_out.value = (reg_out.value ^ (s.GetAs(lhs, uint64_t) + add_int)) & mask;
 		}
 	}
 
 	void Add_ConstUInt_InPlace::operator()(std::vector<System>& state) const
 	{
-		auto dim = System::size_of(reg_in);
+		const auto mask = width_mask(System::size_of(reg_in));
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -382,14 +387,13 @@ namespace qram_simulator
 				continue;
 
 			auto& reg_ = s.get(reg_in);
-			reg_.value += add_int;
-			reg_.value = reg_.value % pow2(dim);
+			reg_.value = (reg_.value + add_int) & mask;
 		}
 	}
 
 	void Add_ConstUInt_InPlace::dag(std::vector<System>& state) const
 	{
-		auto dim = System::size_of(reg_in);
+		const auto mask = width_mask(System::size_of(reg_in));
 
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -404,8 +408,7 @@ namespace qram_simulator
 				continue;
 
 			auto& reg_ = s.get(reg_in);
-			reg_.value += (pow2(dim) - add_int);
-			reg_.value = reg_.value % pow2(dim);
+			reg_.value = (reg_.value - add_int) & mask;
 		}
 	}
 
@@ -488,14 +491,12 @@ namespace qram_simulator
 
 	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
 	{
-		lhs += rhs;
-		lhs %= pow2(l_size);
+		lhs = (lhs + rhs) & width_mask(l_size);
 	}
 
 	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
 	{
-		lhs -= rhs;
-		lhs %= pow2(l_size);
+		lhs = (lhs - rhs) & width_mask(l_size);
 	}
 
 	void AddAssign_AnyInt_AnyInt_InPlace::operator()(std::vector<System>& state) const
@@ -555,7 +556,7 @@ namespace qram_simulator
 			auto& reg1 = s.get(register_1);
 			auto& reg2 = s.get(register_2);
 			const auto size = System::size_of(register_2);
-			const auto mask = size == 64 ? ~uint64_t{0} : pow2(size) - 1;
+			const auto mask = width_mask(size);
 			reg2.value = (reg2.value ^ reg1.value) & mask;
 
 		}
