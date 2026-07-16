@@ -23,7 +23,7 @@ protected:
 
 // Test CondRot_Rational_Bool - conditional rotation based on rational input
 // This rotates a boolean qubit conditioned on the value of a rational register
-TEST(ConditionalRotationTest, CondRotOnZeroCondition)
+TEST_F(ConditionalRotationTest, CondRotOnZeroCondition)
 {
     auto reg_in = System::add_register("reg_in", Rational, 1);
     auto reg_out = System::add_register("reg_out", Boolean, 1);
@@ -40,7 +40,7 @@ TEST(ConditionalRotationTest, CondRotOnZeroCondition)
 }
 
 // Test that conditional rotation works correctly on superposition
-TEST(ConditionalRotationTest, CondRotPreservesSuperposition)
+TEST_F(ConditionalRotationTest, CondRotPreservesSuperposition)
 {
     auto reg_in = System::add_register("reg_in", Rational, 1);
     auto reg_out = System::add_register("reg_out", Boolean, 1);
@@ -59,7 +59,7 @@ TEST(ConditionalRotationTest, CondRotPreservesSuperposition)
 }
 
 // Test phase rotation with Phase_Bool gate
-TEST(ConditionalRotationTest, PhaseBoolGate)
+TEST_F(ConditionalRotationTest, PhaseBoolGate)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -75,7 +75,7 @@ TEST(ConditionalRotationTest, PhaseBoolGate)
 }
 
 // Test phase gate with different angles
-TEST(ConditionalRotationTest, PhaseBoolGateVariousAngles)
+TEST_F(ConditionalRotationTest, PhaseBoolGateVariousAngles)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -90,7 +90,7 @@ TEST(ConditionalRotationTest, PhaseBoolGateVariousAngles)
 }
 
 // Test conditional rotation with multi-digit rational register
-TEST(ConditionalRotationTest, CondRotMultiDigit)
+TEST_F(ConditionalRotationTest, CondRotMultiDigit)
 {
     auto reg_in = System::add_register("reg_in", Rational, 2);
     auto reg_out = System::add_register("reg_out", Boolean, 1);

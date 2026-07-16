@@ -28,7 +28,7 @@ uint64_t getRegValue(const System& s, size_t reg_id, size_t reg_size) {
 
 // ============ Pauli X Gate Tests ============
 // Pauli X: |0> -> |1>, |1> -> |0> (bit flip)
-TEST(BasicGatesTest, PauliXOnZero)
+TEST_F(BasicGatesTest, PauliXOnZero)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -41,7 +41,7 @@ TEST(BasicGatesTest, PauliXOnZero)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(1.0, 0)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, PauliXOnOne)
+TEST_F(BasicGatesTest, PauliXOnOne)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -55,7 +55,7 @@ TEST(BasicGatesTest, PauliXOnOne)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(1.0, 0)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, PauliXTwiceIsIdentity)
+TEST_F(BasicGatesTest, PauliXTwiceIsIdentity)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -71,7 +71,7 @@ TEST(BasicGatesTest, PauliXTwiceIsIdentity)
 
 // ============ Pauli Y Gate Tests ============
 // Pauli Y: |0> -> i|1>, |1> -> -i|0>
-TEST(BasicGatesTest, PauliYOnZero)
+TEST_F(BasicGatesTest, PauliYOnZero)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -85,7 +85,7 @@ TEST(BasicGatesTest, PauliYOnZero)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(0, 1)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, PauliYOnOne)
+TEST_F(BasicGatesTest, PauliYOnOne)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -102,7 +102,7 @@ TEST(BasicGatesTest, PauliYOnOne)
 
 // ============ Pauli Z Gate Tests ============
 // Pauli Z: |0> -> |0>, |1> -> -|1> (phase flip)
-TEST(BasicGatesTest, PauliZOnZero)
+TEST_F(BasicGatesTest, PauliZOnZero)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -116,7 +116,7 @@ TEST(BasicGatesTest, PauliZOnZero)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(1.0, 0)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, PauliZOnOne)
+TEST_F(BasicGatesTest, PauliZOnOne)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -133,7 +133,7 @@ TEST(BasicGatesTest, PauliZOnOne)
 
 // ============ S Gate (Phase Gate) Tests ============
 // S = diag(1, i): |0> -> |0>, |1> -> i|1>
-TEST(BasicGatesTest, SGateOnZero)
+TEST_F(BasicGatesTest, SGateOnZero)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -146,7 +146,7 @@ TEST(BasicGatesTest, SGateOnZero)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(1.0, 0)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, SGateOnOne)
+TEST_F(BasicGatesTest, SGateOnOne)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -160,7 +160,7 @@ TEST(BasicGatesTest, SGateOnOne)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(0, 1)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, SGateTwiceIsZGate)
+TEST_F(BasicGatesTest, SGateTwiceIsZGate)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -178,7 +178,7 @@ TEST(BasicGatesTest, SGateTwiceIsZGate)
 
 // ============ T Gate Tests ============
 // T = diag(1, exp(i*pi/4)): |0> -> |0>, |1> -> exp(i*pi/4)|1>
-TEST(BasicGatesTest, TGateOnZero)
+TEST_F(BasicGatesTest, TGateOnZero)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -191,7 +191,7 @@ TEST(BasicGatesTest, TGateOnZero)
     EXPECT_NEAR(std::abs(state[0].amplitude - complex_t(1.0, 0)), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, TGateOnOne)
+TEST_F(BasicGatesTest, TGateOnOne)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -207,7 +207,7 @@ TEST(BasicGatesTest, TGateOnOne)
     EXPECT_NEAR(std::abs(state[0].amplitude - expected), 0.0, 1e-9);
 }
 
-TEST(BasicGatesTest, TGateFourTimesIsZGate)
+TEST_F(BasicGatesTest, TGateFourTimesIsZGate)
 {
     auto q = System::add_register("q", Boolean, 1);
     std::vector<System> state;
@@ -226,7 +226,7 @@ TEST(BasicGatesTest, TGateFourTimesIsZGate)
 }
 
 // ============ Multi-Qubit Operations ============
-TEST(BasicGatesTest, PauliXOnEachQubitOf2QubitRegister)
+TEST_F(BasicGatesTest, PauliXOnEachQubitOf2QubitRegister)
 {
     auto q = System::add_register("q", UnsignedInteger, 2);
     std::vector<System> state;
