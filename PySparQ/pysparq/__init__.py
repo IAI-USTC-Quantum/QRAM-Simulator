@@ -382,3 +382,8 @@ from pysparq.algorithms.qda_solver import (
     qda_solve_tridiagonal,
     qda_solve_via_qram,
 )
+
+# --------------------------------------------------------------------
+# RIR (QECC.Lang intermediate representation) execution
+# --------------------------------------------------------------------
+from pysparq.rir import RIRError, RIRResult, load_rir, run_rir, run_rir_file
