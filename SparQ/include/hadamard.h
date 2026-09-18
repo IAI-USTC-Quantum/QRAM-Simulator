@@ -248,7 +248,7 @@ namespace qram_simulator
 	 * @brief 部分量子位 Hadamard 门
 	 * @details 只对寄存器中的部分量子位应用 Hadamard 变换
 	 */
-	struct Hadamard_PartialQubit : SelfAdjointOperator {
+	struct Hadamard_Partial : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
@@ -268,7 +268,7 @@ namespace qram_simulator
 		 * @param reg_in 寄存器名称
 		 * @param qubit_positions_ 量子位位置集合
 		 */
-		Hadamard_PartialQubit(std::string_view reg_in, std::set<size_t>& qubit_positions_)
+		Hadamard_Partial(std::string_view reg_in, std::set<size_t>& qubit_positions_)
 			: id(System::get(reg_in)), qubit_positions(qubit_positions_)
 		{
 			mask = make_mask(qubit_positions_);
@@ -279,7 +279,7 @@ namespace qram_simulator
 		 * @param reg_in 寄存器 ID
 		 * @param qubit_positions_ 量子位位置集合
 		 */
-		Hadamard_PartialQubit(size_t reg_in, std::set<size_t>& qubit_positions_)
+		Hadamard_Partial(size_t reg_in, std::set<size_t>& qubit_positions_)
 			: id(reg_in), qubit_positions(qubit_positions_)
 		{
 			mask = make_mask(qubit_positions_);
@@ -333,4 +333,6 @@ namespace qram_simulator
 		void operator()(std::vector<System>& state) const;
 	};
 
+	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
+	[[deprecated("use Hadamard_Partial")]] using Hadamard_PartialQubit = Hadamard_Partial;
 }

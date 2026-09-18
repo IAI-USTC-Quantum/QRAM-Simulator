@@ -405,7 +405,7 @@ void QDAWalkTest(double step_rate,
 	// To set initial state as |1>_{anc_1}|b>
 	//State_Prep(&qram_b, "main_reg", data_size, rational_size)(state);
 	(Hadamard_Int_Full(main_reg))(state);
-	//Xgate_Bool(anc_1, 0)(state);
+	//X_Bool(anc_1, 0)(state);
 
 	WalkSequence_via_QRAM_Debug(&qram_A, &qram_b, mat, b, 
 		"main_reg", "anc_UA",

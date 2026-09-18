@@ -113,7 +113,7 @@ TEST_F(QFTTest, QFTOnTwoState)
 
     // Verify the phase relationship: QFT followed by inverse returns original state
     // (this is tested more directly in InverseQFTCancelsQFT)
-    inverseQFT("q")(state);
+    InverseQFT("q")(state);
     ASSERT_EQ(state.size(), 1);
     uint64_t val = state[0].get(q).as<uint64_t>(2);
     EXPECT_EQ(val, 2);
@@ -146,7 +146,7 @@ TEST_F(QFTTest, QFTOnThreeState)
     EXPECT_NEAR(std::abs(amp3), expected_amp, 1e-9);
 
     // Verify via inverse QFT
-    inverseQFT("q")(state);
+    InverseQFT("q")(state);
     ASSERT_EQ(state.size(), 1);
     uint64_t val = state[0].get(q).as<uint64_t>(2);
     EXPECT_EQ(val, 3);
@@ -161,7 +161,7 @@ TEST_F(QFTTest, InverseQFTCancelsQFT)
     Init_Unsafe("q", 2)(state);  // Start with |10>
 
     QFT("q")(state);
-    inverseQFT("q")(state);
+    InverseQFT("q")(state);
 
     // Should return to |10>
     ASSERT_EQ(state.size(), 1);
@@ -181,7 +181,7 @@ TEST_F(QFTTest, QFTInverseQFTAllBasisStates)
         Init_Unsafe(q, input_val)(state);
 
         QFT("q")(state);
-        inverseQFT("q")(state);
+        InverseQFT("q")(state);
 
         ASSERT_EQ(state.size(), 1) << "Failed for input " << input_val;
         uint64_t val = state[0].get(q).as<uint64_t>(2);

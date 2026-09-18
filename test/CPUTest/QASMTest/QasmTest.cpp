@@ -79,7 +79,7 @@ int testGate(size_t nqubit, size_t digit) {
     std::string reg = "circ";
     System::add_register(reg, UnsignedInteger, nqubit);
 
-    auto gate = Ygate_Bool("circ", digit);
+    auto gate = Y_Bool("circ", digit);
     DenseMatrix mat = gate.extract_matrix();
     ////gate.display();
     fmt::print("Extracted Matrix:\n{}\n", mat.to_string());
@@ -94,16 +94,16 @@ int testGate1Q(size_t nqubit, size_t digit)
     System::add_register(reg, UnsignedInteger, nqubit);
 
     //auto gate = Phase_Bool("circ", digit, pi/2);
-    //auto gate = Ygate_Bool("circ", digit);
-    //auto gate = Zgate_Bool("circ", digit);
-    //auto gate = Sgate_Bool("circ", digit);
-    //auto gate = Tgate_Bool("circ", digit);
-    //auto gate = RXgate_Bool("circ", digit, pi/8);
-    //auto gate = RYgate_Bool("circ", digit, pi/2);
-    //auto gate = RZgate_Bool("circ", digit, pi/2);
-    //auto gate = SXgate_Bool("circ", digit);
-    //auto gate = U2gate_Bool("circ", digit, pi/2, pi/2);
-    auto gate = U3gate_Bool("circ", digit, pi/2, pi/2, pi/2);
+    //auto gate = Y_Bool("circ", digit);
+    //auto gate = Z_Bool("circ", digit);
+    //auto gate = S_Bool("circ", digit);
+    //auto gate = T_Bool("circ", digit);
+    //auto gate = RX_Bool("circ", digit, pi/8);
+    //auto gate = RY_Bool("circ", digit, pi/2);
+    //auto gate = RZ_Bool("circ", digit, pi/2);
+    //auto gate = SX_Bool("circ", digit);
+    //auto gate = U2_Bool("circ", digit, pi/2, pi/2);
+    auto gate = U3_Bool("circ", digit, pi/2, pi/2, pi/2);
     DenseMatrix mat = extract_matrix_from_1q_operation(gate);
     
     fmt::print("Extracted Matrix:\n{}\n", mat.to_string());
@@ -143,30 +143,30 @@ int testGateMCQ(std::string gate_type, size_t nqubit, std::vector<size_t> digits
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Ygate_Bool")
+    else if (gate_type == "Y_Bool")
     {
-        Ygate_Bool gate(main_reg, digits.back());
+        Y_Bool gate(main_reg, digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Zgate_Bool")
+    else if (gate_type == "Z_Bool")
     {
-        Zgate_Bool gate(main_reg, digits.back());
+        Z_Bool gate(main_reg, digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Sgate_Bool")
+    else if (gate_type == "S_Bool")
     {
-        Sgate_Bool gate(main_reg, digits.back());
+        S_Bool gate(main_reg, digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Tgate_Bool")
+    else if (gate_type == "T_Bool")
     {
-        Tgate_Bool gate(main_reg, digits.back());
+        T_Bool gate(main_reg, digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
@@ -179,44 +179,44 @@ int testGateMCQ(std::string gate_type, size_t nqubit, std::vector<size_t> digits
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RXgate_Bool")
+    else if (gate_type == "RX_Bool")
     {
-        RXgate_Bool gate(main_reg, digits.back(), pi / 8);
+        RX_Bool gate(main_reg, digits.back(), pi / 8);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RYgate_Bool")
+    else if (gate_type == "RY_Bool")
     {
-        RYgate_Bool gate(main_reg, digits.back(), pi / 2);
+        RY_Bool gate(main_reg, digits.back(), pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RZgate_Bool")
+    else if (gate_type == "RZ_Bool")
     {
-        RZgate_Bool gate(main_reg, digits.back(), pi / 2);
+        RZ_Bool gate(main_reg, digits.back(), pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "SXgate_Bool")
+    else if (gate_type == "SX_Bool")
     {
-        SXgate_Bool gate(main_reg, digits.back());
+        SX_Bool gate(main_reg, digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "U2gate_Bool")
+    else if (gate_type == "U2_Bool")
     {
-        U2gate_Bool gate(main_reg, digits.back(), pi / 2, pi / 2);
+        U2_Bool gate(main_reg, digits.back(), pi / 2, pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "U3gate_Bool")
+    else if (gate_type == "U3_Bool")
     {
-        U3gate_Bool gate(main_reg, digits.back(), pi / 4, pi /4, pi / 4);
+        U3_Bool gate(main_reg, digits.back(), pi / 4, pi /4, pi / 4);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
@@ -260,30 +260,30 @@ int testGateMCQ(std::string gate_type, std::vector<std::string> qregs,
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Ygate_Bool")
+    else if (gate_type == "Y_Bool")
     {
-        Ygate_Bool gate(qregs.back(), digits.back());
+        Y_Bool gate(qregs.back(), digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Zgate_Bool")
+    else if (gate_type == "Z_Bool")
     {
-        Zgate_Bool gate(qregs.back(), digits.back());
+        Z_Bool gate(qregs.back(), digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Sgate_Bool")
+    else if (gate_type == "S_Bool")
     {
-        Sgate_Bool gate(qregs.back(), digits.back());
+        S_Bool gate(qregs.back(), digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "Tgate_Bool")
+    else if (gate_type == "T_Bool")
     {
-        Tgate_Bool gate(qregs.back(), digits.back());
+        T_Bool gate(qregs.back(), digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
@@ -296,43 +296,43 @@ int testGateMCQ(std::string gate_type, std::vector<std::string> qregs,
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RXgate_Bool"){
-        RXgate_Bool gate(qregs.back(), digits.back(), pi / 8);
+    else if (gate_type == "RX_Bool"){
+        RX_Bool gate(qregs.back(), digits.back(), pi / 8);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RYgate_Bool")
+    else if (gate_type == "RY_Bool")
     {
-        RYgate_Bool gate(qregs.back(), digits.back(), pi / 2);
+        RY_Bool gate(qregs.back(), digits.back(), pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "RZgate_Bool")
+    else if (gate_type == "RZ_Bool")
     {
-        RZgate_Bool gate(qregs.back(), digits.back(), pi / 2);
+        RZ_Bool gate(qregs.back(), digits.back(), pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "SXgate_Bool")
+    else if (gate_type == "SX_Bool")
     {
-        SXgate_Bool gate(qregs.back(), digits.back());
+        SX_Bool gate(qregs.back(), digits.back());
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "U2gate_Bool")
+    else if (gate_type == "U2_Bool")
     {
-        U2gate_Bool gate(qregs.back(), digits.back(), pi / 2, pi / 2);
+        U2_Bool gate(qregs.back(), digits.back(), pi / 2, pi / 2);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
     }
-    else if (gate_type == "U3gate_Bool")
+    else if (gate_type == "U3_Bool")
     {
-        U3gate_Bool gate(qregs.back(), digits.back(), pi / 4, pi /4, pi / 4);
+        U3_Bool gate(qregs.back(), digits.back(), pi / 4, pi /4, pi / 4);
         gate.conditioned_by_bit(cond_variables);
         mat = extract_matrix_from_ctrl_1q_operation(gate, cond_variables);
         //gate.display();
@@ -351,9 +351,9 @@ int testGateMCQ(std::string gate_type, std::vector<std::string> qregs,
 }
 
 int metaGateTest() {
-    std::vector<std::string> gate_types = {"Phase_Bool", "Rot_Bool", "Ygate_Bool", "Zgate_Bool", 
-                                        "Sgate_Bool", "Tgate_Bool", "RXgate_Bool", "RYgate_Bool",
-                                         "RZgate_Bool", "SXgate_Bool", "U2gate_Bool", "U3gate_Bool",
+    std::vector<std::string> gate_types = {"Phase_Bool", "Rot_Bool", "Y_Bool", "Z_Bool", 
+                                        "S_Bool", "T_Bool", "RX_Bool", "RY_Bool",
+                                         "RZ_Bool", "SX_Bool", "U2_Bool", "U3_Bool",
                                         };
     for (auto gate_type : gate_types)
     {

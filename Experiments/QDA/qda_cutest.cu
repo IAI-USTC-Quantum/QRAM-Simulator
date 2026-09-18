@@ -82,7 +82,7 @@ int test_error_bound(size_t nqubit, double steps, double p, double alpha, double
 	SparseState state;
 
 	Hadamard_Int(main_reg, System::size_of(main_reg))(state);
-	//Xgate_Bool(anc_1, 0)(state);
+	//X_Bool(anc_1, 0)(state);
 
 	double kappa = get_kappa_Tridiagonal(alpha, beta, pow2(nqubit));
 	fmt::print("kappa = {}\n", kappa);

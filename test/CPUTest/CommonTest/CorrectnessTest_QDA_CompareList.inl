@@ -52,7 +52,7 @@ void QDA_Poiseuille_via_QRAM_test(size_t nqubit, double step_rate, double p, dou
 
 	Walk_s_via_QRAM::Encb enc_b(&qram_b, "main_reg", data_size, rational_size);
 	enc_b(state);
-	//Xgate_Bool(anc_1, 0)(state);
+	//X_Bool(anc_1, 0)(state);
 
 	constexpr int StepConstant = 2305;
 	size_t steps = size_t(step_rate * StepConstant * kappa);
@@ -124,7 +124,7 @@ void QDA_Poiseuille_Tridiagonal_test(size_t nqubit, double step_rate, double p, 
 
 	Walk_s_Tridiagonal::Encb enc_b("main_reg");
 	enc_b(state);
-	//Xgate_Bool(anc_1, 0)(state);
+	//X_Bool(anc_1, 0)(state);
 
 	constexpr int StepConstant = 2305;
 	size_t steps = size_t(step_rate * StepConstant * kappa);

@@ -309,7 +309,7 @@ namespace qram_simulator
 	 * @brief X 门（Pauli-X / NOT 门）
 	 * @details 翻转量子位状态 |0> <-> |1>
 	 */
-	struct Xgate_Bool : SelfAdjointOperator, GateBase {
+	struct X_Bool : SelfAdjointOperator, GateBase {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
@@ -320,7 +320,7 @@ namespace qram_simulator
 		 * @param reg_ 寄存器名称
 		 * @param digit_ 量子位索引
 		 */
-		Xgate_Bool(std::string_view reg_, size_t digit_)
+		X_Bool(std::string_view reg_, size_t digit_)
 			: GateBase(System::get(reg_), digit_)
 		{
 		}
@@ -330,7 +330,7 @@ namespace qram_simulator
 		 * @param id_ 寄存器 ID
 		 * @param digit_ 量子位索引
 		 */
-		Xgate_Bool(size_t id_, size_t digit_)
+		X_Bool(size_t id_, size_t digit_)
 			: GateBase(id_, digit_)
 		{
 		}
@@ -339,13 +339,13 @@ namespace qram_simulator
 		 * @brief 构造函数（名称，默认位索引为0）
 		 * @param reg_ 寄存器名称
 		 */
-		Xgate_Bool(std::string_view reg_) : Xgate_Bool(reg_, 0) {}
+		X_Bool(std::string_view reg_) : X_Bool(reg_, 0) {}
 
 		/**
 		 * @brief 构造函数（ID，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 */
-		Xgate_Bool(size_t id_) : Xgate_Bool(id_, 0) {}
+		X_Bool(size_t id_) : X_Bool(id_, 0) {}
 
 		/**
 		 * @brief 应用 X 门操作
@@ -366,7 +366,7 @@ namespace qram_simulator
 	 * @brief Y 门（Pauli-Y 门）
 	 * @details 在 Bloch 球上绕 Y 轴旋转 π 角度
 	 */
-	struct Ygate_Bool : SelfAdjointOperator, GateBase {
+	struct Y_Bool : SelfAdjointOperator, GateBase {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 		using GateBase::GateBase;
@@ -386,20 +386,20 @@ namespace qram_simulator
 	 * @brief Z 门（Pauli-Z 门）
 	 * @details 相位翻转门，施加 π 相位
 	 */
-	struct Zgate_Bool : Phase_Bool
+	struct Z_Bool : Phase_Bool
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
 		using Phase_Bool::Phase_Bool;
 
 // Convenience constructors for single-qubit Z gate (lambda = pi)
-		Zgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi) {}
+		Z_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi) {}
 
 		/**
 		 * @brief 构造函数（ID，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 */
-		Zgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi) {}
+		Z_Bool(size_t id_) : Phase_Bool(id_, 0, pi) {}
 //void display() const override;
 	};
 
@@ -407,20 +407,20 @@ namespace qram_simulator
 	 * @brief S 门
 	 * @details 相位门，施加 π/2 相位
 	 */
-	struct Sgate_Bool : Phase_Bool
+	struct S_Bool : Phase_Bool
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
 		using Phase_Bool::Phase_Bool;
 
 // Convenience constructors for S gate (lambda = pi/2)
-		Sgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 2) {}
+		S_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 2) {}
 
 		/**
 		 * @brief 构造函数（ID，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 */
-		Sgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 2) {}
+		S_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 2) {}
 //void display() const override;
 	};
 
@@ -428,20 +428,20 @@ namespace qram_simulator
 	 * @brief T 门
 	 * @details 相位门，施加 π/4 相位
 	 */
-	struct Tgate_Bool : Phase_Bool
+	struct T_Bool : Phase_Bool
 	{
 		using Phase_Bool::operator();
 		using Phase_Bool::dag;
 		using Phase_Bool::Phase_Bool;
 
 // Convenience constructors for T gate (lambda = pi/4)
-		Tgate_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 4) {}
+		T_Bool(std::string_view reg_) : Phase_Bool(reg_, 0, pi / 4) {}
 
 		/**
 		 * @brief 构造函数（ID，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 */
-		Tgate_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 4) {}
+		T_Bool(size_t id_) : Phase_Bool(id_, 0, pi / 4) {}
 //void display() const override;
 	};
 
@@ -449,7 +449,7 @@ namespace qram_simulator
 	 * @brief RX 门（绕 X 轴旋转）
 	 * @details 在 Bloch 球上绕 X 轴旋转指定角度
 	 */
-	struct RXgate_Bool : Rot_Bool
+	struct RX_Bool : Rot_Bool
 	{
 		using Rot_Bool::operator();
 		using Rot_Bool::dag;
@@ -463,7 +463,7 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RXgate_Bool(std::string_view reg_, size_t digit_, double angle_);
+		RX_Bool(std::string_view reg_, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（ID + 位索引 + 角度）
@@ -471,21 +471,21 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RXgate_Bool(size_t id_, size_t digit_, double angle_);
+		RX_Bool(size_t id_, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（名称 + 角度，默认位索引为0）
 		 * @param reg_ 寄存器名称
 		 * @param angle_ 旋转角度
 		 */
-		RXgate_Bool(std::string_view reg_, double angle_) : RXgate_Bool(reg_, 0, angle_) {}
+		RX_Bool(std::string_view reg_, double angle_) : RX_Bool(reg_, 0, angle_) {}
 
 		/**
 		 * @brief 构造函数（ID + 角度，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 * @param angle_ 旋转角度
 		 */
-		RXgate_Bool(size_t id_, double angle_) : RXgate_Bool(id_, 0, angle_) {}
+		RX_Bool(size_t id_, double angle_) : RX_Bool(id_, 0, angle_) {}
 
 		/**
 		 * @brief 应用 RX 门操作
@@ -501,7 +501,7 @@ namespace qram_simulator
 	 * @brief RY 门（绕 Y 轴旋转）
 	 * @details 在 Bloch 球上绕 Y 轴旋转指定角度
 	 */
-	struct RYgate_Bool : Rot_Bool
+	struct RY_Bool : Rot_Bool
 	{
 		using Rot_Bool::operator();
 		using Rot_Bool::dag;
@@ -515,7 +515,7 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RYgate_Bool(std::string_view reg, size_t digit_, double angle_);
+		RY_Bool(std::string_view reg, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（ID + 位索引 + 角度）
@@ -523,21 +523,21 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RYgate_Bool(size_t id_, size_t digit_, double angle_);
+		RY_Bool(size_t id_, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（名称 + 角度，默认位索引为0）
 		 * @param reg_ 寄存器名称
 		 * @param angle_ 旋转角度
 		 */
-		RYgate_Bool(std::string_view reg_, double angle_) : RYgate_Bool(reg_, 0, angle_) {}
+		RY_Bool(std::string_view reg_, double angle_) : RY_Bool(reg_, 0, angle_) {}
 
 		/**
 		 * @brief 构造函数（ID + 角度，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 * @param angle_ 旋转角度
 		 */
-		RYgate_Bool(size_t id_, double angle_) : RYgate_Bool(id_, 0, angle_) {}
+		RY_Bool(size_t id_, double angle_) : RY_Bool(id_, 0, angle_) {}
 
 		/**
 		 * @brief 应用 RY 门操作
@@ -553,7 +553,7 @@ namespace qram_simulator
 	 * @brief RZ 门（绕 Z 轴旋转）
 	 * @details 在 Bloch 球上绕 Z 轴旋转指定角度
 	 */
-	struct RZgate_Bool : BaseOperator, GateBase {
+	struct RZ_Bool : BaseOperator, GateBase {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -568,7 +568,7 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RZgate_Bool(std::string_view reg_, size_t digit_, double angle_);
+		RZ_Bool(std::string_view reg_, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（ID + 位索引 + 角度）
@@ -576,21 +576,21 @@ namespace qram_simulator
 		 * @param digit_ 量子位索引
 		 * @param angle_ 旋转角度
 		 */
-		RZgate_Bool(size_t id_, size_t digit_, double angle_);
+		RZ_Bool(size_t id_, size_t digit_, double angle_);
 
 		/**
 		 * @brief 构造函数（名称 + 角度，默认位索引为0）
 		 * @param reg_ 寄存器名称
 		 * @param angle_ 旋转角度
 		 */
-		RZgate_Bool(std::string_view reg_, double angle_) : RZgate_Bool(reg_, 0, angle_) {}
+		RZ_Bool(std::string_view reg_, double angle_) : RZ_Bool(reg_, 0, angle_) {}
 
 		/**
 		 * @brief 构造函数（ID + 角度，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 * @param angle_ 旋转角度
 		 */
-		RZgate_Bool(size_t id_, double angle_) : RZgate_Bool(id_, 0, angle_) {}
+		RZ_Bool(size_t id_, double angle_) : RZ_Bool(id_, 0, angle_) {}
 
 		/**
 		 * @brief 应用 RZ 门操作
@@ -609,7 +609,7 @@ namespace qram_simulator
 	 * @brief SX 门（X 的平方根门）
 	 * @details sqrt(X) 门，X 门的一半旋转
 	 */
-	struct SXgate_Bool : Rot_Bool
+	struct SX_Bool : Rot_Bool
 	{
 		using Rot_Bool::operator();
 		using Rot_Bool::dag;
@@ -622,26 +622,26 @@ namespace qram_simulator
 		 * @param reg_ 寄存器名称
 		 * @param digit_ 量子位索引
 		 */
-		SXgate_Bool(std::string_view reg_, size_t digit_);
+		SX_Bool(std::string_view reg_, size_t digit_);
 
 		/**
 		 * @brief 构造函数（ID + 位索引）
 		 * @param id_ 寄存器 ID
 		 * @param digit_ 量子位索引
 		 */
-		SXgate_Bool(size_t id_, size_t digit_);
+		SX_Bool(size_t id_, size_t digit_);
 
 		/**
 		 * @brief 构造函数（名称，默认位索引为0）
 		 * @param reg_ 寄存器名称
 		 */
-		SXgate_Bool(std::string_view reg_) : SXgate_Bool(reg_, 0) {}
+		SX_Bool(std::string_view reg_) : SX_Bool(reg_, 0) {}
 
 		/**
 		 * @brief 构造函数（ID，默认位索引为0）
 		 * @param id_ 寄存器 ID
 		 */
-		SXgate_Bool(size_t id_) : SXgate_Bool(id_, 0) {}
+		SX_Bool(size_t id_) : SX_Bool(id_, 0) {}
 
 		/**
 		 * @brief 应用 SX 门操作
@@ -657,7 +657,7 @@ namespace qram_simulator
 	 * @brief U2 门（通用单量子门，2参数）
 	 * @details 通用单量子门，使用 phi 和 lambda 两个参数
 	 */
-	struct U2gate_Bool : Rot_Bool
+	struct U2_Bool : Rot_Bool
 	{
 		using Rot_Bool::operator();
 		using Rot_Bool::dag;
@@ -678,7 +678,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U2gate_Bool(std::string_view reg_, size_t digit_, double phi, double lambda);
+		U2_Bool(std::string_view reg_, size_t digit_, double phi, double lambda);
 
 		/**
 		 * @brief 构造函数（ID + 位索引 + phi + lambda）
@@ -687,7 +687,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U2gate_Bool(size_t id_, size_t digit_, double phi, double lambda);
+		U2_Bool(size_t id_, size_t digit_, double phi, double lambda);
 
 		/**
 		 * @brief 构造函数（名称 + phi + lambda，默认位索引为0）
@@ -695,7 +695,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U2gate_Bool(std::string_view reg_, double phi, double lambda) : U2gate_Bool(reg_, 0, phi, lambda) {}
+		U2_Bool(std::string_view reg_, double phi, double lambda) : U2_Bool(reg_, 0, phi, lambda) {}
 
 		/**
 		 * @brief 构造函数（ID + phi + lambda，默认位索引为0）
@@ -703,7 +703,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U2gate_Bool(size_t id_, double phi, double lambda) : U2gate_Bool(id_, 0, phi, lambda) {}
+		U2_Bool(size_t id_, double phi, double lambda) : U2_Bool(id_, 0, phi, lambda) {}
 
 		/**
 		 * @brief 应用 U2 门操作
@@ -719,7 +719,7 @@ namespace qram_simulator
 	 * @brief U3 门（通用单量子门，3参数）
 	 * @details 最通用的单量子门，使用 theta、phi 和 lambda 三个参数
 	 */
-	struct U3gate_Bool : Rot_Bool
+	struct U3_Bool : Rot_Bool
 	{
 		using Rot_Bool::operator();
 		using Rot_Bool::dag;
@@ -741,7 +741,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U3gate_Bool(std::string_view reg, size_t digit_, double theta, double phi, double lambda);
+		U3_Bool(std::string_view reg, size_t digit_, double theta, double phi, double lambda);
 
 		/**
 		 * @brief 构造函数（ID + 位索引 + theta + phi + lambda）
@@ -751,7 +751,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U3gate_Bool(size_t id_, size_t digit_, double theta, double phi, double lambda);
+		U3_Bool(size_t id_, size_t digit_, double theta, double phi, double lambda);
 
 		/**
 		 * @brief 构造函数（名称 + theta + phi + lambda，默认位索引为0）
@@ -760,7 +760,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U3gate_Bool(std::string_view reg_, double theta, double phi, double lambda) : U3gate_Bool(reg_, 0, theta, phi, lambda) {}
+		U3_Bool(std::string_view reg_, double theta, double phi, double lambda) : U3_Bool(reg_, 0, theta, phi, lambda) {}
 
 		/**
 		 * @brief 构造函数（ID + theta + phi + lambda，默认位索引为0）
@@ -769,7 +769,7 @@ namespace qram_simulator
 		 * @param phi phi 参数
 		 * @param lambda lambda 参数
 		 */
-		U3gate_Bool(size_t id_, double theta, double phi, double lambda) : U3gate_Bool(id_, 0, theta, phi, lambda) {}
+		U3_Bool(size_t id_, double theta, double phi, double lambda) : U3_Bool(id_, 0, theta, phi, lambda) {}
 
 		/**
 		 * @brief 应用 U3 门操作
@@ -780,4 +780,18 @@ namespace qram_simulator
 			Rot_Bool::operator()(state);
 		}
 	};
+
+	// Deprecated aliases kept for source compatibility; see docs/naming_conventions.md.
+	// Remove in the next major version.
+	[[deprecated("use X_Bool")]] using Xgate_Bool = X_Bool;
+	[[deprecated("use Y_Bool")]] using Ygate_Bool = Y_Bool;
+	[[deprecated("use Z_Bool")]] using Zgate_Bool = Z_Bool;
+	[[deprecated("use S_Bool")]] using Sgate_Bool = S_Bool;
+	[[deprecated("use T_Bool")]] using Tgate_Bool = T_Bool;
+	[[deprecated("use RX_Bool")]] using RXgate_Bool = RX_Bool;
+	[[deprecated("use RY_Bool")]] using RYgate_Bool = RY_Bool;
+	[[deprecated("use RZ_Bool")]] using RZgate_Bool = RZ_Bool;
+	[[deprecated("use SX_Bool")]] using SXgate_Bool = SX_Bool;
+	[[deprecated("use U2_Bool")]] using U2gate_Bool = U2_Bool;
+	[[deprecated("use U3_Bool")]] using U3gate_Bool = U3_Bool;
 }

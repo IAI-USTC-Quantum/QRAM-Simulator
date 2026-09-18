@@ -29,7 +29,7 @@ Hadamard 算子在寄存器上创建量子叠加态，是量子算法的基础�
      - 单量子比特 Hadamard
      - Boolean（size=1）
      - SelfAdjoint
-   * - ``Hadamard_PartialQubit``
+   * - ``Hadamard_Partial``
      - 部分量子比特 Hadamard
      - 整数类型
      - SelfAdjoint
@@ -160,10 +160,10 @@ Hadamard_Bool
 
 ---
 
-Hadamard_PartialQubit
+Hadamard_Partial
 ---------------------
 
-.. autoclass:: pysparq.Hadamard_PartialQubit
+.. autoclass:: pysparq.Hadamard_Partial
    :members:
    :undoc-members:
 
@@ -184,7 +184,7 @@ Hadamard_PartialQubit
 
    # 只对第 1 和第 3 位应用 Hadamard
    positions = {1, 3}
-   ps.Hadamard_PartialQubit("q", positions)(state)
+   ps.Hadamard_Partial("q", positions)(state)
 
    # 创建 2^2 = 4 个叠加状态（仅翻转位置 1 和 3）
 
@@ -230,4 +230,4 @@ Hadamard_PartialQubit
    ps.Hadamard_Int("reg", 2)(state)
 
    # 或叠加特定位置
-   ps.Hadamard_PartialQubit("reg", {0, 2})(state)
+   ps.Hadamard_Partial("reg", {0, 2})(state)

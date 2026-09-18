@@ -235,7 +235,7 @@ class BlockEncodingHs(ControllableOperatorMixin):
         self.enc_b.dag(state)
 
         # X gate on anc_1
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
 
         # Reflection on main register
         ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
@@ -243,41 +243,41 @@ class BlockEncodingHs(ControllableOperatorMixin):
         )(state)
 
         # X gate on anc_1
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
 
         # State preparation forward
         self.enc_b(state)
 
         # Rotation sequence on anc_2
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
 
         # Hadamard on anc_2
         ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
 
         # Apply block encoding of A (first pass)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2])(state)
-        ps.Xgate_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
+        ps.X_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
         ps.Reflection_Bool(self.anc_2, True).conditioned_by_all_ones(self.anc_1)(state)
 
         # Block encoding dagger
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2]).dag(state)
 
         # Final operations
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
 
         # Second state preparation sequence
         self.enc_b.dag(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
             [self.anc_1, self.anc_3, self.anc_4]
         )(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         self.enc_b(state)
 
         # Final Hadamard
@@ -293,31 +293,31 @@ class BlockEncodingHs(ControllableOperatorMixin):
         """
         ps.Hadamard_Bool(self.anc_3)(state)
         self.enc_b.dag(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
             [self.anc_1, self.anc_3, self.anc_4]
         )(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         self.enc_b(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2])(state)
         ps.Reflection_Bool(self.anc_2, True).conditioned_by_all_ones(self.anc_1)(state)
-        ps.Xgate_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
+        ps.X_Bool(self.anc_1, 0).conditioned_by_all_ones(self.anc_2)(state)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2]).dag(state)
         ps.Hadamard_Bool(self.anc_2).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
-        ps.Xgate_Bool(self.anc_4, 0)(state)
+        ps.X_Bool(self.anc_4, 0)(state)
         self.enc_b.dag(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
             [self.anc_1, self.anc_3, self.anc_4]
         )(state)
-        ps.Xgate_Bool(self.anc_1, 0)(state)
+        ps.X_Bool(self.anc_1, 0)(state)
         self.enc_b(state)
         ps.Hadamard_Bool(self.anc_3)(state)
 
@@ -360,19 +360,19 @@ class BlockEncodingHsPD:
         )(state)
         self.enc_b(state)
 
-        ps.Xgate_Bool(self.anc_3, 0)(state)
+        ps.X_Bool(self.anc_3, 0)(state)
         ps.Rot_Bool(self.anc_1, self.R_s).conditioned_by_all_ones(self.anc_3)(state)
-        ps.Xgate_Bool(self.anc_3, 0)(state)
+        ps.X_Bool(self.anc_3, 0)(state)
 
         ps.Hadamard_Bool(self.anc_1).conditioned_by_all_ones(self.anc_3)(state)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_3])(state)
-        ps.Xgate_Bool(self.anc_3, 0)(state)
+        ps.X_Bool(self.anc_3, 0)(state)
         self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_3]).dag(state)
         ps.Hadamard_Bool(self.anc_1).conditioned_by_all_ones(self.anc_3)(state)
-        ps.Xgate_Bool(self.anc_3, 0)(state)
+        ps.X_Bool(self.anc_3, 0)(state)
 
         ps.Rot_Bool(self.anc_1, self.R_s).conditioned_by_all_ones(self.anc_3)(state)
-        ps.Xgate_Bool(self.anc_3, 0)(state)
+        ps.X_Bool(self.anc_3, 0)(state)
 
         self.enc_b.dag(state)
         ps.Reflection_Bool(self.main_reg, True).conditioned_by_all_ones(
@@ -451,12 +451,12 @@ class WalkS(ControllableOperatorMixin):
             ps.Reflection_Bool([self.anc_UA, self.anc_1, self.anc_2], False)(state)
 
         # Apply global phase
-        ps.GlobalPhase_Int(self.phase)(state)
+        ps.GlobalPhase(self.phase)(state)
 
     def dag(self, state: ps.SparseState) -> None:
         """Apply inverse walk operator."""
         # Inverse global phase
-        ps.GlobalPhase_Int(-self.phase)(state)
+        ps.GlobalPhase(-self.phase)(state)
 
         # Inverse reflection
         if not self.is_positive_definite:
@@ -555,7 +555,7 @@ class Filtering:
         lcu.conditioned_by_all_ones(self.anc_h)(state)
 
         # X gate
-        ps.Xgate_Bool(self.anc_h, 0)(state)
+        ps.X_Bool(self.anc_h, 0)(state)
 
         # Inverse LCU would go here
         # For now, simplified implementation

@@ -10,6 +10,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **宽度与截断约定**(`docs/operators.md` 新章,权威契约):LSB 对齐;读扩展由
+  名字槽位承载(`_UInt_` 零扩展 / `_SInt_` 符号扩展 / `AnyInt` 按寄存器声明
+  类型),release 构建同样成立;结果 `mod 2^out_width` XOR 写入,输出宽度可与
+  输入任意不同;域外全量化(除零→商 0);flag 谓词在全精度域求值;宽度
+  1..64 全支持;唯一行为变更是 `Add_AnyInt_AnyInt_InPlace` 的 AnyInt 槽语义
+- **16 个新算术算子**(CPU+CUDA+PySparQ 绑定,整数核+flag 谓词族,服务
+  pyqecclang QFVM 算术自动编译的去 compile_operator 化):
+  `Sub_UInt_UInt`、`Neg_UInt`、`Abs_SInt`、`Mul_UInt_UInt`、`Div_UInt_UInt`、
+  `Sqrt_UInt`、`Select_Bool_UInt_UInt`、`And/Or/Xor_UInt_UInt`、
+  `Less_SInt_SInt`、`Carry_UInt_UInt`、`Overflow_SInt_SInt`、
+  `MulOverflow_UInt_UInt`、`IsZero_UInt`、`Negative_SInt`
+- **Common/include/basic.h**:`width_mask` / `isqrt_u64`(HOST_DEVICE,
+  整数位对算法,CPU/CPU-CUDA 位一致)
+- **PySparQ/pysparq/conformance.py**:`two_complement_decode` / `sign_extend`
+  / `WIDTH_BOUNDARIES` / 声明式 `width_matrix_case`(宽度组合 × 独立模型 ×
+  非零输出起点碰撞 × 双序 dagger × 叠加线性 × 控制矩阵一站式 runner);
+  **PySparQ/test/test_width_conventions.py**:16 新算子 + 存量 Add/Assign/
+  Compare 的宽度边界矩阵(含 63/64 位边界)
+- **SparQ/test/quantum_arithmetic.cpp**:16 新算子混合宽度真值表 + 参数化
+  宽度扫描 + Add_AnyInt 新语义专项;**test/GPUTest/ArithmeticTest**:CUDA
+  修复项的一致性用例(新)
+- **docs/naming_conventions.md**:槽位语义承载规则与谓词算子族命名规则增补
+
+### Changed
+- **CUDA 可逆性/UB 修复**:`Add_UInt_UInt` 无条件路径由覆盖写改为 XOR+宽度
+  掩码(此前对非零输出寄存器不可逆);`Add_UInt_UInt_InPlace`/`Add_Mult`/
+  `Assign` CUDA 路径补宽度掩码(消除 CPU/GPU 不等宽行为分歧);全部
+  `%=(1<<w)`/`1<<w` 于 w=64 的 UB 改为 `width_mask`;`cu_as_uint64/double/
+  bool/int64` 与 `CuConditionSatisfied` 的 `1ULL<<64` UB 修复(64 位寄存器
+  CUDA 读取此前掩码为 0)
+- **`Add_AnyInt_AnyInt_InPlace` 语义迁移(唯一行为变更)**:AnyInt 槽按寄存器
+  声明类型扩展(SInt 操作数此前按无符号位模式读);宽度/类型改执行期读取;
+  补 `lhs==rhs` 别名拒绝(always-on)。等宽非负使用不受影响
+- **`CustomArithmetic`**:输出 XOR 补宽度掩码(此前裸写可越宽)
+- **`consumer_runtime_inventory.json`**:accepted 清单增补 16 个新算子
+  (xor_into);契约测试增补 Sub/Div/Select 独立模型用例
+- **docs/naming_conventions.md** (naming-refactor task): authoritative operator
+  naming ruleset — symbol layers, the `Family_Slots_Variants` grammar with closed type-tag /
+  modifier / variant vocabularies, slot and `_Bool` semantics, the `_InPlace`
+  naming contract, dagger-first inversion principle, gate-family rules
+  (`<Axis>_Bool` without the `gate` infix), RPN composition reading, the
+  deprecation/alias mechanism, and the full rename audit table
+- **SparQ/src/qft.cpp**, **SparQ/include/qft.h**: `QFT::dag()` now applies
+  the inverse transform (delegating to `InverseQFT` with control conditions
+  preserved) and is exposed in PySparQ via `BIND_DAG_METHODS(QFT)`
+- **PySparQ/pysparq/__init__.py**: PEP 562 module `__getattr__` providing
+  old spellings of the 18 renamed Python operator names as deprecated aliases
+  (`DeprecationWarning`), keeping external consumers (pyqecclang, qfvm)
+  working during migration; `PySparQ/consumer_runtime_inventory.json` gains a
+  `deprecated_aliases` section documenting the mapping
+- **PySparQ/pysparq/rir.py**: native execution of QECC.Lang RIR JSON documents
+  (schema versions 0.1–0.3) on PySparQ sparse states — module-graph expansion at
+  interpretation time (`Call` inlining via register renaming, `Repeat` replay,
+  `Adjoint` inversion, multi-bit `Control` accumulation) with native operator
+  dispatch (`Add_ConstUInt_InPlace`, `GlobalPhase`, `QRAMLoad`) whenever an
+  RIR operand aligns with a whole register; exposed as `run_rir`, `run_rir_file`,
+  `load_rir`, `RIRResult`, `RIRError`
+- **PySparQ/test/test_rir.py**: regression tests for RIR loading, gate-level
+  execution, module expansion, register-view arithmetic and QRAM loading
+- **docs/sphinx/source/guide/rir.rst**, **docs/sphinx/source/api/rir.rst**,
+  **docs/pysparq.md**: documentation of PySparQ as the natural RIR interpreter,
+  with worked examples (Bell state, `Call`/`Repeat`/`Adjoint` module graphs,
+  register views, QRAM loading)
 - **SparQ/include/measurement.h**, **SparQ/src/measurement.cpp**: First-class
   seedable sparse-state operations for a dynamic executor: `MeasureZ`
   (projective Z-basis measurement: Born-rule sampling + collapse +
@@ -64,6 +127,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     fit the register's bit width, instead of being silently truncated.
 
 ### Changed
+- **Naming refactor (19 operator renames, per docs/naming_conventions.md)**:
+  the gate family loses the `gate` infix (`Xgate_Bool` → `X_Bool`, 11 gates);
+  `inverseQFT` → `InverseQFT` (last lowercase-initial class name); truthless
+  type tags fixed (`GlobalPhase_Int` → `GlobalPhase`,
+  `Div_Sqrt_Arccos_Int_Int` → `Div_Sqrt_Arccos_UInt_UInt`,
+  `Sqrt_Div_Arccos_Int_Int` → `Sqrt_Div_Arccos_Int_UInt`);
+  `AddAssign_AnyInt_AnyInt_InPlace` → `Add_AnyInt_AnyInt_InPlace`;
+  `Hadamard_PartialQubit` → `Hadamard_Partial`;
+  `CondRot_General_Bool_fast` → `CondRot_General_Bool_Fast` (C++ only);
+  `QuantumBinarySearchFast` → `QuantumBinarySearch_Fast`. Old C++ spellings
+  remain available as `[[deprecated]] using` aliases and old Python spellings
+  via the deprecation aliases above; all in-repo consumers (SparQ,
+  SparQ_Algorithm, Experiments, tests, examples, PySparQ, docs) use the new
+  names. `GetRotateAngle_Int_Int` was verified truthful (signed
+  interpretation) and unchanged
+- **docs**: sphinx operator pages drift fixed (short names missing `_InPlace`
+  for `Add_ConstUInt_InPlace`/`Add_Mult_UInt_ConstUInt_InPlace`/
+  `Mod_Mult_UInt_ConstUInt_InPlace`/`Shift*_InPlace`; removed the phantom
+  `CheckNormalization_Renormalize`; corrected the false
+  "ShiftLeft.dag() not implemented" claim); CLAUDE.md no longer claims
+  nonexistent CNOT/Toffoli classes; CONTRIBUTING.md's function-naming example
+  corrected to the real `noise_free_impl` and now links the naming ruleset
 - **SparQ/include/basic_components.h**, **SparQ/src/basic_components.cpp**:
   CPU basis-state register storage now uses `std::vector<StateStorage>`.
   `CACHED_REGISTER_SIZE` is the initial reserved block rather than a hard CPU

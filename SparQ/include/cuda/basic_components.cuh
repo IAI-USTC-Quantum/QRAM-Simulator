@@ -1,30 +1,27 @@
 #pragma once
 
 #include "basic_components.h"
+#include "basic.h"
 
 namespace qram_simulator {
 
 	inline __host__ __device__ uint64_t cu_as_uint64(const StateStorage& storage, size_t size) {
 		uint64_t value = storage.value;
-		uint64_t mask = (1ULL << size) - (size != 0);
-		return value & mask;
+		return value & width_mask(size);
 	}
 	inline __host__ __device__ double cu_as_double(const StateStorage& storage, size_t size) {
 		uint64_t value = storage.value;
-		uint64_t mask = (1ULL << size) - (size != 0);
-		value &= mask;
+		value &= width_mask(size);
 		return value / 2.0 / (1ULL << (size - 1));
 	}
 	inline __host__ __device__ bool cu_as_bool(const StateStorage& storage, size_t size) {
 		uint64_t value = storage.value;
-		uint64_t mask = (1ULL << size) - (size != 0);
-		value &= mask;
+		value &= width_mask(size);
 		return bool(value);
 	}
 	inline __host__ __device__ int64_t cu_as_int64(const StateStorage& storage, size_t size) {
 		uint64_t value = storage.value;
-		uint64_t mask = (1ULL << size) - (size != 0);
-		value &= mask;
+		value &= width_mask(size);
 		return size ? (int64_t)(value << (64 - size)) >> (64 - size) : 0;
 	}
 	inline __host__ __device__ StateStorage& CuGet(System& system, size_t index)

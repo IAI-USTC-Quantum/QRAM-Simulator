@@ -101,8 +101,8 @@ auto test3()
 
 	Init_Unsafe(sparse_offset, offset)(system_states);
 	// Hadamard_Int(j, 2)(system_states);
-	Xgate_Bool(j, 0)(system_states);
-	Xgate_Bool(j, 1)(system_states);
+	X_Bool(j, 0)(system_states);
+	X_Bool(j, 1)(system_states);
 	ClearZero()(system_states);
 
 	size_t sz = System::size_of(j);

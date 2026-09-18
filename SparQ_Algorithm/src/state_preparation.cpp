@@ -31,14 +31,14 @@ namespace qram_simulator {
 		{
 			profiler _("StatePrep::run");
 
-			Xgate_Bool("addr_parent", 0)(system_states);
+			X_Bool("addr_parent", 0)(system_states);
 			for (size_t k = 0; k < addr_size - 1; ++k) {
 				Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(system_states);
 				QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 				QRAMLoad(qram, "addr_child", "data_child")(system_states);
-				Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(system_states);
+				Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(system_states);
 				CondRot_Rational_Bool("div_result", "temp_bit")(system_states);
-				Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(system_states);
+				Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(system_states);
 				QRAMLoad(qram, "addr_child", "data_child")(system_states);
 				QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 				Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(system_states);
@@ -47,7 +47,7 @@ namespace qram_simulator {
 			}
 			ShiftLeft_InPlace("addr_parent", 1)(system_states);
 			Assign("addr_parent", "addr_child")(system_states);
-			Xgate_Bool("addr_child", 0)(system_states);
+			X_Bool("addr_child", 0)(system_states);
 			QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 			QRAMLoad(qram, "addr_child", "data_child")(system_states);
 			GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(system_states);
@@ -55,10 +55,10 @@ namespace qram_simulator {
 			GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(system_states);
 			QRAMLoad(qram, "addr_child", "data_child")(system_states);
 			QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
-			Xgate_Bool("addr_child", 0)(system_states);
+			X_Bool("addr_child", 0)(system_states);
 			Assign("addr_parent", "addr_child")(system_states);
 			Swap_Bool_Bool("temp_bit", 0, "addr_parent", 0)(system_states);
-			Xgate_Bool("addr_parent", addr_size)(system_states);
+			X_Bool("addr_parent", addr_size)(system_states);
 
 			SortByKey("addr_parent")(system_states);
 		}

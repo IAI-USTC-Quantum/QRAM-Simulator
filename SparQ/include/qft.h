@@ -65,13 +65,19 @@ namespace qram_simulator {
 		 */
 		void operator()(std::vector<System>& state) const;
 
+		/**
+		 * @brief 应用 dagger(逆 QFT)操作
+		 * @param state 系统状态向量
+		 */
+		void dag(std::vector<System>& state) const;
+
 	};
 
 	/**
 	 * @brief 逆量子傅里叶变换 (inverse QFT)
 	 * @details 对整数寄存器执行逆量子傅里叶变换
 	 */
-	struct inverseQFT : BaseOperator {
+	struct InverseQFT : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -90,13 +96,13 @@ namespace qram_simulator {
 		 * @brief 构造函数（名称版本）
 		 * @param reg_ins 寄存器名称
 		 */
-		inverseQFT(std::string_view reg_ins);
+		InverseQFT(std::string_view reg_ins);
 
 		/**
 		 * @brief 构造函数（ID 版本）
 		 * @param reg_in 寄存器 ID
 		 */
-		inverseQFT(size_t reg_in);
+		InverseQFT(size_t reg_in);
 
 		/**
 		 * @brief 获取指定位置的值（辅助函数）
@@ -124,6 +130,9 @@ namespace qram_simulator {
 		void operator()(std::vector<System>& state) const;
 
 	};
+
+	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
+	[[deprecated("use InverseQFT")]] using inverseQFT = InverseQFT;
 
 	/**
 	 * @brief 完整量子傅里叶变换

@@ -64,7 +64,7 @@ Boolean（布尔/单量子比特）
 
    # 施加单量子比特门
    state = ps.SparseState()
-   ps.Xgate_Bool("flag", 0)(state)  # 翻转
+   ps.X_Bool("flag", 0)(state)  # 翻转
    ps.Hadamard_Bool("flag")(state)   # Hadamard
 
 Rational（有理数/定点小数）
@@ -110,10 +110,10 @@ StateStorage 类
 .. code-block:: python
 
    # 正确：Boolean 寄存器用于单量子比特门
-   ps.Xgate_Bool("flag", 0)(state)
+   ps.X_Bool("flag", 0)(state)
 
    # 错误：UnsignedInteger 不能用于 Boolean 算子
-   # ps.Xgate_Bool("counter", 0)(state)  # 类型不匹配！
+   # ps.X_Bool("counter", 0)(state)  # 类型不匹配！
 
 类型选择建议
 ------------

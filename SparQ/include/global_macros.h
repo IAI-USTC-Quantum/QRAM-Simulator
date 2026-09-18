@@ -449,7 +449,7 @@ by_value_ptr(by_value_ptr_), by_value_size(by_value_size_)
  */
 #define CuConditionSatisfied(s) bool condition = true;\
 for (size_t i = 0; condition && (i < nonzeros_size); i++) condition &= (CuGetAsUint64(s, nonzeros_ptr[i].first, nonzeros_ptr[i].second) != 0);\
-for (size_t i = 0; condition && (i < all_ones_size); i++) condition &= (CuGetAsUint64(s, all_ones_ptr[i].first, all_ones_ptr[i].second) == pow2(all_ones_ptr[i].second) - 1);\
+for (size_t i = 0; condition && (i < all_ones_size); i++) condition &= (CuGetAsUint64(s, all_ones_ptr[i].first, all_ones_ptr[i].second) == width_mask(all_ones_ptr[i].second));\
 for (size_t i = 0; condition && (i < by_bit_size); i++) condition &= (get_digit(CuGetAsUint64(s, by_bit_ptr[i].first, by_bit_ptr[i].second), by_bit_ptr[i].second) == 1);\
 for (size_t i = 0; condition && (i < by_value_size); i++) condition &= (CuGetAsUint64(s, thrust::get<0>(by_value_ptr[i]), thrust::get<1>(by_value_ptr[i])) == thrust::get<2>(by_value_ptr[i]));\
 if (condition)

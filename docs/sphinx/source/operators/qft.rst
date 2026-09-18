@@ -19,7 +19,7 @@
    * - ``QFT``
      - 量子傅里叶变换
      - BaseOperator
-   * - ``inverseQFT``
+   * - ``InverseQFT``
      - 逆量子傅里叶变换
      - BaseOperator
 
@@ -82,10 +82,10 @@ QFT
    # 撤销（逆变换）
    op.dag(state)
 
-inverseQFT
+InverseQFT
 ---------
 
-.. autoclass:: pysparq.inverseQFT
+.. autoclass:: pysparq.InverseQFT
    :members:
    :undoc-members:
 
@@ -105,7 +105,7 @@ inverseQFT
    ps.Hadamard_Int_Full("q")(state)
 
    # 应用逆 QFT
-   ps.inverseQFT("q")(state)
+   ps.InverseQFT("q")(state)
 
    # 逆 QFT 和 QFT 互为逆运算
    ps.QFT("q")(state)
@@ -136,7 +136,7 @@ inverseQFT
    ps.Hadamard_Int_Full("phase")(state)
 
    # 应用逆 QFT 解析周期
-   ps.inverseQFT("phase")(state)
+   ps.InverseQFT("phase")(state)
 
    # 观测相位寄存器，确定周期
    # ...
@@ -156,7 +156,7 @@ inverseQFT
    # controlled_U(...)(state)
 
    # 3. 逆 QFT 提取相位
-   ps.inverseQFT("estimate")(state)
+   ps.InverseQFT("estimate")(state)
 
    # 4. 测量得到相位估计
    # ...
@@ -178,7 +178,7 @@ inverseQFT
    # 频域处理...
 
    # 变换回时域
-   ps.inverseQFT("signal")(state)
+   ps.InverseQFT("signal")(state)
 
 性能考虑
 --------
@@ -194,7 +194,7 @@ inverseQFT
 实际示例
 --------
 
-完整 QFT + inverseQFT 循环
+完整 QFT + InverseQFT 循环
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -221,8 +221,8 @@ inverseQFT
    print("\nQFT 后:")
    ps.pprint(state)
 
-   # inverseQFT
-   ps.inverseQFT("q")(state)
-   print("\ninverseQFT 后:")
+   # InverseQFT
+   ps.InverseQFT("q")(state)
+   print("\nInverseQFT 后:")
    ps.pprint(state)
    # 恢复到 |q=5⟩

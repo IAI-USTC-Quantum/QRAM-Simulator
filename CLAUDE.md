@@ -49,7 +49,7 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 - **`SparQ/include/sparse_state_simulator.h`** — Core state representation using `map<QIndex, Complex>` (only non-zero amplitudes stored)
 - **`SparQ/include/system_operations.h`** — Register management (creation, lifecycle, storage types: UnsignedInteger, SignedInteger, Boolean)
 - **`SparQ/include/quantum_arithmetic.h`** — Register-level arithmetic (Add_UInt_UInt, Mult_UInt_ConstUInt, Shift, etc.)
-- **`SparQ/include/basic_gates.h`** — Fundamental quantum gates (H, X, Y, Z, S, T, RX, RY, RZ, CNOT, Toffoli)
+- **`SparQ/include/basic_gates.h`** — Single-qubit gates (`X_Bool` … `U3_Bool`, plus the parameterized carriers `Phase_Bool` / `Rot_Bool`); operator naming follows `docs/naming_conventions.md`
 - **`SparQ/include/qft.h`** — Optimized QFT implementation
 - **`SparQ/include/qram.h`** — QRAM load operations
 - **`SparQ/include/condrot.h`** — Conditional rotations

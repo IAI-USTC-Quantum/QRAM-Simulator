@@ -171,12 +171,12 @@ namespace qram_simulator {
         }
     }
 
-    struct GlobalPhase_Int_Functor_Control {
+    struct GlobalPhase_Functor_Control {
         double c_real;
         double c_imag;
         CuCondition_Functor
 
-            GlobalPhase_Int_Functor_Control(double c_real, double c_imag, CuCondition_Params)
+            GlobalPhase_Functor_Control(double c_real, double c_imag, CuCondition_Params)
             : c_real(c_real), c_imag(c_imag), CuCondition_Init{
         }
 
@@ -191,11 +191,11 @@ namespace qram_simulator {
         }
     };
 
-    struct GlobalPhase_Int_Functor {
+    struct GlobalPhase_Functor {
         double c_real;
         double c_imag;
 
-        GlobalPhase_Int_Functor(double c_real, double c_imag)
+        GlobalPhase_Functor(double c_real, double c_imag)
             : c_real(c_real), c_imag(c_imag) {
         }
 
@@ -208,12 +208,12 @@ namespace qram_simulator {
         }
     };
 
-    struct GlobalPhase_Int_Functor_Control_Dag {
+    struct GlobalPhase_Functor_Control_Dag {
         double c_real;
         double c_imag;
         CuCondition_Functor
 
-            GlobalPhase_Int_Functor_Control_Dag(double c_real, double c_imag, CuCondition_Params)
+            GlobalPhase_Functor_Control_Dag(double c_real, double c_imag, CuCondition_Params)
             : c_real(c_real), c_imag(c_imag), CuCondition_Init{
         }
 
@@ -228,11 +228,11 @@ namespace qram_simulator {
         }
     };
 
-    struct GlobalPhase_Int_Dag_Functor {
+    struct GlobalPhase_Dag_Functor {
         double c_real;
         double c_imag;
 
-        GlobalPhase_Int_Dag_Functor(double c_real, double c_imag)
+        GlobalPhase_Dag_Functor(double c_real, double c_imag)
             : c_real(c_real), c_imag(c_imag) {
         }
 
@@ -245,15 +245,15 @@ namespace qram_simulator {
         }
     };
 
-    void GlobalPhase_Int::operator()(CuSparseState& state) const
+    void GlobalPhase::operator()(CuSparseState& state) const
     {
-        profiler _("GlobalPhase_Int cuda");
+        profiler _("GlobalPhase cuda");
         state.move_to_gpu();
         if (!HasCondition)
         {
             thrust::for_each(thrust::device,
                 state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-                GlobalPhase_Int_Functor(c.real(), c.imag())
+                GlobalPhase_Functor(c.real(), c.imag())
             );
         }
         else
@@ -261,20 +261,20 @@ namespace qram_simulator {
             CuCondition_Host_Prepare
             thrust::for_each(thrust::device,
                 state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-                GlobalPhase_Int_Functor_Control(c.real(), c.imag(), CuCondition_Args)
+                GlobalPhase_Functor_Control(c.real(), c.imag(), CuCondition_Args)
             );
         }
     }
 
-    void GlobalPhase_Int::dag(CuSparseState& state) const
+    void GlobalPhase::dag(CuSparseState& state) const
     {
-        profiler _("GlobalPhase_Int(dag) cuda");
+        profiler _("GlobalPhase(dag) cuda");
         state.move_to_gpu();
         if (!HasCondition)
         {
             thrust::for_each(thrust::device,
                 state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-                GlobalPhase_Int_Dag_Functor(c.real(), c.imag())
+                GlobalPhase_Dag_Functor(c.real(), c.imag())
             );
         }
         else
@@ -282,7 +282,7 @@ namespace qram_simulator {
             CuCondition_Host_Prepare
             thrust::for_each(thrust::device,
                 state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-                GlobalPhase_Int_Functor_Control_Dag(c.real(), c.imag(), CuCondition_Args)
+                GlobalPhase_Functor_Control_Dag(c.real(), c.imag(), CuCondition_Args)
             );
         }
     }

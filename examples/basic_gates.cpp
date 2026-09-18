@@ -37,7 +37,7 @@ void example_single_qubit_gates() {
     (StatePrint(Detail))(state);
     
     // Pauli-X gate (NOT gate): |0> -> |1>
-    (Xgate_Bool(qubit))(state);
+    (X_Bool(qubit))(state);
     std::cout << "After X gate (|0> -> |1>):" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -47,7 +47,7 @@ void example_single_qubit_gates() {
     (StatePrint(Detail))(state);
     
     // Pauli-Z gate: flips the sign of |1>
-    (Zgate_Bool(qubit))(state);
+    (Z_Bool(qubit))(state);
     std::cout << "After Z gate (phase flip):" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -67,13 +67,13 @@ void example_multi_qubit_gates() {
     (StatePrint(Detail))(state);
     
     // Apply X to first qubit: |00> -> |10>
-    (Xgate_Bool(q0))(state);
+    (X_Bool(q0))(state);
     std::cout << "After X on q0 (|10>):" << std::endl;
     (StatePrint(Detail))(state);
     
     // CNOT: Control=q0, Target=q1
     // |10> -> |11>
-    (Xgate_Bool(q1).conditioned_by_all_ones(q0))(state);
+    (X_Bool(q1).conditioned_by_all_ones(q0))(state);
     std::cout << "After CNOT(q0->q1) (|11>):" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -84,7 +84,7 @@ void example_multi_qubit_gates() {
     q1 = AddRegister("q1", Boolean, 1)(state);
     
     (Hadamard_Bool(q0))(state);
-    (Xgate_Bool(q1).conditioned_by_all_ones(q0))(state);
+    (X_Bool(q1).conditioned_by_all_ones(q0))(state);
     std::cout << "Bell state (|00> + |11>)/sqrt(2):" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -120,12 +120,12 @@ void example_rotation_gates() {
     auto qubit = AddRegister("q", Boolean, 1)(state);
     
     // Apply X gate first to get |1>
-    (Xgate_Bool(qubit))(state);
+    (X_Bool(qubit))(state);
     std::cout << "Initial |1> state:" << std::endl;
     (StatePrint(Detail))(state);
     
     // RX rotation by pi/2
-    (RXgate_Bool(qubit, M_PI / 2))(state);
+    (RX_Bool(qubit, M_PI / 2))(state);
     std::cout << "After RX(pi/2):" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -150,7 +150,7 @@ void example_controlled_operations() {
     (StatePrint(Detail))(state);
     
     // Apply X to target conditioned on control value = 2 (binary: 10)
-    (Xgate_Bool(target).conditioned_by_value(ctrl, 2))(state);
+    (X_Bool(target).conditioned_by_value(ctrl, 2))(state);
     std::cout << "After X on target when ctrl=2:" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -162,7 +162,7 @@ void example_controlled_operations() {
     
     (Hadamard_Int_Full(ctrl))(state);
     // Control by specific bit positions
-    (Xgate_Bool(target).conditioned_by_bit({{ctrl, 0}}))(state);
+    (X_Bool(target).conditioned_by_bit({{ctrl, 0}}))(state);
     std::cout << "After X on target when ctrl[0]=1:" << std::endl;
     (StatePrint(Detail))(state);
     
@@ -211,7 +211,7 @@ void example_qram_with_gates() {
     
     // For simplicity, let's use value-based conditioning
     // Apply X to aux when data = 3 (address 2)
-    (Xgate_Bool(aux).conditioned_by_value(data_reg, 3))(state);
+    (X_Bool(aux).conditioned_by_value(data_reg, 3))(state);
     std::cout << "After conditional X on aux (when data=3):" << std::endl;
     (StatePrint(Detail))(state);
     

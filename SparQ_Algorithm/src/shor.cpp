@@ -158,7 +158,7 @@ namespace qram_simulator
 			std::vector<System> state;
 			state.emplace_back();
 			std::vector<uint64_t> res;
-			Xgate_Bool(ancilla_reg, 0)(state);
+			X_Bool(ancilla_reg, 0)(state);
 			for (size_t x = 0; x < size; ++x)
 			{
 				size_t work_reg = AddRegisterWithHadamard("work_reg", UnsignedInteger, 1)(state);
@@ -200,7 +200,7 @@ namespace qram_simulator
 			auto&& [measured_results, prob] = PartialTrace(std::vector{ ancilla_reg })(state);
 			fmt::print("PartialTrace finished.\n");
 			QFT_Full(work_reg).dag(state);
-			fmt::print("inverseQFT finished.\n");
+			fmt::print("InverseQFT finished.\n");
 		}
 	}
 }

@@ -240,16 +240,16 @@ def test_sparse_state_clone_is_independent():
 
         cloned = state.clone()
         copied = ps.SparseState(state)
-        ps.Xgate_Bool("q", 0)(cloned)
+        ps.X_Bool("q", 0)(cloned)
 
         assert ps.Probability("q", 0)(state) == pytest.approx(1.0)
         assert ps.Probability("q", 0)(copied) == pytest.approx(1.0)
         assert ps.Probability("q", 1)(cloned) == pytest.approx(1.0)
 
-        ps.Xgate_Bool("q", 0)(state)
+        ps.X_Bool("q", 0)(state)
         assert ps.Probability("q", 0)(copied) == pytest.approx(1.0)
-        ps.Xgate_Bool("q", 0)(copied)
-        ps.Xgate_Bool("q", 0)(state)
+        ps.X_Bool("q", 0)(copied)
+        ps.X_Bool("q", 0)(state)
         assert ps.Probability("q", 0)(state) == pytest.approx(1.0)
         assert ps.Probability("q", 1)(copied) == pytest.approx(1.0)
         assert ps.Probability("q", 1)(cloned) == pytest.approx(1.0)
@@ -265,13 +265,13 @@ class TestMeasureZNormalizationValidation:
     """
 
     def test_measure_rejects_state_scaled_up(self):
-        """GlobalPhase_Int accepts an arbitrary complex factor (not only unit
+        """GlobalPhase accepts an arbitrary complex factor (not only unit
         modulus), so it is a convenient, already-public way to construct a
         deliberately non-normalized state for this negative test."""
         _setup_two_registers()
         state = ps.SparseState()
         ps.Init_Unsafe("a", 1)(state)
-        ps.GlobalPhase_Int(2.0 + 0j)(state)  # total probability becomes 4.0
+        ps.GlobalPhase(2.0 + 0j)(state)  # total probability becomes 4.0
 
         with pytest.raises(RuntimeError):
             ps.MeasureZ("a")(state)
@@ -280,7 +280,7 @@ class TestMeasureZNormalizationValidation:
         _setup_two_registers()
         state = ps.SparseState()
         ps.Init_Unsafe("a", 1)(state)
-        ps.GlobalPhase_Int(0.5 + 0j)(state)  # total probability becomes 0.25
+        ps.GlobalPhase(0.5 + 0j)(state)  # total probability becomes 0.25
 
         with pytest.raises(RuntimeError):
             ps.MeasureZ("a")(state)
@@ -291,7 +291,7 @@ class TestMeasureZNormalizationValidation:
         _setup_two_registers()
         state = ps.SparseState()
         ps.Init_Unsafe("a", 1)(state)
-        ps.GlobalPhase_Int(2.0 + 0j)(state)
+        ps.GlobalPhase(2.0 + 0j)(state)
 
         with pytest.raises(RuntimeError):
             ps.Reset("a")(state)
@@ -302,7 +302,7 @@ class TestMeasureZNormalizationValidation:
         _setup_two_registers()
         state = ps.SparseState()
         ps.Init_Unsafe("a", 1)(state)
-        ps.GlobalPhase_Int(1.0 + 1e-8 + 0j)(state)  # |c|^2 - 1 ~ 2e-8
+        ps.GlobalPhase(1.0 + 1e-8 + 0j)(state)  # |c|^2 - 1 ~ 2e-8
 
         outcome, prob = ps.MeasureZ("a")(state)
         assert outcome == [1]

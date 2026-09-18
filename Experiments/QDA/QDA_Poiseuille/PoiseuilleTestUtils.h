@@ -721,7 +721,7 @@ int PoiseuilleTest_via_QRAM_nonPD(size_t nqubit, double step_rate, double p, dou
 	state.emplace_back();
 
 	(Hadamard_Int_Full(main_reg))(state);
-	//Xgate_Bool(anc_1, 0)(state);
+	//X_Bool(anc_1, 0)(state);
 
 	double kappa = get_kappa_Tridiagonal(alpha, beta, pow2(nqubit));
 	fmt::print("kappa = {}\n", kappa);

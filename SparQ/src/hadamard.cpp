@@ -462,9 +462,9 @@ namespace qram_simulator
 		return position;
 	}
 
-	void Hadamard_PartialQubit::operate(size_t l, size_t r, std::vector<System>& state) const
+	void Hadamard_Partial::operate(size_t l, size_t r, std::vector<System>& state) const
 	{
-		profiler _("Hadamard_PartialQubit::operate");
+		profiler _("Hadamard_Partial::operate");
 		size_t n = r - l; // number of Feynman paths in same interference pattern
 		size_t full_size = pow2(qubit_positions.size());
 		size_t original_size = state.size();
@@ -585,7 +585,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Hadamard_PartialQubit::operate_pair(size_t zero, size_t one, std::vector<System>& state) const
+	void Hadamard_Partial::operate_pair(size_t zero, size_t one, std::vector<System>& state) const
 	{	// only for single qubit
 		complex_t a = state[zero].amplitude;
 		complex_t b = state[one].amplitude;
@@ -593,7 +593,7 @@ namespace qram_simulator
 		state[one].amplitude = a * sqrt2inv - b * sqrt2inv;
 	}
 
-	void Hadamard_PartialQubit::operate_alone_zero(size_t zero, std::vector<System>& state) const
+	void Hadamard_Partial::operate_alone_zero(size_t zero, std::vector<System>& state) const
 	{	// only for single qubit
 		state.push_back(state[zero]);
 		state.back().get(id).value |= (~mask);
@@ -602,7 +602,7 @@ namespace qram_simulator
 		state.back().amplitude *= sqrt2inv;
 	}
 
-	void Hadamard_PartialQubit::operate_alone_one(size_t one, std::vector<System>& state) const
+	void Hadamard_Partial::operate_alone_one(size_t one, std::vector<System>& state) const
 	{	// only for single qubit
 		state.push_back(state[one]);
 		state.back().get(id).value &= mask;
@@ -611,12 +611,12 @@ namespace qram_simulator
 		state[one].amplitude *= (-sqrt2inv);
 	}
 
-	void Hadamard_PartialQubit::operator()(std::vector<System>& state) const
+	void Hadamard_Partial::operator()(std::vector<System>& state) const
 	{
 		bool use_hash = true;
 		if (!use_hash)
 		{
-			profiler _("Hadamard_PartialQubit_v1");
+			profiler _("Hadamard_Partial_v1");
 			(SortExceptKeyHadamard(id, qubit_positions))(state);
 			size_t current_size = state.size();
 			auto iter_l = 0;
@@ -644,7 +644,7 @@ namespace qram_simulator
 			System::update_max_size(state.size());
 		}
 		else {
-			profiler _("Hadamard_PartialQubit_v2");
+			profiler _("Hadamard_Partial_v2");
 			if (!state.size()) return;
 #ifdef SAFE_HASH
 			StateLessExceptQubits pred(id, qubit_positions);

@@ -37,6 +37,11 @@ namespace qram_simulator {
 		return (static_cast<uint64_t>(1ull)) << (n);
 	}
 
+	HOST_DEVICE constexpr uint64_t width_mask(size_t width)
+	{
+		return width == 64 ? ~uint64_t{0} : pow2(width) - 1;
+	}
+
 	constexpr size_t log2(uint64_t n) {
 		size_t ret = 0;
 		while (n > 1) {
@@ -108,6 +113,21 @@ namespace qram_simulator {
 	HOST_DEVICE	constexpr int64_t get_complement(uint64_t data, size_t data_sz)
 	{
 		return data_sz ? (int64_t)(data << (64 - data_sz)) >> (64 - data_sz) : 0;
+	}
+
+	// 整数平方根（下取整）：纯整数逐位算法，无浮点参与，
+	// CPU 与 CUDA 结果按位一致（docs/operators.md《宽度与截断约定》）
+	HOST_DEVICE inline uint64_t isqrt_u64(uint64_t n)
+	{
+		uint64_t rem = 0, root = 0;
+		const int digits = 32;
+		for (int i = digits - 1; i >= 0; --i) {
+			rem = (rem << 2) | ((n >> (2 * i)) & 3ull);
+			root <<= 1;
+			const uint64_t trial = (root << 1) + 1;
+			if (rem >= trial) { rem -= trial; root |= 1ull; }
+		}
+		return root;
 	}
 
 #ifdef __CUDACC__

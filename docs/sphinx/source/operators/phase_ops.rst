@@ -22,7 +22,7 @@
    * - ``Reflection_Bool``
      - 关于 ``|0⟩`` 态的反射（Grover 扩散）
      - SelfAdjoint
-   * - ``GlobalPhase_Int``
+   * - ``GlobalPhase``
      - 全局相位乘以复数因子
      - BaseOperator
 
@@ -100,10 +100,10 @@ Reflection_Bool（反射）
 
 ---
 
-GlobalPhase_Int（全局相位）
+GlobalPhase（全局相位）
 --------------------------
 
-.. autoclass:: pysparq.GlobalPhase_Int
+.. autoclass:: pysparq.GlobalPhase
    :members:
    :undoc-members:
 
@@ -120,7 +120,7 @@ GlobalPhase_Int（全局相位）
    import numpy as np
 
    # 全局相位旋转 e^{iπ/4}
-   op = ps.GlobalPhase_Int(np.exp(1j * np.pi / 4))
+   op = ps.GlobalPhase(np.exp(1j * np.pi / 4))
    op(state)
 
    # 撤销

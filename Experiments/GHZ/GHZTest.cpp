@@ -51,7 +51,7 @@ std::chrono::duration<double> GHZTest(size_t nqubit)
     Hadamard_Bool("ctrl")(state);
     for (int i = 1; i < remainder + 1; i++)
     {
-        Xgate_Bool("main", i-1).conditioned_by_all_ones("ctrl")(state);
+        X_Bool("main", i-1).conditioned_by_all_ones("ctrl")(state);
     }
     for (auto reg : reg_names) {
         FlipBools(System::get(reg)).conditioned_by_all_ones("ctrl")(state);

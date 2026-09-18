@@ -34,7 +34,7 @@ TEST_F(BasicGatesTest, PauliXOnZero)
     std::vector<System> state;
     state.emplace_back();  // |0>
 
-    Xgate_Bool("q")(state);
+    X_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -48,7 +48,7 @@ TEST_F(BasicGatesTest, PauliXOnOne)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);  // |1>
 
-    Xgate_Bool("q")(state);
+    X_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -61,8 +61,8 @@ TEST_F(BasicGatesTest, PauliXTwiceIsIdentity)
     std::vector<System> state;
     state.emplace_back();  // |0>
 
-    Xgate_Bool("q")(state);
-    Xgate_Bool("q")(state);
+    X_Bool("q")(state);
+    X_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -77,7 +77,7 @@ TEST_F(BasicGatesTest, PauliYOnZero)
     std::vector<System> state;
     state.emplace_back();  // |0>
 
-    Ygate_Bool("q")(state);
+    Y_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -92,7 +92,7 @@ TEST_F(BasicGatesTest, PauliYOnOne)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);  // |1>
 
-    Ygate_Bool("q")(state);
+    Y_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -108,7 +108,7 @@ TEST_F(BasicGatesTest, PauliZOnZero)
     std::vector<System> state;
     state.emplace_back();  // |0>
 
-    Zgate_Bool("q")(state);
+    Z_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -123,7 +123,7 @@ TEST_F(BasicGatesTest, PauliZOnOne)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);  // |1>
 
-    Zgate_Bool("q")(state);
+    Z_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -139,7 +139,7 @@ TEST_F(BasicGatesTest, SGateOnZero)
     std::vector<System> state;
     state.emplace_back();
 
-    Sgate_Bool("q")(state);
+    S_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -153,7 +153,7 @@ TEST_F(BasicGatesTest, SGateOnOne)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);
 
-    Sgate_Bool("q")(state);
+    S_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -167,8 +167,8 @@ TEST_F(BasicGatesTest, SGateTwiceIsZGate)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);
 
-    Sgate_Bool("q")(state);
-    Sgate_Bool("q")(state);
+    S_Bool("q")(state);
+    S_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -184,7 +184,7 @@ TEST_F(BasicGatesTest, TGateOnZero)
     std::vector<System> state;
     state.emplace_back();
 
-    Tgate_Bool("q")(state);
+    T_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 0);
@@ -198,7 +198,7 @@ TEST_F(BasicGatesTest, TGateOnOne)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);
 
-    Tgate_Bool("q")(state);
+    T_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -214,10 +214,10 @@ TEST_F(BasicGatesTest, TGateFourTimesIsZGate)
     state.emplace_back();
     Init_Unsafe("q", 1)(state);
 
-    Tgate_Bool("q")(state);
-    Tgate_Bool("q")(state);
-    Tgate_Bool("q")(state);
-    Tgate_Bool("q")(state);
+    T_Bool("q")(state);
+    T_Bool("q")(state);
+    T_Bool("q")(state);
+    T_Bool("q")(state);
 
     ASSERT_EQ(state.size(), 1);
     EXPECT_EQ(getRegValue(state[0], q, 1), 1);
@@ -233,14 +233,14 @@ TEST_F(BasicGatesTest, PauliXOnEachQubitOf2QubitRegister)
     state.emplace_back();  // |00>
 
     // Flip bit 0: |00> -> |01>
-    Xgate_Bool("q", 0)(state);
+    X_Bool("q", 0)(state);
     EXPECT_EQ(getRegValue(state[0], q, 2), 1);
 
     // Flip bit 1: |01> -> |11>
-    Xgate_Bool("q", 1)(state);
+    X_Bool("q", 1)(state);
     EXPECT_EQ(getRegValue(state[0], q, 2), 3);
 
     // Flip bit 0 again: |11> -> |10>
-    Xgate_Bool("q", 0)(state);
+    X_Bool("q", 0)(state);
     EXPECT_EQ(getRegValue(state[0], q, 2), 2);
 }

@@ -76,6 +76,10 @@ __all__ = [
     "assert_superposition_linearity",
     "assert_controls",
     "sample_values",
+    "two_complement_decode",
+    "sign_extend",
+    "WIDTH_BOUNDARIES",
+    "width_matrix_case",
 ]
 
 
@@ -363,7 +367,7 @@ def assert_superposition_linearity(
     # applying the operator. This is required (not merely convenient) when
     # an in-place bijective operator overwrites one of the very registers
     # that was put into superposition (e.g. Swap_General_General,
-    # Xgate_Bool) — reading registers only works after the C++ call
+    # X_Bool) — reading registers only works after the C++ call
     # returns, so the branch order (stable, since the operator must not
     # reorder/merge/split branches for a classical leaf) is used to align
     # each branch's pre-image with its post-image.
@@ -490,3 +494,162 @@ def assert_controls(
             assert (
                 got == action_output
             ), f"single control {name} active did not apply action: got {got}"
+
+
+# ---------------------------------------------------------------------------
+# Width & truncation convention helpers (docs/operators.md《宽度与截断约定》)
+# ---------------------------------------------------------------------------
+
+
+def two_complement_decode(value: int, width: int) -> int:
+    """Decode a two's-complement bit pattern of the given width.
+
+    Mirrors the SparQ ``get_complement`` read used by ``_SInt_`` slots.
+    """
+    value &= (1 << width) - 1
+    if width and (value >> (width - 1)):
+        return value - (1 << width)
+    return value
+
+
+def sign_extend(value: int, width: int) -> int:
+    """Sign-extend a bit pattern per the ``_SInt_`` slot rule."""
+    return two_complement_decode(value, width)
+
+
+#: Boundary widths the width matrix must cover (1..64 supported; 63/64 are
+#: the shift/mask UB boundaries fixed alongside this harness).
+WIDTH_BOUNDARIES: tuple[int, ...] = (1, 2, 3, 5, 8, 63, 64)
+
+
+def width_matrix_case(
+    *,
+    label: str,
+    specs_factory: Callable[[tuple[int, ...]], Sequence[RegisterSpec]],
+    make_op: Callable[[Mapping[str, int]], "ps.BaseOperator"],
+    model: Callable[[Mapping[str, int], Mapping[str, int]], Mapping[str, int]],
+    input_names: Sequence[str],
+    output_names: Sequence[str],
+    width_combos: Sequence[tuple[int, ...]],
+    max_exhaustive_pairs: int = 4096,
+    sampled_pairs: int = 48,
+    superposition_max_bits: int = 6,
+    control_case: tuple[tuple[int, ...], Sequence[RegisterSpec], Mapping[str, int], Mapping[str, int]] | None = None,
+    rng: random.Random | None = None,
+) -> None:
+    """Run the full conformance matrix across a set of width combinations.
+
+    Implements the reversibility coverage required by 《宽度与截断约定》:
+    for every combo in ``width_combos`` (a tuple of widths, one per register
+    in the order ``specs_factory`` expects):
+
+    * **model check** — the forward map (basis exhaustive when the swept
+      input space is small, sampled otherwise, always including 0/1/all-ones
+      edge values) must equal ``model(values, widths)`` XOR-ed into the
+      starting output values, with inputs untouched;
+    * **collision check at nonzero output starts** — the ``xor_into``
+      bijection must hold for arbitrary starting output values;
+    * **dagger identity in both orders** (self-adjoint ops: ``dag == call``);
+    * **superposition linearity** for combos whose swept input bits fit
+      ``superposition_max_bits``;
+    * **controls** once per call when ``control_case`` is provided.
+
+    ``model(values, widths)`` returns a mapping of *output-name -> increment*
+    (the value XOR-ed into an initially-zero output register); ``make_op``
+    receives the per-register widths (``name -> width``) and constructs the
+    operator under test.
+    """
+    rng = rng or random.Random(1234)
+    touched = list(input_names) + list(output_names)
+
+    for combo in width_combos:
+        specs = specs_factory(combo)
+        assert len(specs) == len(combo), (
+            f"{label}: specs_factory returned {len(specs)} specs for combo {combo}"
+        )
+        setup_registers(specs)
+        masks = {spec.name: spec.mask for spec in specs}
+        widths = {spec.name: spec.width for spec in specs}
+
+        pools = [
+            sample_values(widths[name], max_exhaustive=5, samples=8, rng=rng)
+            for name in input_names
+        ]
+        total_pairs = 1
+        for pool in pools:
+            total_pairs *= len(pool)
+        if total_pairs <= max_exhaustive_pairs:
+            sweep = {name: pool for name, pool in zip(input_names, pools)}
+            pairs = list(_iter_combos(sweep))
+        else:
+            all_pairs = list(_iter_combos({n: p for n, p in zip(input_names, pools)}))
+            step = max(1, len(all_pairs) // max(1, sampled_pairs))
+            pairs = all_pairs[::step][:sampled_pairs]
+            # 碰撞/dagger 辅助检查接受 sweep 字典(内部做笛卡尔积),
+            # 用选中对的坐标并集——它是选中对的有界超集。
+            sweep = {
+                name: sorted({c[name] for c in pairs}) for name in input_names
+            }
+
+        # 1. model check — zero and nonzero output starts, inputs untouched.
+        output_starts = [{}]
+        if output_names:
+            output_starts.append({name: (masks[name] // 2 or 1) for name in output_names})
+        for start in output_starts:
+            for combo_values in pairs:
+                values = {**combo_values, **start}
+                state = make_basis_state(values)
+                make_op(widths)(state)
+                got = dict(zip(touched, read_registers(state, touched, masks)))
+                for name in input_names:
+                    expected_in = values[name] & masks[name]
+                    assert got[name] == expected_in, (
+                        f"{label} {combo}: input register {name} modified: "
+                        f"{got[name]} != {expected_in}"
+                    )
+                increment = model(combo_values, widths)
+                for name in output_names:
+                    expected = (values.get(name, 0) ^ increment[name]) & masks[name]
+                    assert got[name] == expected, (
+                        f"{label} {combo} {combo_values} start={start}: output "
+                        f"{name} = {got[name]}, expected {expected} "
+                        f"({values.get(name, 0)} ^ {increment[name]})"
+                    )
+
+        op_factory = lambda w=widths: make_op(w)  # noqa: E731
+        assert_collision_free_for_output_starts(
+            op_factory,
+            touched,
+            masks,
+            sweep,
+            {
+                name: [0, 1, masks[name] // 2, masks[name]]
+                for name in output_names
+            },
+        )
+        assert_forward_dagger_identity(op_factory, touched, masks, sweep)
+        assert_dagger_forward_identity(op_factory, touched, masks, sweep)
+
+        swept_bits = sum(widths[name] for name in input_names)
+        if swept_bits <= superposition_max_bits:
+            hadamard_regs = [(name, widths[name]) for name in input_names]
+            assert_superposition_linearity(
+                op_factory, touched, masks, hadamard_regs
+            )
+
+    if control_case is not None:
+        combo, control_specs, active, inactive = control_case
+        specs = specs_factory(combo)
+        setup_registers(list(specs) + list(control_specs))
+        masks = {spec.name: spec.mask for spec in list(specs) + list(control_specs)}
+        widths = {spec.name: spec.width for spec in specs}
+        assert_controls(
+            lambda: make_op(widths),
+            touched,
+            masks,
+            control_specs,
+            active,
+            inactive,
+            fixed={},
+            conditioned_by="nonzeros",
+        )

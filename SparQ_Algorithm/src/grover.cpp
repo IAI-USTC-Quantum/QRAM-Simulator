@@ -103,7 +103,7 @@ namespace qram_simulator {
 
 			// auto&& [measured_results, prob] = PartialTrace(std::vector{ addr_reg, data_reg, search_data_reg })(state);
 
-			(inverseQFT(count_reg))(state);
+			(InverseQFT(count_reg))(state);
 		}
 	}
 }//namespace qram_simulator

@@ -100,9 +100,9 @@ g++ -std=c++17 -I./SparQ/include -I./QRAM/include -I./Common/include \
 - Integration of gates with QRAM
 
 **Functions Demonstrated**:
-- `Xgate_Bool`, `Ygate_Bool`, `Zgate_Bool`
+- `X_Bool`, `Y_Bool`, `Z_Bool`
 - `Hadamard_Bool`, `Hadamard_Int_Full`
-- `RXgate_Bool`, `RYgate_Bool`, `RZgate_Bool`
+- `RX_Bool`, `RY_Bool`, `RZ_Bool`
 - `conditioned_by_all_ones()`, `conditioned_by_value()`, `conditioned_by_bit()`
 
 **Run**:

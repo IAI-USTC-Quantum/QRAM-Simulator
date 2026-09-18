@@ -68,27 +68,27 @@ namespace qram_simulator {
 
 					(Hadamard_Bool(anc_3))(state);
 					enc_b.dag(state);
-					Xgate_Bool(anc_1, 0)(state);
+					X_Bool(anc_1, 0)(state);
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_1, anc_3, anc_4 })(state);
-					Xgate_Bool(anc_1, 0)(state);
+					X_Bool(anc_1, 0)(state);
 					enc_b(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Rot_Bool(anc_2, R_s).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Hadamard_Bool(anc_2).conditioned_by_all_ones(anc_4)(state);
 					enc_A_copy.conditioned_by_all_ones({ anc_1, anc_2 })(state);
-					Xgate_Bool(anc_1, 0).conditioned_by_all_ones(anc_2)(state);
+					X_Bool(anc_1, 0).conditioned_by_all_ones(anc_2)(state);
 					Reflection_Bool(anc_2, true).conditioned_by_all_ones(anc_1)(state);
 					enc_A_copy.conditioned_by_all_ones({ anc_1, anc_2 }).dag(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Hadamard_Bool(anc_2).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Rot_Bool(anc_2, R_s).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					enc_b.dag(state);
-					Xgate_Bool(anc_1, 0)(state);
+					X_Bool(anc_1, 0)(state);
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_1, anc_3, anc_4 })(state);
-					Xgate_Bool(anc_1, 0)(state);
+					X_Bool(anc_1, 0)(state);
 					enc_b(state);
 					(Hadamard_Bool(anc_3))(state);
 				}
@@ -108,19 +108,19 @@ namespace qram_simulator {
 					enc_b.dag(state);
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_1, anc_3, anc_4 })(state);
 					enc_b(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Rot_Bool(anc_2, R_s).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Hadamard_Bool(anc_2).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					enc_A_copy.conditioned_by_all_ones({ anc_1, anc_2 })(state);
 					Reflection_Bool(anc_2, true).conditioned_by_all_ones(anc_1)(state);
-					Xgate_Bool(anc_1, 0).conditioned_by_all_ones(anc_2)(state);
+					X_Bool(anc_1, 0).conditioned_by_all_ones(anc_2)(state);
 					enc_A_copy.conditioned_by_all_ones({ anc_1, anc_2 }).dag(state);
 					Hadamard_Bool(anc_2).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					Rot_Bool(anc_2, R_s).conditioned_by_all_ones(anc_4)(state);
-					Xgate_Bool(anc_4, 0)(state);
+					X_Bool(anc_4, 0)(state);
 					enc_b.dag(state);
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_1, anc_3, anc_4 })(state);
 					enc_b(state);
@@ -190,17 +190,17 @@ namespace qram_simulator {
 					enc_b.dag(state);					
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_2, anc_3 })(state);
 					enc_b(state);
-					Xgate_Bool(anc_3, 0)(state);
+					X_Bool(anc_3, 0)(state);
 					Rot_Bool(anc_1, R_s).conditioned_by_all_ones(anc_3)(state);
-					Xgate_Bool(anc_3, 0)(state);
+					X_Bool(anc_3, 0)(state);
 					Hadamard_Bool(anc_1).conditioned_by_all_ones(anc_3)(state);
 					enc_A_copy.conditioned_by_all_ones(std::vector<std::string>{ anc_1, anc_3 })(state);
-					Xgate_Bool(anc_3, 0)(state);
+					X_Bool(anc_3, 0)(state);
 					enc_A_copy.conditioned_by_all_ones(std::vector<std::string>{ anc_1, anc_3 }).dag(state);
 					Hadamard_Bool(anc_1).conditioned_by_all_ones(anc_3)(state);
-					Xgate_Bool(anc_3, 0)(state);
+					X_Bool(anc_3, 0)(state);
 					Rot_Bool(anc_1, R_s).conditioned_by_all_ones(anc_3)(state);
-					Xgate_Bool(anc_3, 0)(state);
+					X_Bool(anc_3, 0)(state);
 					enc_b.dag(state);
 					Reflection_Bool(main_reg, true).conditioned_by_all_ones({ anc_2, anc_3 })(state);
 					enc_b(state);
@@ -274,7 +274,7 @@ namespace qram_simulator {
 				}
 				MERGE_BY_CONDITIONS
 
-				(GlobalPhase_Int(phase))(state);
+				(GlobalPhase(phase))(state);
 			}
 
 			template<typename Ty>
@@ -282,7 +282,7 @@ namespace qram_simulator {
 			{
 				profiler _("Walk_s::dag");
 
-				(GlobalPhase_Int(-phase))(state);
+				(GlobalPhase(-phase))(state);
 
 				SPLIT_BY_CONDITIONS
 				{
@@ -700,9 +700,9 @@ namespace qram_simulator{
 				(Hadamard_Int_Full(anc_h))(state);
 				LCU<Walk_type>(Walk, index, stdout_filename).conditioned_by_all_ones(anc_h)(state);
 
-				Xgate_Bool(anc_h, 0)(state);
+				X_Bool(anc_h, 0)(state);
 				LCU<Walk_type>(Walk, index, stdout_filename).conditioned_by_all_ones(anc_h).dag(state);
-				Xgate_Bool(anc_h, 0)(state);
+				X_Bool(anc_h, 0)(state);
 
 				(Hadamard_Int_Full(anc_h))(state);
 				State_Prep_via_QRAM(qram_w, index, data_size, rational_size).dag(state);

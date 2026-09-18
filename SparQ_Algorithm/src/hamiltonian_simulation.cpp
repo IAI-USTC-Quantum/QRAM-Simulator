@@ -123,7 +123,7 @@ namespace qram_simulator {
 		}
 
 
-		QuantumBinarySearchFast::QuantumBinarySearchFast(
+		QuantumBinarySearch_Fast::QuantumBinarySearch_Fast(
 			qram_qutrit::QRAMCircuit* qram_,
 			std::string_view address_offset_register_name_,
 			size_t total_length_,
@@ -139,7 +139,7 @@ namespace qram_simulator {
 			result_id = System::get(result_register_name_);
 		}
 
-		QuantumBinarySearchFast::QuantumBinarySearchFast(
+		QuantumBinarySearch_Fast::QuantumBinarySearch_Fast(
 			qram_qutrit::QRAMCircuit* qram_,
 			size_t address_offset_register_name_,
 			size_t total_length_,
@@ -155,7 +155,7 @@ namespace qram_simulator {
 			result_id = result_register_name_;
 		}
 
-		size_t QuantumBinarySearchFast::binary_search(size_t offset, size_t target) const
+		size_t QuantumBinarySearch_Fast::binary_search(size_t offset, size_t target) const
 		{
 			const auto& mem = qram->memory;
 			size_t l = offset;
@@ -174,7 +174,7 @@ namespace qram_simulator {
 			return 0;
 		}
 
-		void QuantumBinarySearchFast::operator()(std::vector<System>& state) const
+		void QuantumBinarySearch_Fast::operator()(std::vector<System>& state) const
 		{
 			profiler _("QBS_Fast");
 	#ifdef SINGLE_THREAD
@@ -362,7 +362,7 @@ namespace qram_simulator {
 			// Cancel extra offset 
 			// |sparse_offset>|k>|l + SearchResult (l+offset)> ->
 			// |sparse_offset>|k>|l + SearchResult (l)> ->
-			AddAssign_AnyInt_AnyInt_InPlace(l, sparse_offset).dag(system_states);
+			Add_AnyInt_AnyInt_InPlace(l, sparse_offset).dag(system_states);
 		}
 
 			void CondRot_General_Bool_QW::operate(size_t l, size_t r, std::vector<System>& state, walk_angle_function_t func) const

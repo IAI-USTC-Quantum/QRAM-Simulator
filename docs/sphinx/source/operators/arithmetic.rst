@@ -29,7 +29,7 @@
      - ``result ^= lhs + const``
      - Out-of-place
      - SelfAdjoint
-   * - ``Add_ConstUInt``
+   * - ``Add_ConstUInt_InPlace``
      - ``reg += const``
      - In-place
      - BaseOperator
@@ -37,19 +37,19 @@
      - ``result ^= input * const``
      - Out-of-place
      - SelfAdjoint
-   * - ``Add_Mult_UInt_ConstUInt``
+   * - ``Add_Mult_UInt_ConstUInt_InPlace``
      - ``res += lhs * const``
      - In-place
      - BaseOperator
-   * - ``Mod_Mult_UInt_ConstUInt``
+   * - ``Mod_Mult_UInt_ConstUInt_InPlace``
      - ``y = y * a^(2^x) mod N``
      - In-place
      - BaseOperator
-   * - ``ShiftLeft``
+   * - ``ShiftLeft_InPlace``
      - 循环左移
      - In-place
      - BaseOperator
-   * - ``ShiftRight``
+   * - ``ShiftRight_InPlace``
      - 循环右移
      - In-place
      - BaseOperator
@@ -179,10 +179,10 @@ Add_UInt_ConstUInt（常量外置加法）
    # result = 0 ^ (3 + 5) = 8
    ps.Add_UInt_ConstUInt("lhs", 5, "result")(state)
 
-Add_ConstUInt（常量内置加法）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Add_ConstUInt_InPlace（常量内置加法）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Add_ConstUInt
+.. autoclass:: pysparq.Add_ConstUInt_InPlace
    :members:
    :undoc-members:
 
@@ -200,7 +200,7 @@ Add_ConstUInt（常量内置加法）
    ps.Init_Unsafe("counter", 10)(state)
 
    # counter = (10 + 7) % 16 = 1
-   op = ps.Add_ConstUInt("counter", 7)
+   op = ps.Add_ConstUInt_InPlace("counter", 7)
    op(state)
 
    # 撤销
@@ -243,10 +243,10 @@ Mult_UInt_ConstUInt（常量外置乘法）
    # 避免：偶数乘数不双射
    # ps.Mult_UInt_ConstUInt("input", 2, "result")(state)  # 丢失 LSB
 
-Add_Mult_UInt_ConstUInt（累加乘法）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Add_Mult_UInt_ConstUInt_InPlace（累加乘法）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Add_Mult_UInt_ConstUInt
+.. autoclass:: pysparq.Add_Mult_UInt_ConstUInt_InPlace
    :members:
    :undoc-members:
 
@@ -266,7 +266,7 @@ Add_Mult_UInt_ConstUInt（累加乘法）
    ps.Init_Unsafe("result", 5)(state)
 
    # result = 5 + (3 * 4) = 17
-   op = ps.Add_Mult_UInt_ConstUInt("input", 4, "result")
+   op = ps.Add_Mult_UInt_ConstUInt_InPlace("input", 4, "result")
    op(state)
 
    # 撤销
@@ -277,10 +277,10 @@ Add_Mult_UInt_ConstUInt（累加乘法）
 模乘算子
 --------
 
-Mod_Mult_UInt_ConstUInt（模乘算子）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mod_Mult_UInt_ConstUInt_InPlace（模乘算子）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Mod_Mult_UInt_ConstUInt
+.. autoclass:: pysparq.Mod_Mult_UInt_ConstUInt_InPlace
    :members:
    :undoc-members:
 
@@ -302,7 +302,7 @@ Mod_Mult_UInt_ConstUInt（模乘算子）
    ps.Init_Unsafe("y", 3)(state)
 
    # y = 3 * 7 mod 15 = 6
-   op = ps.Mod_Mult_UInt_ConstUInt("y", 7, 0, 15)
+   op = ps.Mod_Mult_UInt_ConstUInt_InPlace("y", 7, 0, 15)
    op(state)
 
    # 撤销: y = 6 * 13 mod 15 = 3
@@ -313,16 +313,16 @@ Mod_Mult_UInt_ConstUInt（模乘算子）
 移位算子
 --------
 
-ShiftLeft（循环左移）
-^^^^^^^^^^^^^^^^^^^^
+ShiftLeft_InPlace（循环左移）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.ShiftLeft
+.. autoclass:: pysparq.ShiftLeft_InPlace
    :members:
    :undoc-members:
 
 **操作**: 循环左移 ``digit`` 位
 
-**Dagger**: ShiftLeft 和 ShiftRight 在概念上互为逆，但 ``.dag()`` 方法未实现。使用 ``ShiftRight(reg, digit)`` 撤销。
+**Dagger**: ``.dag()`` 已实现,效果等同 ``ShiftRight_InPlace(reg, digit)``;两者互为 dagger。
 
 **类型约束**: ``UnsignedInteger`` 或 ``SignedInteger``。
 
@@ -337,33 +337,33 @@ ShiftLeft（循环左移）
    state = ps.SparseState()
    ps.Init_Unsafe("reg", 0b1010)(state)  # 10
 
-   ps.ShiftLeft("reg", 1)(state)
+   ps.ShiftLeft_InPlace("reg", 1)(state)
    # reg = 0b0101 = 5
 
-   # 撤销（使用 ShiftRight，因为 ShiftLeft.dag() 未实现）
-   ps.ShiftRight("reg", 1)(state)
+   # 撤销
+   op.dag(state)
    # reg = 0b1010 = 10
 
-ShiftRight（循环右移）
-^^^^^^^^^^^^^^^^^^^^^
+ShiftRight_InPlace（循环右移）
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.ShiftRight
+.. autoclass:: pysparq.ShiftRight_InPlace
    :members:
    :undoc-members:
 
 **操作**: 循环右移 ``digit`` 位
 
-**Dagger**: ``ShiftLeft(reg, digit)``
+**Dagger**: ``ShiftLeft_InPlace(reg, digit)``
 
 .. code-block:: python
 
    ps.Init_Unsafe("reg", 0b1010)(state)  # 10
 
-   ps.ShiftRight("reg", 1)(state)
+   ps.ShiftRight_InPlace("reg", 1)(state)
    # reg = 0b0101 = 5
 
-   # ShiftLeft 和 ShiftRight 互为逆
-   ps.ShiftLeft("reg", 1)(state)
+   # ShiftLeft_InPlace 和 ShiftRight_InPlace 互为逆
+   ps.ShiftLeft_InPlace("reg", 1)(state)
    # reg = 0b1010 = 10
 
 ---

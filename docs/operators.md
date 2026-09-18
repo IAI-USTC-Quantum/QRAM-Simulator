@@ -5,6 +5,7 @@
 ## 目录
 
 - [概述](#概述)
+- [宽度与截断约定](#宽度与截断约定)
 - [算子分类](#算子分类)
 - [算子详细说明](#算子详细说明)
 - [Unitary 性质保证机制](#unitary-性质保证机制)
@@ -21,6 +22,37 @@ QRAM-Simulator 采用 "Register Level Programming" 范式，所有算子直接�
 2. **In-place 操作**: 结果直接修改输入寄存器，需要显式实现 dagger 方法保证可逆性
 3. **SelfAdjoint 算子**: 满足 U† = U，应用两次等于恒等操作
 
+## 宽度与截断约定
+
+本节是所有算术算子位宽行为的**权威契约**(2026-09 制定)。原则:**语义由算子名承载,
+不依赖构建模式**;寄存器声明类型的校验仅在 debug 构建额外执行。
+
+1. **LSB 对齐**:所有操作数与输出按最低有效位对齐,不存在隐式移位。
+2. **读扩展由名字槽位决定**:`_UInt_` 槽把操作数零扩展到计算域;`_SInt_` 槽按
+   二补码符号扩展;`_Bool_` 槽按单比特;`AnyInt` 槽按寄存器**声明类型**扩展
+   (UInt→零扩展,SInt→符号扩展)。实现把扩展逻辑直接写死,release 构建同样正确。
+3. **计算域**:中间量按全精度求值——乘法经 64 位高低半分解(等价 128 位精度),
+   加/减/比较在无符号 64 位回绕域上等价成立,除法/开方商域 ≤ 64 位。
+4. **写入**:结果取 `mod 2^out_width` 后 **XOR** 进输出寄存器。输出宽度可与
+   任意输入宽度不同;输入寄存器的值永不被 out-of-place 算子修改。
+5. **域外全量化**:可逆性要求算子在全部基矢上是确定性函数,因此核心算子不抛
+   定义域异常——`Div_UInt_UInt` 在除数为零时商取 0;`Sqrt_UInt` 只接受幅度
+   (非负)输入。定义域/溢出信息一律由专用 flag 算子另行报告。
+6. **flag 谓词**:flag 输出 XOR 进 1-bit Boolean 寄存器;谓词在**全精度域**上
+   求值。以 `out` 为参数的 flag 算子(`Carry_UInt_UInt` 等)**只取该寄存器的
+   宽度、不读其值**,因此对输出寄存器的初始内容没有前置假设。
+7. **宽度边界**:1..64 全支持。所有 `pow2(w)`/`1<<w` 于 w=64 的未定义行为
+   一律以 `width_mask`(64 特判)替代;算子读取宽度一律在执行期经
+   `System::size_of`,不在构造期快照。
+8. **别名约束**:输出(含 flag)与任一输入不得别名——always-on 检查(与
+   debug/release 无关)。
+9. **约定例外**:`GetMid_UInt_UInt` 与 `Swap_General_General` 维持等宽要求
+   (中点溢出与原值交换的语义本质上依赖等宽),是本约定仅有的两个例外。
+10. **存量兼容**:既有 Add 族(读零扩展 + 写 `mod 2^dst`)与本约定一致。
+    唯一的历史行为修正是 `Add_AnyInt_AnyInt_InPlace`:AnyInt 槽自本约定起按
+    寄存器声明类型扩展(此前一律按无符号位模式读),并补上 `lhs == rhs` 的
+    别名拒绝与执行期宽度读取。
+
 ## 算子分类
 
 ### 1. Out-of-place 算子 (SelfAdjointOperator)
@@ -30,27 +62,41 @@ QRAM-Simulator 采用 "Register Level Programming" 范式，所有算子直接�
 | `Add_UInt_UInt` | res ^= lhs + rhs | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
 | `Add_UInt_ConstUInt` | res ^= lhs + const | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
 | `Mult_UInt_ConstUInt` | res ^= lhs * const | UnsignedInteger | UnsignedInteger | const 应为奇数以保证双射 |
-| `Assign` | reg2 ^= reg1 | 任意 | 与 reg1 相同 | 两寄存器大小必须相同 |
+| `Assign` | reg2 ^= reg1 | 任意 | 与 reg1 相同 | 宽度任意，reg2 按 mod 2^reg2_w 截断 |
 | `Compare_UInt_UInt` | 输出比较标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
 | `Less_UInt_UInt` | 输出小于标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
 | `GetMid_UInt_UInt` | mid ^= (l+r)/2 | UnsignedInteger | UnsignedInteger | 三个寄存器大小必须相同 |
 | `FlipBools` | reg ^= ~reg | UnsignedInteger/SignedInteger | - | 按位取反所有位 |
 | `Swap_Bool_Bool` | 交换单个比特 | 任意 | 任意 | 位索引在有效范围内 |
 | `Swap_General_General` | 交换整个寄存器 | 任意 | 任意 | 两寄存器大小必须相同 |
-| `Div_Sqrt_Arccos_Int_Int` | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
-| `Sqrt_Div_Arccos_Int_Int` | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
+| `Div_Sqrt_Arccos_UInt_UInt` | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
+| `Sqrt_Div_Arccos_Int_UInt` | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
 | `GetRotateAngle_Int_Int` | res ^= atan2(r,l)/2π | 整数类型 | Rational | 结果在 [0,1) 范围内 |
+| `Sub_UInt_UInt` | res ^= lhs − rhs | UnsignedInteger | UnsignedInteger | 宽度任意（约定通用行） |
+| `Neg_UInt` | res ^= 0 − reg | UnsignedInteger | UnsignedInteger | 宽度任意 |
+| `Abs_SInt` | res ^= \|sext(reg)\| | SignedInteger | UnsignedInteger | 补码最小值回绕自身 |
+| `Mul_UInt_UInt` | res ^= lhs · rhs | UnsignedInteger | UnsignedInteger | 宽度任意，结果 mod 2^res_w |
+| `Div_UInt_UInt` | res ^= lhs // rhs | UnsignedInteger | UnsignedInteger | **除零 → 商 0**（域外全量化） |
+| `Sqrt_UInt` | res ^= isqrt(reg) | UnsignedInteger | UnsignedInteger | 整数开方（floor） |
+| `Select_Bool_UInt_UInt` | res ^= cond ? lhs : rhs | Boolean, UInt×2 | UnsignedInteger | cond 宽度为 1 |
+| `And_UInt_UInt` / `Or_UInt_UInt` / `Xor_UInt_UInt` | 按位与/或/异或 | UnsignedInteger×2 | UnsignedInteger | 宽度任意 |
+| `Less_SInt_SInt` | flag ^= sext(lhs) < sext(rhs) | SignedInteger×2 | Boolean | 有符号比较 |
+| `Carry_UInt_UInt` | flag ^= lhs+rhs ≥ 2^res_w | UnsignedInteger×2 | Boolean | res 仅提供宽度，不读不写 |
+| `Overflow_SInt_SInt` | flag ^= 有符号加溢出 | SignedInteger×2 | Boolean | res 仅提供宽度；内部按 res 宽度求值 |
+| `MulOverflow_UInt_UInt` | flag ^= lhs·rhs ≥ 2^res_w (全精度) | UnsignedInteger×2 | Boolean | res 仅提供宽度 |
+| `IsZero_UInt` | flag ^= reg == 0 | UnsignedInteger | Boolean | — |
+| `Negative_SInt` | flag ^= sext(reg) < 0 | SignedInteger | Boolean | — |
 | `CustomArithmetic` | res ^= func(inputs) | 任意 | 任意 | func 必须是确定性函数 |
 
 ### 2. In-place 算子 (BaseOperator)
 
 | 算子 | 操作 | 输入类型 | Dagger 实现 | 约束 |
 |------|------|----------|-------------|------|
-| `Add_UInt_UInt_InPlace` | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | 两寄存器大小应相同 |
+| `Add_UInt_UInt_InPlace` | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | 宽度任意，lhs 零扩展，rhs 按 mod 2^rhs_w 回绕 |
 | `Add_Mult_UInt_ConstUInt_InPlace` | res += lhs * const (lhs不变) | UnsignedInteger | res -= lhs * const | lhs不变，仅res更新 |
 | `Add_ConstUInt_InPlace` | reg += const | UnsignedInteger/SignedInteger | reg += (2^N - const) | 模 2^N 回绕 |
 | `Mod_Mult_UInt_ConstUInt_InPlace` | y = y * a^(2^x) mod N | UnsignedInteger | y = y * a^(-2^x) mod N | gcd(a, N) = 1，寄存器 ≥ ⌈log₂(N)⌉ |
-| `AddAssign_AnyInt_AnyInt_InPlace` | lhs += rhs | 整数类型 | lhs -= rhs (mod 2^N) | 支持混合类型 |
+| `Add_AnyInt_AnyInt_InPlace` | lhs += rhs | 整数类型 | lhs -= rhs (mod 2^N) | 混合类型；rhs 按声明类型扩展（SInt 符号扩展）；lhs≠rhs |
 | `ShiftLeft_InPlace` | 循环左移 | UnsignedInteger/SignedInteger | 循环右移相同位数 | 移位量 ≤ 寄存器大小 |
 | `ShiftRight_InPlace` | 循环右移 | UnsignedInteger/SignedInteger | 循环左移相同位数 | 移位量 ≤ 寄存器大小 |
 

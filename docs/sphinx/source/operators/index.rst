@@ -64,7 +64,7 @@ PySparQ 通过两种机制保证幺正性：
      - ``Add_UInt_UInt``, ``Mult_UInt_ConstUInt``
    * - In-place（内置）
      - 显式 dagger 实现
-     - ``Add_UInt_UInt_InPlace``, ``ShiftLeft``
+     - ``Add_UInt_UInt_InPlace``, ``ShiftLeft_InPlace``
 
 SelfAdjointOperator vs BaseOperator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,11 +79,11 @@ SelfAdjointOperator vs BaseOperator
    * - ``SelfAdjointOperator``
      - :math:`U^\dagger = U`
      - ``dag()`` 等同于 ``operator()``
-     - ``Add_UInt_UInt``, ``Xgate_Bool``
+     - ``Add_UInt_UInt``, ``X_Bool``
    * - ``BaseOperator``
      - 一般幺正算子
      - 需要显式实现 ``dag()``
-     - ``Add_UInt_UInt_InPlace``, ``ShiftLeft``
+     - ``Add_UInt_UInt_InPlace``, ``ShiftLeft_InPlace``
 
 .. code-block:: python
 
@@ -93,7 +93,7 @@ SelfAdjointOperator vs BaseOperator
    op(state)  # 再次应用 = 撤销（因为 XOR 自逆）
 
    # BaseOperator：需要 dag() 撤销
-   op = ps.ShiftLeft("reg", 2)
+   op = ps.ShiftLeft_InPlace("reg", 2)
    op(state)      # 左移 2 位
    op.dag(state)  # 右移 2 位（撤销）
 
@@ -128,11 +128,11 @@ SelfAdjointOperator vs BaseOperator
 
    # 正确：Boolean 用于单量子比特门
    ps.System.add_register("qubit", ps.Boolean, 1)
-   ps.Xgate_Bool("qubit", 0)(state)
+   ps.X_Bool("qubit", 0)(state)
 
    # 错误：类型不匹配
    # ps.System.add_register("counter", ps.UnsignedInteger, 4)
-   # ps.Xgate_Bool("counter", 0)(state)  # 抛出异常！
+   # ps.X_Bool("counter", 0)(state)  # 抛出异常！
 
 位约束
 ^^^^^^

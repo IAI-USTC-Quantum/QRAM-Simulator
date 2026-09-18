@@ -39,19 +39,19 @@ from pysparq._core import (
     Hadamard_Int,
     Hadamard_Int_Full,
     Hadamard_Bool,
-    Hadamard_PartialQubit,
+    Hadamard_Partial,
     ZeroConditionalPhaseFlip,
     Reflection_Bool,
-    GlobalPhase_Int,
+    GlobalPhase,
     PartialTrace,
     PartialTraceSelect,
     PartialTraceSelectRange,
     QFT,
-    inverseQFT,
+    InverseQFT,
     QRAMCircuit_qutrit,
     QRAMLoad,
     QRAMLoadFast,
-    Xgate_Bool,
+    X_Bool,
     FlipBools,
     Swap_Bool_Bool,
     ShiftLeft_InPlace,
@@ -63,10 +63,26 @@ from pysparq._core import (
     Add_UInt_UInt_InPlace,
     Add_UInt_ConstUInt,
     Add_ConstUInt_InPlace,
-    Div_Sqrt_Arccos_Int_Int,
-    Sqrt_Div_Arccos_Int_Int,
+    Div_Sqrt_Arccos_UInt_UInt,
+    Sqrt_Div_Arccos_Int_UInt,
     GetRotateAngle_Int_Int,
-    AddAssign_AnyInt_AnyInt_InPlace,
+    Sub_UInt_UInt,
+    Neg_UInt,
+    Abs_SInt,
+    Mul_UInt_UInt,
+    Div_UInt_UInt,
+    Sqrt_UInt,
+    Select_Bool_UInt_UInt,
+    And_UInt_UInt,
+    Or_UInt_UInt,
+    Xor_UInt_UInt,
+    Less_SInt_SInt,
+    Carry_UInt_UInt,
+    Overflow_SInt_SInt,
+    MulOverflow_UInt_UInt,
+    IsZero_UInt,
+    Negative_SInt,
+    Add_AnyInt_AnyInt_InPlace,
     Assign,
     Compare_UInt_UInt,
     Less_UInt_UInt,
@@ -91,16 +107,16 @@ from pysparq._core import (
     SortByKey2,
     Phase_Bool,
     Rot_Bool,
-    Ygate_Bool,
-    Zgate_Bool,
-    Sgate_Bool,
-    Tgate_Bool,
-    RXgate_Bool,
-    RYgate_Bool,
-    RZgate_Bool,
-    SXgate_Bool,
-    U2gate_Bool,
-    U3gate_Bool,
+    Y_Bool,
+    Z_Bool,
+    S_Bool,
+    T_Bool,
+    RX_Bool,
+    RY_Bool,
+    RZ_Bool,
+    SX_Bool,
+    U2_Bool,
+    U3_Bool,
     CondRot_Rational_Bool,
     CondRot_Fixed_Bool,
     CondRot_General_Bool_QW_fast,
@@ -112,6 +128,29 @@ from pysparq._core import (
     remove_system,
     StatePrintDisplay,
 )
+
+
+# Deprecated aliases kept for backward compatibility; resolved at runtime by
+# the module-level __getattr__ in __init__.py (emits DeprecationWarning).
+# See docs/naming_conventions.md; remove in the next major version.
+Xgate_Bool: type[X_Bool]
+Ygate_Bool: type[Y_Bool]
+Zgate_Bool: type[Z_Bool]
+Sgate_Bool: type[S_Bool]
+Tgate_Bool: type[T_Bool]
+RXgate_Bool: type[RX_Bool]
+RYgate_Bool: type[RY_Bool]
+RZgate_Bool: type[RZ_Bool]
+SXgate_Bool: type[SX_Bool]
+U2gate_Bool: type[U2_Bool]
+U3gate_Bool: type[U3_Bool]
+inverseQFT: type[InverseQFT]
+GlobalPhase_Int: type[GlobalPhase]
+AddAssign_AnyInt_AnyInt_InPlace: type[Add_AnyInt_AnyInt_InPlace]
+Div_Sqrt_Arccos_Int_Int: type[Div_Sqrt_Arccos_UInt_UInt]
+Sqrt_Div_Arccos_Int_Int: type[Sqrt_Div_Arccos_Int_UInt]
+Hadamard_PartialQubit: type[Hadamard_Partial]
+QuantumBinarySearchFast: type[QuantumBinarySearch_Fast]
 
 
 # Python-only functions and classes

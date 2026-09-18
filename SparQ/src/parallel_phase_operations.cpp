@@ -64,9 +64,9 @@ namespace qram_simulator
 		}
 	}
 
-	void GlobalPhase_Int::operator()(std::vector<System>& state) const
+	void GlobalPhase::operator()(std::vector<System>& state) const
 	{
-		profiler _("GlobalPhase_Int");
+		profiler _("GlobalPhase");
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{
@@ -83,9 +83,9 @@ namespace qram_simulator
 		}
 	}
 
-	void GlobalPhase_Int::dag(std::vector<System>& state) const
+	void GlobalPhase::dag(std::vector<System>& state) const
 	{
-		profiler _("GlobalPhase_Int");
+		profiler _("GlobalPhase");
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{

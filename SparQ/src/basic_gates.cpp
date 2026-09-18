@@ -374,9 +374,9 @@ namespace qram_simulator
 	//	fmt::print("Rotation gate\n{}\n", matrix.to_string());
 	//}
 
-	void Xgate_Bool::operator()(std::vector<System>& state) const
+	void X_Bool::operator()(std::vector<System>& state) const
 	{
-		profiler _("Xgate_Bool");
+		profiler _("X_Bool");
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
 		{
@@ -394,7 +394,7 @@ namespace qram_simulator
 		}
 	}
 
-	//void Xgate_Bool::display() const
+	//void X_Bool::display() const
 	//{
 	//	size_t n_ctrl = condition_variable_by_bit.size();
 	//	uint64_t size = pow2(n_ctrl + 1);
@@ -409,7 +409,7 @@ namespace qram_simulator
 	//	fmt::print("X gate\n{}\n", matrix.to_string());
 	//}
 
-	void Ygate_Bool::operator()(std::vector<System>& state) const
+	void Y_Bool::operator()(std::vector<System>& state) const
 	{
 		complex_t phase_pos = complex_t(0, 1);
 		complex_t phase_neg = complex_t(0, -1);
@@ -435,7 +435,7 @@ namespace qram_simulator
 	}
 
 
-	//void Ygate_Bool::display() const
+	//void Y_Bool::display() const
 	//{
 	//	size_t n_ctrl = condition_variable_by_bit.size();
 	//	uint64_t size = pow2(n_ctrl + 1);
@@ -450,7 +450,7 @@ namespace qram_simulator
 	//	fmt::print("Y gate\n{}\n", matrix.to_string());
 	//}
 
-	DenseMatrix<complex_t> Ygate_Bool::extract_matrix()
+	DenseMatrix<complex_t> Y_Bool::extract_matrix()
 	{
 		size_t nqubit = System::size_of(id);
 
@@ -483,7 +483,7 @@ namespace qram_simulator
 		return ret;
 	}
 
-	//void Zgate_Bool::display() const
+	//void Z_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -498,7 +498,7 @@ namespace qram_simulator
 	//	fmt::print("Z gate\n{}\n", matrix.to_string());
 	//}
 
-	//void Sgate_Bool::display() const
+	//void S_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -513,7 +513,7 @@ namespace qram_simulator
 	//	fmt::print("S gate\n{}\n", matrix.to_string());
 	//}
 
-	//void Tgate_Bool::display() const
+	//void T_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -528,7 +528,7 @@ namespace qram_simulator
 	//	fmt::print("T gate\n{}\n", matrix.to_string());
 	//}
 
-	RXgate_Bool::RXgate_Bool(std::string_view reg_, size_t digit_, double angle_)
+	RX_Bool::RX_Bool(std::string_view reg_, size_t digit_, double angle_)
 		: Rot_Bool(reg_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -537,7 +537,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	RXgate_Bool::RXgate_Bool(size_t id_, size_t digit_, double angle_)
+	RX_Bool::RX_Bool(size_t id_, size_t digit_, double angle_)
 		: Rot_Bool(id_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -546,7 +546,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	//void RXgate_Bool::display() const
+	//void RX_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -563,7 +563,7 @@ namespace qram_simulator
 	//	fmt::print("RX gate\n{}\n", matrix.to_string());
 	//}
 
-	RYgate_Bool::RYgate_Bool(std::string_view reg_, size_t digit_, double angle_)
+	RY_Bool::RY_Bool(std::string_view reg_, size_t digit_, double angle_)
 		: Rot_Bool(reg_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -572,7 +572,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	RYgate_Bool::RYgate_Bool(size_t id_, size_t digit_, double angle_)
+	RY_Bool::RY_Bool(size_t id_, size_t digit_, double angle_)
 		: Rot_Bool(id_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -581,7 +581,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	//void RYgate_Bool::display() const
+	//void RY_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -598,7 +598,7 @@ namespace qram_simulator
 	//	fmt::print("RY gate\n{}\n", matrix.to_string());
 	//}
 
-	RZgate_Bool::RZgate_Bool(std::string_view reg_, size_t digit_, double angle_)
+	RZ_Bool::RZ_Bool(std::string_view reg_, size_t digit_, double angle_)
 		: GateBase(reg_, digit_), angle(angle_)
 	{
 		size_t size = System::size_of(id);
@@ -606,7 +606,7 @@ namespace qram_simulator
 			throw_invalid_input();
 	}
 
-	RZgate_Bool::RZgate_Bool(size_t id_, size_t digit_, double angle_)
+	RZ_Bool::RZ_Bool(size_t id_, size_t digit_, double angle_)
 		: GateBase(id_, digit_), angle(angle_)
 	{
 		size_t size = System::size_of(id);
@@ -614,7 +614,7 @@ namespace qram_simulator
 			throw_invalid_input();
 	}
 
-	void RZgate_Bool::operator()(std::vector<System>& state) const
+	void RZ_Bool::operator()(std::vector<System>& state) const
 	{
 		// Todo : check if condition_variable_by_bit is valid.
 		// That is, check if the conditioned bit is the same as operation itself.
@@ -646,14 +646,14 @@ namespace qram_simulator
 
 	}
 
-	void RZgate_Bool::dag(std::vector<System>& state) const
+	void RZ_Bool::dag(std::vector<System>& state) const
 	{
-		RZgate_Bool inverse(id, digit, -angle);
+		RZ_Bool inverse(id, digit, -angle);
 		copy_control_conditions_to(inverse);
 		inverse(state);
 	}
 
-	//void RZgate_Bool::display() const
+	//void RZ_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -670,7 +670,7 @@ namespace qram_simulator
 	//	fmt::print("RZ gate\n{}\n", matrix.to_string());
 	//}
 
-	SXgate_Bool::SXgate_Bool(std::string_view reg_, size_t digit_)
+	SX_Bool::SX_Bool(std::string_view reg_, size_t digit_)
 		: Rot_Bool(reg_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -679,7 +679,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	SXgate_Bool::SXgate_Bool(size_t id_, size_t digit_)
+	SX_Bool::SX_Bool(size_t id_, size_t digit_)
 		: Rot_Bool(id_, digit_, {})
 	{
 		// todo check if digit is valid
@@ -688,7 +688,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	//void SXgate_Bool::display() const
+	//void SX_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -705,7 +705,7 @@ namespace qram_simulator
 	//	fmt::print("SX gate\n{}\n", matrix.to_string());
 	//}
 
-	U2gate_Bool::U2gate_Bool(std::string_view reg_, size_t digit_, double phi, double lambda)
+	U2_Bool::U2_Bool(std::string_view reg_, size_t digit_, double phi, double lambda)
 		: Rot_Bool(reg_, digit_, {}), phi(phi), lambda(lambda)
 	{
 		// todo check if digit is valid
@@ -714,7 +714,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	U2gate_Bool::U2gate_Bool(size_t id_, size_t digit_, double phi, double lambda)
+	U2_Bool::U2_Bool(size_t id_, size_t digit_, double phi, double lambda)
 		: Rot_Bool(id_, digit_, {}), phi(phi), lambda(lambda)
 	{
 		// todo check if digit is valid
@@ -723,7 +723,7 @@ namespace qram_simulator
 		Rot_Bool::mat = mat;
 	};
 
-	//void U2gate_Bool::display() const
+	//void U2_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);
@@ -740,7 +740,7 @@ namespace qram_simulator
 	//	fmt::print("U2 gate\n{}\n", matrix.to_string());
 	//}
 
-	U3gate_Bool::U3gate_Bool(std::string_view reg_, size_t digit_, double theta, double phi, double lambda)
+	U3_Bool::U3_Bool(std::string_view reg_, size_t digit_, double theta, double phi, double lambda)
 		: Rot_Bool(reg_, digit_, {}), theta(theta), phi(phi), lambda(lambda)
 	{
 		// todo check if digit is valid
@@ -750,7 +750,7 @@ namespace qram_simulator
 				complex_t(cos(lambda + phi) * cos(theta / 2), sin(lambda + phi) * cos(theta / 2)) };
 	};
 
-	U3gate_Bool::U3gate_Bool(size_t id_, size_t digit_, double theta, double phi, double lambda)
+	U3_Bool::U3_Bool(size_t id_, size_t digit_, double theta, double phi, double lambda)
 		: Rot_Bool(id_, digit_, {}), theta(theta), phi(phi), lambda(lambda)
 	{
 		// todo check if digit is valid
@@ -760,7 +760,7 @@ namespace qram_simulator
 				complex_t(cos(lambda + phi) * cos(theta / 2), sin(lambda + phi) * cos(theta / 2)) };
 	};
 
-	//void U3gate_Bool::display() const
+	//void U3_Bool::display() const
 	//{
 	//	auto n_ctrl = condition_variable_by_bit.size();
 	//	auto size = pow2(n_ctrl + 1);

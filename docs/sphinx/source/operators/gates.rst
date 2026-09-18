@@ -16,40 +16,40 @@
    * - 算子
      - 操作
      - 幺正类
-   * - ``Xgate_Bool``
+   * - ``X_Bool``
      - Pauli-X（比特翻转）
      - SelfAdjoint
-   * - ``Ygate_Bool``
+   * - ``Y_Bool``
      - Pauli-Y
      - SelfAdjoint
-   * - ``Zgate_Bool``
+   * - ``Z_Bool``
      - Pauli-Z（相位翻转）
      - SelfAdjoint
-   * - ``Sgate_Bool``
+   * - ``S_Bool``
      - S 门（π/2 相位）
      - SelfAdjoint
-   * - ``Tgate_Bool``
+   * - ``T_Bool``
      - T 门（π/4 相位）
      - SelfAdjoint
    * - ``Phase_Bool``
      - 任意相位 e^{iλ}
      - BaseOperator
-   * - ``RXgate_Bool``
+   * - ``RX_Bool``
      - X 轴旋转
      - SelfAdjoint
-   * - ``RYgate_Bool``
+   * - ``RY_Bool``
      - Y 轴旋转
      - SelfAdjoint
-   * - ``RZgate_Bool``
+   * - ``RZ_Bool``
      - Z 轴旋转
      - SelfAdjoint
-   * - ``SXgate_Bool``
+   * - ``SX_Bool``
      - √X 门
      - SelfAdjoint
-   * - ``U2gate_Bool``
+   * - ``U2_Bool``
      - 通用单量子比特门（2 参数）
      - BaseOperator
-   * - ``U3gate_Bool``
+   * - ``U3_Bool``
      - 通用单量子比特门（3 参数）
      - BaseOperator
 
@@ -65,20 +65,20 @@
 
    # 正确：Boolean 类型用于单量子比特门
    ps.System.add_register("qubit", ps.Boolean, 1)
-   ps.Xgate_Bool("qubit", 0)(state)
+   ps.X_Bool("qubit", 0)(state)
 
    # 错误：位索引超出范围
-   # ps.Xgate_Bool("qubit", 1)(state)  # 抛出异常！
+   # ps.X_Bool("qubit", 1)(state)  # 抛出异常！
 
 ---
 
 Pauli 门
 --------
 
-Xgate_Bool（Pauli-X / NOT）
+X_Bool（Pauli-X / NOT）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Xgate_Bool
+.. autoclass:: pysparq.X_Bool
    :members:
    :undoc-members:
 
@@ -100,17 +100,17 @@ Xgate_Bool（Pauli-X / NOT）
    state = ps.SparseState()
    # 初始 |q=0⟩
 
-   ps.Xgate_Bool("q", 0)(state)
+   ps.X_Bool("q", 0)(state)
    # |q=1⟩
 
    # 再次应用恢复原状态（自伴）
-   ps.Xgate_Bool("q", 0)(state)
+   ps.X_Bool("q", 0)(state)
    # |q=0⟩
 
-Ygate_Bool（Pauli-Y）
+Y_Bool（Pauli-Y）
 ^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Ygate_Bool
+.. autoclass:: pysparq.Y_Bool
    :members:
    :undoc-members:
 
@@ -122,12 +122,12 @@ Ygate_Bool（Pauli-Y）
 
 .. code-block:: python
 
-   ps.Ygate_Bool("q", 0)(state)
+   ps.Y_Bool("q", 0)(state)
 
-Zgate_Bool（Pauli-Z）
+Z_Bool（Pauli-Z）
 ^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Zgate_Bool
+.. autoclass:: pysparq.Z_Bool
    :members:
    :undoc-members:
 
@@ -141,17 +141,17 @@ Zgate_Bool（Pauli-Z）
 
 .. code-block:: python
 
-   ps.Zgate_Bool("q", 0)(state)
+   ps.Z_Bool("q", 0)(state)
 
 ---
 
 相位门
 ------
 
-Sgate_Bool（S 门）
+S_Bool（S 门）
 ^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Sgate_Bool
+.. autoclass:: pysparq.S_Bool
    :members:
    :undoc-members:
 
@@ -165,12 +165,12 @@ Sgate_Bool（S 门）
 
 .. code-block:: python
 
-   ps.Sgate_Bool("q", 0)(state)
+   ps.S_Bool("q", 0)(state)
 
-Tgate_Bool（T 门）
+T_Bool（T 门）
 ^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.Tgate_Bool
+.. autoclass:: pysparq.T_Bool
    :members:
    :undoc-members:
 
@@ -184,7 +184,7 @@ Tgate_Bool（T 门）
 
 .. code-block:: python
 
-   ps.Tgate_Bool("q", 0)(state)
+   ps.T_Bool("q", 0)(state)
 
 Phase_Bool（任意相位）
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -211,10 +211,10 @@ Phase_Bool（任意相位）
 旋转门
 ------
 
-RXgate_Bool（X 轴旋转）
+RX_Bool（X 轴旋转）
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.RXgate_Bool
+.. autoclass:: pysparq.RX_Bool
    :members:
    :undoc-members:
 
@@ -229,12 +229,12 @@ RXgate_Bool（X 轴旋转）
    import numpy as np
 
    # X 轴旋转 π/2
-   ps.RXgate_Bool("q", np.pi / 2)(state)
+   ps.RX_Bool("q", np.pi / 2)(state)
 
-RYgate_Bool（Y 轴旋转）
+RY_Bool（Y 轴旋转）
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.RYgate_Bool
+.. autoclass:: pysparq.RY_Bool
    :members:
    :undoc-members:
 
@@ -246,12 +246,12 @@ RYgate_Bool（Y 轴旋转）
 
 .. code-block:: python
 
-   ps.RYgate_Bool("q", np.pi / 2)(state)
+   ps.RY_Bool("q", np.pi / 2)(state)
 
-RZgate_Bool（Z 轴旋转）
+RZ_Bool（Z 轴旋转）
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.RZgate_Bool
+.. autoclass:: pysparq.RZ_Bool
    :members:
    :undoc-members:
 
@@ -263,12 +263,12 @@ RZgate_Bool（Z 轴旋转）
 
 .. code-block:: python
 
-   ps.RZgate_Bool("q", np.pi / 2)(state)
+   ps.RZ_Bool("q", np.pi / 2)(state)
 
-SXgate_Bool（√X 门）
+SX_Bool（√X 门）
 ^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.SXgate_Bool
+.. autoclass:: pysparq.SX_Bool
    :members:
    :undoc-members:
 
@@ -276,17 +276,17 @@ SXgate_Bool（√X 门）
 
 .. code-block:: python
 
-   ps.SXgate_Bool("q", 0)(state)
+   ps.SX_Bool("q", 0)(state)
 
 ---
 
 通用门
 ------
 
-U2gate_Bool（2 参数通用门）
+U2_Bool（2 参数通用门）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.U2gate_Bool
+.. autoclass:: pysparq.U2_Bool
    :members:
    :undoc-members:
 
@@ -296,10 +296,10 @@ U2gate_Bool（2 参数通用门）
 
    U_2(\phi, \lambda) = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & -e^{i\lambda} \\ e^{i\phi} & e^{i(\phi+\lambda)} \end{pmatrix}
 
-U3gate_Bool（3 参数通用门）
+U3_Bool（3 参数通用门）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: pysparq.U3gate_Bool
+.. autoclass:: pysparq.U3_Bool
    :members:
    :undoc-members:
 
@@ -313,7 +313,7 @@ U3gate_Bool（3 参数通用门）
 
    import numpy as np
 
-   op = ps.U3gate_Bool("q", np.pi/4, np.pi/2, 0)
+   op = ps.U3_Bool("q", np.pi/4, np.pi/2, 0)
    op(state)
 
    # 撤销

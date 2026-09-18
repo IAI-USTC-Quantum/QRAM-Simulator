@@ -339,17 +339,18 @@ namespace qram_simulator {
 		size_t res;
 		size_t mult_int;
 		size_t lhs_size; // 新增变量
+		size_t res_size;
 
 		CuCondition_Functor
 
-			Add_Mult_UInt_ConstUInt_Functor_Control(size_t lhs_, size_t res_, size_t mult_int_, size_t lhs_size_, CuCondition_Params)
-			: lhs(lhs_), res(res_), mult_int(mult_int_), lhs_size(lhs_size_), CuCondition_Init{
+			Add_Mult_UInt_ConstUInt_Functor_Control(size_t lhs_, size_t res_, size_t mult_int_, size_t lhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), res(res_), mult_int(mult_int_), lhs_size(lhs_size_), res_size(res_size_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_out = CuGet(s, res);
-				reg_out.value += (mult_int * CuGetAsUint64(s, lhs, lhs_size));
+				reg_out.value = (reg_out.value + mult_int * CuGetAsUint64(s, lhs, lhs_size)) & width_mask(res_size);
 			}
 		}
 	};
@@ -359,14 +360,15 @@ namespace qram_simulator {
 		size_t res;
 		size_t mult_int;
 		size_t lhs_size; // 新增变量
+		size_t res_size;
 
-		Add_Mult_UInt_ConstUInt_Functor(size_t lhs_, size_t res_, size_t mult_int_, size_t lhs_size_)
-			: lhs(lhs_), res(res_), mult_int(mult_int_), lhs_size(lhs_size_) {
+		Add_Mult_UInt_ConstUInt_Functor(size_t lhs_, size_t res_, size_t mult_int_, size_t lhs_size_, size_t res_size_)
+			: lhs(lhs_), res(res_), mult_int(mult_int_), lhs_size(lhs_size_), res_size(res_size_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_out = CuGet(s, res);
-			reg_out.value += (mult_int * CuGetAsUint64(s, lhs, lhs_size));
+			reg_out.value = (reg_out.value + mult_int * CuGetAsUint64(s, lhs, lhs_size)) & width_mask(res_size);
 		}
 	};
 
@@ -374,12 +376,13 @@ namespace qram_simulator {
 	{
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(lhs); // 获取lhs的大小
+		size_t res_size = System::size_of(res);
 
 		if (!HasCondition)
 		{
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Add_Mult_UInt_ConstUInt_Functor(lhs, res, mult_int, lhs_size)
+				Add_Mult_UInt_ConstUInt_Functor(lhs, res, mult_int, lhs_size, res_size)
 			);
 		}
 		else
@@ -388,7 +391,7 @@ namespace qram_simulator {
 
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Add_Mult_UInt_ConstUInt_Functor_Control(lhs, res, mult_int, lhs_size, CuCondition_Args)
+					Add_Mult_UInt_ConstUInt_Functor_Control(lhs, res, mult_int, lhs_size, res_size, CuCondition_Args)
 				);
 		}
 	}
@@ -408,14 +411,10 @@ namespace qram_simulator {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
-			CuConditionSatisfied(s) {
-				auto dim_val = 1ULL << dim;
-				auto lhs_val = CuGetAsUint64(s, lhs, lhs_size);
-				// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
-				auto& reg_out = CuGet(s, res);
-				reg_out.value += (dim_val - lhs_val * mult_int % dim_val);
-				reg_out.value %= dim_val;
-			}
+			auto lhs_val = CuGetAsUint64(s, lhs, lhs_size);
+			// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value - lhs_val * mult_int) & width_mask(dim);
 		}
 	};
 
@@ -431,12 +430,10 @@ namespace qram_simulator {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
-			auto dim_val = 1ULL << dim;
 			auto lhs_val = CuGetAsUint64(s, lhs, lhs_size);
 			// Inverse: res -= lhs * mult (mod 2^dim).  lhs is NOT modified.
 			auto& reg_out = CuGet(s, res);
-			reg_out.value += (dim_val - lhs_val * mult_int % dim_val);
-			reg_out.value %= dim_val;
+			reg_out.value = (reg_out.value - lhs_val * mult_int) & width_mask(dim);
 		}
 	};
 
@@ -445,7 +442,6 @@ namespace qram_simulator {
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(lhs);
 		size_t dim = System::size_of(res);
-		auto dim_val = 1ULL << dim;
 
 		if (!HasCondition)
 		{
@@ -471,17 +467,18 @@ namespace qram_simulator {
 		size_t res;
 		size_t lhs_size; // 新增变量
 		size_t rhs_size; // 新增变量
+		size_t res_size;
 
 		CuCondition_Functor
 
-			Add_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, CuCondition_Params)
-			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), CuCondition_Init{
+			Add_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_out = CuGet(s, res);
-				reg_out.value ^= (CuGetAsUint64(s, lhs, lhs_size) + CuGetAsUint64(s, rhs, rhs_size));
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) + CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
 			}
 		}
 	};
@@ -492,14 +489,15 @@ namespace qram_simulator {
 		size_t res;
 		size_t lhs_size;
 		size_t rhs_size;
+		size_t res_size;
 
-		Add_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_)
-			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_) {
+		Add_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_out = CuGet(s, res);
-			reg_out.value = (CuGetAsUint64(s, lhs, lhs_size) + CuGetAsUint64(s, rhs, rhs_size));
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) + CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
 		}
 	};
 
@@ -508,12 +506,13 @@ namespace qram_simulator {
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(lhs);
 		size_t rhs_size = System::size_of(rhs); 
+		size_t res_size = System::size_of(res);
 
 		if (!HasCondition)
 		{
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Add_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size)
+				Add_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
 			);
 		}
 		else
@@ -522,7 +521,7 @@ namespace qram_simulator {
 
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Add_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, CuCondition_Args)
+					Add_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
 				);
 		}
 	}
@@ -531,17 +530,18 @@ namespace qram_simulator {
 		size_t lhs;
 		size_t rhs;
 		size_t lhs_size; // 新增变量
+		size_t rhs_size;
 
 		CuCondition_Functor
 
-			Add_UInt_UInt_InPlace_Functor_Control(size_t lhs_, size_t rhs_, size_t lhs_size_, CuCondition_Params)
-			: lhs(lhs_), rhs(rhs_), lhs_size(lhs_size_), CuCondition_Init{
+			Add_UInt_UInt_InPlace_Functor_Control(size_t lhs_, size_t rhs_, size_t lhs_size_, size_t rhs_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), lhs_size(lhs_size_), rhs_size(rhs_size_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_rhs = CuGet(s, rhs);
-				reg_rhs.value += CuGetAsUint64(s, lhs, lhs_size);
+				reg_rhs.value = (reg_rhs.value + CuGetAsUint64(s, lhs, lhs_size)) & width_mask(rhs_size);
 			}
 		}
 	};
@@ -550,14 +550,15 @@ namespace qram_simulator {
 		size_t lhs;
 		size_t rhs;
 		size_t lhs_size; // 新增变量
+		size_t rhs_size;
 
-		Add_UInt_UInt_InPlace_Functor(size_t lhs_, size_t rhs_, size_t lhs_size_)
-			: lhs(lhs_), rhs(rhs_), lhs_size(lhs_size_) {
+		Add_UInt_UInt_InPlace_Functor(size_t lhs_, size_t rhs_, size_t lhs_size_, size_t rhs_size_)
+			: lhs(lhs_), rhs(rhs_), lhs_size(lhs_size_), rhs_size(rhs_size_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_rhs = CuGet(s, rhs);
-			reg_rhs.value += CuGetAsUint64(s, lhs, lhs_size);
+			reg_rhs.value = (reg_rhs.value + CuGetAsUint64(s, lhs, lhs_size)) & width_mask(rhs_size);
 		}
 	};
 
@@ -565,12 +566,13 @@ namespace qram_simulator {
 	{
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(lhs); // 获取lhs的大小
+		size_t rhs_size = System::size_of(rhs);
 
 		if (!HasCondition)
 		{
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Add_UInt_UInt_InPlace_Functor(lhs, rhs, lhs_size)
+				Add_UInt_UInt_InPlace_Functor(lhs, rhs, lhs_size, rhs_size)
 			);
 		}
 		else
@@ -579,7 +581,7 @@ namespace qram_simulator {
 
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Add_UInt_UInt_InPlace_Functor_Control(lhs, rhs, lhs_size, CuCondition_Args)
+					Add_UInt_UInt_InPlace_Functor_Control(lhs, rhs, lhs_size, rhs_size, CuCondition_Args)
 				);
 		}
 	}
@@ -600,8 +602,7 @@ namespace qram_simulator {
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_rhs = CuGet(s, rhs);
-				reg_rhs.value += (pow2(dim) - CuGetAsUint64(s, lhs, lhs_size));
-				reg_rhs.value = reg_rhs.value % pow2(dim);
+				reg_rhs.value = (reg_rhs.value - CuGetAsUint64(s, lhs, lhs_size)) & width_mask(dim);
 			}
 		}
 	};
@@ -618,8 +619,7 @@ namespace qram_simulator {
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_rhs = CuGet(s, rhs);
-			reg_rhs.value += (pow2(dim) - CuGetAsUint64(s, lhs, lhs_size));
-			reg_rhs.value = reg_rhs.value % pow2(dim);
+			reg_rhs.value = (reg_rhs.value - CuGetAsUint64(s, lhs, lhs_size)) & width_mask(dim);
 		}
 	};
 
@@ -719,8 +719,7 @@ namespace qram_simulator {
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_ = CuGet(s, reg_in);
-				reg_.value += add_int;
-				reg_.value = reg_.value % pow2(dim);
+				reg_.value = (reg_.value + add_int) & width_mask(dim);
 			}
 		}
 	};
@@ -736,8 +735,7 @@ namespace qram_simulator {
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_ = CuGet(s, reg_in);
-			reg_.value += add_int;
-			reg_.value = reg_.value % pow2(dim);
+			reg_.value = (reg_.value + add_int) & width_mask(dim);
 		}
 	};
 
@@ -776,8 +774,7 @@ namespace qram_simulator {
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg_ = CuGet(s, reg_in);
-				reg_.value += (pow2(dim) - add_int);
-				reg_.value = reg_.value % pow2(dim);
+				reg_.value = (reg_.value - add_int) & width_mask(dim);
 			}
 		}
 	};
@@ -793,8 +790,7 @@ namespace qram_simulator {
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg_ = CuGet(s, reg_in);
-			reg_.value += (pow2(dim) - add_int);
-			reg_.value = reg_.value % pow2(dim);
+			reg_.value = (reg_.value - add_int) & width_mask(dim);
 		}
 	};
 
@@ -819,7 +815,7 @@ namespace qram_simulator {
 			}
 	}
 
-	struct Div_Sqrt_Arccos_Int_Int_Functor_Control {
+	struct Div_Sqrt_Arccos_UInt_UInt_Functor_Control {
 		size_t register_lhs;
 		size_t register_rhs;
 		size_t register_out;
@@ -829,7 +825,7 @@ namespace qram_simulator {
 
 		CuCondition_Functor
 
-		Div_Sqrt_Arccos_Int_Int_Functor_Control(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
+		Div_Sqrt_Arccos_UInt_UInt_Functor_Control(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
 			size_t lhs_size_, size_t rhs_size_, size_t out_size_, CuCondition_Params)
 			: register_lhs(register_lhs_), register_rhs(register_rhs_), register_out(register_out_),
 			lhs_size(lhs_size_), rhs_size(rhs_size_), out_size(out_size_), CuCondition_Init{
@@ -846,7 +842,7 @@ namespace qram_simulator {
 		}
 	};
 
-	struct Div_Sqrt_Arccos_Int_Int_Functor {
+	struct Div_Sqrt_Arccos_UInt_UInt_Functor {
 		size_t register_lhs;
 		size_t register_rhs;
 		size_t register_out;
@@ -854,7 +850,7 @@ namespace qram_simulator {
 		size_t lhs_size; // 新增变量
 		size_t rhs_size; // 新增变量
 
-		Div_Sqrt_Arccos_Int_Int_Functor(size_t register_lhs_, size_t register_rhs_, size_t register_out_, 
+		Div_Sqrt_Arccos_UInt_UInt_Functor(size_t register_lhs_, size_t register_rhs_, size_t register_out_, 
 			size_t lhs_size_, size_t rhs_size_, size_t out_size_)
 			: register_lhs(register_lhs_), register_rhs(register_rhs_), register_out(register_out_), 
 			lhs_size(lhs_size_), rhs_size(rhs_size_), out_size(out_size_) {
@@ -869,7 +865,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Div_Sqrt_Arccos_Int_Int::operator()(CuSparseState& state) const
+	void Div_Sqrt_Arccos_UInt_UInt::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(register_lhs);
@@ -880,7 +876,7 @@ namespace qram_simulator {
 		{
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Div_Sqrt_Arccos_Int_Int_Functor(register_lhs, register_rhs, register_out, 
+				Div_Sqrt_Arccos_UInt_UInt_Functor(register_lhs, register_rhs, register_out, 
 					lhs_size, rhs_size, out_size)
 			);
 		}
@@ -890,13 +886,13 @@ namespace qram_simulator {
 
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Div_Sqrt_Arccos_Int_Int_Functor_Control(register_lhs, register_rhs, register_out, 
+				Div_Sqrt_Arccos_UInt_UInt_Functor_Control(register_lhs, register_rhs, register_out, 
 					lhs_size, rhs_size, out_size, CuCondition_Args)
 			);
 		}
 	}
 
-	struct Sqrt_Div_Arccos_Int_Int_Functor_Control {
+	struct Sqrt_Div_Arccos_Int_UInt_Functor_Control {
 		size_t register_lhs;
 		size_t register_rhs;
 		size_t register_out;
@@ -906,7 +902,7 @@ namespace qram_simulator {
 
 		CuCondition_Functor
 
-			Sqrt_Div_Arccos_Int_Int_Functor_Control(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
+			Sqrt_Div_Arccos_Int_UInt_Functor_Control(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
 				size_t lhs_size_, size_t rhs_size_, size_t out_size_, CuCondition_Params)
 			: register_lhs(register_lhs_), register_rhs(register_rhs_), register_out(register_out_),
 			lhs_size(lhs_size_), rhs_size(rhs_size_), out_size(out_size_), CuCondition_Init{
@@ -923,7 +919,7 @@ namespace qram_simulator {
 		}
 	};
 
-	struct Sqrt_Div_Arccos_Int_Int_Functor {
+	struct Sqrt_Div_Arccos_Int_UInt_Functor {
 		size_t register_lhs;
 		size_t register_rhs;
 		size_t register_out;
@@ -931,7 +927,7 @@ namespace qram_simulator {
 		size_t lhs_size; // 新增变量
 		size_t rhs_size; // 新增变量
 
-		Sqrt_Div_Arccos_Int_Int_Functor(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
+		Sqrt_Div_Arccos_Int_UInt_Functor(size_t register_lhs_, size_t register_rhs_, size_t register_out_,
 			size_t lhs_size_, size_t rhs_size_, size_t out_size_)
 			: register_lhs(register_lhs_), register_rhs(register_rhs_), register_out(register_out_),
 			lhs_size(lhs_size_), rhs_size(rhs_size_), out_size(out_size_) {
@@ -946,7 +942,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Sqrt_Div_Arccos_Int_Int::operator()(CuSparseState& state) const
+	void Sqrt_Div_Arccos_Int_UInt::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		size_t lhs_size = System::size_of(register_lhs);
@@ -957,7 +953,7 @@ namespace qram_simulator {
 		{
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				Sqrt_Div_Arccos_Int_Int_Functor(register_lhs, register_rhs, register_out,
+				Sqrt_Div_Arccos_Int_UInt_Functor(register_lhs, register_rhs, register_out,
 					lhs_size, rhs_size, out_size)
 			);
 		}
@@ -967,7 +963,7 @@ namespace qram_simulator {
 
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Sqrt_Div_Arccos_Int_Int_Functor_Control(register_lhs, register_rhs, register_out,
+					Sqrt_Div_Arccos_Int_UInt_Functor_Control(register_lhs, register_rhs, register_out,
 						lhs_size, rhs_size, out_size, CuCondition_Args)
 				);
 		}
@@ -1070,143 +1066,164 @@ namespace qram_simulator {
 		}
 	}
 
-	struct AddAssign_AnyInt_AnyInt_Functor_Control {
+	struct Add_AnyInt_AnyInt_InPlace_Functor_Control {
 		size_t lhs_id;
 		size_t rhs_id;
 		size_t lhs_size;
 		size_t rhs_size;
+		bool rhs_signed;
 
 		CuCondition_Functor
 
-			AddAssign_AnyInt_AnyInt_Functor_Control(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, CuCondition_Params)
-			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), CuCondition_Init{
+			Add_AnyInt_AnyInt_InPlace_Functor_Control(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, bool rhs_signed_, CuCondition_Params)
+			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), rhs_signed(rhs_signed_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
-				size_t rhs = CuGetAsUint64(s, rhs_id, rhs_size);
-				size_t& lhs = CuGet(s, lhs_id).value;
-				lhs += rhs;
-				lhs %= pow2(lhs_size);
+				// AnyInt 槽：rhs 按寄存器声明类型扩展（宽度与截断约定）
+				uint64_t r = CuGetAsUint64(s, rhs_id, rhs_size);
+				if (rhs_signed)
+					r = (uint64_t)get_complement(r, rhs_size);
+				auto& lhs_reg = CuGet(s, lhs_id);
+				lhs_reg.value = (lhs_reg.value + r) & width_mask(lhs_size);
 			}
 		}
 	};
 
-	struct AddAssign_AnyInt_AnyInt_Functor {
+	struct Add_AnyInt_AnyInt_InPlace_Functor {
 		size_t lhs_id;
 		size_t rhs_id;
 		size_t lhs_size;
 		size_t rhs_size;
+		bool rhs_signed;
 
-		AddAssign_AnyInt_AnyInt_Functor(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_)
-			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_) {
+		Add_AnyInt_AnyInt_InPlace_Functor(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, bool rhs_signed_)
+			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), rhs_signed(rhs_signed_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
-			size_t rhs = CuGetAsUint64(s, rhs_id, rhs_size);
-			size_t& lhs = CuGet(s, lhs_id).value;
-			lhs += rhs;
-			lhs %= pow2(lhs_size);
+			// AnyInt 槽：rhs 按寄存器声明类型扩展（宽度与截断约定）
+			uint64_t r = CuGetAsUint64(s, rhs_id, rhs_size);
+			if (rhs_signed)
+				r = (uint64_t)get_complement(r, rhs_size);
+			auto& lhs_reg = CuGet(s, lhs_id);
+			lhs_reg.value = (lhs_reg.value + r) & width_mask(lhs_size);
 		}
 	};
 
-	struct AddAssign_AnyInt_AnyInt_Functor_Control_Dag {
+	struct Add_AnyInt_AnyInt_InPlace_Functor_Control_Dag {
 		size_t lhs_id;
 		size_t rhs_id;
 		size_t lhs_size;
 		size_t rhs_size;
+		bool rhs_signed;
 
 		CuCondition_Functor
 
-			AddAssign_AnyInt_AnyInt_Functor_Control_Dag(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, CuCondition_Params)
-			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), CuCondition_Init{
+			Add_AnyInt_AnyInt_InPlace_Functor_Control_Dag(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, bool rhs_signed_, CuCondition_Params)
+			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), rhs_signed(rhs_signed_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
-				size_t rhs = CuGetAsUint64(s, rhs_id, rhs_size);
-				size_t& lhs = CuGet(s, lhs_id).value;
-				lhs -= rhs;
-				lhs %= pow2(lhs_size);
+				// AnyInt 槽：rhs 按寄存器声明类型扩展（宽度与截断约定）
+				uint64_t r = CuGetAsUint64(s, rhs_id, rhs_size);
+				if (rhs_signed)
+					r = (uint64_t)get_complement(r, rhs_size);
+				auto& lhs_reg = CuGet(s, lhs_id);
+				lhs_reg.value = (lhs_reg.value - r) & width_mask(lhs_size);
 			}
 		}
 	};
 
-	struct AddAssign_AnyInt_AnyInt_Functor_Dag {
+	struct Add_AnyInt_AnyInt_InPlace_Functor_Dag {
 		size_t lhs_id;
 		size_t rhs_id;
 		size_t lhs_size;
 		size_t rhs_size;
+		bool rhs_signed;
 
-		AddAssign_AnyInt_AnyInt_Functor_Dag(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_)
-			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_) {
+		Add_AnyInt_AnyInt_InPlace_Functor_Dag(size_t lhs_id_, size_t rhs_id_, size_t lhs_size_, size_t rhs_size_, bool rhs_signed_)
+			: lhs_id(lhs_id_), rhs_id(rhs_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), rhs_signed(rhs_signed_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
-			size_t rhs = CuGetAsUint64(s, rhs_id, rhs_size);
-			size_t& lhs = CuGet(s, lhs_id).value;
-			lhs -= rhs;
-			lhs %= pow2(lhs_size);
+			// AnyInt 槽：rhs 按寄存器声明类型扩展（宽度与截断约定）
+			uint64_t r = CuGetAsUint64(s, rhs_id, rhs_size);
+			if (rhs_signed)
+				r = (uint64_t)get_complement(r, rhs_size);
+			auto& lhs_reg = CuGet(s, lhs_id);
+			lhs_reg.value = (lhs_reg.value - r) & width_mask(lhs_size);
 		}
 	};
 
-	void AddAssign_AnyInt_AnyInt_InPlace::operator()(CuSparseState& state) const
+	void Add_AnyInt_AnyInt_InPlace::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs_id);
+		size_t rhs_size = System::size_of(rhs_id);
+		bool rhs_signed = (System::type_of(rhs_id) == SignedInteger);
 
-			if (!HasCondition)
-			{
-				thrust::for_each(thrust::device,
-					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					AddAssign_AnyInt_AnyInt_Functor(lhs_id, rhs_id, lhs_size, rhs_size)
-				);
-			}
-			else
-			{
-				CuCondition_Host_Prepare
-				thrust::for_each(thrust::device,
-					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					AddAssign_AnyInt_AnyInt_Functor_Control(lhs_id, rhs_id, lhs_size, rhs_size, CuCondition_Args)
-				);
-			}
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Add_AnyInt_AnyInt_InPlace_Functor(lhs_id, rhs_id, lhs_size, rhs_size, rhs_signed)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Add_AnyInt_AnyInt_InPlace_Functor_Control(lhs_id, rhs_id, lhs_size, rhs_size, rhs_signed, CuCondition_Args)
+			);
+		}
 	}
 
-	void AddAssign_AnyInt_AnyInt_InPlace::dag(CuSparseState& state) const
+	void Add_AnyInt_AnyInt_InPlace::dag(CuSparseState& state) const
 	{
 		state.move_to_gpu();
-		CuCondition_Host_Prepare
+		size_t lhs_size = System::size_of(lhs_id);
+		size_t rhs_size = System::size_of(rhs_id);
+		bool rhs_signed = (System::type_of(rhs_id) == SignedInteger);
 
-			if (!HasCondition)
-			{
-				thrust::for_each(thrust::device,
-					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					AddAssign_AnyInt_AnyInt_Functor_Dag(lhs_id, rhs_id, lhs_size, rhs_size)
-				);
-			}
-			else
-			{
-				thrust::for_each(thrust::device,
-					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					AddAssign_AnyInt_AnyInt_Functor_Control_Dag(lhs_id, rhs_id, lhs_size, rhs_size, CuCondition_Args)
-				);
-			}
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Add_AnyInt_AnyInt_InPlace_Functor_Dag(lhs_id, rhs_id, lhs_size, rhs_size, rhs_signed)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Add_AnyInt_AnyInt_InPlace_Functor_Control_Dag(lhs_id, rhs_id, lhs_size, rhs_size, rhs_signed, CuCondition_Args)
+			);
+		}
 	}
 
 
 	struct Assign_Functor_Control {
 		size_t register_1;
 		size_t register_2;
+		size_t register_2_size;
 		CuCondition_Functor
 
-			Assign_Functor_Control(size_t register_1_, size_t register_2_, CuCondition_Params)
-			: register_1(register_1_), register_2(register_2_), CuCondition_Init{
+			Assign_Functor_Control(size_t register_1_, size_t register_2_, size_t register_2_size_, CuCondition_Params)
+			: register_1(register_1_), register_2(register_2_), register_2_size(register_2_size_), CuCondition_Init{
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			CuConditionSatisfied(s) {
 				auto& reg1 = CuGet(s, register_1);
 				auto& reg2 = CuGet(s, register_2);
-				reg2.value ^= reg1.value;
+				reg2.value = (reg2.value ^ reg1.value) & width_mask(register_2_size);
 			}
 		}
 	};
@@ -1214,26 +1231,28 @@ namespace qram_simulator {
 	struct Assign_Functor {
 		size_t register_1;
 		size_t register_2;
+		size_t register_2_size;
 
-		Assign_Functor(size_t register_1_, size_t register_2_)
-			: register_1(register_1_), register_2(register_2_) {
+		Assign_Functor(size_t register_1_, size_t register_2_, size_t register_2_size_)
+			: register_1(register_1_), register_2(register_2_), register_2_size(register_2_size_) {
 		}
 
 		__host__ __device__ void operator()(System& s) const {
 			auto& reg1 = CuGet(s, register_1);
 			auto& reg2 = CuGet(s, register_2);
-			reg2.value ^= reg1.value;
+			reg2.value = (reg2.value ^ reg1.value) & width_mask(register_2_size);
 		}
 	};
 
 	void Assign::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
+		size_t register_2_size = System::size_of(register_2);
 			if (!HasCondition)
 			{
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Assign_Functor(register_1, register_2)
+					Assign_Functor(register_1, register_2, register_2_size)
 				);
 			}
 			else
@@ -1241,7 +1260,7 @@ namespace qram_simulator {
 				CuCondition_Host_Prepare
 				thrust::for_each(thrust::device,
 					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-					Assign_Functor_Control(register_1, register_2, CuCondition_Args)
+					Assign_Functor_Control(register_1, register_2, register_2_size, CuCondition_Args)
 				);
 			}
 	}
@@ -1648,6 +1667,1107 @@ namespace qram_simulator {
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
 				Mod_Mult_UInt_ConstUInt_Functor_Control_Dag(reg, inverse_opnum, N, reg_size, CuCondition_Args)
 			);
+		}
+	}
+
+	struct Sub_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Sub_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) - CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Sub_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Sub_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) - CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+		}
+	};
+
+	void Sub_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Sub_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Sub_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Neg_UInt_Functor_Control {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Neg_UInt_Functor_Control(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_, CuCondition_Params)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (uint64_t{0} - CuGetAsUint64(s, reg, reg_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Neg_UInt_Functor {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		Neg_UInt_Functor(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (uint64_t{0} - CuGetAsUint64(s, reg, reg_size))) & width_mask(res_size);
+		}
+	};
+
+	void Neg_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Neg_UInt_Functor(reg, res, reg_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Neg_UInt_Functor_Control(reg, res, reg_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Abs_SInt_Functor_Control {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Abs_SInt_Functor_Control(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_, CuCondition_Params)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				const int64_t v = CuGetAsInt64(s, reg, reg_size);
+				/* 最小负数（w = 64）回绕为自身 */
+				const uint64_t magnitude = v < 0 ? (uint64_t)(-v) : (uint64_t)v;
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ magnitude) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Abs_SInt_Functor {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		Abs_SInt_Functor(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			const int64_t v = CuGetAsInt64(s, reg, reg_size);
+			/* 最小负数（w = 64）回绕为自身 */
+			const uint64_t magnitude = v < 0 ? (uint64_t)(-v) : (uint64_t)v;
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ magnitude) & width_mask(res_size);
+		}
+	};
+
+	void Abs_SInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Abs_SInt_Functor(reg, res, reg_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Abs_SInt_Functor_Control(reg, res, reg_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Mul_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Mul_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) * CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Mul_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Mul_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) * CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+		}
+	};
+
+	void Mul_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Mul_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Mul_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Div_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Div_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				/* 全域化：除数为零时商取 0（宽度与截断约定） */
+				const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+				const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+				const uint64_t quotient = b == 0 ? uint64_t{0} : a / b;
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ quotient) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Div_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Div_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			/* 全域化：除数为零时商取 0（宽度与截断约定） */
+			const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+			const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+			const uint64_t quotient = b == 0 ? uint64_t{0} : a / b;
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ quotient) & width_mask(res_size);
+		}
+	};
+
+	void Div_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Div_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Div_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Sqrt_UInt_Functor_Control {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Sqrt_UInt_Functor_Control(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_, CuCondition_Params)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ isqrt_u64(CuGetAsUint64(s, reg, reg_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Sqrt_UInt_Functor {
+		size_t reg;
+		size_t res;
+		size_t reg_size;
+		size_t res_size;
+
+		Sqrt_UInt_Functor(size_t reg_, size_t res_, size_t reg_size_, size_t res_size_)
+			: reg(reg_), res(res_), reg_size(reg_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ isqrt_u64(CuGetAsUint64(s, reg, reg_size))) & width_mask(res_size);
+		}
+	};
+
+	void Sqrt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Sqrt_UInt_Functor(reg, res, reg_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Sqrt_UInt_Functor_Control(reg, res, reg_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Select_Bool_UInt_UInt_Functor_Control {
+		size_t cond;
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t cond_size;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Select_Bool_UInt_UInt_Functor_Control(size_t cond_, size_t lhs_, size_t rhs_, size_t res_,
+				size_t cond_size_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: cond(cond_), lhs(lhs_), rhs(rhs_), res(res_),
+			cond_size(cond_size_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				const uint64_t cond_bit = CuGetAsUint64(s, cond, cond_size) & 1ull;
+				const uint64_t selected = cond_bit != 0 ?
+					CuGetAsUint64(s, lhs, lhs_size) : CuGetAsUint64(s, rhs, rhs_size);
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ selected) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Select_Bool_UInt_UInt_Functor {
+		size_t cond;
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t cond_size;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Select_Bool_UInt_UInt_Functor(size_t cond_, size_t lhs_, size_t rhs_, size_t res_,
+			size_t cond_size_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: cond(cond_), lhs(lhs_), rhs(rhs_), res(res_),
+			cond_size(cond_size_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			const uint64_t cond_bit = CuGetAsUint64(s, cond, cond_size) & 1ull;
+			const uint64_t selected = cond_bit != 0 ?
+				CuGetAsUint64(s, lhs, lhs_size) : CuGetAsUint64(s, rhs, rhs_size);
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ selected) & width_mask(res_size);
+		}
+	};
+
+	void Select_Bool_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t cond_size = System::size_of(cond);
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Select_Bool_UInt_UInt_Functor(cond, lhs, rhs, res, cond_size, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Select_Bool_UInt_UInt_Functor_Control(cond, lhs, rhs, res, cond_size, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct And_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			And_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) & CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct And_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		And_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) & CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+		}
+	};
+
+	void And_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				And_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					And_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Or_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Or_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) | CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Or_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Or_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) | CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+		}
+	};
+
+	void Or_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Or_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Or_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Xor_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Xor_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				auto& reg_out = CuGet(s, res);
+				reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) ^ CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+			}
+		}
+	};
+
+	struct Xor_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Xor_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			auto& reg_out = CuGet(s, res);
+			reg_out.value = (reg_out.value ^ (CuGetAsUint64(s, lhs, lhs_size) ^ CuGetAsUint64(s, rhs, rhs_size))) & width_mask(res_size);
+		}
+	};
+
+	void Xor_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Xor_UInt_UInt_Functor(lhs, rhs, res, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Xor_UInt_UInt_Functor_Control(lhs, rhs, res, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Less_SInt_SInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+
+		CuCondition_Functor
+
+			Less_SInt_SInt_Functor_Control(size_t lhs_, size_t rhs_, size_t flag_id_, size_t lhs_size_, size_t rhs_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), flag_id(flag_id_), lhs_size(lhs_size_), rhs_size(rhs_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				const int64_t l = CuGetAsInt64(s, lhs, lhs_size);
+				const int64_t r = CuGetAsInt64(s, rhs, rhs_size);
+				const bool pred = l < r;
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct Less_SInt_SInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+
+		Less_SInt_SInt_Functor(size_t lhs_, size_t rhs_, size_t flag_id_, size_t lhs_size_, size_t rhs_size_)
+			: lhs(lhs_), rhs(rhs_), flag_id(flag_id_), lhs_size(lhs_size_), rhs_size(rhs_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			const int64_t l = CuGetAsInt64(s, lhs, lhs_size);
+			const int64_t r = CuGetAsInt64(s, rhs, rhs_size);
+			const bool pred = l < r;
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void Less_SInt_SInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Less_SInt_SInt_Functor(lhs, rhs, flag_id, lhs_size, rhs_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Less_SInt_SInt_Functor_Control(lhs, rhs, flag_id, lhs_size, rhs_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Carry_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Carry_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+				size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+				const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+				const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+				const bool pred = res_size >= 64 ? (a + b < a) :
+					(a >= (1ull << res_size)) || (b >= (1ull << res_size) - a);
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct Carry_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Carry_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+			size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+			const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+			const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+			const bool pred = res_size >= 64 ? (a + b < a) :
+				(a >= (1ull << res_size)) || (b >= (1ull << res_size) - a);
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void Carry_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Carry_UInt_UInt_Functor(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Carry_UInt_UInt_Functor_Control(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Overflow_SInt_SInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			Overflow_SInt_SInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+				size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+				const uint64_t mask = width_mask(res_size);
+				const uint64_t A = (uint64_t)CuGetAsInt64(s, lhs, lhs_size) & mask;
+				const uint64_t B = (uint64_t)CuGetAsInt64(s, rhs, rhs_size) & mask;
+				const uint64_t S = (A + B) & mask;
+				const uint64_t signA = (A >> (res_size - 1)) & 1ull;
+				const uint64_t signB = (B >> (res_size - 1)) & 1ull;
+				const uint64_t signS = (S >> (res_size - 1)) & 1ull;
+				const bool pred = (signA == signB) && (signS != signA);
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct Overflow_SInt_SInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		Overflow_SInt_SInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+			size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+			const uint64_t mask = width_mask(res_size);
+			const uint64_t A = (uint64_t)CuGetAsInt64(s, lhs, lhs_size) & mask;
+			const uint64_t B = (uint64_t)CuGetAsInt64(s, rhs, rhs_size) & mask;
+			const uint64_t S = (A + B) & mask;
+			const uint64_t signA = (A >> (res_size - 1)) & 1ull;
+			const uint64_t signB = (B >> (res_size - 1)) & 1ull;
+			const uint64_t signS = (S >> (res_size - 1)) & 1ull;
+			const bool pred = (signA == signB) && (signS != signA);
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void Overflow_SInt_SInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Overflow_SInt_SInt_Functor(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Overflow_SInt_SInt_Functor_Control(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	// 128 位乘积高 64 位：device 走 CUDA 内建，host 走 128 位整数（与 CPU 侧分块算法位等价）
+	__host__ __device__ inline uint64_t mul_hi_u64(uint64_t a, uint64_t b)
+	{
+#ifdef __CUDA_ARCH__
+		return __umul64hi(a, b);
+#else
+		return static_cast<uint64_t>((static_cast<unsigned __int128>(a) * b) >> 64);
+#endif
+	}
+
+	struct MulOverflow_UInt_UInt_Functor_Control {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		CuCondition_Functor
+
+			MulOverflow_UInt_UInt_Functor_Control(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+				size_t lhs_size_, size_t rhs_size_, size_t res_size_, CuCondition_Params)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+				const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+				const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+				const uint64_t lo = a * b;
+				const uint64_t hi = mul_hi_u64(a, b);
+				const bool pred = hi != 0 || (res_size < 64 && lo >= (1ull << res_size));
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct MulOverflow_UInt_UInt_Functor {
+		size_t lhs;
+		size_t rhs;
+		size_t res;
+		size_t flag_id;
+		size_t lhs_size;
+		size_t rhs_size;
+		size_t res_size;
+
+		MulOverflow_UInt_UInt_Functor(size_t lhs_, size_t rhs_, size_t res_, size_t flag_id_,
+			size_t lhs_size_, size_t rhs_size_, size_t res_size_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_id_),
+			lhs_size(lhs_size_), rhs_size(rhs_size_), res_size(res_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			/* res 仅提供宽度 res_size，不读其值（宽度与截断约定） */
+			const uint64_t a = CuGetAsUint64(s, lhs, lhs_size);
+			const uint64_t b = CuGetAsUint64(s, rhs, rhs_size);
+			const uint64_t lo = a * b;
+			const uint64_t hi = mul_hi_u64(a, b);
+			const bool pred = hi != 0 || (res_size < 64 && lo >= (1ull << res_size));
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void MulOverflow_UInt_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t lhs_size = System::size_of(lhs);
+		size_t rhs_size = System::size_of(rhs);
+		size_t res_size = System::size_of(res);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				MulOverflow_UInt_UInt_Functor(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					MulOverflow_UInt_UInt_Functor_Control(lhs, rhs, res, flag_id, lhs_size, rhs_size, res_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct IsZero_UInt_Functor_Control {
+		size_t reg;
+		size_t flag_id;
+		size_t reg_size;
+
+		CuCondition_Functor
+
+			IsZero_UInt_Functor_Control(size_t reg_, size_t flag_id_, size_t reg_size_, CuCondition_Params)
+			: reg(reg_), flag_id(flag_id_), reg_size(reg_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				const bool pred = CuGetAsUint64(s, reg, reg_size) == 0;
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct IsZero_UInt_Functor {
+		size_t reg;
+		size_t flag_id;
+		size_t reg_size;
+
+		IsZero_UInt_Functor(size_t reg_, size_t flag_id_, size_t reg_size_)
+			: reg(reg_), flag_id(flag_id_), reg_size(reg_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			const bool pred = CuGetAsUint64(s, reg, reg_size) == 0;
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void IsZero_UInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				IsZero_UInt_Functor(reg, flag_id, reg_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					IsZero_UInt_Functor_Control(reg, flag_id, reg_size, CuCondition_Args)
+				);
+		}
+	}
+
+	struct Negative_SInt_Functor_Control {
+		size_t reg;
+		size_t flag_id;
+		size_t reg_size;
+
+		CuCondition_Functor
+
+			Negative_SInt_Functor_Control(size_t reg_, size_t flag_id_, size_t reg_size_, CuCondition_Params)
+			: reg(reg_), flag_id(flag_id_), reg_size(reg_size_), CuCondition_Init{
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			CuConditionSatisfied(s) {
+				const bool pred = CuGetAsInt64(s, reg, reg_size) < 0;
+				CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+			}
+		}
+	};
+
+	struct Negative_SInt_Functor {
+		size_t reg;
+		size_t flag_id;
+		size_t reg_size;
+
+		Negative_SInt_Functor(size_t reg_, size_t flag_id_, size_t reg_size_)
+			: reg(reg_), flag_id(flag_id_), reg_size(reg_size_) {
+		}
+
+		__host__ __device__ void operator()(System& s) const {
+			const bool pred = CuGetAsInt64(s, reg, reg_size) < 0;
+			CuGet(s, flag_id).value ^= (pred ? 1ull : 0ull);
+		}
+	};
+
+	void Negative_SInt::operator()(CuSparseState& state) const
+	{
+		state.move_to_gpu();
+		size_t reg_size = System::size_of(reg);
+
+		if (!HasCondition)
+		{
+			thrust::for_each(thrust::device,
+				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+				Negative_SInt_Functor(reg, flag_id, reg_size)
+			);
+		}
+		else
+		{
+			CuCondition_Host_Prepare
+
+				thrust::for_each(thrust::device,
+					state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
+					Negative_SInt_Functor_Control(reg, flag_id, reg_size, CuCondition_Args)
+				);
 		}
 	}
 

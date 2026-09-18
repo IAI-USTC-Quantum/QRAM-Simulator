@@ -105,11 +105,14 @@ pip install -e .
 |------|---------|------|
 | 命名空间 | 小写 + 下划线 | `qram_simulator` |
 | 类名 | 大驼峰 (PascalCase) | `QRAMLoad`, `SparseState` |
-| 函数名 | 小驼峰 (camelCase) | `noiseFreeImpl`, `getAmplitude` |
+| 函数名 | 小写 + 下划线 (snake_case) | `noise_free_impl`, `make_mask` |
 | 成员变量 | 小驼峰 + 下划线后缀 | `register_addr_`, `state_vector_` |
 | 局部变量 | 小驼峰 | `tempValue`, `index` |
 | 宏/常量 | 大写 + 下划线 | `MAX_QUBITS`, `CACHE_SIZE` |
 | 模板参数 | 大驼峰 | `typename InputIt` |
+
+量子算子的命名（类型槽位、变体后缀、逆操作表示等）遵循
+[docs/naming_conventions.md](docs/naming_conventions.md)，新增算子前请先阅读。
 
 ### 头文件规范
 

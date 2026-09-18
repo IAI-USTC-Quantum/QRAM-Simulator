@@ -306,7 +306,7 @@ namespace qram_simulator
 
 	/**
 	 * @brief 比较两个系统是否相等（Hadamard 版本）
-	 * @details 用于 Hadamard_PartialQubit，比较时排除目标量子位和掩码位
+	 * @details 用于 Hadamard_Partial，比较时排除目标量子位和掩码位
 	 * @param a 第一个系统
 	 * @param b 第二个系统
 	 * @param out_id 排除的键（寄存器 ID）

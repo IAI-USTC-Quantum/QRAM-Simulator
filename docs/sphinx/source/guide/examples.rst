@@ -75,7 +75,7 @@ PySparQ 已安装，且 C++ 核心已编译（GPU 支持可选）。
 
 .. code-block:: python
 
-   ps.Add_ConstUInt("q", 1)(state)  # |q⟩ → |q+1⟩，所以 |5⟩ → |6⟩
+   ps.Add_ConstUInt_InPlace("q", 1)(state)  # |q⟩ → |q+1⟩，所以 |5⟩ → |6⟩
    ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
@@ -122,7 +122,7 @@ PySparQ 提供丰富的内置算子，覆盖算术、QRAM、QFT、条件旋转�
    # 1.000000+0.000000i  a=|20> b=|7>
 
    # a ← a << 1（左移1位，等价于乘2）
-   ps.ShiftLeft("a", 1)(state)
+   ps.ShiftLeft_InPlace("a", 1)(state)
    ps.pprint(state)           # a = 40
    # 输出：
    # StatePrint (mode=Detail)
@@ -185,12 +185,12 @@ QFT 与逆 QFT
 
    ps.Init_Unsafe("reg", 5)(state)
    ps.QFT("reg")(state)        # 应用 QFT
-   ps.inverseQFT("reg")(state)  # 应用逆 QFT，恢复到 |5⟩
+   ps.InverseQFT("reg")(state)  # 应用逆 QFT，恢复到 |5⟩
    ps.pprint(state)
    # 输出：
    # StatePrint (mode=Detail)
    # |(0)reg : UInt4 |
-   # 1.000000+0.000000i  reg=|5>   ← QFT 后再 inverseQFT 恢复到 |5⟩
+   # 1.000000+0.000000i  reg=|5>   ← QFT 后再 InverseQFT 恢复到 |5⟩
 
 
 示例 3：Python 侧自定义算子
@@ -212,7 +212,7 @@ QFT 与逆 QFT
            ps.SplitRegister(self.target, "tmp", 1)(state)
            ps.CombineRegister(self.target, "tmp")(state)
            # tmp = target << 1
-           ps.ShiftLeft(self.target, 1)(state)
+           ps.ShiftLeft_InPlace(self.target, 1)(state)
            # target = target + tmp
            ps.Add_UInt_UInt(self.target, "tmp")(state)
            ps.RemoveRegister("tmp")(state)

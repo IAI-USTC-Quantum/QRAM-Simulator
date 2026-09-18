@@ -9,6 +9,7 @@ PySparQ is the Python binding for the QRAM-Simulator's sparse-state quantum circ
 - [Core Concepts](#core-concepts)
 - [API Reference](#api-reference)
 - [Examples](#examples)
+- [RIR Execution](#rir-execution)
 - [Performance Tips](#performance-tips)
 
 ## Installation
@@ -252,18 +253,18 @@ ps.GetMid_UInt_UInt("low", "high", "mid")(state)
 
 ```python
 # Pauli gates
-ps.Xgate_Bool("qubit", 0)(state)        # X gate (bit flip) - digit parameter required
-ps.Ygate_Bool("qubit")(state)           # Y gate - digit defaults to 0
-ps.Zgate_Bool("qubit")(state)           # Z gate (phase flip) - digit defaults to 0
+ps.X_Bool("qubit", 0)(state)        # X gate (bit flip) - digit parameter required
+ps.Y_Bool("qubit")(state)           # Y gate - digit defaults to 0
+ps.Z_Bool("qubit")(state)           # Z gate (phase flip) - digit defaults to 0
 
 # Phase gates
-ps.Sgate_Bool("qubit")(state)           # S gate (phase by i)
-ps.Tgate_Bool("qubit")(state)           # T gate (phase by e^(iπ/4))
+ps.S_Bool("qubit")(state)           # S gate (phase by i)
+ps.T_Bool("qubit")(state)           # T gate (phase by e^(iπ/4))
 
 # Rotation gates
-ps.RXgate_Bool("qubit", theta)(state)   # X rotation
-ps.RYgate_Bool("qubit", theta)(state)   # Y rotation
-ps.RZgate_Bool("qubit", theta)(state)   # Z rotation
+ps.RX_Bool("qubit", theta)(state)   # X rotation
+ps.RY_Bool("qubit", theta)(state)   # Y rotation
+ps.RZ_Bool("qubit", theta)(state)   # Z rotation
 
 # General unitary
 matrix = [[a, b], [c, d]]  # 2x2 unitary matrix
@@ -281,7 +282,7 @@ ps.Hadamard_Int("reg", n_digits)(state)
 
 # QFT
 ps.QFT("reg")(state)
-ps.inverseQFT("reg")(state)
+ps.InverseQFT("reg")(state)
 
 # Reflection (diffusion) operator
 ps.Reflection_Bool("reg")(state)
@@ -509,6 +510,168 @@ ps.pprint(state)
 # |(0)addr : UInt4 | |(1)data : UInt8 |
 # 1.000000+0.000000i  addr=|5> data=|42>
 ```
+
+## RIR Execution
+
+PySparQ is the **natural interpreter for RIR** — the register-level intermediate
+representation of the *QECC.Lang* quantum language (the `pyqecclang` package).
+RIR is itself register-level: its JSON documents declare typed named registers
+(`bits` / `uint` / `sint` / `rational` with widths), QRAM resources, and a module
+graph mixing gate-level primitives with structured control nodes (`Call` /
+`Repeat` / `Control` / `Adjoint`). That is exactly the abstraction level PySparQ
+natively operates on, so RIR needs no separate lowering pass:
+`pysparq.run_rir` interprets the document directly on a `SparseState`.
+
+### Why It Is a Natural Fit
+
+| RIR concept | PySparQ native counterpart |
+|---|---|
+| kinds `bits`/`uint`/`sint`/`rational` | `StateStorageType.General`/`UnsignedInteger`/`SignedInteger`/`Rational` |
+| `add_const` on a whole register | `Add_ConstUInt_InPlace` (one native register operation) |
+| uncontrolled `gphase` | `GlobalPhase` |
+| controlled `gphase` | `Phase_Bool` with remaining control bits |
+| gate broadcast on a view | `Rot_Bool` per bit |
+| `xor` / `swap` views | controlled `X_Bool` chains |
+| QRAM resource + `Load` | `QRAMCircuit_qutrit` + `QRAMLoad` |
+| `Control` | multi-bit `conditioned_by_bit` conditions |
+| `Call` / `Repeat` / `Adjoint` | inlined / replayed / inverted at interpretation time |
+
+The module graph is expanded **at interpretation time**: calls are inlined
+through register renaming, `Repeat` bodies are replayed, `Adjoint` walks the body
+backwards with inverted operations, and nested `Control` conditions accumulate
+into multi-bit coherent conditions. Whenever an RIR operand aligns with a whole
+register, the interpreter dispatches the native register-level operator instead
+of decomposing into gate chains; register *slices* fall back to bit-level
+decomposition with wraparound at the view width, as the RIR spec requires.
+
+### API
+
+```python
+import pysparq as ps
+
+result = ps.run_rir(document, memory)  # default budgets
+result = ps.run_rir(document, memory, max_steps=500_000, max_states=4_096)
+result = ps.run_rir_file("program.rir.json", memory={"rom": [1, 2, 4, 7]})
+document = ps.load_rir("program.rir.json")  # dict, JSON string, or file path
+```
+
+- `document` — decoded mapping, JSON string, or path; schema versions `0.1`–`0.3`.
+- `memory` — QRAM contents keyed by resource name; each value is a word sequence
+  or a sparse `{address: word}` mapping.
+- `max_steps` / `max_states` — expansion and sparse-state budgets; exceeding
+  either raises `RIRError` instead of truncating silently.
+
+The returned `RIRResult` provides `registers` (entry-module `(name, width)`
+pairs in declaration order), `amplitudes` (mapping from tuples of per-register
+integer values to complex amplitudes) and `statevector()` (dense little-endian
+vector, `index = value(r0) + (value(r1) << width(r0)) + ...`).
+
+### Example: Bell State
+
+With small helpers mirroring the RIR JSON encoding (see
+`PySparQ/test/test_rir.py`):
+
+```python
+import pysparq as ps
+
+def ref(register, start, width, kind="uint"):
+    return {"tag": "Ref",
+            "parts": [{"tag": "Span", "register": register, "start": start, "width": width}],
+            "type": {"tag": "RegType", "kind": kind, "width": width}}
+
+def prim(op, operands, angle=None, value=None):
+    return {"tag": "Primitive", "op": op, "operands": operands, "angle": angle, "value": value}
+
+def module(name, registers, body, locals_=None, resources=None):
+    return {"tag": "Module", "name": name, "registers": registers,
+            "locals": locals_ or [], "resources": resources or [],
+            "body": body, "attributes": []}
+
+def program(entry, modules):
+    return {"tag": "Program", "entry": entry, "modules": modules, "version": "0.3"}
+
+bell = program("main", [module(
+    "main",
+    [{"tag": "Register", "name": "a", "type": {"tag": "RegType", "kind": "bits", "width": 1}},
+     {"tag": "Register", "name": "b", "type": {"tag": "RegType", "kind": "bits", "width": 1}}],
+    [
+        prim("h", [ref("a", 0, 1, "bits")]),
+        {"tag": "Control", "register": ref("a", 0, 1, "bits"), "value": 1,
+         "body": [prim("x", [ref("b", 0, 1, "bits")])]},
+    ],
+)])
+
+result = ps.run_rir(bell)
+print(result.amplitudes)
+# {(0, 0): (0.7071067811865476+0j), (1, 1): (0.7071067811865476+0j)}
+```
+
+### Example: Module Graph with Call / Repeat / Adjoint
+
+```python
+def register(name, width, kind="uint"):
+    return {"tag": "Register", "name": name, "type": {"tag": "RegType", "kind": kind, "width": width}}
+
+def call(module_name, arguments, resources=()):
+    return {"tag": "Call", "module": module_name, "arguments": arguments, "resources": list(resources)}
+
+inc = module("inc", [register("x", 4)], [prim("add_const", [ref("x", 0, 4)], value=1)])
+main = module(
+    "main",
+    [register("x", 4)],
+    [
+        {"tag": "Repeat", "count": 3, "body": [call("inc", [ref("x", 0, 4)])]},
+        {"tag": "Adjoint", "body": [call("inc", [ref("x", 0, 4)])]},
+    ],
+)
+
+result = ps.run_rir(program("main", [main, inc]))
+print(result.amplitudes)
+# {(2,): (1+0j)}   — three increments, then one adjoint decrement
+```
+
+The whole-register `add_const` is dispatched as a single native
+`Add_ConstUInt_InPlace`; the adjoint negates the constant modulo `2^width`.
+
+### Example: QRAM Loading
+
+```python
+values = {"tag": "Resource", "name": "values",
+          "type": {"tag": "QRAM", "address_width": 2, "data_width": 3}}
+
+main = module(
+    "main",
+    [register("address", 2), register("data", 3)],
+    [
+        prim("h", [ref("address", 0, 2)]),
+        {"tag": "Load", "resource": "values",
+         "address": ref("address", 0, 2), "data": ref("data", 0, 3)},
+    ],
+    resources=[values],
+)
+
+result = ps.run_rir(program("main", [main]), memory={"values": [1, 2, 4, 7]})
+print(result.amplitudes)
+# each branch ≈ 0.5:
+# {(0, 1): (0.5+0j), (1, 2): (0.5+0j), (2, 4): (0.5+0j), (3, 7): (0.5+0j)}
+```
+
+### Safety Properties
+
+- `max_steps` / `max_states` budgets raise `RIRError` instead of truncating.
+- QRAMs wider than `2^20` cells are refused; `memory` must match the declared
+  resources exactly, with range-checked addresses and words.
+- `Module.locals` workspaces must be uncomputed at exit (runtime check).
+- `run_rir` requires an empty global register table and always finishes with
+  `System.clear()`.
+
+### Cross-Validation with pyqecclang
+
+The interpreter consumes only the JSON document — it never imports
+`pyqecclang`. Together with `pyqecclang`'s own event-based adapter
+(`run_pysparq`) and its JSON path (`run_pysparq_rir`, which calls
+`pysparq.run_rir`), the two implementations serve as independent cross-checks
+for each other. Regression tests live in `PySparQ/test/test_rir.py`.
 
 ## Performance Tips
 

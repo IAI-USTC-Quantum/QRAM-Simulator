@@ -343,7 +343,7 @@ def grover_count(
             grover_op.conditioned_by_bit("count", i)(state)
 
     # Apply inverse QFT on count register
-    ps.inverseQFT("count")(state)
+    ps.InverseQFT("count")(state)
 
     # Measure count register
     measured_results, prob = ps.PartialTrace(["addr", "data", "search"])(state)

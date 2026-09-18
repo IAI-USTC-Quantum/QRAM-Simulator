@@ -319,7 +319,7 @@ namespace qram_simulator {
 			);
 		}
 
-		struct QuantumBinarySearchFastFunctor {
+		struct QuantumBinarySearch_FastFunctor {
 			size_t total_length;
 			size_t max_step;
 			size_t address_offset_id;
@@ -331,7 +331,7 @@ namespace qram_simulator {
 
 			size_t* mem;
 
-			QuantumBinarySearchFastFunctor(size_t total_length, size_t max_step, size_t address_offset_id, size_t target_id, size_t result_id,
+			QuantumBinarySearch_FastFunctor(size_t total_length, size_t max_step, size_t address_offset_id, size_t target_id, size_t result_id,
 				size_t address_offset_size, size_t target_size, size_t* mem)
 				: total_length(total_length), max_step(max_step), address_offset_id(address_offset_id), target_id(target_id), result_id(result_id),
 				address_offset_size(address_offset_size), target_size(target_size), mem(mem)
@@ -365,7 +365,7 @@ namespace qram_simulator {
 			}
 		};
 
-		void QuantumBinarySearchFast::operator()(CuSparseState& state) const
+		void QuantumBinarySearch_Fast::operator()(CuSparseState& state) const
 		{
 			profiler _("QBS_Fast");
 			state.move_to_gpu();
@@ -381,7 +381,7 @@ namespace qram_simulator {
 
 			thrust::for_each(thrust::device,
 				state.sparse_state_gpu.begin(), state.sparse_state_gpu.end(),
-				QuantumBinarySearchFastFunctor(total_length, max_step, address_offset_id, target_id, result_id,
+				QuantumBinarySearch_FastFunctor(total_length, max_step, address_offset_id, target_id, result_id,
 					address_offset_size, target_size, mem)
 			);
 		}

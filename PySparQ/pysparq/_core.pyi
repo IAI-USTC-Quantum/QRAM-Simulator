@@ -23,8 +23,333 @@ Example:
 from __future__ import annotations
 import collections.abc
 import typing
-__all__: list[str] = ['AddAssign_AnyInt_AnyInt_InPlace', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt_InPlace', 'Add_Mult_UInt_ConstUInt_InPlace', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Fixed_Bool', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_Int_Int', 'FlipBools', 'General', 'GetDataAddr', 'GetMid_UInt_UInt', 'GetQWRotateAngle_Int_Int_Int', 'GetRotateAngle_Int_Int', 'GetRowAddr', 'GlobalPhase_Int', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_PartialQubit', 'Init_Unsafe', 'Less_UInt_UInt', 'MeasureZ', 'Mod_Mult_UInt_ConstUInt_InPlace', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'Mult_UInt_ConstUInt', 'Normalize', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Probability', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'QuantumBinarySearchFast', 'RXgate_Bool', 'RYgate_Bool', 'RZgate_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Reset', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SXgate_Bool', 'SelfAdjointOperator', 'Sgate_Bool', 'ShiftLeft_InPlace', 'ShiftRight_InPlace', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_Int', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'Tgate_Bool', 'U2gate_Bool', 'U3gate_Bool', 'UnsignedInteger', 'ViewNormalization', 'Xgate_Bool', 'Ygate_Bool', 'ZeroConditionalPhaseFlip', 'Zgate_Bool', 'combine_systems', 'get_seed', 'inverseQFT', 'merge_system', 'print', 'remove_system', 'reseed', 'set_seed', 'split_systems', 'stateprep_unitary_build_schmidt', 'time_seed']
-class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
+__all__: list[str] = ['Abs_SInt', 'Add_AnyInt_AnyInt_InPlace', 'AddRegister', 'AddRegisterWithHadamard', 'Add_ConstUInt_InPlace', 'Add_Mult_UInt_ConstUInt_InPlace', 'Add_UInt_ConstUInt', 'Add_UInt_UInt', 'Add_UInt_UInt_InPlace', 'And_UInt_UInt', 'Assign', 'BaseOperator', 'Binary', 'Boolean', 'Carry_UInt_UInt', 'CheckDuplicateKey', 'CheckNan', 'CheckNormalization', 'ClearZero', 'CombineRegister', 'Compare_UInt_UInt', 'CondRot_Fixed_Bool', 'CondRot_Rational_Bool', 'CustomArithmetic', 'Default', 'DenseMatrix_complex', 'DenseMatrix_float64', 'Detail', 'Div_Sqrt_Arccos_UInt_UInt', 'Div_UInt_UInt', 'FlipBools', 'General', 'GetDataAddr', 'GetMid_UInt_UInt', 'GetQWRotateAngle_Int_Int_Int', 'GetRotateAngle_Int_Int', 'GetRowAddr', 'GlobalPhase', 'Hadamard_Bool', 'Hadamard_Int', 'Hadamard_Int_Full', 'Hadamard_Partial', 'Init_Unsafe', 'IsZero_UInt', 'Less_SInt_SInt', 'Less_UInt_UInt', 'MeasureZ', 'Mod_Mult_UInt_ConstUInt_InPlace', 'ModuleInheritance_Test', 'ModuleInheritance_Test_SelfAdjoint', 'MoveBackRegister', 'MulOverflow_UInt_UInt', 'Mul_UInt_UInt', 'Mult_UInt_ConstUInt', 'Neg_UInt', 'Negative_SInt', 'Normalize', 'Or_UInt_UInt', 'Overflow_SInt_SInt', 'PartialTrace', 'PartialTraceSelect', 'PartialTraceSelectRange', 'Phase_Bool', 'PlusOneAndOverflow', 'Pop', 'Prob', 'Probability', 'Push', 'QFT', 'QRAMCircuit_qutrit', 'QRAMLoad', 'QRAMLoadFast', 'QuantumBinarySearch_Fast', 'RX_Bool', 'RY_Bool', 'RZ_Bool', 'Rational', 'Reflection_Bool', 'RemoveRegister', 'Reset', 'Rot_Bool', 'Rot_GeneralStatePrep', 'Rot_GeneralUnitary', 'SX_Bool', 'Select_Bool_UInt_UInt', 'SelfAdjointOperator', 'S_Bool', 'ShiftLeft_InPlace', 'ShiftRight_InPlace', 'SignedInteger', 'SortByAmplitude', 'SortByKey', 'SortByKey2', 'SortExceptBit', 'SortExceptKey', 'SortExceptKeyHadamard', 'SortUnconditional', 'SparseMatrix', 'SparseState', 'SplitRegister', 'Sqrt_Div_Arccos_Int_UInt', 'Sqrt_UInt', 'StateEqualExceptKey', 'StateEqualExceptQubits', 'StateHashExceptKey', 'StateHashExceptQubits', 'StateLessExceptKey', 'StateLessExceptQubits', 'StatePrint', 'StatePrintDisplay', 'StateStorage', 'StateStorageType', 'Sub_UInt_UInt', 'Swap_Bool_Bool', 'Swap_General_General', 'System', 'TestRemovable', 'T_Bool', 'U2_Bool', 'U3_Bool', 'UnsignedInteger', 'ViewNormalization', 'X_Bool', 'Xor_UInt_UInt', 'Y_Bool', 'ZeroConditionalPhaseFlip', 'Z_Bool', 'combine_systems', 'get_seed', 'InverseQFT', 'merge_system', 'print', 'remove_system', 'reseed', 'set_seed', 'split_systems', 'stateprep_unitary_build_schmidt', 'time_seed']
+class Abs_SInt(SelfAdjointOperator):
+    """
+    Absolute value of a signed integer register.
+
+    Computes: res ^= |reg|, where reg is sign-extended from its two's complement
+    bit pattern, truncated to mod 2^res_width before being XORed into res (SInt
+    in, UInt out).
+
+    Args:
+        reg: Name/ID of the SignedInteger input register.
+        res: Name/ID of the UnsignedInteger output register (result is XORed in).
+
+    Example:
+        Abs_SInt("a", "result")(state)  # result ^= |a|
+    """
+    @typing.overload
+    def __init__(self, reg: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Abs_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Abs_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Abs_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Abs_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Abs_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Abs_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Abs_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Abs_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Abs_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Abs_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Abs_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Add_AnyInt_AnyInt_InPlace(BaseOperator):
     @typing.overload
     def __init__(self, input_reg: str, output_reg: str) -> None:
         ...
@@ -48,7 +373,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_all_ones(self, cond: str) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -64,7 +389,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -80,7 +405,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -96,7 +421,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -112,7 +437,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
 
@@ -129,7 +454,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
 
@@ -146,7 +471,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
 
@@ -163,7 +488,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on a specific bit position.
 
@@ -180,7 +505,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_nonzeros(self, cond: str) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
 
@@ -199,7 +524,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
 
@@ -218,7 +543,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
 
@@ -237,7 +562,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers with nonzero values.
 
@@ -256,7 +581,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
 
@@ -273,7 +598,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
 
@@ -290,7 +615,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
 
@@ -307,7 +632,7 @@ class AddAssign_AnyInt_AnyInt_InPlace(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> AddAssign_AnyInt_AnyInt_InPlace:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Add_AnyInt_AnyInt_InPlace:
         """
         Condition this operation on registers holding a specific value.
 
@@ -1950,6 +2275,331 @@ class Add_UInt_UInt_InPlace(BaseOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
+class And_UInt_UInt(SelfAdjointOperator):
+    """
+    Bitwise AND of two unsigned integer registers.
+
+    Computes: res ^= lhs & rhs, operands zero-extended, result truncated to
+    mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        And_UInt_UInt("a", "b", "result")(state)  # result ^= a & b
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> And_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> And_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> And_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> And_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> And_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> And_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
 class Assign(SelfAdjointOperator):
     @typing.overload
     def __init__(self, src: str, dst: str) -> None:
@@ -2265,6 +2915,333 @@ class BaseOperator:
     def __call__(self, arg0: SparseState) -> None:
         ...
     def dag(self, arg0: SparseState) -> None:
+        ...
+class Carry_UInt_UInt(SelfAdjointOperator):
+    """
+    Carry-out flag of an unsigned addition at the res width.
+
+    Computes: flag ^= carry_out(lhs + rhs) relative to the width w of res,
+    i.e. whether the full-precision sum is >= 2^w (at w = 64 the predicate is
+    64-bit wraparound). out/res 参数仅提供宽度,不读其值.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the register providing the target width w (not read).
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        Carry_UInt_UInt("a", "b", "result", "flag")(state)  # flag ^= carry of a+b at result width
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Carry_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
         ...
 class CheckDuplicateKey(SelfAdjointOperator):
     def __init__(self) -> None:
@@ -2933,7 +3910,7 @@ class DenseMatrix_float64:
     @typing.overload
     def __init__(self, size: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
+class Div_Sqrt_Arccos_UInt_UInt(SelfAdjointOperator):
     @typing.overload
     def __init__(self, lhs_reg: str, rhs_reg: str, out_reg: str) -> None:
         ...
@@ -2957,7 +3934,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, cond: str) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -2973,7 +3950,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -2989,7 +3966,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -3005,7 +3982,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -3021,7 +3998,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -3038,7 +4015,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -3055,7 +4032,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -3072,7 +4049,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -3089,7 +4066,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, cond: str) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -3108,7 +4085,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -3127,7 +4104,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -3146,7 +4123,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -3165,7 +4142,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -3182,7 +4159,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -3199,7 +4176,7 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_Sqrt_Arccos_UInt_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -3216,7 +4193,334 @@ class Div_Sqrt_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_Int_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_Sqrt_Arccos_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Div_UInt_UInt(SelfAdjointOperator):
+    """
+    Integer-divide two unsigned integer registers.
+
+    Computes: res ^= lhs / rhs (floor division). Total-domain convention: a zero
+    divisor yields quotient 0 instead of raising (overflow/domain information is
+    reported by dedicated flag operators); the quotient is truncated to
+    mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the dividend register.
+        rhs: Name/ID of the divisor register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Div_UInt_UInt("a", "b", "result")(state)  # result ^= a / b (0 if b == 0)
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Div_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Div_UInt_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -4502,7 +5806,7 @@ class GetRowAddr(SelfAdjointOperator):
     @typing.overload
     def __init__(self, reg_offset: typing.SupportsInt | typing.SupportsIndex, reg_row: typing.SupportsInt | typing.SupportsIndex, row_size: typing.SupportsInt | typing.SupportsIndex, reg_row_offset: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class GlobalPhase_Int(BaseOperator):
+class GlobalPhase(BaseOperator):
     def __init__(self, phase: typing.SupportsComplex | typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
     def clear_control_all_ones(self) -> None:
@@ -4522,7 +5826,7 @@ class GlobalPhase_Int(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> GlobalPhase_Int:
+    def conditioned_by_all_ones(self, cond: str) -> GlobalPhase:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -4538,7 +5842,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> GlobalPhase_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> GlobalPhase:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -4554,7 +5858,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -4570,7 +5874,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> GlobalPhase_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> GlobalPhase:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -4586,7 +5890,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on a specific bit position.
 
@@ -4603,7 +5907,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase:
         """
         Condition this operation on a specific bit position.
 
@@ -4620,7 +5924,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on a specific bit position.
 
@@ -4637,7 +5941,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase:
         """
         Condition this operation on a specific bit position.
 
@@ -4654,7 +5958,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> GlobalPhase_Int:
+    def conditioned_by_nonzeros(self, cond: str) -> GlobalPhase:
         """
         Condition this operation on registers with nonzero values.
 
@@ -4673,7 +5977,7 @@ class GlobalPhase_Int(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> GlobalPhase_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> GlobalPhase:
         """
         Condition this operation on registers with nonzero values.
 
@@ -4692,7 +5996,7 @@ class GlobalPhase_Int(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on registers with nonzero values.
 
@@ -4711,7 +6015,7 @@ class GlobalPhase_Int(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> GlobalPhase_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> GlobalPhase:
         """
         Condition this operation on registers with nonzero values.
 
@@ -4730,7 +6034,7 @@ class GlobalPhase_Int(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on registers holding a specific value.
 
@@ -4747,7 +6051,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase:
         """
         Condition this operation on registers holding a specific value.
 
@@ -4764,7 +6068,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase_Int:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> GlobalPhase:
         """
         Condition this operation on registers holding a specific value.
 
@@ -4781,7 +6085,7 @@ class GlobalPhase_Int(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> GlobalPhase:
         """
         Condition this operation on registers holding a specific value.
 
@@ -5756,7 +7060,7 @@ class Hadamard_Int_Full(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class Hadamard_PartialQubit(SelfAdjointOperator):
+class Hadamard_Partial(SelfAdjointOperator):
     @typing.overload
     def __init__(self, reg_in: str, qubit_positions: set) -> None:
         ...
@@ -5780,7 +7084,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Hadamard_PartialQubit:
+    def conditioned_by_all_ones(self, cond: str) -> Hadamard_Partial:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -5796,7 +7100,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Hadamard_PartialQubit:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Hadamard_Partial:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -5812,7 +7116,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -5828,7 +7132,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Hadamard_PartialQubit:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Hadamard_Partial:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -5844,7 +7148,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on a specific bit position.
 
@@ -5861,7 +7165,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_PartialQubit:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_Partial:
         """
         Condition this operation on a specific bit position.
 
@@ -5878,7 +7182,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on a specific bit position.
 
@@ -5895,7 +7199,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_PartialQubit:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_Partial:
         """
         Condition this operation on a specific bit position.
 
@@ -5912,7 +7216,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Hadamard_PartialQubit:
+    def conditioned_by_nonzeros(self, cond: str) -> Hadamard_Partial:
         """
         Condition this operation on registers with nonzero values.
 
@@ -5931,7 +7235,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Hadamard_PartialQubit:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Hadamard_Partial:
         """
         Condition this operation on registers with nonzero values.
 
@@ -5950,7 +7254,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on registers with nonzero values.
 
@@ -5969,7 +7273,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Hadamard_PartialQubit:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Hadamard_Partial:
         """
         Condition this operation on registers with nonzero values.
 
@@ -5988,7 +7292,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on registers holding a specific value.
 
@@ -6005,7 +7309,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_PartialQubit:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_Partial:
         """
         Condition this operation on registers holding a specific value.
 
@@ -6022,7 +7326,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_PartialQubit:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Hadamard_Partial:
         """
         Condition this operation on registers holding a specific value.
 
@@ -6039,7 +7343,7 @@ class Hadamard_PartialQubit(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_PartialQubit:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Hadamard_Partial:
         """
         Condition this operation on registers holding a specific value.
 
@@ -6087,6 +7391,655 @@ class Init_Unsafe(SelfAdjointOperator):
         ...
     @typing.overload
     def __init__(self, id: typing.SupportsInt | typing.SupportsIndex, value: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+class IsZero_UInt(SelfAdjointOperator):
+    """
+    Zero test of an unsigned integer register.
+
+    Computes: flag ^= (reg == 0), with the operand zero-extended to the
+    full-precision domain before comparing.
+
+    Args:
+        reg: Name/ID of the UnsignedInteger input register.
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        IsZero_UInt("a", "flag")(state)  # flag ^= (a == 0)
+    """
+    @typing.overload
+    def __init__(self, reg: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> IsZero_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> IsZero_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> IsZero_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> IsZero_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> IsZero_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> IsZero_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> IsZero_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> IsZero_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> IsZero_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> IsZero_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> IsZero_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Less_SInt_SInt(SelfAdjointOperator):
+    """
+    Signed less-than comparison of two signed integer registers.
+
+    Computes: flag ^= (lhs < rhs), where both operands are sign-extended to the
+    full-precision comparison domain (64-bit) before comparing.
+
+    Args:
+        lhs: Name/ID of the SignedInteger left operand register.
+        rhs: Name/ID of the SignedInteger right operand register.
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        Less_SInt_SInt("a", "b", "flag")(state)  # flag ^= (a < b)
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Less_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Less_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Less_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
         ...
 class Less_UInt_UInt(SelfAdjointOperator):
     @typing.overload
@@ -6776,6 +8729,658 @@ class MoveBackRegister:
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
+class MulOverflow_UInt_UInt(SelfAdjointOperator):
+    """
+    Multiplication overflow flag relative to the res width.
+
+    Computes: flag ^= (lhs * rhs does not fit in w bits), where w is the width of
+    res; the product is evaluated at full precision (128-bit, via 64-bit hi/lo
+    decomposition). out/res 参数仅提供宽度,不读其值.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the register providing the target width w (not read).
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        MulOverflow_UInt_UInt("a", "b", "result", "flag")(state)  # flag ^= (a*b overflows result width)
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> MulOverflow_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Mul_UInt_UInt(SelfAdjointOperator):
+    """
+    Multiply two unsigned integer registers.
+
+    Computes: res ^= lhs * rhs, taking the low 64 bits of the full-precision
+    (128-bit) product, truncated to mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Mul_UInt_UInt("a", "b", "result")(state)  # result ^= a * b
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Mul_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
 class Mult_UInt_ConstUInt(SelfAdjointOperator):
     @typing.overload
     def __init__(self, input_reg: str, multiplier: typing.SupportsInt | typing.SupportsIndex, output_reg: str) -> None:
@@ -7087,6 +9692,654 @@ class Mult_UInt_ConstUInt(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
+class Neg_UInt(SelfAdjointOperator):
+    """
+    Negate an unsigned integer register.
+
+    Computes: res ^= 0 - reg (two's complement negation on the unsigned 64-bit
+    wraparound domain), truncated to mod 2^res_width before being XORed into res.
+
+    Args:
+        reg: Name/ID of the input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Neg_UInt("a", "result")(state)  # result ^= -a
+    """
+    @typing.overload
+    def __init__(self, reg: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Neg_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Neg_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Neg_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Neg_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Neg_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Neg_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Neg_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Neg_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Neg_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Neg_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Neg_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Negative_SInt(SelfAdjointOperator):
+    """
+    Negativity test of a signed integer register.
+
+    Computes: flag ^= (reg < 0), where reg is sign-extended from its two's
+    complement bit pattern before comparing against 0.
+
+    Args:
+        reg: Name/ID of the SignedInteger input register.
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        Negative_SInt("a", "flag")(state)  # flag ^= (a < 0)
+    """
+    @typing.overload
+    def __init__(self, reg: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Negative_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Negative_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Negative_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Negative_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Negative_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Negative_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Negative_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Negative_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Negative_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Negative_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Negative_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
 class Normalize(SelfAdjointOperator):
     """
 
@@ -7100,6 +10353,658 @@ class Normalize(SelfAdjointOperator):
         Normalize()(state)
     """
     def __init__(self) -> None:
+        ...
+class Or_UInt_UInt(SelfAdjointOperator):
+    """
+    Bitwise OR of two unsigned integer registers.
+
+    Computes: res ^= lhs | rhs, operands zero-extended, result truncated to
+    mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Or_UInt_UInt("a", "b", "result")(state)  # result ^= a | b
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Or_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Or_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Or_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Overflow_SInt_SInt(SelfAdjointOperator):
+    """
+    Signed-addition overflow flag at the res width.
+
+    Computes: flag ^= overflow(lhs + rhs) at width w of res: operands are
+    sign-extended, truncated to w bits, and the same-sign/addends/result-sign-
+    flip rule is applied. out/res 参数仅提供宽度,不读其值.
+
+    Args:
+        lhs: Name/ID of the SignedInteger left operand register.
+        rhs: Name/ID of the SignedInteger right operand register.
+        res: Name/ID of the register providing the target width w (not read).
+        flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+    Example:
+        Overflow_SInt_SInt("a", "b", "result", "flag")(state)  # flag ^= signed overflow of a+b at result width
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str, flag: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex, flag_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Overflow_SInt_SInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
         ...
 class PartialTrace:
     def __call__(self, state: SparseState) -> tuple[list[int], float]:
@@ -7836,7 +11741,7 @@ class QFT(BaseOperator):
     Example:
         QFT("data")(state)  # Apply QFT
         # ... computation ...
-        inverseQFT("data")(state)  # Apply inverse QFT
+        InverseQFT("data")(state)  # Apply inverse QFT
     """
     @typing.overload
     def __init__(self, reg_name: str) -> None:
@@ -8135,6 +12040,15 @@ class QFT(BaseOperator):
 
         Returns:
             Self, for method chaining.
+        """
+    def dag(self, state: SparseState) -> None:
+        """
+        Apply the adjoint (inverse) of this operation.
+
+        Args:
+            state: The quantum state to operate on.
+
+        Note: Only available for self-adjoint operators.
         """
     @property
     def condition_variable_all_ones(self) -> list[int]:
@@ -8810,14 +12724,14 @@ class QRAMLoadFast(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class QuantumBinarySearchFast(SelfAdjointOperator):
+class QuantumBinarySearch_Fast(SelfAdjointOperator):
     @typing.overload
     def __init__(self, qram: QRAMCircuit_qutrit, address_offset_register: str, total_length: typing.SupportsInt | typing.SupportsIndex, target_register: str, result_register: str) -> None:
         ...
     @typing.overload
     def __init__(self, qram: QRAMCircuit_qutrit, address_offset_register: typing.SupportsInt | typing.SupportsIndex, total_length: typing.SupportsInt | typing.SupportsIndex, target_register: typing.SupportsInt | typing.SupportsIndex, result_register: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class RXgate_Bool(Rot_Bool):
+class RX_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
@@ -8830,7 +12744,7 @@ class RXgate_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
-class RYgate_Bool(Rot_Bool):
+class RY_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
@@ -8843,7 +12757,7 @@ class RYgate_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
-class RZgate_Bool(BaseOperator):
+class RZ_Bool(BaseOperator):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
@@ -8873,7 +12787,7 @@ class RZgate_Bool(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> RZgate_Bool:
+    def conditioned_by_all_ones(self, cond: str) -> RZ_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -8889,7 +12803,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> RZgate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> RZ_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -8905,7 +12819,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -8921,7 +12835,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> RZgate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> RZ_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -8937,7 +12851,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -8954,7 +12868,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> RZgate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> RZ_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -8971,7 +12885,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -8988,7 +12902,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> RZgate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> RZ_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -9005,7 +12919,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> RZgate_Bool:
+    def conditioned_by_nonzeros(self, cond: str) -> RZ_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -9024,7 +12938,7 @@ class RZgate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> RZgate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> RZ_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -9043,7 +12957,7 @@ class RZgate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -9062,7 +12976,7 @@ class RZgate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> RZgate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> RZ_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -9081,7 +12995,7 @@ class RZgate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -9098,7 +13012,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> RZgate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> RZ_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -9115,7 +13029,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> RZgate_Bool:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> RZ_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -9132,7 +13046,7 @@ class RZgate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> RZgate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> RZ_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -10477,17 +14391,344 @@ class Rot_GeneralUnitary(BaseOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class SXgate_Bool(Rot_Bool):
+class SX_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
+class Select_Bool_UInt_UInt(SelfAdjointOperator):
+    """
+    Select between two unsigned integer registers by a Boolean condition.
+
+    Computes: res ^= (cond ? lhs : rhs), where cond is a width-1 Boolean register
+    read at bit 0; the selected value is truncated to mod 2^res_width before
+    being XORed into res.
+
+    Args:
+        cond: Name/ID of the width-1 Boolean condition register.
+        lhs: Name/ID of the register selected when cond == 1.
+        rhs: Name/ID of the register selected when cond == 0.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Select_Bool_UInt_UInt("c", "a", "b", "result")(state)  # result ^= a if c else b
+    """
+    @typing.overload
+    def __init__(self, cond: str, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, cond_id: typing.SupportsInt | typing.SupportsIndex, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Select_Bool_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
 class SelfAdjointOperator(BaseOperator):
     def dag(self, arg0: SparseState) -> None:
         ...
-class Sgate_Bool(Phase_Bool):
+class S_Bool(Phase_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
@@ -11245,7 +15486,7 @@ class SplitRegister:
         ...
     def __init__(self, first: str, second: str, size: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
+class Sqrt_Div_Arccos_Int_UInt(SelfAdjointOperator):
     @typing.overload
     def __init__(self, lhs_reg: str, rhs_reg: str, out_reg: str) -> None:
         ...
@@ -11269,7 +15510,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, cond: str) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -11285,7 +15526,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -11301,7 +15542,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -11317,7 +15558,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -11333,7 +15574,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -11350,7 +15591,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -11367,7 +15608,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -11384,7 +15625,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on a specific bit position.
 
@@ -11401,7 +15642,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, cond: str) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -11420,7 +15661,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -11439,7 +15680,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -11458,7 +15699,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers with nonzero values.
 
@@ -11477,7 +15718,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -11494,7 +15735,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -11511,7 +15752,7 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_Div_Arccos_Int_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -11528,7 +15769,332 @@ class Sqrt_Div_Arccos_Int_Int(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_Int:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_Div_Arccos_Int_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Sqrt_UInt(SelfAdjointOperator):
+    """
+    Integer square root of an unsigned integer register.
+
+    Computes: res ^= isqrt(reg) = floor(sqrt(reg)) via an integer-only bitwise
+    algorithm (CPU and CUDA agree bit-for-bit), truncated to mod 2^res_width
+    before being XORed into res.
+
+    Args:
+        reg: Name/ID of the input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Sqrt_UInt("a", "result")(state)  # result ^= floor(sqrt(a))
+    """
+    @typing.overload
+    def __init__(self, reg: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Sqrt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Sqrt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Sqrt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Sqrt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sqrt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sqrt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sqrt_UInt:
         """
         Condition this operation on registers holding a specific value.
 
@@ -11695,6 +16261,331 @@ class StateStorageType:
         ...
     @property
     def value(self) -> int:
+        ...
+class Sub_UInt_UInt(SelfAdjointOperator):
+    """
+    Subtract two unsigned integer registers.
+
+    Computes: res ^= lhs - rhs, evaluated on the unsigned 64-bit wraparound
+    domain, then truncated to mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the minuend register.
+        rhs: Name/ID of the subtrahend register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Sub_UInt_UInt("a", "b", "result")(state)  # result ^= a - b
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Sub_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
         ...
 class Swap_Bool_Bool(SelfAdjointOperator):
     @typing.overload
@@ -12460,14 +17351,14 @@ class TestRemovable(SelfAdjointOperator):
     @typing.overload
     def __init__(self, register_id: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
-class Tgate_Bool(Phase_Bool):
+class T_Bool(Phase_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
-class U2gate_Bool(Rot_Bool):
+class U2_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex, phi: typing.SupportsFloat | typing.SupportsIndex, lambda_: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
@@ -12480,7 +17371,7 @@ class U2gate_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, phi: typing.SupportsFloat | typing.SupportsIndex, lambda_: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
-class U3gate_Bool(Rot_Bool):
+class U3_Bool(Rot_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex, theta: typing.SupportsFloat | typing.SupportsIndex, phi: typing.SupportsFloat | typing.SupportsIndex, lambda_: typing.SupportsFloat | typing.SupportsIndex) -> None:
         ...
@@ -12496,7 +17387,7 @@ class U3gate_Bool(Rot_Bool):
 class ViewNormalization(SelfAdjointOperator):
     def __init__(self) -> None:
         ...
-class Xgate_Bool(SelfAdjointOperator):
+class X_Bool(SelfAdjointOperator):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
@@ -12520,7 +17411,7 @@ class Xgate_Bool(SelfAdjointOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Xgate_Bool:
+    def conditioned_by_all_ones(self, cond: str) -> X_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12536,7 +17427,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Xgate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> X_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12552,7 +17443,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12568,7 +17459,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Xgate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> X_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12584,7 +17475,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12601,7 +17492,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Xgate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> X_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12618,7 +17509,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12635,7 +17526,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Xgate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> X_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12652,7 +17543,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Xgate_Bool:
+    def conditioned_by_nonzeros(self, cond: str) -> X_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -12671,7 +17562,7 @@ class Xgate_Bool(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Xgate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> X_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -12690,7 +17581,7 @@ class Xgate_Bool(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -12709,7 +17600,7 @@ class Xgate_Bool(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Xgate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> X_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -12728,7 +17619,7 @@ class Xgate_Bool(SelfAdjointOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -12745,7 +17636,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Xgate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> X_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -12762,7 +17653,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Xgate_Bool:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> X_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -12779,7 +17670,7 @@ class Xgate_Bool(SelfAdjointOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Xgate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> X_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -12807,7 +17698,332 @@ class Xgate_Bool(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class Ygate_Bool(BaseOperator):
+class Xor_UInt_UInt(SelfAdjointOperator):
+    """
+    Bitwise XOR of two unsigned integer registers.
+
+    Computes: res ^= lhs ^ rhs, operands zero-extended, result truncated to
+    mod 2^res_width before being XORed into res.
+
+    Args:
+        lhs: Name/ID of the first input register.
+        rhs: Name/ID of the second input register.
+        res: Name/ID of the output register (result is XORed in).
+
+    Example:
+        Xor_UInt_UInt("a", "b", "result")(state)  # result ^= a ^ b
+    """
+    @typing.overload
+    def __init__(self, lhs: str, rhs: str, res: str) -> None:
+        ...
+    @typing.overload
+    def __init__(self, lhs_id: typing.SupportsInt | typing.SupportsIndex, rhs_id: typing.SupportsInt | typing.SupportsIndex, res_id: typing.SupportsInt | typing.SupportsIndex) -> None:
+        ...
+    def clear_control_all_ones(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_bit(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_by_value(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    def clear_control_nonzeros(self) -> None:
+        """
+        Clear all control conditions of the specified type.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: str) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers where all bits are 1.
+
+        Calling this method replaces prior all-ones conditions. Pass the list
+        overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on a specific bit position.
+
+        Calling this method replaces prior bit conditions. Pass the list-of-pairs
+        overload to require several bits simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Bit position to check (0-indexed).
+            conds: List of (register, position) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: str) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers with nonzero values.
+
+        Calling this method replaces prior nonzero-register conditions. Pass the
+        list overload to require several registers simultaneously; conditions of
+        different kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int) to condition on.
+            conds: List of register names or IDs for multi-condition.
+
+        Returns:
+            Self, for method chaining.
+
+        Example:
+            op.conditioned_by_nonzeros('control_reg')(state)
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @typing.overload
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Xor_UInt_UInt:
+        """
+        Condition this operation on registers holding a specific value.
+
+        Calling this method replaces prior value conditions. Pass the list-of-pairs
+        overload to require several values simultaneously; conditions of different
+        kinds are combined with logical AND.
+
+        Args:
+            cond: Register name (str) or ID (int).
+            pos: Value to match.
+            conds: List of (register, value) pairs.
+
+        Returns:
+            Self, for method chaining.
+        """
+    @property
+    def condition_variable_all_ones(self) -> list[int]:
+        ...
+    @property
+    def condition_variable_by_bit(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_by_value(self) -> list[tuple[int, int]]:
+        ...
+    @property
+    def condition_variable_nonzeros(self) -> list[int]:
+        ...
+class Y_Bool(BaseOperator):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
@@ -12831,7 +18047,7 @@ class Ygate_Bool(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> Ygate_Bool:
+    def conditioned_by_all_ones(self, cond: str) -> Y_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12847,7 +18063,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Ygate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> Y_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12863,7 +18079,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12879,7 +18095,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Ygate_Bool:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Y_Bool:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -12895,7 +18111,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12912,7 +18128,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Ygate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Y_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12929,7 +18145,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12946,7 +18162,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Ygate_Bool:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Y_Bool:
         """
         Condition this operation on a specific bit position.
 
@@ -12963,7 +18179,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> Ygate_Bool:
+    def conditioned_by_nonzeros(self, cond: str) -> Y_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -12982,7 +18198,7 @@ class Ygate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Ygate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> Y_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13001,7 +18217,7 @@ class Ygate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13020,7 +18236,7 @@ class Ygate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Ygate_Bool:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> Y_Bool:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13039,7 +18255,7 @@ class Ygate_Bool(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13056,7 +18272,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Ygate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> Y_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13073,7 +18289,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Ygate_Bool:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> Y_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13090,7 +18306,7 @@ class Ygate_Bool(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Ygate_Bool:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> Y_Bool:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13429,14 +18645,14 @@ class ZeroConditionalPhaseFlip(SelfAdjointOperator):
     @property
     def condition_variable_nonzeros(self) -> list[int]:
         ...
-class Zgate_Bool(Phase_Bool):
+class Z_Bool(Phase_Bool):
     @typing.overload
     def __init__(self, reg: str, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
     @typing.overload
     def __init__(self, reg_id: typing.SupportsInt | typing.SupportsIndex, digit: typing.SupportsInt | typing.SupportsIndex = 0) -> None:
         ...
-class inverseQFT(BaseOperator):
+class InverseQFT(BaseOperator):
     """
 
     Inverse Quantum Fourier Transform on a register.
@@ -13470,7 +18686,7 @@ class inverseQFT(BaseOperator):
         Clear all control conditions of the specified type.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: str) -> inverseQFT:
+    def conditioned_by_all_ones(self, cond: str) -> InverseQFT:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -13486,7 +18702,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> inverseQFT:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[str]) -> InverseQFT:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -13502,7 +18718,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_all_ones(self, cond: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -13518,7 +18734,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> inverseQFT:
+    def conditioned_by_all_ones(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> InverseQFT:
         """
         Condition this operation on registers where all bits are 1.
 
@@ -13534,7 +18750,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_bit(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on a specific bit position.
 
@@ -13551,7 +18767,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> inverseQFT:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> InverseQFT:
         """
         Condition this operation on a specific bit position.
 
@@ -13568,7 +18784,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_bit(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on a specific bit position.
 
@@ -13585,7 +18801,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> inverseQFT:
+    def conditioned_by_bit(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> InverseQFT:
         """
         Condition this operation on a specific bit position.
 
@@ -13602,7 +18818,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: str) -> inverseQFT:
+    def conditioned_by_nonzeros(self, cond: str) -> InverseQFT:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13621,7 +18837,7 @@ class inverseQFT(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> inverseQFT:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[str]) -> InverseQFT:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13640,7 +18856,7 @@ class inverseQFT(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_nonzeros(self, cond: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13659,7 +18875,7 @@ class inverseQFT(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> inverseQFT:
+    def conditioned_by_nonzeros(self, conds: collections.abc.Sequence[typing.SupportsInt | typing.SupportsIndex]) -> InverseQFT:
         """
         Condition this operation on registers with nonzero values.
 
@@ -13678,7 +18894,7 @@ class inverseQFT(BaseOperator):
             op.conditioned_by_nonzeros('control_reg')(state)
         """
     @typing.overload
-    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_value(self, cond: str, pos: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13695,7 +18911,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> inverseQFT:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[str, typing.SupportsInt | typing.SupportsIndex]]) -> InverseQFT:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13712,7 +18928,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> inverseQFT:
+    def conditioned_by_value(self, cond: typing.SupportsInt | typing.SupportsIndex, pos: typing.SupportsInt | typing.SupportsIndex) -> InverseQFT:
         """
         Condition this operation on registers holding a specific value.
 
@@ -13729,7 +18945,7 @@ class inverseQFT(BaseOperator):
             Self, for method chaining.
         """
     @typing.overload
-    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> inverseQFT:
+    def conditioned_by_value(self, conds: collections.abc.Sequence[tuple[typing.SupportsInt | typing.SupportsIndex, typing.SupportsInt | typing.SupportsIndex]]) -> InverseQFT:
         """
         Condition this operation on registers holding a specific value.
 

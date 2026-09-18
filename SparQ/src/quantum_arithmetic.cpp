@@ -2,14 +2,6 @@
 
 namespace qram_simulator
 {
-	namespace
-	{
-		uint64_t width_mask(size_t width)
-		{
-			return width == 64 ? ~uint64_t{0} : pow2(width) - 1;
-		}
-	}
-
 	void FlipBools::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
@@ -412,7 +404,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Div_Sqrt_Arccos_Int_Int::operator()(std::vector<System>& state) const
+	void Div_Sqrt_Arccos_UInt_UInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -434,7 +426,7 @@ namespace qram_simulator
 		}
 	}
 
-	void Sqrt_Div_Arccos_Int_Int::operator()(std::vector<System>& state) const
+	void Sqrt_Div_Arccos_Int_UInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -489,17 +481,7 @@ namespace qram_simulator
 		}
 	}
 
-	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
-	{
-		lhs = (lhs + rhs) & width_mask(l_size);
-	}
-
-	void AddAssign_AnyInt_AnyInt_InPlace::_operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size)
-	{
-		lhs = (lhs - rhs) & width_mask(l_size);
-	}
-
-	void AddAssign_AnyInt_AnyInt_InPlace::operator()(std::vector<System>& state) const
+	void Sub_UInt_UInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -513,13 +495,14 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 
-			_operate_uint_uint(
-				s.get(lhs_id).value, lhs_size,
-				s.get(rhs_id).as<uint64_t>(rhs_size), rhs_size);
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (s.GetAs(lhs, uint64_t) - s.GetAs(rhs, uint64_t))) & mask;
 		}
 	}
 
-	void AddAssign_AnyInt_AnyInt_InPlace::dag(std::vector<System>& state) const
+	void Neg_UInt::operator()(std::vector<System>& state) const
 	{
 #ifdef SINGLE_THREAD
 		for (auto& s : state)
@@ -533,9 +516,387 @@ namespace qram_simulator
 			if (ConditionNotSatisfied(s))
 				continue;
 
-			_operate_uint_uint_dag(
-				s.get(lhs_id).value, lhs_size,
-				s.get(rhs_id).as<uint64_t>(rhs_size), rhs_size);
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (uint64_t{0} - s.GetAs(reg, uint64_t))) & mask;
+		}
+	}
+
+	void Abs_SInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const int64_t v = get_complement(s.GetAs(reg, uint64_t), System::size_of(reg));
+			/* 最小负数（w = 64）回绕为自身 */
+			const uint64_t magnitude = v < 0 ? (uint64_t)(-v) : (uint64_t)v;
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ magnitude) & mask;
+		}
+	}
+
+	void Mul_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (s.GetAs(lhs, uint64_t) * s.GetAs(rhs, uint64_t))) & mask;
+		}
+	}
+
+	void Div_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			/* 全域化：除数为零时商取 0（宽度与截断约定） */
+			const uint64_t a = s.GetAs(lhs, uint64_t);
+			const uint64_t b = s.GetAs(rhs, uint64_t);
+			const uint64_t quotient = b == 0 ? uint64_t{0} : a / b;
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ quotient) & mask;
+		}
+	}
+
+	void Sqrt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ isqrt_u64(s.GetAs(reg, uint64_t))) & mask;
+		}
+	}
+
+	void Select_Bool_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const uint64_t cond_bit = s.GetAs(cond, uint64_t) & 1ull;
+			const uint64_t selected = cond_bit != 0 ? s.GetAs(lhs, uint64_t) : s.GetAs(rhs, uint64_t);
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ selected) & mask;
+		}
+	}
+
+	void And_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (s.GetAs(lhs, uint64_t) & s.GetAs(rhs, uint64_t))) & mask;
+		}
+	}
+
+	void Or_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (s.GetAs(lhs, uint64_t) | s.GetAs(rhs, uint64_t))) & mask;
+		}
+	}
+
+	void Xor_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			auto& result = s.get(res).value;
+			const auto size = System::size_of(res);
+			const auto mask = width_mask(size);
+			result = (result ^ (s.GetAs(lhs, uint64_t) ^ s.GetAs(rhs, uint64_t))) & mask;
+		}
+	}
+
+	void Less_SInt_SInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const int64_t l = get_complement(s.GetAs(lhs, uint64_t), System::size_of(lhs));
+			const int64_t r = get_complement(s.GetAs(rhs, uint64_t), System::size_of(rhs));
+			const bool pred = l < r;
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	void Carry_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			/* res 仅提供宽度 w，不读其值（宽度与截断约定） */
+			const uint64_t a = s.GetAs(lhs, uint64_t);
+			const uint64_t b = s.GetAs(rhs, uint64_t);
+			const size_t w = System::size_of(res);
+			const bool pred = w >= 64 ? (a + b < a) :
+				(a >= (1ull << w)) || (b >= (1ull << w) - a);
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	void Overflow_SInt_SInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			/* res 仅提供宽度 w，不读其值（宽度与截断约定） */
+			const size_t w = System::size_of(res);
+			const uint64_t mask = width_mask(w);
+			const uint64_t A = static_cast<uint64_t>(
+				get_complement(s.GetAs(lhs, uint64_t), System::size_of(lhs))) & mask;
+			const uint64_t B = static_cast<uint64_t>(
+				get_complement(s.GetAs(rhs, uint64_t), System::size_of(rhs))) & mask;
+			const uint64_t S = (A + B) & mask;
+			const uint64_t signA = (A >> (w - 1)) & 1ull;
+			const uint64_t signB = (B >> (w - 1)) & 1ull;
+			const uint64_t signS = (S >> (w - 1)) & 1ull;
+			const bool pred = (signA == signB) && (signS != signA);
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	void MulOverflow_UInt_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			/* res 仅提供宽度 w，不读其值（宽度与截断约定） */
+			const uint64_t a = s.GetAs(lhs, uint64_t);
+			const uint64_t b = s.GetAs(rhs, uint64_t);
+			const uint64_t lo = a * b;
+			/* 128 位乘积高 64 位：32 位分块（与 CUDA 侧 mul_hi_u64 位等价） */
+			const uint64_t a_lo = uint32_t(a), a_hi = a >> 32;
+			const uint64_t b_lo = uint32_t(b), b_hi = b >> 32;
+			const uint64_t p0 = a_lo * b_lo, p1 = a_lo * b_hi;
+			const uint64_t p2 = a_hi * b_lo, p3 = a_hi * b_hi;
+			const uint64_t hi = p3 + (p1 >> 32) + (p2 >> 32)
+				+ (((p0 >> 32) + uint32_t(p1) + uint32_t(p2)) >> 32);
+			const size_t w = System::size_of(res);
+			const bool pred = hi != 0 || (w < 64 && lo >= (1ull << w));
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	void IsZero_UInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const bool pred = s.GetAs(reg, uint64_t) == 0;
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	void Negative_SInt::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const bool pred = get_complement(s.GetAs(reg, uint64_t), System::size_of(reg)) < 0;
+			auto& flag = s.get(flag_id);
+			flag.value = flag.value ^ (pred ? 1ull : 0ull);
+		}
+	}
+
+	uint64_t Add_AnyInt_AnyInt_InPlace::_extended_rhs(const System& s, size_t id)
+	{
+		const size_t size = System::size_of(id);
+		const uint64_t raw = s.get(id).as<uint64_t>(size);
+		// AnyInt 槽：按寄存器声明类型扩展（宽度与截断约定，见 docs/operators.md）
+		if (System::type_of(id) == SignedInteger)
+			return static_cast<uint64_t>(get_complement(raw, size));
+		return raw;
+	}
+
+	void Add_AnyInt_AnyInt_InPlace::operator()(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const size_t lhs_size = System::size_of(lhs_id);
+			s.get(lhs_id).value =
+				(s.get(lhs_id).value + _extended_rhs(s, rhs_id)) & width_mask(lhs_size);
+		}
+	}
+
+	void Add_AnyInt_AnyInt_InPlace::dag(std::vector<System>& state) const
+	{
+#ifdef SINGLE_THREAD
+		for (auto& s : state)
+		{
+#else
+#pragma omp parallel for
+		for (int i = 0; i < state.size(); ++i)
+		{
+			auto& s = state[i];
+#endif
+			if (ConditionNotSatisfied(s))
+				continue;
+
+			const size_t lhs_size = System::size_of(lhs_id);
+			s.get(lhs_id).value =
+				(s.get(lhs_id).value - _extended_rhs(s, rhs_id)) & width_mask(lhs_size);
 		}
 	}
 

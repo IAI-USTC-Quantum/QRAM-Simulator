@@ -114,7 +114,18 @@ namespace qram_simulator
 		System::update_max_size(state.size());
 	}
 
-	inverseQFT::inverseQFT(std::string_view reg_in)
+	void QFT::dag(std::vector<System>& state) const
+	{
+		profiler _("QFT::dag");
+		InverseQFT inverse(id);
+		inverse.condition_variable_nonzeros = condition_variable_nonzeros;
+		inverse.condition_variable_all_ones = condition_variable_all_ones;
+		inverse.condition_variable_by_bit = condition_variable_by_bit;
+		inverse.condition_variable_by_value = condition_variable_by_value;
+		inverse(state);
+	}
+
+	InverseQFT::InverseQFT(std::string_view reg_in)
 	{
 		id = System::get(reg_in);
 		n_digits = System::size_of(reg_in);
@@ -122,7 +133,7 @@ namespace qram_simulator
 		omega = complex_t{ cos(theta), -sin(theta) };
 	}
 
-	inverseQFT::inverseQFT(size_t reg_in)
+	InverseQFT::InverseQFT(size_t reg_in)
 	{
 		id = reg_in;
 		n_digits = System::size_of(reg_in);
@@ -137,7 +148,7 @@ namespace qram_simulator
 	if ( x[i] & y[i] ) H = exp(2 * pi * i * x * y / 2^n) / 2^n
 	else H = 1
 	*/
-	void inverseQFT::operate(size_t l, size_t r, std::vector<System>& state) const
+	void InverseQFT::operate(size_t l, size_t r, std::vector<System>& state) const
 	{
 		size_t n = r - l;
 		size_t full_size = pow2(n_digits);
@@ -195,9 +206,9 @@ namespace qram_simulator
 		}
 	}
 
-	void inverseQFT::operator()(std::vector<System>& state) const
+	void InverseQFT::operator()(std::vector<System>& state) const
 	{
-		profiler _("inverseQFT");
+		profiler _("InverseQFT");
 		/*(MoveBackRegister(register_name))(state);
 		SortUnconditional()(state);*/
 		(SortExceptKey(id))(state);

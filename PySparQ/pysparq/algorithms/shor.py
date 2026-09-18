@@ -295,7 +295,7 @@ class SemiClassicalShor:
 
         # Create ancilla register initialized to |1>
         anc_reg = ps.AddRegister("anc_reg", ps.UnsignedInteger, self.n)(state)
-        ps.Xgate_Bool("anc_reg", 0)(state)
+        ps.X_Bool("anc_reg", 0)(state)
 
         results: list[int] = []
 
@@ -411,7 +411,7 @@ class Shor:
         ps.PartialTrace([self.ancilla_reg])(state)
 
         # Apply inverse QFT
-        ps.inverseQFT(self.work_reg)(state)
+        ps.InverseQFT(self.work_reg)(state)
 
 
 def factor(N: int, a: int | None = None) -> tuple[int, int]:

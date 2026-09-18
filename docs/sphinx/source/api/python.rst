@@ -40,13 +40,13 @@ PySparQ 通过 :mod:`pysparq` 模块将所有量子操作暴露为 Python 类和
 
 .. autofunction:: pysparq._core.QFT
 
-.. autofunction:: pysparq._core.inverseQFT
+.. autofunction:: pysparq._core.InverseQFT
 
-.. autofunction:: pysparq._core.Xgate_Bool
+.. autofunction:: pysparq._core.X_Bool
 
-.. autofunction:: pysparq._core.Ygate_Bool
+.. autofunction:: pysparq._core.Y_Bool
 
-.. autofunction:: pysparq._core.Zgate_Bool
+.. autofunction:: pysparq._core.Z_Bool
 
 QRAM 操作
 ---------

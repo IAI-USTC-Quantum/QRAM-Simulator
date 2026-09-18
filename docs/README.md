@@ -10,6 +10,7 @@ docs/
 ├── index.html         # GitHub Pages landing page
 ├── architecture.md    # Project architecture documentation
 ├── operators.md       # C++ quantum arithmetic operators documentation
+├── naming_conventions.md  # Operator naming rules (authoritative)
 ├── pysparq.md         # PySparQ Python bindings documentation
 ├── paper/             # Paper-related documentation
 │   ├── README.md
@@ -23,10 +24,11 @@ docs/
 ### For C++ Users
 - **[Architecture](architecture.md)**: Project architecture and design philosophy
 - **[Operators Reference](operators.md)**: Detailed documentation for quantum arithmetic operators
+- **[Naming Conventions](naming_conventions.md)**: Authoritative operator naming rules and the rename audit table
 - **[API Docs](https://iai-ustc-quantum.github.io/QRAM-Simulator/api/)**: Auto-generated Doxygen documentation
 
 ### For Python Users
-- **[PySparQ Documentation](pysparq.md)**: Python bindings user guide and API reference
+- **[PySparQ Documentation](pysparq.md)**: Python bindings user guide and API reference, including the native RIR (QECC.Lang) interpreter
 
 ### For Researchers
 - **[Paper Documentation](paper/)**: Reproduction guides and paper-related resources

@@ -87,10 +87,10 @@ from pysparq._core import (
     Hadamard_Int,
     Hadamard_Int_Full,
     Hadamard_Bool,
-    Hadamard_PartialQubit,
+    Hadamard_Partial,
     ZeroConditionalPhaseFlip,
     Reflection_Bool,
-    GlobalPhase_Int,
+    GlobalPhase,
     PartialTrace,
     PartialTraceSelect,
     PartialTraceSelectRange,
@@ -103,11 +103,11 @@ from pysparq._core import (
     reseed,
     time_seed,
     QFT,
-    inverseQFT,
+    InverseQFT,
     QRAMCircuit_qutrit,
     QRAMLoad,
     QRAMLoadFast,
-    Xgate_Bool,
+    X_Bool,
     FlipBools,
     Swap_Bool_Bool,
     ShiftLeft_InPlace,
@@ -119,10 +119,27 @@ from pysparq._core import (
     Add_UInt_UInt_InPlace,
     Add_UInt_ConstUInt,
     Add_ConstUInt_InPlace,
-    Div_Sqrt_Arccos_Int_Int,
-    Sqrt_Div_Arccos_Int_Int,
+    Div_Sqrt_Arccos_UInt_UInt,
+    Sqrt_Div_Arccos_Int_UInt,
     GetRotateAngle_Int_Int,
-    AddAssign_AnyInt_AnyInt_InPlace,
+    # Arithmetic extension ops (width & truncation convention, docs/operators.md)
+    Sub_UInt_UInt,
+    Neg_UInt,
+    Abs_SInt,
+    Mul_UInt_UInt,
+    Div_UInt_UInt,
+    Sqrt_UInt,
+    Select_Bool_UInt_UInt,
+    And_UInt_UInt,
+    Or_UInt_UInt,
+    Xor_UInt_UInt,
+    Less_SInt_SInt,
+    Carry_UInt_UInt,
+    Overflow_SInt_SInt,
+    MulOverflow_UInt_UInt,
+    IsZero_UInt,
+    Negative_SInt,
+    Add_AnyInt_AnyInt_InPlace,
     Assign,
     Compare_UInt_UInt,
     Less_UInt_UInt,
@@ -147,20 +164,20 @@ from pysparq._core import (
     SortByKey2,
     Phase_Bool,
     Rot_Bool,
-    Ygate_Bool,
-    Zgate_Bool,
-    Sgate_Bool,
-    Tgate_Bool,
-    RXgate_Bool,
-    RYgate_Bool,
-    RZgate_Bool,
-    SXgate_Bool,
-	    U2gate_Bool,
-	    U3gate_Bool,
+    Y_Bool,
+    Z_Bool,
+    S_Bool,
+    T_Bool,
+    RX_Bool,
+    RY_Bool,
+    RZ_Bool,
+    SX_Bool,
+	    U2_Bool,
+	    U3_Bool,
 	    CondRot_Rational_Bool,
 	    CondRot_Fixed_Bool,
 	    GetQWRotateAngle_Int_Int_Int,
-	    QuantumBinarySearchFast,
+	    QuantumBinarySearch_Fast,
 	    GetRowAddr,
     GetDataAddr,
     PlusOneAndOverflow,
@@ -387,3 +404,46 @@ from pysparq.algorithms.qda_solver import (
 # RIR (QECC.Lang intermediate representation) execution
 # --------------------------------------------------------------------
 from pysparq.rir import RIRError, RIRResult, load_rir, run_rir, run_rir_file
+
+# --------------------------------------------------------------------
+# Deprecated operator aliases (naming refactor; see docs/naming_conventions.md)
+# --------------------------------------------------------------------
+# Old names resolve to their renamed classes and emit a DeprecationWarning.
+# Remove these aliases (and the matching C++ ``using`` aliases) in the next
+# major version.
+
+import warnings
+
+_DEPRECATED_ALIASES = {
+    "Xgate_Bool": "X_Bool",
+    "Ygate_Bool": "Y_Bool",
+    "Zgate_Bool": "Z_Bool",
+    "Sgate_Bool": "S_Bool",
+    "Tgate_Bool": "T_Bool",
+    "RXgate_Bool": "RX_Bool",
+    "RYgate_Bool": "RY_Bool",
+    "RZgate_Bool": "RZ_Bool",
+    "SXgate_Bool": "SX_Bool",
+    "U2gate_Bool": "U2_Bool",
+    "U3gate_Bool": "U3_Bool",
+    "inverseQFT": "InverseQFT",
+    "GlobalPhase_Int": "GlobalPhase",
+    "AddAssign_AnyInt_AnyInt_InPlace": "Add_AnyInt_AnyInt_InPlace",
+    "Div_Sqrt_Arccos_Int_Int": "Div_Sqrt_Arccos_UInt_UInt",
+    "Sqrt_Div_Arccos_Int_Int": "Sqrt_Div_Arccos_Int_UInt",
+    "Hadamard_PartialQubit": "Hadamard_Partial",
+    "QuantumBinarySearchFast": "QuantumBinarySearch_Fast",
+}
+
+
+def __getattr__(name: str):
+    new_name = _DEPRECATED_ALIASES.get(name)
+    if new_name is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    warnings.warn(
+        f"pysparq.{name} is deprecated; use pysparq.{new_name} instead "
+        "(docs/naming_conventions.md)",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return globals()[new_name]

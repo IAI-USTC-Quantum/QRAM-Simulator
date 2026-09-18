@@ -19,8 +19,8 @@ def test_combine_masks_one_bit_sentinel_values():
         for name, width in parts:
             ps.SplitRegister("state", name, width)(state)
 
-        ps.Xgate_Bool("filter", 0)(state)
-        ps.Xgate_Bool("bold", 3)(state)
+        ps.X_Bool("filter", 0)(state)
+        ps.X_Bool("bold", 3)(state)
         for name, _ in reversed(parts):
             ps.CombineRegister("state", name)(state)
 
@@ -39,7 +39,7 @@ def test_split_combine_masks_sentinels_for_multiple_basis_states():
         ps.Hadamard_Int_Full("seed")(state)
         ps.AddRegister("packed", ps.StateStorageType.General, 12)(state)
         for digit in (0, 1, 5, 7, 11):
-            ps.Xgate_Bool("packed", digit)(state)
+            ps.X_Bool("packed", digit)(state)
 
         packed_id = ps.System.get_id("packed")
         low_id = ps.SplitRegister("packed", "low", 5)(state)

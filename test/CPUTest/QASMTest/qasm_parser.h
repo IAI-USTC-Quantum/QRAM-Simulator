@@ -254,7 +254,7 @@ namespace qram_simulator
                             for (const auto& target : h_positions) {
                                 positions.insert(target.second);
                             }
-                            Hadamard_PartialQubit(current_register, positions)(state);
+                            Hadamard_Partial(current_register, positions)(state);
 
                             // Clear the temporary container and start new sequence with current 'h'
                             h_positions.clear();
@@ -271,56 +271,56 @@ namespace qram_simulator
                                 positions.insert(pos.second);
                             }
                             // Apply a large Hadamard operation
-                            Hadamard_PartialQubit(h_positions[0].first, positions)(state);
+                            Hadamard_Partial(h_positions[0].first, positions)(state);
                             // Clear the temporary container
                             h_positions.clear();
                         }
 #else
                     if (operation.gate == "h") {
                         std::set<size_t> qubit_pos = { operation.targets[0].second };
-                        Hadamard_PartialQubit(operation.targets[0].first, qubit_pos)(state);
+                        Hadamard_Partial(operation.targets[0].first, qubit_pos)(state);
                     }
                     else {
 #endif
                         if (operation.gate == "x") {
-                            Xgate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            X_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "y") {
-                            Ygate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            Y_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "z") {
-                            Zgate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            Z_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "s") {
-                            Sgate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            S_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "sdg") {
-                            Sgate_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
+                            S_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
                         }
                         else if (operation.gate == "t") {
-                            Tgate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            T_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "tdg") {
-                            Tgate_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
+                            T_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
                         }
                         else if (operation.gate == "sx") {
-                            SXgate_Bool(operation.targets[0].first, operation.targets[0].second)(state);
+                            SX_Bool(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "sxdg") {
-                            SXgate_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
+                            SX_Bool(operation.targets[0].first, operation.targets[0].second).dag(state);
                         }
                         else if (operation.gate == "cx") {
-                            Xgate_Bool(operation.targets[1].first, operation.targets[1].second)
+                            X_Bool(operation.targets[1].first, operation.targets[1].second)
                                 .conditioned_by_bit(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "cz") {
-                            Zgate_Bool(operation.targets[1].first, operation.targets[1].second)
+                            Z_Bool(operation.targets[1].first, operation.targets[1].second)
                                 .conditioned_by_bit(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "ccx") {
                             std::vector<std::pair<std::string_view, size_t>> cond_vars = { {operation.targets[0].first, operation.targets[0].second},
                                                                             {operation.targets[1].first, operation.targets[1].second} };
-                            Xgate_Bool(operation.targets[2].first, operation.targets[2].second)
+                            X_Bool(operation.targets[2].first, operation.targets[2].second)
                                 .conditioned_by_bit(cond_vars)(state);
                         }
                         else if (operation.gate == "phase" || operation.gate == "p") {
@@ -331,13 +331,13 @@ namespace qram_simulator
                                 .conditioned_by_bit(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "rx") {
-                            RXgate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
+                            RX_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
                         }
                         else if (operation.gate == "ry") {
-                            RYgate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
+                            RY_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
                         }
                         else if (operation.gate == "rz") {
-                            RZgate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
+                            RZ_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
                         }
                         else if (operation.gate == "swap") {
                             Swap_Bool_Bool(operation.targets[0].first, operation.targets[0].second, operation.targets[1].first, operation.targets[1].second)(state);
@@ -347,16 +347,16 @@ namespace qram_simulator
                                 .conditioned_by_bit(operation.targets[0].first, operation.targets[0].second)(state);
                         }
                         else if (operation.gate == "u") {
-                            U3gate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1], operation.angles[2])(state);
+                            U3_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1], operation.angles[2])(state);
                         }
                         else if (operation.gate == "u1") {
                             Phase_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0])(state);
                         }
                         else if (operation.gate == "u2") {
-                            U2gate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1])(state);
+                            U2_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1])(state);
                         }
                         else if (operation.gate == "u3") {
-                            U3gate_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1], operation.angles[2])(state);
+                            U3_Bool(operation.targets[0].first, operation.targets[0].second, operation.angles[0], operation.angles[1], operation.angles[2])(state);
                         }
                         else {
                             throw std::runtime_error("Unsupported gate operation: " + operation.gate);

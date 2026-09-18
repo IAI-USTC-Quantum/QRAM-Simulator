@@ -354,19 +354,19 @@ double cal_gen(std::vector<double> vector_i_, std::vector<double> kernel_) {
 	(Hadamard_Int_Full("q"))(state);
 	(Hadamard_Int_Full("anc"))(state);
 	QRAMLoad(&qram1, "q", "data").conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 	QRAMLoad(&qram2, "q", "data").conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 
 	CondRot_P("data", "anc_cr", conrotfunc_P, norm).conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 	CondRot_P("data", "anc_cr", conrotfunc_P, get_vector_F_form(kernel)).conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 
 	QRAMLoad(&qram1, "q", "data").conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 	QRAMLoad(&qram2, "q", "data").conditioned_by_nonzeros("anc")(state);
-	Xgate_Bool("anc", 0)(state);
+	X_Bool("anc", 0)(state);
 	RemoveRegister("data")(state);
 
 	(Hadamard_Int_Full("anc"))(state);
@@ -1438,7 +1438,7 @@ auto test_sparse() {
 
 	QRAMLoad::version = qram_version;
 
-	Xgate_Bool("addr_parent", 0)(system_states);
+	X_Bool("addr_parent", 0)(system_states);
 	for (size_t k = 0; k < addr_size - 1; ++k) {
 		std::cout<<"============================================================"<<k<<"========================================================="<<std::endl;
 		StatePrint(StatePrintDisplay::Detail | 0)(system_states);
@@ -1446,9 +1446,9 @@ auto test_sparse() {
 		QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 		QRAMLoad(qram, "addr_child", "data_child")(system_states);
 		StatePrint(StatePrintDisplay::Detail | 0)(system_states);
-		Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(system_states);
+		Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(system_states);
 		CondRot_Rational_Bool("div_result", "temp_bit")(system_states);
-		Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(system_states);
+		Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(system_states);
 		QRAMLoad(qram, "addr_child", "data_child")(system_states);
 		QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 		Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(system_states);
@@ -1460,7 +1460,7 @@ auto test_sparse() {
 	StatePrint(StatePrintDisplay::Detail | 0)(system_states);
 	ShiftLeft_InPlace("addr_parent", 1)(system_states);
 	Assign("addr_parent", "addr_child")(system_states);
-	Xgate_Bool("addr_child", 0)(system_states);
+	X_Bool("addr_child", 0)(system_states);
 	QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
 	QRAMLoad(qram, "addr_child", "data_child")(system_states);
 	GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(system_states);
@@ -1468,10 +1468,10 @@ auto test_sparse() {
 	GetRotateAngle_Int_Int("data_parent", "data_child", "div_result")(system_states);
 	QRAMLoad(qram, "addr_child", "data_child")(system_states);
 	QRAMLoad(qram, "addr_parent", "data_parent")(system_states);
-	Xgate_Bool("addr_child", 0)(system_states);
+	X_Bool("addr_child", 0)(system_states);
 	Assign("addr_parent", "addr_child")(system_states);
 	Swap_Bool_Bool("temp_bit", 0, "addr_parent", 0)(system_states);
-	Xgate_Bool("addr_parent", addr_size)(system_states);
+	X_Bool("addr_parent", addr_size)(system_states);
 
 	SortByKey("addr_parent")(system_states);
 }

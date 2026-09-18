@@ -130,7 +130,7 @@ namespace qram_simulator
 	 * @tparam Callable 角度计算函数类型
 	 */
 	template<typename Callable = std::function<u22_t(uint64_t)>>
-	struct CondRot_General_Bool_fast : BaseOperator {
+	struct CondRot_General_Bool_Fast : BaseOperator {
 		using BaseOperator::operator();
 		using BaseOperator::dag;
 
@@ -150,7 +150,7 @@ namespace qram_simulator
 		 * @param angle_function 角度计算函数
 		 * @throws 当类型不匹配或输出寄存器大小不为1时抛出异常
 		 */
-		CondRot_General_Bool_fast(std::string_view reg_in, std::string_view reg_out, Callable angle_function)
+		CondRot_General_Bool_Fast(std::string_view reg_in, std::string_view reg_out, Callable angle_function)
 			: in_id(System::get(reg_in)), out_id(System::get(reg_out)), func(angle_function)
 		{
 			/* Type check */
@@ -169,7 +169,7 @@ namespace qram_simulator
 		 * @param reg_out 输出寄存器 ID
 		 * @param angle_function 角度计算函数
 		 */
-		CondRot_General_Bool_fast(size_t reg_in, size_t reg_out, Callable angle_function)
+		CondRot_General_Bool_Fast(size_t reg_in, size_t reg_out, Callable angle_function)
 			: in_id(reg_in), out_id(reg_out), func(angle_function)
 		{
 			/* Type check */
@@ -316,6 +316,9 @@ namespace qram_simulator
 	};
 
 	template<typename Callable = std::function<u22_t(uint64_t)>>
-	using CondRot_General_Bool = CondRot_General_Bool_fast<Callable>;
+	using CondRot_General_Bool = CondRot_General_Bool_Fast<Callable>;
+
+	template<typename Callable = std::function<u22_t(uint64_t)>>
+	[[deprecated("use CondRot_General_Bool_Fast")]] using CondRot_General_Bool_fast = CondRot_General_Bool_Fast<Callable>;
 
 }

@@ -185,7 +185,7 @@ namespace qram_simulator
 	 * @brief 全局相位操作（整数寄存器）
 	 * @details 对整个状态施加全局相位
 	 */
-	struct GlobalPhase_Int : BaseOperator
+	struct GlobalPhase : BaseOperator
 	{
 		using BaseOperator::operator();
 		using BaseOperator::dag;
@@ -199,7 +199,7 @@ namespace qram_simulator
 		 * @brief 构造函数
 		 * @param c_ 相位因子
 		 */
-		GlobalPhase_Int(complex_t c_) : c(c_) {};
+		GlobalPhase(complex_t c_) : c(c_) {};
 
 		/**
 		 * @brief 应用全局相位操作
@@ -228,4 +228,6 @@ namespace qram_simulator
 #endif
 	};
 
+	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
+	[[deprecated("use GlobalPhase")]] using GlobalPhase_Int = GlobalPhase;
 }

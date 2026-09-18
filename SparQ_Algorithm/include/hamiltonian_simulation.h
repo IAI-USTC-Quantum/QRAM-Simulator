@@ -327,7 +327,7 @@ namespace qram_simulator
 			void impl(Ty& state) const {
 				profiler _("QBS");
 				auto flag = AddRegister("flag", Boolean, 1)(state);
-				Xgate_Bool(flag, 0)(state);
+				X_Bool(flag, 0)(state);
 
 				auto compare_less = AddRegister("compare_less", Boolean, 1)(state);
 				auto compare_equal = AddRegister("compare_equal", Boolean, 1)(state);
@@ -369,7 +369,7 @@ namespace qram_simulator
 						Swap_General_General(left_register, mid_register)
 							.conditioned_by_nonzeros({ compare_less, flag })(state);
 
-						Xgate_Bool(compare_less, 0)(state);
+						X_Bool(compare_less, 0)(state);
 
 						Swap_General_General(right_register, mid_register)
 							.conditioned_by_nonzeros({ compare_less, flag })(state);
@@ -397,7 +397,7 @@ namespace qram_simulator
 						Swap_General_General(right_register, mid_register)
 							.conditioned_by_nonzeros({ compare_less, flag })(state);
 
-						Xgate_Bool(compare_less, 0)(state);
+						X_Bool(compare_less, 0)(state);
 						Swap_General_General(left_register, mid_register)
 							.conditioned_by_nonzeros({ compare_less, flag })(state);
 
@@ -416,7 +416,7 @@ namespace qram_simulator
 
 				Add_UInt_ConstUInt(left_register, total_length, right_register)(state);
 				Assign(address_offset_id, left_register)(state);
-				Xgate_Bool(flag, 0)(state);
+				X_Bool(flag, 0)(state);
 				(RemoveRegister(compare_less))(state);
 				(RemoveRegister(compare_equal))(state);
 				(RemoveRegister(left_register))(state);
@@ -436,7 +436,7 @@ namespace qram_simulator
 		};
 
 		// quantum binary search
-		struct QuantumBinarySearchFast : SelfAdjointOperator
+		struct QuantumBinarySearch_Fast : SelfAdjointOperator
 		{
 			using SelfAdjointOperator::operator();
 			using SelfAdjointOperator::dag;
@@ -451,13 +451,13 @@ namespace qram_simulator
 
 			//int iteration_level;
 
-			QuantumBinarySearchFast(qram_qutrit::QRAMCircuit* qram,
+			QuantumBinarySearch_Fast(qram_qutrit::QRAMCircuit* qram,
 				std::string_view address_offset_register,
 				size_t total_length_,
 				std::string_view target_register,
 				std::string_view result_register);
 
-			QuantumBinarySearchFast(qram_qutrit::QRAMCircuit* qram,
+			QuantumBinarySearch_Fast(qram_qutrit::QRAMCircuit* qram,
 				size_t address_offset_register,
 				size_t total_length_,
 				size_t target_register,
@@ -622,7 +622,7 @@ namespace qram_simulator
 
 				// |offset>|i>|j>|row_addr>|result = s_j>
 				//QuantumBinarySearch(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
-				QuantumBinarySearchFast(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
+				QuantumBinarySearch_Fast(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
 
 				// |offset>|i>|0>|row_addr>|result> 
 				QRAMLoad(qram, reg_search_result, reg_col)(state);
@@ -631,7 +631,7 @@ namespace qram_simulator
 				Swap_General_General(reg_col, reg_search_result)(state);
 
 				// |offset>|i>|s_j>|row_addr>|0> 
-				AddAssign_AnyInt_AnyInt_InPlace(reg_col, "row_addr").dag(state);
+				Add_AnyInt_AnyInt_InPlace(reg_col, "row_addr").dag(state);
 
 				// |offset>|i>|s_j>|0>|0> 
 				GetRowAddr(reg_sparse_offset, reg_row, row_size, "row_addr")(state);
@@ -647,11 +647,11 @@ namespace qram_simulator
 
 				// |offset>|i>|s_j>|0>|0>|row_addr>
 				GetRowAddr(reg_sparse_offset, reg_row, row_size, "row_addr")(state);
-				AddAssign_AnyInt_AnyInt_InPlace(reg_col, "row_addr")(state);
+				Add_AnyInt_AnyInt_InPlace(reg_col, "row_addr")(state);
 				Swap_General_General(reg_col, reg_search_result)(state);
 				QRAMLoad(qram, reg_search_result, reg_col)(state);
 				//QuantumBinarySearch(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
-				QuantumBinarySearchFast(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
+				QuantumBinarySearch_Fast(qram, "row_addr", row_size, reg_col, reg_search_result)(state);
 				GetRowAddr(reg_sparse_offset, reg_row, row_size, "row_addr")(state);
 
 				RemoveRegister("row_addr")(state);
@@ -1273,5 +1273,7 @@ namespace qram_simulator
 		std::vector<complex_t> my_linear_solver_reference(const SparseMatrix& mat);
 		std::vector<complex_t> my_linear_solver_reference(const SparseMatrix& mat, const DenseVector<double>& vec);
 
+		// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
+		[[deprecated("use QuantumBinarySearch_Fast")]] using QuantumBinarySearchFast = QuantumBinarySearch_Fast;
 	} // namespace CKS
 }

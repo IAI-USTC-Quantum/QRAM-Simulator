@@ -108,7 +108,7 @@ def _assert_state(actual, expected):
         (
             [("word", ps.Boolean, 2)],
             ("word",),
-            lambda: ps.Xgate_Bool("word", 1),
+            lambda: ps.X_Bool("word", 1),
             lambda word: (word ^ 2,),
         ),
         (
@@ -116,6 +116,24 @@ def _assert_state(actual, expected):
             ("word",),
             lambda: ps.FlipBools("word"),
             lambda word: (word ^ 3,),
+        ),
+        (
+            [("a", ps.UnsignedInteger, 2), ("b", ps.UnsignedInteger, 2), ("out", ps.UnsignedInteger, 2)],
+            ("a", "b", "out"),
+            lambda: ps.Sub_UInt_UInt("a", "b", "out"),
+            lambda a, b, out: (a, b, out ^ ((a - b) & 3)),
+        ),
+        (
+            [("num", ps.UnsignedInteger, 2), ("den", ps.UnsignedInteger, 2), ("q", ps.UnsignedInteger, 2)],
+            ("num", "den", "q"),
+            lambda: ps.Div_UInt_UInt("num", "den", "q"),
+            lambda num, den, q: (num, den, q ^ (((num // den) if den else 0) & 3)),
+        ),
+        (
+            [("s", ps.Boolean, 1), ("x", ps.UnsignedInteger, 2), ("y", ps.UnsignedInteger, 2), ("out", ps.UnsignedInteger, 2)],
+            ("s", "x", "y", "out"),
+            lambda: ps.Select_Bool_UInt_UInt("s", "x", "y", "out"),
+            lambda s, x, y, out: (s, x, y, out ^ ((x if s else y) & 3)),
         ),
     ],
 )
@@ -172,12 +190,27 @@ def test_consumed_operations_match_independent_basis_models(
         (
             [("word", ps.Boolean, 2)],
             ("word",),
-            lambda: ps.Xgate_Bool("word", 1),
+            lambda: ps.X_Bool("word", 1),
         ),
         (
             [("word", ps.Boolean, 2)],
             ("word",),
             lambda: ps.FlipBools("word"),
+        ),
+        (
+            [("a", ps.UnsignedInteger, 2), ("b", ps.UnsignedInteger, 2), ("out", ps.UnsignedInteger, 2)],
+            ("a", "b", "out"),
+            lambda: ps.Sub_UInt_UInt("a", "b", "out"),
+        ),
+        (
+            [("num", ps.UnsignedInteger, 2), ("den", ps.UnsignedInteger, 2), ("q", ps.UnsignedInteger, 2)],
+            ("num", "den", "q"),
+            lambda: ps.Div_UInt_UInt("num", "den", "q"),
+        ),
+        (
+            [("s", ps.Boolean, 1), ("x", ps.UnsignedInteger, 2), ("y", ps.UnsignedInteger, 2), ("out", ps.UnsignedInteger, 2)],
+            ("s", "x", "y", "out"),
+            lambda: ps.Select_Bool_UInt_UInt("s", "x", "y", "out"),
         ),
     ],
 )
@@ -313,7 +346,7 @@ def test_nonunitary_aliases_and_bit_range_errors_are_rejected():
         lambda: ps.Swap_General_General("a", "a"),
         lambda: ps.QRAMLoad(qram, "a", "a"),
         lambda: ps.QRAMLoadFast(qram, "a", "a"),
-        lambda: ps.Xgate_Bool("f1", 1),
+        lambda: ps.X_Bool("f1", 1),
     ]
     for factory in factories:
         with pytest.raises((ValueError, RuntimeError)):
@@ -342,6 +375,6 @@ def test_control_superposition_matches_positive_and_negative_branches():
     _declare([("control", ps.Boolean, 1), ("target", ps.Boolean, 1)])
     state = ps.SparseState()
     ps.Hadamard_Bool("control")(state)
-    ps.Xgate_Bool("target", 0).conditioned_by_bit("control", 0)(state)
+    ps.X_Bool("target", 0).conditioned_by_bit("control", 0)(state)
     amp = 1 / math.sqrt(2)
     _assert_state(_snapshot(state, ("control", "target")), {(0, 0): amp, (1, 1): amp})

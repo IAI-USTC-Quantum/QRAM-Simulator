@@ -328,8 +328,8 @@ auto test_operations()
 	}
 	// s.copy_to_cpu();
 	StatePrint(Detail | 0)(s);
-	Xgate_Bool("reg1", 0).conditioned_by_nonzeros("reg2")(s);
-	// Xgate_Bool("reg1", 0)(s);
+	X_Bool("reg1", 0).conditioned_by_nonzeros("reg2")(s);
+	// X_Bool("reg1", 0)(s);
 	StatePrint(Detail | 0)(s);
 
 	//System::add_register("reg1", UnsignedInteger, 5);

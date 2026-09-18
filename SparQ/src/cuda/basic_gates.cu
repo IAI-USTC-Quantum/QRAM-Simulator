@@ -327,7 +327,7 @@ namespace qram_simulator {
 		}
 	};
 
-	void Xgate_Bool::operator()(CuSparseState& state) const
+	void X_Bool::operator()(CuSparseState& state) const
 	{
 		state.move_to_gpu();
 		if (!HasCondition)

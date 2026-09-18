@@ -62,7 +62,7 @@ std::chrono::duration<double> QFT_Test(size_t nqubit)
     Init_Unsafe("main", 1)(state);
     QFT("main")(state);
     QFT("main")(state);
-    inverseQFT("main")(state);
+    InverseQFT("main")(state);
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> running_time = end - start;

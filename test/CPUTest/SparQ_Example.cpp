@@ -34,8 +34,8 @@ int example_1() {
     // 1) 使用Hadamard门对reg0作用: 首先通过参数列表创建一个Hadamard_Int_Full的对象，这个对象是一个可调用对象（Callable），可以对SparseState对象进行操作。
     (Hadamard_Int_Full(reg0))(s);
 
-    // 2) 使用Pauli-X门对reg1作用: 同样，创建一个Xgate_Bool对象，并对reg2作用。
-    (Xgate_Bool(reg1))(s);
+    // 2) 使用Pauli-X门对reg1作用: 同样，创建一个X_Bool对象，并对reg2作用。
+    (X_Bool(reg1))(s);
 
     // 3. 打印它目前的状态
     (StatePrint(Detail))(s);
@@ -82,8 +82,8 @@ int example_2() {
         */
 
         // 对 reg0的第0个比特施加X门，并对reg1的第0个比特施加CCX (Toffoli) 门
-        (Xgate_Bool(reg0, 0))(s);
-        (Xgate_Bool(reg1).conditioned_by_all_ones(reg0))(s);
+        (X_Bool(reg0, 0))(s);
+        (X_Bool(reg1).conditioned_by_all_ones(reg0))(s);
 
         // 打印量子态
         (StatePrint(Detail))(s);
@@ -115,9 +115,9 @@ int example_2() {
         */
 
         // 对 reg0的第0个比特施加X门，并对reg1的第0个比特施加CCX (Toffoli) 门
-        (Xgate_Bool(reg0, 0))(s);
-        (Xgate_Bool(reg0, 2))(s);
-        (Xgate_Bool(reg1).conditioned_by_bit({ {reg0, 0}, {reg0, 2} }))(s);
+        (X_Bool(reg0, 0))(s);
+        (X_Bool(reg0, 2))(s);
+        (X_Bool(reg1).conditioned_by_bit({ {reg0, 0}, {reg0, 2} }))(s);
 
         // 打印量子态
         (StatePrint(Detail))(s);

@@ -1050,10 +1050,10 @@ namespace qram_simulator
 	 * Init_Unsafe(lhs, 1);  // lhs = 1
 	 * Init_Unsafe(rhs, 4);  // rhs = 4
 	 * // res = arccos(sqrt(1/4)) / 2π = arccos(0.5) / 2π = 1/6 ≈ 0.167
-	 * Div_Sqrt_Arccos_Int_Int("lhs", "rhs", "res");
+	 * Div_Sqrt_Arccos_UInt_UInt("lhs", "rhs", "res");
 	 * @endcode
 	 */
-	struct Div_Sqrt_Arccos_Int_Int : SelfAdjointOperator {
+	struct Div_Sqrt_Arccos_UInt_UInt : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
@@ -1074,7 +1074,7 @@ namespace qram_simulator
 		 * @param register_rhs 右操作数寄存器名称
 		 * @param register_out 输出寄存器名称
 		 */
-		Div_Sqrt_Arccos_Int_Int(std::string_view register_lhs, std::string_view register_rhs, std::string_view register_out)
+		Div_Sqrt_Arccos_UInt_UInt(std::string_view register_lhs, std::string_view register_rhs, std::string_view register_out)
 			:register_lhs(System::get(register_lhs)),
 			register_rhs(System::get(register_rhs)),
 			register_out(System::get(register_out))
@@ -1094,7 +1094,7 @@ namespace qram_simulator
 		 * @param reg_rhs 右操作数寄存器 ID
 		 * @param reg_out 输出寄存器 ID
 		 */
-		Div_Sqrt_Arccos_Int_Int(size_t reg_lhs, size_t reg_rhs, size_t reg_out)
+		Div_Sqrt_Arccos_UInt_UInt(size_t reg_lhs, size_t reg_rhs, size_t reg_out)
 			:register_lhs(reg_lhs),
 			register_rhs(reg_rhs),
 			register_out(reg_out)
@@ -1150,10 +1150,10 @@ namespace qram_simulator
 	 * Init_Unsafe(lhs, 1);   // lhs = 1
 	 * Init_Unsafe(rhs, 4);   // rhs = 4
 	 * // res = arccos(1/2) / 2π = 1/6 ≈ 0.167
-	 * Sqrt_Div_Arccos_Int_Int("lhs", "rhs", "res");
+	 * Sqrt_Div_Arccos_Int_UInt("lhs", "rhs", "res");
 	 * @endcode
 	 */
-	struct Sqrt_Div_Arccos_Int_Int : SelfAdjointOperator {
+	struct Sqrt_Div_Arccos_Int_UInt : SelfAdjointOperator {
 		using SelfAdjointOperator::operator();
 		using SelfAdjointOperator::dag;
 
@@ -1174,7 +1174,7 @@ namespace qram_simulator
 		 * @param rhs 右操作数寄存器名称
 		 * @param out 输出寄存器名称
 		 */
-		Sqrt_Div_Arccos_Int_Int(std::string_view lhs, std::string_view rhs, std::string_view out)
+		Sqrt_Div_Arccos_Int_UInt(std::string_view lhs, std::string_view rhs, std::string_view out)
 			:register_lhs(System::get(lhs)),
 			register_rhs(System::get(rhs)),
 			register_out(System::get(out))
@@ -1194,7 +1194,7 @@ namespace qram_simulator
 		 * @param reg_rhs 右操作数寄存器 ID
 		 * @param reg_out 输出寄存器 ID
 		 */
-		Sqrt_Div_Arccos_Int_Int(size_t reg_lhs, size_t reg_rhs, size_t reg_out)
+		Sqrt_Div_Arccos_Int_UInt(size_t reg_lhs, size_t reg_rhs, size_t reg_out)
 			:register_lhs(reg_lhs),
 			register_rhs(reg_rhs),
 			register_out(reg_out)
@@ -1310,6 +1310,1281 @@ namespace qram_simulator
 	};
 
 	/**
+	 * @brief 无符号整数减法操作（Out-of-place）
+	 * @details 实现 out-of-place 减法：res ^= lhs - rhs
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，差在无符号 64 位回绕域上求值，
+	 *       取 mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Sub_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Sub_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Sub_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用减法操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用减法操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数取负操作（Out-of-place）
+	 * @details 实现 out-of-place 取负：res ^= 0 - reg
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：reg、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，负值在无符号 64 位回绕域上求值
+	 *       （等价于按 64 位二补码取负），取 mod 2^res_width 后 XOR 进 res
+	 *       （docs/operators.md《宽度与截断约定》）
+	 */
+	struct Neg_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 输入寄存器 ID */
+		size_t reg;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_ 输入寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Neg_UInt(std::string_view reg_, std::string_view res_)
+			: reg(System::get(reg_)), res(System::get(res_))
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param reg_ 输入寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Neg_UInt(size_t reg_, size_t res_)
+			: reg(reg_), res(res_)
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用取负操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用取负操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 有符号整数取绝对值操作（Out-of-place）
+	 * @details 实现 out-of-place 取绝对值：res ^= |reg|，reg 按二补码符号扩展读入
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：reg 必须是 SignedInteger，res 必须是 UnsignedInteger
+	 * @note 宽度与截断：reg 符号扩展到 64 位后取绝对值，结果取
+	 *       mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 * @note 边界行为：输入为最小负数（w = 64 时的 INT64_MIN）时，
+	 *       -v 按回绕仍为自身，输出保持最小负数的位模式
+	 */
+	struct Abs_SInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 输入寄存器 ID */
+		size_t reg;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_ 输入寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Abs_SInt(std::string_view reg_, std::string_view res_)
+			: reg(System::get(reg_)), res(System::get(res_))
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != SignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param reg_ 输入寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Abs_SInt(size_t reg_, size_t res_)
+			: reg(reg_), res(res_)
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != SignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用取绝对值操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用取绝对值操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数乘法操作（Out-of-place）
+	 * @details 实现 out-of-place 乘法：res ^= lhs * rhs
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，按 128 位全精度乘积取低 64 位，
+	 *       再取 mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Mul_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Mul_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Mul_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用乘法操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用乘法操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数除法操作（Out-of-place）
+	 * @details 实现 out-of-place 除法：res ^= lhs / rhs（整数除法，向下取整）
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 全域化：除数为零时商取 0，不抛定义域异常（可逆性要求算子
+	 *       在全部基矢上是确定性函数；docs/operators.md《宽度与截断约定》）；
+	 *       溢出信息由专用 flag 算子另行报告
+	 * @note 宽度与截断：操作数零扩展，商域 ≤ 64 位，
+	 *       取 mod 2^res_width 后 XOR 进 res
+	 */
+	struct Div_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Div_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Div_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用除法操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用除法操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数平方根操作（Out-of-place）
+	 * @details 实现 out-of-place 开方：res ^= floor(sqrt(reg))
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：reg、res 都必须是 UnsignedInteger
+	 * @note 实现细节：纯整数逐位开方算法（isqrt_u64），无浮点参与，
+	 *       CPU 与 CUDA 结果按位一致
+	 * @note 宽度与截断：操作数零扩展，商域 ≤ 64 位，
+	 *       取 mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Sqrt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 输入寄存器 ID */
+		size_t reg;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_ 输入寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Sqrt_UInt(std::string_view reg_, std::string_view res_)
+			: reg(System::get(reg_)), res(System::get(res_))
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param reg_ 输入寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Sqrt_UInt(size_t reg_, size_t res_)
+			: reg(reg_), res(res_)
+		{
+			if (res == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用开方操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用开方操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 布尔条件选择操作（Out-of-place）
+	 * @details 实现 out-of-place 二选一：res ^= (cond ? lhs : rhs)，cond 读第 0 位
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：cond 必须是 Boolean（宽度为 1），
+	 *       lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，被选中的值取
+	 *       mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Select_Bool_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 条件寄存器 ID */
+		size_t cond;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param cond_ 条件寄存器名称
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Select_Bool_UInt_UInt(std::string_view cond_, std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: cond(System::get(cond_)), lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == cond || res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(cond) != Boolean || System::size_of(cond) != 1)
+				throw_invalid_input();
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param cond_ 条件寄存器 ID
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Select_Bool_UInt_UInt(size_t cond_, size_t lhs_, size_t rhs_, size_t res_)
+			: cond(cond_), lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == cond || res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(cond) != Boolean || System::size_of(cond) != 1)
+				throw_invalid_input();
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用条件选择操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用条件选择操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数按位与操作（Out-of-place）
+	 * @details 实现 out-of-place 按位与：res ^= lhs & rhs
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，结果取
+	 *       mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct And_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		And_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		And_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用按位与操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用按位与操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数按位或操作（Out-of-place）
+	 * @details 实现 out-of-place 按位或：res ^= lhs | rhs
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，结果取
+	 *       mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Or_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Or_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Or_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用按位或操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用按位或操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数按位异或操作（Out-of-place）
+	 * @details 实现 out-of-place 按位异或：res ^= lhs ^ rhs
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 都必须是 UnsignedInteger
+	 * @note 宽度与截断：操作数零扩展，结果取
+	 *       mod 2^res_width 后 XOR 进 res（docs/operators.md《宽度与截断约定》）
+	 */
+	struct Xor_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 结果寄存器 ID */
+		size_t res;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 结果寄存器名称
+		 */
+		Xor_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_))
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 结果寄存器 ID
+		 */
+		Xor_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_)
+			: lhs(lhs_), rhs(rhs_), res(res_)
+		{
+			if (res == lhs || res == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用按位异或操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用按位异或操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 有符号整数小于比较操作（Out-of-place）
+	 * @details 实现 out-of-place 有符号比较：flag ^= (lhs < rhs)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs 必须是 SignedInteger，flag 必须是 Boolean（宽度 1）
+	 * @note 谓词在全精度域上求值：操作数符号扩展到 64 位后比较
+	 *       （docs/operators.md《宽度与截断约定》）
+	 */
+	struct Less_SInt_SInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 小于结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param flag_ 小于结果 flag 寄存器名称
+		 */
+		Less_SInt_SInt(std::string_view lhs_, std::string_view rhs_, std::string_view flag_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == lhs || flag_id == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != SignedInteger ||
+				System::type_of(rhs) != SignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param flag_ 小于结果 flag 寄存器 ID
+		 */
+		Less_SInt_SInt(size_t lhs_, size_t rhs_, size_t flag_)
+			: lhs(lhs_), rhs(rhs_), flag_id(flag_)
+		{
+			if (flag_id == lhs || flag_id == rhs)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != SignedInteger ||
+				System::type_of(rhs) != SignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用有符号小于比较操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用有符号小于比较操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号加法进位标志操作（Out-of-place flag 算子）
+	 * @details 报告 lhs + rhs 相对 res 宽度 w 的进位输出：flag ^= carry_out_w(lhs + rhs)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 必须是 UnsignedInteger，flag 必须是 Boolean（宽度 1）
+	 * @note out 参数仅提供宽度，不读其值：res 只用于确定进位判定的目标宽度 w，
+	 *       本算子不读写 res（docs/operators.md《宽度与截断约定》）
+	 * @note 谓词在全精度域上求值：w = 64 时按 64 位回绕判定，
+	 *       w < 64 时按 a + b >= 2^w 判定
+	 */
+	struct Carry_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 提供目标宽度的 out 寄存器 ID（不读其值） */
+		size_t res;
+
+		/** @brief 进位结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 提供目标宽度的 out 寄存器名称
+		 * @param flag_ 进位结果 flag 寄存器名称
+		 */
+		Carry_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_, std::string_view flag_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 提供目标宽度的 out 寄存器 ID
+		 * @param flag_ 进位结果 flag 寄存器 ID
+		 */
+		Carry_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_, size_t flag_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_)
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用进位标志操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用进位标志操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 有符号加法溢出标志操作（Out-of-place flag 算子）
+	 * @details 报告 lhs + rhs 相对 res 宽度 w 的有符号溢出：flag ^= overflow_w(lhs + rhs)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs 必须是 SignedInteger，res 必须是 UnsignedInteger，
+	 *       flag 必须是 Boolean（宽度 1）
+	 * @note out 参数仅提供宽度，不读其值：res 只用于确定溢出判定的目标宽度 w，
+	 *       本算子不读写 res（docs/operators.md《宽度与截断约定》）
+	 * @note 谓词在全精度域上求值：操作数符号扩展后截断到 w 位，
+	 *       按同号相加、结果变号判定
+	 */
+	struct Overflow_SInt_SInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 提供目标宽度的 out 寄存器 ID（不读其值） */
+		size_t res;
+
+		/** @brief 溢出结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 提供目标宽度的 out 寄存器名称
+		 * @param flag_ 溢出结果 flag 寄存器名称
+		 */
+		Overflow_SInt_SInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_, std::string_view flag_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != SignedInteger ||
+				System::type_of(rhs) != SignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 提供目标宽度的 out 寄存器 ID
+		 * @param flag_ 溢出结果 flag 寄存器 ID
+		 */
+		Overflow_SInt_SInt(size_t lhs_, size_t rhs_, size_t res_, size_t flag_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_)
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != SignedInteger ||
+				System::type_of(rhs) != SignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用溢出标志操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用溢出标志操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号乘法溢出标志操作（Out-of-place flag 算子）
+	 * @details 报告 lhs * rhs 是否超出 res 宽度 w 的表示范围：flag ^= (lhs * rhs 不含于 w 位)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：lhs、rhs、res 必须是 UnsignedInteger，flag 必须是 Boolean（宽度 1）
+	 * @note out 参数仅提供宽度，不读其值：res 只用于确定溢出判定的目标宽度 w，
+	 *       本算子不读写 res（docs/operators.md《宽度与截断约定》）
+	 * @note 谓词在全精度域上求值：乘积经 64 位高低半分解（等价 128 位精度），
+	 *       高 64 位非零或低 64 位超出 w 位范围即判定溢出
+	 */
+	struct MulOverflow_UInt_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 左操作数寄存器 ID */
+		size_t lhs;
+
+		/** @brief 右操作数寄存器 ID */
+		size_t rhs;
+
+		/** @brief 提供目标宽度的 out 寄存器 ID（不读其值） */
+		size_t res;
+
+		/** @brief 溢出结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param lhs_ 左操作数寄存器名称
+		 * @param rhs_ 右操作数寄存器名称
+		 * @param res_ 提供目标宽度的 out 寄存器名称
+		 * @param flag_ 溢出结果 flag 寄存器名称
+		 */
+		MulOverflow_UInt_UInt(std::string_view lhs_, std::string_view rhs_, std::string_view res_, std::string_view flag_)
+			: lhs(System::get(lhs_)), rhs(System::get(rhs_)), res(System::get(res_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param lhs_ 左操作数寄存器 ID
+		 * @param rhs_ 右操作数寄存器 ID
+		 * @param res_ 提供目标宽度的 out 寄存器 ID
+		 * @param flag_ 溢出结果 flag 寄存器 ID
+		 */
+		MulOverflow_UInt_UInt(size_t lhs_, size_t rhs_, size_t res_, size_t flag_)
+			: lhs(lhs_), rhs(rhs_), res(res_), flag_id(flag_)
+		{
+			if (flag_id == lhs || flag_id == rhs || flag_id == res)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(lhs) != UnsignedInteger ||
+				System::type_of(rhs) != UnsignedInteger ||
+				System::type_of(res) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用乘法溢出标志操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用乘法溢出标志操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 无符号整数判零操作（Out-of-place flag 算子）
+	 * @details 实现 out-of-place 判零：flag ^= (reg == 0)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：reg 必须是 UnsignedInteger，flag 必须是 Boolean（宽度 1）
+	 * @note 谓词在全精度域上求值：操作数零扩展后与 0 比较
+	 *       （docs/operators.md《宽度与截断约定》）
+	 */
+	struct IsZero_UInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 输入寄存器 ID */
+		size_t reg;
+
+		/** @brief 判零结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_ 输入寄存器名称
+		 * @param flag_ 判零结果 flag 寄存器名称
+		 */
+		IsZero_UInt(std::string_view reg_, std::string_view flag_)
+			: reg(System::get(reg_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param reg_ 输入寄存器 ID
+		 * @param flag_ 判零结果 flag 寄存器 ID
+		 */
+		IsZero_UInt(size_t reg_, size_t flag_)
+			: reg(reg_), flag_id(flag_)
+		{
+			if (flag_id == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != UnsignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用判零操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用判零操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
+	 * @brief 有符号整数负数判定操作（Out-of-place flag 算子）
+	 * @details 实现 out-of-place 负数判定：flag ^= (reg < 0)
+	 *
+	 * @note Unitary性质：自伴算子（U^† = U），因为XOR是自逆操作
+	 * @note 数据类型：reg 必须是 SignedInteger，flag 必须是 Boolean（宽度 1）
+	 * @note 谓词在全精度域上求值：操作数按二补码符号扩展后与 0 比较
+	 *       （docs/operators.md《宽度与截断约定》）
+	 */
+	struct Negative_SInt : SelfAdjointOperator {
+		using SelfAdjointOperator::operator();
+		using SelfAdjointOperator::dag;
+
+		/** @brief 输入寄存器 ID */
+		size_t reg;
+
+		/** @brief 负数判定结果 flag 寄存器 ID */
+		size_t flag_id;
+
+		ClassControllable
+
+		/**
+		 * @brief 构造函数（名称版本）
+		 * @param reg_ 输入寄存器名称
+		 * @param flag_ 负数判定结果 flag 寄存器名称
+		 */
+		Negative_SInt(std::string_view reg_, std::string_view flag_)
+			: reg(System::get(reg_)), flag_id(System::get(flag_))
+		{
+			if (flag_id == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != SignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 构造函数（ID 版本）
+		 * @param reg_ 输入寄存器 ID
+		 * @param flag_ 负数判定结果 flag 寄存器 ID
+		 */
+		Negative_SInt(size_t reg_, size_t flag_)
+			: reg(reg_), flag_id(flag_)
+		{
+			if (flag_id == reg)
+				throw_invalid_input();
+			/* Type check */
+#ifndef QRAM_Release
+			if (System::type_of(reg) != SignedInteger ||
+				System::type_of(flag_id) != Boolean)
+				throw_invalid_input();
+#endif
+		}
+
+		/**
+		 * @brief 应用负数判定操作
+		 * @param state 系统状态向量
+		 */
+		void operator()(std::vector<System>& state) const;
+
+#ifdef USE_CUDA
+		/**
+		 * @brief CUDA 应用负数判定操作
+		 * @param state CUDA 稀疏状态
+		 */
+		void operator()(CuSparseState& state) const;
+#endif
+	};
+
+	/**
 	 * @brief 任意整数累加操作（In-place）
 	 * @details 实现 in-place 加法：lhs += rhs，支持有符号和无符号整数
 	 *
@@ -1320,8 +2595,12 @@ namespace qram_simulator
 	 * @note 数据类型：lhs和rhs可以是UnsignedInteger或SignedInteger
 	 * @note 溢出行为：结果按lhs寄存器大小模2^N回绕
 	 * @note 类型组合：支持混合类型（如lhs为SignedInteger，rhs为UnsignedInteger）
+	 * @note 读扩展（宽度与截断约定）：rhs按其寄存器声明类型扩展——
+	 *       UnsignedInteger 零扩展，SignedInteger 符号扩展；宽度与类型在
+	 *       执行期读取，不在构造期快照
 	 *
-	 * @pre lhs和rhs必须是整数类型（UnsignedInteger或SignedInteger）
+	 * @pre lhs和rhs必须是整数类型（UnsignedInteger或SignedInteger，debug 校验）
+	 * @pre lhs与rhs不得为同一寄存器（别名检查，always-on）
 	 * @pre 所有寄存器必须是激活状态
 	 *
 	 * @warning 有符号整数的溢出行为是未定义的（C++标准），使用时需谨慎
@@ -1333,12 +2612,12 @@ namespace qram_simulator
 	 * Init_Unsafe(lhs, 8);  // lhs = 8
 	 * Init_Unsafe(rhs, 6);  // rhs = 6
 	 * // lhs = (8 + 6) % 16 = 14
-	 * AddAssign_AnyInt_AnyInt_InPlace("lhs", "rhs");
+	 * Add_AnyInt_AnyInt_InPlace("lhs", "rhs");
 	 * // dagger: lhs = (14 - 6) % 16 = 8 (恢复原值)
 	 * op.dag(state);
 	 * @endcode
 	 */
-	struct AddAssign_AnyInt_AnyInt_InPlace : BaseOperator
+	struct Add_AnyInt_AnyInt_InPlace : BaseOperator
 	{
 		using BaseOperator::operator();
 		using BaseOperator::dag;
@@ -1349,30 +2628,20 @@ namespace qram_simulator
 		/** @brief 右操作数寄存器 ID */
 		size_t rhs_id;
 
-		/** @brief 左操作数大小 */
-		size_t lhs_size;
-
-		/** @brief 右操作数大小 */
-		size_t rhs_size;
-
-		/** @brief 左操作数类型 */
-		StateStorageType lhs_type;
-
-		/** @brief 右操作数类型 */
-		StateStorageType rhs_type;
-
 		/**
 		 * @brief 构造函数（名称版本）
 		 * @param reg_lhs 左操作数寄存器名称
 		 * @param reg_rhs 右操作数寄存器名称
 		 */
-		AddAssign_AnyInt_AnyInt_InPlace(std::string_view reg_lhs, std::string_view reg_rhs)
-			: lhs_id(System::get(reg_lhs)), rhs_id(System::get(reg_rhs)),
-			lhs_size(System::size_of(lhs_id)), rhs_size(System::size_of(rhs_id)),
-			lhs_type(System::type_of(lhs_id)), rhs_type(System::type_of(rhs_id))
+		Add_AnyInt_AnyInt_InPlace(std::string_view reg_lhs, std::string_view reg_rhs)
+			: lhs_id(System::get(reg_lhs)), rhs_id(System::get(reg_rhs))
 		{
+			if (lhs_id == rhs_id)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
+			const auto lhs_type = System::type_of(lhs_id);
+			const auto rhs_type = System::type_of(rhs_id);
 			if (lhs_type != UnsignedInteger && lhs_type != SignedInteger)
 				throw_invalid_input();
 			if (rhs_type != UnsignedInteger && rhs_type != SignedInteger)
@@ -1385,13 +2654,15 @@ namespace qram_simulator
 		 * @param reg_lhs 左操作数寄存器 ID
 		 * @param reg_rhs 右操作数寄存器 ID
 		 */
-		AddAssign_AnyInt_AnyInt_InPlace(size_t reg_lhs, size_t reg_rhs)
-			: lhs_id(reg_lhs), rhs_id(reg_rhs),
-			lhs_size(System::size_of(lhs_id)), rhs_size(System::size_of(rhs_id)),
-			lhs_type(System::type_of(lhs_id)), rhs_type(System::type_of(rhs_id))
+		Add_AnyInt_AnyInt_InPlace(size_t reg_lhs, size_t reg_rhs)
+			: lhs_id(reg_lhs), rhs_id(reg_rhs)
 		{
+			if (lhs_id == rhs_id)
+				throw_invalid_input();
 			/* Type check */
 #ifndef QRAM_Release
+			const auto lhs_type = System::type_of(lhs_id);
+			const auto rhs_type = System::type_of(rhs_id);
 			if (lhs_type != UnsignedInteger && lhs_type != SignedInteger)
 				throw_invalid_input();
 			if (rhs_type != UnsignedInteger && rhs_type != SignedInteger)
@@ -1402,22 +2673,14 @@ namespace qram_simulator
 		ClassControllable
 
 		/**
-		 * @brief 无符号整数运算实现
-		 * @param lhs 左操作数引用
-		 * @param l_size 左操作数大小
-		 * @param rhs 右操作数值
-		 * @param r_size 右操作数大小
+		 * @brief 按寄存器声明类型扩展读取右操作数
+		 * @details UnsignedInteger 零扩展；SignedInteger 符号扩展（二补码位模式）。
+		 *          宽度与类型在执行期读取（宽度与截断约定）。
+		 * @param s 当前基矢
+		 * @param id 右操作数寄存器 ID
+		 * @return 扩展后的 64 位位模式
 		 */
-		static void _operate_uint_uint(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size);
-
-		/**
-		 * @brief 无符号整数 dagger 运算实现
-		 * @param lhs 左操作数引用
-		 * @param l_size 左操作数大小
-		 * @param rhs 右操作数值
-		 * @param r_size 右操作数大小
-		 */
-		static void _operate_uint_uint_dag(uint64_t& lhs, size_t l_size, uint64_t rhs, size_t r_size);
+		static uint64_t _extended_rhs(const System& s, size_t id);
 
 		/**
 		 * @brief 应用累加操作
@@ -2133,12 +3396,22 @@ namespace qram_simulator
 				/* apply the custom function */
 				std::vector<size_t> output_values = func(input_values);
 
-				/* write the output reversibly via XOR */
+				/* write the output reversibly via XOR, masked to the output width
+				   (宽度与截断约定，docs/operators.md) */
 				for (size_t i = 0; i < output_ids.size(); ++i)
 				{
-					s.get(output_ids[i]).value ^= output_values[i];
+					const size_t out_size = System::size_of(output_ids[i]);
+					auto& out_reg = s.get(output_ids[i]);
+					out_reg.value =
+						(out_reg.value ^ output_values[i]) &
+						(out_size == 64 ? ~uint64_t{0} : pow2(out_size) - 1);
 				}
 			}
 		}
 	};
+
+	// Deprecated aliases; see docs/naming_conventions.md. Remove in the next major version.
+	[[deprecated("use Add_AnyInt_AnyInt_InPlace")]] using AddAssign_AnyInt_AnyInt_InPlace = Add_AnyInt_AnyInt_InPlace;
+	[[deprecated("use Div_Sqrt_Arccos_UInt_UInt")]] using Div_Sqrt_Arccos_Int_Int = Div_Sqrt_Arccos_UInt_UInt;
+	[[deprecated("use Sqrt_Div_Arccos_Int_UInt")]] using Sqrt_Div_Arccos_Int_Int = Sqrt_Div_Arccos_Int_UInt;
 } // namespace qram_simulator

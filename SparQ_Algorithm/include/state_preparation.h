@@ -41,25 +41,25 @@ namespace qram_simulator {
 					Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1)(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent")(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
-					Xgate_Bool("addr_child", 0)(state);
+					X_Bool("addr_child", 0)(state);
 					if (k != addr_size - 1)
 					{
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
-						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
+						Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(state);
 						{
 							profiler _("StatePrep::CondRot");
 							CondRot_Fixed_Bool("div_result", "rotation")(state);
 						}
 						ClearZero()(state);
-						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
+						Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 					}
 					else
 					{
 						ShiftLeft_InPlace("addr_parent", 1)(state);
-						Xgate_Bool("addr_parent", 0)(state);
+						X_Bool("addr_parent", 0)(state);
 						Add_ConstUInt_InPlace("addr_child", 1)(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
@@ -73,10 +73,10 @@ namespace qram_simulator {
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 						Add_ConstUInt_InPlace("addr_child", 1).dag(state);
-						Xgate_Bool("addr_parent", 0)(state);
+						X_Bool("addr_parent", 0)(state);
 						ShiftRight_InPlace("addr_parent", 1)(state);
 					}
-					Xgate_Bool("addr_child", 0)(state);
+					X_Bool("addr_child", 0)(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent").dag(state);
 					Add_ConstUInt_InPlace("addr_parent", pow2(k) - 1).dag(state);
@@ -113,12 +113,12 @@ namespace qram_simulator {
 					Add_ConstUInt_InPlace("addr_parent", pow2(addr_size - 1 - k) - 1)(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent")(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
-					Xgate_Bool("addr_child", 0)(state);
+					X_Bool("addr_child", 0)(state);
 					if (k != 0)
 					{
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
-						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
+						Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(state);
 						{
 							profiler _("StatePrep::CondRot::dag");
 							// size_t original_size = state.size();
@@ -126,14 +126,14 @@ namespace qram_simulator {
 							CondRot_Fixed_Bool("div_result", "rotation").dag(state);
 						}
 						ClearZero()(state);
-						Div_Sqrt_Arccos_Int_Int("data_child", "data_parent", "div_result")(state);
+						Div_Sqrt_Arccos_UInt_UInt("data_child", "data_parent", "div_result")(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 					}
 					else
 					{
 						ShiftLeft_InPlace("addr_parent", 1)(state);
-						Xgate_Bool("addr_parent", 0)(state);
+						X_Bool("addr_parent", 0)(state);
 						Add_ConstUInt_InPlace("addr_child", 1)(state);
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
@@ -149,10 +149,10 @@ namespace qram_simulator {
 						QRAMLoad(qram, "addr_parent", "data_parent")(state);
 						QRAMLoad(qram, "addr_child", "data_child")(state);
 						Add_ConstUInt_InPlace("addr_child", 1).dag(state);
-						Xgate_Bool("addr_parent", 0)(state);
+						X_Bool("addr_parent", 0)(state);
 						ShiftRight_InPlace("addr_parent", 1)(state);
 					}
-					Xgate_Bool("addr_child", 0)(state);
+					X_Bool("addr_child", 0)(state);
 					Mult_UInt_ConstUInt("addr_parent", 2, "addr_child")(state);
 					Add_UInt_UInt_InPlace(work_qubit, "addr_parent").dag(state);
 					Add_ConstUInt_InPlace("addr_parent", pow2(addr_size - 1 - k) - 1).dag(state);

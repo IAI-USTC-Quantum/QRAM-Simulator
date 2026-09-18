@@ -65,7 +65,7 @@ SparQ 的算子遵循 **构造 → 作用** 的两阶段模型：
 .. code-block:: python
 
    # 常量加法：指定常数 7
-   ps.Add_ConstUInt("counter", 7)
+   ps.Add_ConstUInt_InPlace("counter", 7)
 
    # 常量乘法：指定乘数 3
    ps.Mult_UInt_ConstUInt("input", 3, "result")
@@ -83,10 +83,10 @@ SparQ 的算子遵循 **构造 → 作用** 的两阶段模型：
 .. code-block:: python
 
    # 在寄存器 "q" 的第 0 位作用 X 门
-   ps.Xgate_Bool("q", 0)
+   ps.X_Bool("q", 0)
 
    # 绕 X 轴旋转 π/4
-   ps.RXgate_Bool("q", 0, np.pi / 4)
+   ps.RX_Bool("q", 0, np.pi / 4)
 
 作用方式
 --------
@@ -108,7 +108,7 @@ SparQ 的算子遵循 **构造 → 作用** 的两阶段模型：
 
 .. code-block:: python
 
-   op = ps.ShiftLeft("reg", 2)
+   op = ps.ShiftLeft_InPlace("reg", 2)
    op(state)       # 左移 2 位
    op.dag(state)   # 右移 2 位（撤销）
 

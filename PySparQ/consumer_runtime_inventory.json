@@ -136,14 +136,30 @@
       "contract": "inplace_bijective",
       "consumers": ["qecc_lang"]
     },
-    {"symbol": "Xgate_Bool", "contract": "inplace_bijective", "consumers": ["qecc_lang"]},
+    {"symbol": "X_Bool", "contract": "inplace_bijective", "consumers": ["qecc_lang"]},
     {"symbol": "FlipBools", "contract": "inplace_bijective", "consumers": ["qecc_lang"]},
     {
       "symbol": "QRAMLoad",
       "contract": "xor_into",
       "consumers": ["qecc_lang", "quantum_cfd_qfvm"]
     },
-    {"symbol": "QRAMLoadFast", "contract": "xor_into", "consumers": ["qecc_lang"]}
+    {"symbol": "QRAMLoadFast", "contract": "xor_into", "consumers": ["qecc_lang"]},
+    {"symbol": "Sub_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Neg_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Abs_SInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Mul_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Div_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Sqrt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Select_Bool_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "And_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Or_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Xor_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Less_SInt_SInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Carry_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Overflow_SInt_SInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "MulOverflow_UInt_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "IsZero_UInt", "contract": "xor_into", "consumers": []},
+    {"symbol": "Negative_SInt", "contract": "xor_into", "consumers": []}
   ],
   "accepted_wrappers": [
     "dag",
@@ -177,6 +193,27 @@
       "qcfd_common/qecclang/fixed_point.py"
     ],
     "claim": "compile_operator is not accepted as quantum semantics on the frozen supported paths"
+  },
+  "deprecated_aliases": {
+    "note": "Naming refactor per docs/naming_conventions.md. The observed_*_runtime_symbols lists are historical observations at the pinned revisions above and keep the old names. Canonical symbols (e.g. in accepted_reversible_operations) use the new names. Old Python names remain importable via module __getattr__ with a DeprecationWarning, and old C++ names via [[deprecated]] using aliases, until the next major version.",
+    "Xgate_Bool": "X_Bool",
+    "Ygate_Bool": "Y_Bool",
+    "Zgate_Bool": "Z_Bool",
+    "Sgate_Bool": "S_Bool",
+    "Tgate_Bool": "T_Bool",
+    "RXgate_Bool": "RX_Bool",
+    "RYgate_Bool": "RY_Bool",
+    "RZgate_Bool": "RZ_Bool",
+    "SXgate_Bool": "SX_Bool",
+    "U2gate_Bool": "U2_Bool",
+    "U3gate_Bool": "U3_Bool",
+    "inverseQFT": "InverseQFT",
+    "GlobalPhase_Int": "GlobalPhase",
+    "AddAssign_AnyInt_AnyInt_InPlace": "Add_AnyInt_AnyInt_InPlace",
+    "Div_Sqrt_Arccos_Int_Int": "Div_Sqrt_Arccos_UInt_UInt",
+    "Sqrt_Div_Arccos_Int_Int": "Sqrt_Div_Arccos_Int_UInt",
+    "Hadamard_PartialQubit": "Hadamard_Partial",
+    "QuantumBinarySearchFast": "QuantumBinarySearch_Fast"
   },
   "claim_limit": "QDA evidence covers consumed helpers, block encodings and selected walk outputs; CKS evidence covers consumed helpers and sparse encoding, not whole-solver correctness."
 }

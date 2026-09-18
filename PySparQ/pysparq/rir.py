@@ -12,7 +12,7 @@ backend: it loads the versioned JSON encoding (schema versions ``0.1``,
 register renaming, ``Repeat`` bodies are replayed, ``Adjoint`` walks the
 body backwards with inverted operations, and ``Control`` accumulates
 multi-bit conditions — while mapping register-level arithmetic onto native
-PySparQ operators (``Add_ConstUInt_InPlace``, ``GlobalPhase_Int``,
+PySparQ operators (``Add_ConstUInt_InPlace``, ``GlobalPhase``,
 ``QRAMLoad``) whenever the RIR operand aligns with a whole register.
 
 The interpreter is deliberately independent of ``pyqecclang`` itself: it
@@ -403,12 +403,12 @@ class _Runner:
                 if not (expected >> index) & 1:
                     zeros.append(pair)
         for pair in zeros:
-            _core.Xgate_Bool(*pair)(self.state)
+            _core.X_Bool(*pair)(self.state)
         try:
             body(tuple(flat))
         finally:
             for pair in reversed(zeros):
-                _core.Xgate_Bool(*pair)(self.state)
+                _core.X_Bool(*pair)(self.state)
 
     # -- events --------------------------------------------------------------
 
@@ -455,7 +455,7 @@ class _Runner:
 
     def _gphase(self, theta: float, controls: tuple[tuple[Bits, int], ...]) -> None:
         if not controls:
-            self._apply(_core.GlobalPhase_Int(cmath.exp(1j * theta)))
+            self._apply(_core.GlobalPhase(cmath.exp(1j * theta)))
             return
         flat: list[Bit] = []
         zeros: list[Bit] = []
@@ -467,12 +467,12 @@ class _Runner:
         target = flat[-1]
         rest = tuple(flat[:-1])
         for pair in zeros:
-            _core.Xgate_Bool(*pair)(self.state)
+            _core.X_Bool(*pair)(self.state)
         try:
             self._apply(_core.Phase_Bool(*target, theta), rest)
         finally:
             for pair in reversed(zeros):
-                _core.Xgate_Bool(*pair)(self.state)
+                _core.X_Bool(*pair)(self.state)
 
     def _bitwise(
         self, op: str, source: Bits, target: Bits, controls: tuple[tuple[Bits, int], ...]
@@ -482,10 +482,10 @@ class _Runner:
 
         def body(c: tuple[Bit, ...]) -> None:
             for a, b in zip(source, target):
-                self._apply(_core.Xgate_Bool(*b), c + (a,))
+                self._apply(_core.X_Bool(*b), c + (a,))
                 if op == _EVENT_SWAP:
-                    self._apply(_core.Xgate_Bool(*a), c + (b,))
-                    self._apply(_core.Xgate_Bool(*b), c + (a,))
+                    self._apply(_core.X_Bool(*a), c + (b,))
+                    self._apply(_core.X_Bool(*b), c + (a,))
 
         self._with_conditions(controls, body)
 
@@ -513,8 +513,8 @@ class _Runner:
             for offset in range(width):
                 if (value >> offset) & 1:
                     for i in reversed(range(offset + 1, width)):
-                        self._apply(_core.Xgate_Bool(*bits[i]), c + tuple(bits[offset:i]))
-                    self._apply(_core.Xgate_Bool(*bits[offset]), c)
+                        self._apply(_core.X_Bool(*bits[i]), c + tuple(bits[offset:i]))
+                    self._apply(_core.X_Bool(*bits[offset]), c)
 
         self._with_conditions(controls, body)
 
@@ -532,14 +532,14 @@ class _Runner:
 
             def body(c: tuple[Bit, ...]) -> None:
                 for i, pair in enumerate(address):
-                    self._apply(_core.Xgate_Bool(addr_tmp, i), c + (pair,))
+                    self._apply(_core.X_Bool(addr_tmp, i), c + (pair,))
                 query = _core.QRAMLoad(self.qrams[qram_name], addr_tmp, data_tmp)
                 query(self.state)
                 for i, pair in enumerate(data):
-                    self._apply(_core.Xgate_Bool(*pair), c + ((data_tmp, i),))
+                    self._apply(_core.X_Bool(*pair), c + ((data_tmp, i),))
                 query(self.state)
                 for i, pair in reversed(list(enumerate(address))):
-                    self._apply(_core.Xgate_Bool(addr_tmp, i), c + (pair,))
+                    self._apply(_core.X_Bool(addr_tmp, i), c + (pair,))
 
             self._with_conditions(controls, body)
         finally:

@@ -395,7 +395,7 @@ class QuantumBinarySearch(ControllableOperatorMixin):
         """Execute quantum binary search."""
         # Create flag register
         ps.AddRegister("qbs_flag", ps.Boolean, 1)(state)
-        ps.Xgate_Bool("qbs_flag", 0)(state)
+        ps.X_Bool("qbs_flag", 0)(state)
 
         # Create comparison registers
         ps.AddRegister("compare_less", ps.Boolean, 1)(state)
@@ -448,7 +448,7 @@ class QuantumBinarySearch(ControllableOperatorMixin):
                 ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
                     ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.X_Bool("compare_less", 0)(state)
                 ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
                     ["compare_less", "qbs_flag"]
                 )(state)
@@ -459,7 +459,7 @@ class QuantumBinarySearch(ControllableOperatorMixin):
                 ps.Swap_General_General("right_reg", "mid_reg").conditioned_by_nonzeros(
                     ["compare_less", "qbs_flag"]
                 )(state)
-                ps.Xgate_Bool("compare_less", 0)(state)
+                ps.X_Bool("compare_less", 0)(state)
                 ps.Swap_General_General("left_reg", "mid_reg").conditioned_by_nonzeros(
                     ["compare_less", "qbs_flag"]
                 )(state)
@@ -478,7 +478,7 @@ class QuantumBinarySearch(ControllableOperatorMixin):
         # Cleanup
         ps.Add_UInt_ConstUInt("left_reg", self.total_length, "right_reg")(state)
         ps.Assign(self.address_offset_reg, "left_reg")(state)
-        ps.Xgate_Bool("qbs_flag", 0)(state)
+        ps.X_Bool("qbs_flag", 0)(state)
 
         ps.RemoveRegister("compare_less")(state)
         ps.RemoveRegister("compare_equal")(state)
@@ -489,7 +489,7 @@ class QuantumBinarySearch(ControllableOperatorMixin):
         ps.RemoveRegister("qbs_flag")(state)
 
 
-class QuantumBinarySearchFast(ControllableOperatorMixin):
+class QuantumBinarySearch_Fast(ControllableOperatorMixin):
     """Compatibility wrapper around the native CKS binary-search primitive."""
 
     def __init__(
@@ -513,7 +513,7 @@ class QuantumBinarySearchFast(ControllableOperatorMixin):
         self(state)
 
     def __call__(self, state: ps.SparseState) -> None:
-        ps.QuantumBinarySearchFast(
+        ps.QuantumBinarySearch_Fast(
             self.qram, self.address_offset_reg, self.total_length,
             self.target_reg, self.result_reg,
         )(state)
@@ -704,7 +704,7 @@ class TOperator(ControllableOperatorMixin):
         ps.Add_UInt_UInt(self.data_offset_reg, "data_addr", "data_addr")(state)
 
         # Step 3: data_addr += k (using AddAssign which is self-adjoint)
-        ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "data_addr")(state)
+        ps.Add_AnyInt_AnyInt_InPlace(self.k_reg, "data_addr")(state)
 
     def _find_column_position(self, state: ps.SparseState, inverse: bool = False) -> None:
         """Find column position in sparse storage (SparseMatrixOracle2).
@@ -712,7 +712,7 @@ class TOperator(ControllableOperatorMixin):
         Maps |j>|k>|0> -> |j>|s_j>|search_result>
         where s_j is the position of column k in row j's sparse storage.
 
-        Uses QuantumBinarySearchFast (classical O(log n), self-adjoint, no temp regs).
+        Uses QuantumBinarySearch_Fast (classical O(log n), self-adjoint, no temp regs).
         """
         ps.AddRegister("row_addr", ps.UnsignedInteger, self.qram.address_size)(state)
 
@@ -721,18 +721,18 @@ class TOperator(ControllableOperatorMixin):
         )(state)
 
         if not inverse:
-            ps.QuantumBinarySearchFast(
+            ps.QuantumBinarySearch_Fast(
                 self.qram, "row_addr", self.nnz_col,
                 self.k_reg, self.search_result_reg,
             )(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
-            ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr").dag(state)
+            ps.Add_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr").dag(state)
         else:
-            ps.AddAssign_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr")(state)
+            ps.Add_AnyInt_AnyInt_InPlace(self.k_reg, "row_addr")(state)
             ps.Swap_General_General(self.k_reg, self.search_result_reg)(state)
             ps.QRAMLoad(self.qram, self.search_result_reg, self.k_reg)(state)
-            ps.QuantumBinarySearchFast(
+            ps.QuantumBinarySearch_Fast(
                 self.qram, "row_addr", self.nnz_col,
                 self.k_reg, self.search_result_reg,
             )(state)

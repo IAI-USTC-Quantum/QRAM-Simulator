@@ -198,8 +198,8 @@ ps.ShiftRight(reg, n)                # 右移 n 位
 
 # 基础量子门
 ps.Hadamard_Int(reg, n_digits)       # 对整数寄存器应用 Hadamard
-ps.Xgate_Bool(reg, pos)              # X 门（特定比特位）
-ps.Zgate_Bool(reg, pos)              # Z 门
+ps.X_Bool(reg, pos)              # X 门（特定比特位）
+ps.Z_Bool(reg, pos)              # Z 门
 
 # QRAM 操作
 ps.QRAMLoad(qram, addr_reg, data_reg)      # QRAM 加载
@@ -554,7 +554,7 @@ for (size_t i = 0; i < n_repeats * 4; ++i) {
 | `System::add_register("count", UnsignedInteger, count_precision)` | `ps.AddRegister("count", ps.UnsignedInteger, precision_bits)(state)` |
 | `Hadamard_Int_Full(addr/count)` | `ps.Hadamard_Int_Full("count/addr")(state)` |
 | `GroverCount(&qram, count_reg, ...)` | `GroverOperator(...).conditioned_by_bit("count", i)(state)` |
-| 逆向 QFT `inverseQFT` | `ps.inverseQFT("count")(state)` |
+| 逆向 QFT `InverseQFT` | `ps.InverseQFT("count")(state)` |
 
 ---
 
@@ -698,14 +698,14 @@ WalkSequence_via_QRAM_Debug(&qram_A, &qram_b, mat, b, ...,
 def __call__(self, state: ps.SparseState) -> None:
     ps.Hadamard_Bool(self.anc_3)(state)         # H
     self.enc_b.dag(state)                        # 状态准备逆操作
-    ps.Xgate_Bool(self.anc_1, 0)(state)          # X
+    ps.X_Bool(self.anc_1, 0)(state)          # X
     ps.Reflection_Bool(self.main_reg, True)      # 反射算子（关于 |0⟩）
           .conditioned_by_all_ones([self.anc_1, self.anc_3, self.anc_4])(state)
-    ps.Xgate_Bool(self.anc_1, 0)(state)
+    ps.X_Bool(self.anc_1, 0)(state)
     self.enc_b(state)                            # 状态准备
     
     # 旋转序列：R_s(f(s))
-    ps.Xgate_Bool(self.anc_4, 0)(state)
+    ps.X_Bool(self.anc_4, 0)(state)
     ps.Rot_Bool(self.anc_2, self.R_s).conditioned_by_all_ones(self.anc_4)(state)
     ...
     self.enc_A.conditioned_by_all_ones([self.anc_1, self.anc_2])(state)  # 块编码 A
@@ -780,7 +780,7 @@ vector<double> weights = ComputeFourierCoeffs(epsilon_, l_);
 
 CKS 算法利用 Chebyshev 多项式逼近和量子游走，在稀疏矩阵条件下达到 O(κ log(κ/ε)) 的复杂度，比 HHL 类算法有更好的常数因子。
 
-PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearchFast`、`GetRowAddr`、`GetDataAddr`、`GetQWRotateAngle_Int_Int_Int`、`CondRot_Fixed_Bool`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver，也不暴露用户传入 Python function 的旧泛化 CondRot API。
+PySparQ 版本同样只通过底层 primitive 复刻 C++ `HamiltonianSimulationTest.cpp` 的量子游走路径。Python 的 `SparseMatrix` 使用 C++ 同款紧凑 QRAM 布局，`TOperator`、`QuantumBinarySearch_Fast`、`GetRowAddr`、`GetDataAddr`、`GetQWRotateAngle_Int_Int_Int`、`CondRot_Fixed_Bool`、`QRAMLoad` 和寄存器交换等步骤按 C++ 顺序组合；没有绑定完整 C++ CKS solver，也不暴露用户传入 Python function 的旧泛化 CondRot API。
 
 核心流程：
 ```
@@ -941,7 +941,7 @@ Hadamard_Bool("ctrl")(state);   // H → (|0⟩+|1⟩)/√2
 
 // 对每个主量子比特应用受控 X（ctrl=1 时翻转）
 for (int i = 1; i < remainder + 1; i++)
-    Xgate_Bool("main", i-1).conditioned_by_all_ones("ctrl")(state);
+    X_Bool("main", i-1).conditioned_by_all_ones("ctrl")(state);
 for (auto reg : reg_names)
     FlipBools(System::get(reg)).conditioned_by_all_ones("ctrl")(state);
 ```
@@ -970,12 +970,12 @@ def ghz_state(nqubit: int) -> ps.SparseState:
         main_regs.append(main_reg)
     
     # GHZ 电路
-    ps.Xgate_Bool("ctrl", 0)(state)       # |0⟩ → |1⟩
+    ps.X_Bool("ctrl", 0)(state)       # |0⟩ → |1⟩
     ps.Hadamard_Bool("ctrl")(state)        # (|0⟩+|1⟩)/√2
     
     for reg in main_regs:
         for pos in range(ps.System.size_of(reg)):
-            ps.Xgate_Bool(reg, pos).conditioned_by_nonzeros("ctrl")(state)
+            ps.X_Bool(reg, pos).conditioned_by_nonzeros("ctrl")(state)
     
     return state
 ```
@@ -1012,7 +1012,7 @@ op = ps.ZeroConditionalPhaseFlip([cond_reg])
 op.conditioned_by_nonzeros(other_reg)(state)  # 多次加条件
 
 # 对应 C++ 中：
-# Xgate_Bool("ctrl", 0).conditioned_by_all_ones("ctrl")(state);
+# X_Bool("ctrl", 0).conditioned_by_all_ones("ctrl")(state);
 ```
 
 **原则四：自伴算子用 `.dag()` 逆操作**

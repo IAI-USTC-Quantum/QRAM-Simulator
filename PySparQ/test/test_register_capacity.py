@@ -51,7 +51,7 @@ def test_cpu_system_storage_grows_well_past_the_preallocated_block():
 
     assert len(state.basis_states[0].registers) == register_count
 
-    ps.Xgate_Bool(f"r{register_count - 1}", 0)(state)
+    ps.X_Bool(f"r{register_count - 1}", 0)(state)
     basis = state.basis_states[0]
     assert basis.get(register_count - 1).value == 1
     assert basis.get(0).value == 0
@@ -127,7 +127,7 @@ def test_generated_sequence_matches_independent_multi_basis_model():
         )(state) == model.add()
 
     for register_id in (7, 8, 9, 144):
-        ps.Xgate_Bool(register_id, 0)(state)
+        ps.X_Bool(register_id, 0)(state)
         for basis in model.values:
             basis[register_id] = 1
     assert_matches(state, model)

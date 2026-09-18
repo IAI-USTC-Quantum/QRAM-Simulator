@@ -1,4 +1,4 @@
-﻿#ifdef __GNUC__
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-value"
 #endif
@@ -315,15 +315,15 @@ Example:
         .def(py::init<size_t>(), py::arg("reg_in"))
             BIND_CONTROLLABLE_METHODS(Hadamard_Bool);
 
-    // 绑定Hadamard_PartialQubit（需要特殊处理std::set参数）
-    BIND_SELF_ADJOINT_OPERATOR(Hadamard_PartialQubit)
+    // 绑定Hadamard_Partial（需要特殊处理std::set参数）
+    BIND_SELF_ADJOINT_OPERATOR(Hadamard_Partial)
         .def(py::init([](std::string_view reg_in, py::set positions)
                       {
 		std::set<size_t> pos_set;
 		for (auto item : positions) {
 			pos_set.insert(item.cast<size_t>());
 		}
-		return new Hadamard_PartialQubit(reg_in, pos_set); }),
+		return new Hadamard_Partial(reg_in, pos_set); }),
              py::arg("reg_in"), py::arg("qubit_positions"))
         .def(py::init([](size_t reg_in, py::set positions)
                       {
@@ -331,9 +331,9 @@ Example:
 		for (auto item : positions) {
 			pos_set.insert(item.cast<size_t>());
 		}
-		return new Hadamard_PartialQubit(reg_in, pos_set); }),
+		return new Hadamard_Partial(reg_in, pos_set); }),
              py::arg("reg_in"), py::arg("qubit_positions"))
-            BIND_CONTROLLABLE_METHODS(Hadamard_PartialQubit);
+            BIND_CONTROLLABLE_METHODS(Hadamard_Partial);
 
     /* parallel_phase_operations.h */
     BIND_SELF_ADJOINT_OPERATOR(ZeroConditionalPhaseFlip)
@@ -348,9 +348,9 @@ Example:
         .def(py::init<const std::vector<std::string> &, bool>(), py::arg("regs"), py::arg("inverse") = false)
             BIND_CONTROLLABLE_METHODS(Reflection_Bool);
 
-    BIND_BASE_OPERATOR(GlobalPhase_Int)
+    BIND_BASE_OPERATOR(GlobalPhase)
         .def(py::init<complex_t>(), py::arg("phase"))
-            BIND_CONTROLLABLE_METHODS(GlobalPhase_Int);
+            BIND_CONTROLLABLE_METHODS(GlobalPhase);
 
     /* partial_trace.h */
     // PartialTrace 绑定
@@ -506,15 +506,17 @@ Args:
 Example:
     QFT("data")(state)  # Apply QFT
     # ... computation ...
-    inverseQFT("data")(state)  # Apply inverse QFT
+    InverseQFT("data")(state)  # Apply inverse QFT
 )doc")
         // 寄存器名称/ID构造
         .def(py::init<std::string_view>(), py::arg("reg_name"))
         .def(py::init<size_t>(), py::arg("reg_id"))
+        // dagger（逆 QFT）——与其它带 dag 的算子一致，经 SparseState 重载虚派发到 QFT::dag
+        BIND_DAG_METHODS(QFT)
             BIND_CONTROLLABLE_METHODS(QFT);
 
-    // 绑定inverseQFT（保持C++命名风格）
-    BIND_BASE_OPERATOR(inverseQFT, R"doc(
+    // 绑定 InverseQFT（已按 docs/naming_conventions.md 完成更名；Python 侧旧小写名由 __init__.py 的弃用别名提供）
+    BIND_BASE_OPERATOR(InverseQFT, R"doc(
 Inverse Quantum Fourier Transform on a register.
 
 Applies the inverse QFT to transform from Fourier basis back to
@@ -525,7 +527,7 @@ Args:
 )doc")
         .def(py::init<std::string_view>(), py::arg("reg_name"))
         .def(py::init<size_t>(), py::arg("reg_id"))
-            BIND_CONTROLLABLE_METHODS(inverseQFT);
+            BIND_CONTROLLABLE_METHODS(InverseQFT);
 
     /* qram.h */
     py::class_<qram_qutrit::QRAMCircuit>(m, "QRAMCircuit_qutrit")
@@ -580,8 +582,8 @@ Note:
         BIND_CONTROLLABLE_METHODS(QRAMLoadFast);
 
     // 基础算术操作绑定
-    BIND_SELF_ADJOINT_OPERATOR(Xgate_Bool)
-    BIND_CONTROLLABLE_METHODS(Xgate_Bool)
+    BIND_SELF_ADJOINT_OPERATOR(X_Bool)
+    BIND_CONTROLLABLE_METHODS(X_Bool)
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit"))
         .def(py::init<size_t, size_t>(),
@@ -699,21 +701,21 @@ Example:
             BIND_CONTROLLABLE_METHODS(Add_ConstUInt_InPlace);
 
     // 复杂算术操作
-    BIND_SELF_ADJOINT_OPERATOR(Div_Sqrt_Arccos_Int_Int)
+    BIND_SELF_ADJOINT_OPERATOR(Div_Sqrt_Arccos_UInt_UInt)
         .def(py::init<std::string_view, std::string_view, std::string_view>(),
              py::arg("lhs_reg"), py::arg("rhs_reg"), py::arg("out_reg"))
         .def(py::init<size_t, size_t, size_t>(),
              py::arg("lhs_reg"), py::arg("rhs_reg"), py::arg("out_reg"))
 
-            BIND_CONTROLLABLE_METHODS(Div_Sqrt_Arccos_Int_Int);
+            BIND_CONTROLLABLE_METHODS(Div_Sqrt_Arccos_UInt_UInt);
 
-    BIND_SELF_ADJOINT_OPERATOR(Sqrt_Div_Arccos_Int_Int)
+    BIND_SELF_ADJOINT_OPERATOR(Sqrt_Div_Arccos_Int_UInt)
         .def(py::init<std::string_view, std::string_view, std::string_view>(),
              py::arg("lhs_reg"), py::arg("rhs_reg"), py::arg("out_reg"))
         .def(py::init<size_t, size_t, size_t>(),
              py::arg("lhs_reg"), py::arg("rhs_reg"), py::arg("out_reg"))
 
-            BIND_CONTROLLABLE_METHODS(Sqrt_Div_Arccos_Int_Int);
+            BIND_CONTROLLABLE_METHODS(Sqrt_Div_Arccos_Int_UInt);
 
     BIND_SELF_ADJOINT_OPERATOR(GetRotateAngle_Int_Int)
         .def(py::init<std::string_view, std::string_view, std::string_view>(),
@@ -723,13 +725,357 @@ Example:
 
             BIND_CONTROLLABLE_METHODS(GetRotateAngle_Int_Int);
 
-    BIND_BASE_OPERATOR(AddAssign_AnyInt_AnyInt_InPlace)
+    // 算术扩展操作（宽度与截断约定见 docs/operators.md）
+    BIND_SELF_ADJOINT_OPERATOR(Sub_UInt_UInt, R"doc(
+Subtract two unsigned integer registers.
+
+Computes: res ^= lhs - rhs, evaluated on the unsigned 64-bit wraparound
+domain, then truncated to mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the minuend register.
+    rhs: Name/ID of the subtrahend register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Sub_UInt_UInt("a", "b", "result")(state)  # result ^= a - b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Sub_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Neg_UInt, R"doc(
+Negate an unsigned integer register.
+
+Computes: res ^= 0 - reg (two's complement negation on the unsigned 64-bit
+wraparound domain), truncated to mod 2^res_width before being XORed into res.
+
+Args:
+    reg: Name/ID of the input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Neg_UInt("a", "result")(state)  # result ^= -a
+)doc")
+        .def(py::init<std::string_view, std::string_view>(),
+             py::arg("reg"), py::arg("res"))
+        .def(py::init<size_t, size_t>(),
+             py::arg("reg_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Neg_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Abs_SInt, R"doc(
+Absolute value of a signed integer register.
+
+Computes: res ^= |reg|, where reg is sign-extended from its two's complement
+bit pattern, truncated to mod 2^res_width before being XORed into res (SInt
+in, UInt out).
+
+Args:
+    reg: Name/ID of the SignedInteger input register.
+    res: Name/ID of the UnsignedInteger output register (result is XORed in).
+
+Example:
+    Abs_SInt("a", "result")(state)  # result ^= |a|
+)doc")
+        .def(py::init<std::string_view, std::string_view>(),
+             py::arg("reg"), py::arg("res"))
+        .def(py::init<size_t, size_t>(),
+             py::arg("reg_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Abs_SInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Mul_UInt_UInt, R"doc(
+Multiply two unsigned integer registers.
+
+Computes: res ^= lhs * rhs, taking the low 64 bits of the full-precision
+(128-bit) product, truncated to mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Mul_UInt_UInt("a", "b", "result")(state)  # result ^= a * b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Mul_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Div_UInt_UInt, R"doc(
+Integer-divide two unsigned integer registers.
+
+Computes: res ^= lhs / rhs (floor division). Total-domain convention: a zero
+divisor yields quotient 0 instead of raising (overflow/domain information is
+reported by dedicated flag operators); the quotient is truncated to
+mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the dividend register.
+    rhs: Name/ID of the divisor register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Div_UInt_UInt("a", "b", "result")(state)  # result ^= a / b (0 if b == 0)
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Div_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Sqrt_UInt, R"doc(
+Integer square root of an unsigned integer register.
+
+Computes: res ^= isqrt(reg) = floor(sqrt(reg)) via an integer-only bitwise
+algorithm (CPU and CUDA agree bit-for-bit), truncated to mod 2^res_width
+before being XORed into res.
+
+Args:
+    reg: Name/ID of the input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Sqrt_UInt("a", "result")(state)  # result ^= floor(sqrt(a))
+)doc")
+        .def(py::init<std::string_view, std::string_view>(),
+             py::arg("reg"), py::arg("res"))
+        .def(py::init<size_t, size_t>(),
+             py::arg("reg_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Sqrt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Select_Bool_UInt_UInt, R"doc(
+Select between two unsigned integer registers by a Boolean condition.
+
+Computes: res ^= (cond ? lhs : rhs), where cond is a width-1 Boolean register
+read at bit 0; the selected value is truncated to mod 2^res_width before
+being XORed into res.
+
+Args:
+    cond: Name/ID of the width-1 Boolean condition register.
+    lhs: Name/ID of the register selected when cond == 1.
+    rhs: Name/ID of the register selected when cond == 0.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Select_Bool_UInt_UInt("c", "a", "b", "result")(state)  # result ^= a if c else b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view>(),
+             py::arg("cond"), py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t, size_t>(),
+             py::arg("cond_id"), py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Select_Bool_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(And_UInt_UInt, R"doc(
+Bitwise AND of two unsigned integer registers.
+
+Computes: res ^= lhs & rhs, operands zero-extended, result truncated to
+mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    And_UInt_UInt("a", "b", "result")(state)  # result ^= a & b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(And_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Or_UInt_UInt, R"doc(
+Bitwise OR of two unsigned integer registers.
+
+Computes: res ^= lhs | rhs, operands zero-extended, result truncated to
+mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Or_UInt_UInt("a", "b", "result")(state)  # result ^= a | b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Or_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Xor_UInt_UInt, R"doc(
+Bitwise XOR of two unsigned integer registers.
+
+Computes: res ^= lhs ^ rhs, operands zero-extended, result truncated to
+mod 2^res_width before being XORed into res.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the output register (result is XORed in).
+
+Example:
+    Xor_UInt_UInt("a", "b", "result")(state)  # result ^= a ^ b
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"))
+
+            BIND_CONTROLLABLE_METHODS(Xor_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Less_SInt_SInt, R"doc(
+Signed less-than comparison of two signed integer registers.
+
+Computes: flag ^= (lhs < rhs), where both operands are sign-extended to the
+full-precision comparison domain (64-bit) before comparing.
+
+Args:
+    lhs: Name/ID of the SignedInteger left operand register.
+    rhs: Name/ID of the SignedInteger right operand register.
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    Less_SInt_SInt("a", "b", "flag")(state)  # flag ^= (a < b)
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("flag"))
+        .def(py::init<size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(Less_SInt_SInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Carry_UInt_UInt, R"doc(
+Carry-out flag of an unsigned addition at the res width.
+
+Computes: flag ^= carry_out(lhs + rhs) relative to the width w of res,
+i.e. whether the full-precision sum is >= 2^w (at w = 64 the predicate is
+64-bit wraparound). out/res 参数仅提供宽度,不读其值.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the register providing the target width w (not read).
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    Carry_UInt_UInt("a", "b", "result", "flag")(state)  # flag ^= carry of a+b at result width
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"), py::arg("flag"))
+        .def(py::init<size_t, size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(Carry_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Overflow_SInt_SInt, R"doc(
+Signed-addition overflow flag at the res width.
+
+Computes: flag ^= overflow(lhs + rhs) at width w of res: operands are
+sign-extended, truncated to w bits, and the same-sign/addends/result-sign-
+flip rule is applied. out/res 参数仅提供宽度,不读其值.
+
+Args:
+    lhs: Name/ID of the SignedInteger left operand register.
+    rhs: Name/ID of the SignedInteger right operand register.
+    res: Name/ID of the register providing the target width w (not read).
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    Overflow_SInt_SInt("a", "b", "result", "flag")(state)  # flag ^= signed overflow of a+b at result width
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"), py::arg("flag"))
+        .def(py::init<size_t, size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(Overflow_SInt_SInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(MulOverflow_UInt_UInt, R"doc(
+Multiplication overflow flag relative to the res width.
+
+Computes: flag ^= (lhs * rhs does not fit in w bits), where w is the width of
+res; the product is evaluated at full precision (128-bit, via 64-bit hi/lo
+decomposition). out/res 参数仅提供宽度,不读其值.
+
+Args:
+    lhs: Name/ID of the first input register.
+    rhs: Name/ID of the second input register.
+    res: Name/ID of the register providing the target width w (not read).
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    MulOverflow_UInt_UInt("a", "b", "result", "flag")(state)  # flag ^= (a*b overflows result width)
+)doc")
+        .def(py::init<std::string_view, std::string_view, std::string_view, std::string_view>(),
+             py::arg("lhs"), py::arg("rhs"), py::arg("res"), py::arg("flag"))
+        .def(py::init<size_t, size_t, size_t, size_t>(),
+             py::arg("lhs_id"), py::arg("rhs_id"), py::arg("res_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(MulOverflow_UInt_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(IsZero_UInt, R"doc(
+Zero test of an unsigned integer register.
+
+Computes: flag ^= (reg == 0), with the operand zero-extended to the
+full-precision domain before comparing.
+
+Args:
+    reg: Name/ID of the UnsignedInteger input register.
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    IsZero_UInt("a", "flag")(state)  # flag ^= (a == 0)
+)doc")
+        .def(py::init<std::string_view, std::string_view>(),
+             py::arg("reg"), py::arg("flag"))
+        .def(py::init<size_t, size_t>(),
+             py::arg("reg_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(IsZero_UInt);
+
+    BIND_SELF_ADJOINT_OPERATOR(Negative_SInt, R"doc(
+Negativity test of a signed integer register.
+
+Computes: flag ^= (reg < 0), where reg is sign-extended from its two's
+complement bit pattern before comparing against 0.
+
+Args:
+    reg: Name/ID of the SignedInteger input register.
+    flag: Name/ID of the width-1 Boolean flag register (result is XORed in).
+
+Example:
+    Negative_SInt("a", "flag")(state)  # flag ^= (a < 0)
+)doc")
+        .def(py::init<std::string_view, std::string_view>(),
+             py::arg("reg"), py::arg("flag"))
+        .def(py::init<size_t, size_t>(),
+             py::arg("reg_id"), py::arg("flag_id"))
+
+            BIND_CONTROLLABLE_METHODS(Negative_SInt);
+
+    BIND_BASE_OPERATOR(Add_AnyInt_AnyInt_InPlace)
         .def(py::init<std::string_view, std::string_view>(),
              py::arg("input_reg"), py::arg("output_reg"))
         .def(py::init<size_t, size_t>(),
              py::arg("input_reg"), py::arg("output_reg"))
-            BIND_DAG_METHODS(AddAssign_AnyInt_AnyInt_InPlace)
-                BIND_CONTROLLABLE_METHODS(AddAssign_AnyInt_AnyInt_InPlace);
+            BIND_DAG_METHODS(Add_AnyInt_AnyInt_InPlace)
+                BIND_CONTROLLABLE_METHODS(Add_AnyInt_AnyInt_InPlace);
 
     // 通用赋值操作
     BIND_SELF_ADJOINT_OPERATOR(Assign)
@@ -1007,32 +1353,32 @@ Example:
              py::arg("reg_id"), py::arg("matrix"))
             BIND_CONTROLLABLE_METHODS(Rot_Bool);
 
-    BIND_BASE_OPERATOR(Ygate_Bool)
+    BIND_BASE_OPERATOR(Y_Bool)
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit") = 0)
         .def(py::init<size_t, size_t>(),
              py::arg("reg_id"), py::arg("digit") = 0)
-            BIND_CONTROLLABLE_METHODS(Ygate_Bool);
+            BIND_CONTROLLABLE_METHODS(Y_Bool);
 
-    py::class_<Zgate_Bool, Phase_Bool>(m, "Zgate_Bool")
+    py::class_<Z_Bool, Phase_Bool>(m, "Z_Bool")
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit") = 0)
         .def(py::init<size_t, size_t>(),
              py::arg("reg_id"), py::arg("digit") = 0);
 
-    py::class_<Sgate_Bool, Phase_Bool>(m, "Sgate_Bool")
+    py::class_<S_Bool, Phase_Bool>(m, "S_Bool")
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit") = 0)
         .def(py::init<size_t, size_t>(),
              py::arg("reg_id"), py::arg("digit") = 0);
 
-    py::class_<Tgate_Bool, Phase_Bool>(m, "Tgate_Bool")
+    py::class_<T_Bool, Phase_Bool>(m, "T_Bool")
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit") = 0)
         .def(py::init<size_t, size_t>(),
              py::arg("reg_id"), py::arg("digit") = 0);
 
-    py::class_<RXgate_Bool, Rot_Bool>(m, "RXgate_Bool")
+    py::class_<RX_Bool, Rot_Bool>(m, "RX_Bool")
         .def(py::init<std::string_view, size_t, double>(),
              py::arg("reg"), py::arg("digit"), py::arg("theta"))
         .def(py::init<size_t, size_t, double>(),
@@ -1042,7 +1388,7 @@ Example:
         .def(py::init<size_t, double>(),
              py::arg("reg_id"), py::arg("theta"));
 
-    py::class_<RYgate_Bool, Rot_Bool>(m, "RYgate_Bool")
+    py::class_<RY_Bool, Rot_Bool>(m, "RY_Bool")
         .def(py::init<std::string_view, size_t, double>(),
              py::arg("reg"), py::arg("digit"), py::arg("theta"))
         .def(py::init<size_t, size_t, double>(),
@@ -1052,7 +1398,7 @@ Example:
         .def(py::init<size_t, double>(),
              py::arg("reg_id"), py::arg("theta"));
 
-    BIND_BASE_OPERATOR(RZgate_Bool)
+    BIND_BASE_OPERATOR(RZ_Bool)
         .def(py::init<std::string_view, size_t, double>(),
              py::arg("reg"), py::arg("digit"), py::arg("theta"))
         .def(py::init<size_t, size_t, double>(),
@@ -1061,15 +1407,15 @@ Example:
              py::arg("reg"), py::arg("theta"))
         .def(py::init<size_t, double>(),
              py::arg("reg_id"), py::arg("theta"))
-            BIND_CONTROLLABLE_METHODS(RZgate_Bool);
+            BIND_CONTROLLABLE_METHODS(RZ_Bool);
 
-    py::class_<SXgate_Bool, Rot_Bool>(m, "SXgate_Bool")
+    py::class_<SX_Bool, Rot_Bool>(m, "SX_Bool")
         .def(py::init<std::string_view, size_t>(),
              py::arg("reg"), py::arg("digit") = 0)
         .def(py::init<size_t, size_t>(),
              py::arg("reg_id"), py::arg("digit") = 0);
 
-    py::class_<U2gate_Bool, Rot_Bool>(m, "U2gate_Bool")
+    py::class_<U2_Bool, Rot_Bool>(m, "U2_Bool")
         .def(py::init<std::string_view, size_t, double, double>(),
              py::arg("reg"), py::arg("digit"), py::arg("phi"), py::arg("lambda_"))
         .def(py::init<size_t, size_t, double, double>(),
@@ -1079,7 +1425,7 @@ Example:
         .def(py::init<size_t, double, double>(),
              py::arg("reg_id"), py::arg("phi"), py::arg("lambda_"));
 
-    py::class_<U3gate_Bool, Rot_Bool>(m, "U3gate_Bool")
+    py::class_<U3_Bool, Rot_Bool>(m, "U3_Bool")
         .def(py::init<std::string_view, size_t, double, double, double>(),
              py::arg("reg"), py::arg("digit"), py::arg("theta"), py::arg("phi"), py::arg("lambda_"))
         .def(py::init<size_t, size_t, double, double, double>(),
@@ -1112,7 +1458,7 @@ Example:
 	                  py::arg("data"), py::arg("row"), py::arg("col"), py::arg("out"), py::arg("mat"))
 	                 BIND_CONTROLLABLE_METHODS(GetQWRotateAngle_Int_Int_Int);
 
-         BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearchFast)
+         BIND_SELF_ADJOINT_OPERATOR(QuantumBinarySearch_Fast)
              .def(py::init<qram_qutrit::QRAMCircuit *, std::string_view, size_t, std::string_view, std::string_view>(),
                   py::arg("qram"), py::arg("address_offset_register"), py::arg("total_length"),
                   py::arg("target_register"), py::arg("result_register"))

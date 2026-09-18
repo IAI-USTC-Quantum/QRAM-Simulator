@@ -352,7 +352,7 @@ TEST_F(QuantumArithmeticTest, AddAssignAnyIntAnyInt)
         state[0].get(lhs).value = lhs_start;
         state[0].get(rhs).value = rhs_start;
 
-        AddAssign_AnyInt_AnyInt_InPlace("lhs", "rhs")(state);
+        Add_AnyInt_AnyInt_InPlace("lhs", "rhs")(state);
 
         EXPECT_EQ(state[0].get(lhs).value, (lhs_start + rhs_start) & 0xf);
         EXPECT_EQ(state[0].get(rhs).value, rhs_start);
@@ -549,7 +549,7 @@ TEST_F(QuantumArithmeticTest, AddMultUIntConstUIntUnitarity)
 // Test AddAssign_AnyInt_AnyInt unitarity (in-place with explicit dagger)
 TEST_F(QuantumArithmeticTest, AddAssignAnyIntAnyIntUnitarity)
 {
-    EXPECT_TRUE((verify_inplace_unitarity<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2")));
+    EXPECT_TRUE((verify_inplace_unitarity<Add_AnyInt_AnyInt_InPlace>("reg1", "reg2")));
 }
 
 // Test Compare_UInt_UInt unitarity (out-of-place, self-adjoint)
@@ -689,11 +689,11 @@ TEST_F(QuantumArithmeticTest, AddMultUIntConstUIntInPlaceBidirectional)
     EXPECT_TRUE(verify_inplace_unitarity_dag_then_fwd<Add_Mult_UInt_ConstUInt_InPlace>("reg1", 3, "reg2"));
 }
 
-// Test AddAssign_AnyInt_AnyInt_InPlace bidirectional (forward→dag and dag→forward)
+// Test Add_AnyInt_AnyInt_InPlace bidirectional (forward→dag and dag→forward)
 TEST_F(QuantumArithmeticTest, AddAssignAnyIntAnyIntInPlaceBidirectional)
 {
-    EXPECT_TRUE(verify_inplace_unitarity_fwd_then_dag<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
-    EXPECT_TRUE(verify_inplace_unitarity_dag_then_fwd<AddAssign_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
+    EXPECT_TRUE(verify_inplace_unitarity_fwd_then_dag<Add_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
+    EXPECT_TRUE(verify_inplace_unitarity_dag_then_fwd<Add_AnyInt_AnyInt_InPlace>("reg1", "reg2"));
 }
 
 // Generalized check_inplace_unitarity: factory lambda, 3-bit lhs + 3-bit res = 6 bits (64 states)
@@ -714,4 +714,648 @@ TEST_F(QuantumArithmeticTest, GeneralizedCheckInplaceUnitarity)
     std::vector<bool> seen_dag(tt_dag.size(), false);
     for (size_t out : tt_dag)
         EXPECT_FALSE(seen_dag[out]) << "Non-bijective dagger: " << out << " seen twice", seen_dag[out] = true;
+}
+
+// ============ Width & Truncation Convention Helpers ============
+// Reference helpers for the new arithmetic operators (docs/operators.md
+// 《宽度与截断约定》). Kept independent of the library's internal helpers so
+// the tests encode the documented contract, not the implementation.
+namespace {
+    uint64_t ref_width_mask(size_t w) {
+        return w >= 64 ? ~uint64_t{0} : (uint64_t{1} << w) - 1;
+    }
+
+    // Two's complement sign extension of a w-bit pattern (w < 64)
+    int64_t ref_sext(uint64_t v, size_t w) {
+        if (w >= 64)
+            return static_cast<int64_t>(v);
+        const uint64_t sign = uint64_t{1} << (w - 1);
+        if (v & sign)
+            v |= ~ref_width_mask(w);
+        return static_cast<int64_t>(v);
+    }
+
+    // Integer square root via floating point + exact correction
+    uint64_t ref_isqrt(uint64_t n) {
+        uint64_t r = static_cast<uint64_t>(std::sqrt(static_cast<double>(n)));
+        while (r > 0 && (r - 1) * (r - 1) >= n) --r;
+        while ((r + 1) * (r + 1) <= n) ++r;
+        return r;
+    }
+
+    // Sampled operand values for wide sweeps: 0, 1, all-ones, a few mids
+    std::vector<uint64_t> ref_sample_values(size_t w) {
+        const uint64_t max = ref_width_mask(w);
+        std::vector<uint64_t> vals{0, 1, max, max >> 1, max / 3, max - 1};
+        std::vector<uint64_t> uniq;
+        for (uint64_t v : vals) {
+            bool dup = false;
+            for (uint64_t u : uniq)
+                if (u == v) dup = true;
+            if (!dup)
+                uniq.push_back(v);
+        }
+        return uniq;
+    }
+}
+
+// ============ New Arithmetic Operator Truth-Table Tests ============
+
+// Sub_UInt_UInt: mixed widths lhs 3-bit / rhs 5-bit / res 4-bit, full sweep.
+// res ^= (lhs - rhs) on the unsigned 64-bit wraparound domain, truncated mod 2^4.
+TEST_F(QuantumArithmeticTest, SubUIntUIntTruthTable)
+{
+    auto lhs = System::add_register("sub_lhs", UnsignedInteger, 3);
+    auto rhs = System::add_register("sub_rhs", UnsignedInteger, 5);
+    auto res = System::add_register("sub_res", UnsignedInteger, 4);
+
+    for (uint64_t a = 0; a < 8; ++a) {
+        for (uint64_t b = 0; b < 32; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(res).value = 0;
+
+            Sub_UInt_UInt("sub_lhs", "sub_rhs", "sub_res")(state);
+
+            const uint64_t expected = (a - b) & 0xf;  // uint64 wraparound, then mod 16
+            EXPECT_EQ(state.size(), 1);
+            EXPECT_EQ(state[0].get(res).value, expected) << "a=" << a << " b=" << b;
+            EXPECT_EQ(state[0].get(lhs).value, a);
+            EXPECT_EQ(state[0].get(rhs).value, b);
+        }
+    }
+
+    // Nonzero initial res must be XORed into (XOR-out semantics)
+    {
+        std::vector<System> state(1);
+        state[0].get(lhs).value = 1;
+        state[0].get(rhs).value = 2;
+        state[0].get(res).value = 0xf;
+        Sub_UInt_UInt("sub_lhs", "sub_rhs", "sub_res")(state);
+        // (1 - 2) & 0xf = 15; 15 ^ 15 = 0
+        EXPECT_EQ(state[0].get(res).value, 0xf ^ static_cast<uint64_t>((1 - 2) & 0xf));
+    }
+}
+
+// Neg_UInt: res ^= 0 - reg; wider and narrower res than reg
+TEST_F(QuantumArithmeticTest, NegUIntTruthTable)
+{
+    auto reg_w3 = System::add_register("neg_reg_w3", UnsignedInteger, 3);
+    auto res_w5 = System::add_register("neg_res_w5", UnsignedInteger, 5);
+    auto reg_w5 = System::add_register("neg_reg_w5", UnsignedInteger, 5);
+    auto res_w3 = System::add_register("neg_res_w3", UnsignedInteger, 3);
+
+    for (uint64_t v = 0; v < 8; ++v) {
+        std::vector<System> state(1);
+        state[0].get(reg_w3).value = v;
+        state[0].get(res_w5).value = 0;
+        Neg_UInt(reg_w3, res_w5)(state);
+        EXPECT_EQ(state[0].get(res_w5).value, (0 - v) & 0x1f);
+        EXPECT_EQ(state[0].get(reg_w3).value, v);
+    }
+    for (uint64_t v = 0; v < 32; ++v) {
+        std::vector<System> state(1);
+        state[0].get(reg_w5).value = v;
+        state[0].get(res_w3).value = 0;
+        Neg_UInt(reg_w5, res_w3)(state);
+        EXPECT_EQ(state[0].get(res_w3).value, (0 - v) & 0x7);
+        EXPECT_EQ(state[0].get(reg_w5).value, v);
+    }
+}
+
+// Abs_SInt: SInt in / UInt out, sign-extended magnitude truncated to res width
+TEST_F(QuantumArithmeticTest, AbsSIntTruthTable)
+{
+    auto reg_w4 = System::add_register("abs_reg_w4", SignedInteger, 4);
+    auto res_w5 = System::add_register("abs_res_w5", UnsignedInteger, 5);
+    auto reg_w5 = System::add_register("abs_reg_w5", SignedInteger, 5);
+    auto res_w3 = System::add_register("abs_res_w3", UnsignedInteger, 3);
+
+    for (uint64_t bits = 0; bits < 16; ++bits) {
+        std::vector<System> state(1);
+        state[0].get(reg_w4).value = bits;
+        state[0].get(res_w5).value = 0;
+        Abs_SInt(reg_w4, res_w5)(state);
+        const int64_t v = ref_sext(bits, 4);
+        EXPECT_EQ(state[0].get(res_w5).value,
+                  static_cast<uint64_t>(v < 0 ? -v : v) & 0x1f);
+        EXPECT_EQ(state[0].get(reg_w4).value, bits);
+    }
+    for (uint64_t bits = 0; bits < 32; ++bits) {
+        std::vector<System> state(1);
+        state[0].get(reg_w5).value = bits;
+        state[0].get(res_w3).value = 0;
+        Abs_SInt(reg_w5, res_w3)(state);
+        const int64_t v = ref_sext(bits, 5);
+        EXPECT_EQ(state[0].get(res_w3).value,
+                  static_cast<uint64_t>(v < 0 ? -v : v) & 0x7);
+    }
+}
+
+// Mul_UInt_UInt: low-64 product truncated to res width, mixed widths
+TEST_F(QuantumArithmeticTest, MulUIntUIntTruthTable)
+{
+    auto lhs_w3 = System::add_register("mul_lhs_w3", UnsignedInteger, 3);
+    auto rhs_w3 = System::add_register("mul_rhs_w3", UnsignedInteger, 3);
+    auto res_w4 = System::add_register("mul_res_w4", UnsignedInteger, 4);
+    auto lhs_w5 = System::add_register("mul_lhs_w5", UnsignedInteger, 5);
+    auto rhs_w2 = System::add_register("mul_rhs_w2", UnsignedInteger, 2);
+    auto res_w3 = System::add_register("mul_res_w3", UnsignedInteger, 3);
+
+    for (uint64_t a = 0; a < 8; ++a) {
+        for (uint64_t b = 0; b < 8; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs_w3).value = a;
+            state[0].get(rhs_w3).value = b;
+            state[0].get(res_w4).value = 0;
+            Mul_UInt_UInt(lhs_w3, rhs_w3, res_w4)(state);
+            EXPECT_EQ(state[0].get(res_w4).value, (a * b) & 0xf);
+            EXPECT_EQ(state[0].get(lhs_w3).value, a);
+            EXPECT_EQ(state[0].get(rhs_w3).value, b);
+        }
+    }
+    for (uint64_t a = 0; a < 32; ++a) {
+        for (uint64_t b = 0; b < 4; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs_w5).value = a;
+            state[0].get(rhs_w2).value = b;
+            state[0].get(res_w3).value = 0;
+            Mul_UInt_UInt(lhs_w5, rhs_w2, res_w3)(state);
+            EXPECT_EQ(state[0].get(res_w3).value, (a * b) & 0x7);
+        }
+    }
+}
+
+// Div_UInt_UInt: floor division; zero divisor yields quotient 0 (total domain)
+TEST_F(QuantumArithmeticTest, DivUIntUIntTruthTable)
+{
+    auto lhs = System::add_register("div_lhs", UnsignedInteger, 5);
+    auto rhs = System::add_register("div_rhs", UnsignedInteger, 3);
+    auto res = System::add_register("div_res", UnsignedInteger, 5);
+
+    for (uint64_t a = 0; a < 32; ++a) {
+        for (uint64_t b = 0; b < 8; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(res).value = 0;
+
+            Div_UInt_UInt("div_lhs", "div_rhs", "div_res")(state);
+
+            const uint64_t expected = (b == 0) ? 0 : a / b;
+            EXPECT_EQ(state.size(), 1);
+            EXPECT_EQ(state[0].get(res).value, expected) << "a=" << a << " b=" << b;
+            EXPECT_EQ(state[0].get(lhs).value, a);
+            EXPECT_EQ(state[0].get(rhs).value, b);
+        }
+    }
+}
+
+// Sqrt_UInt: res ^= isqrt(reg), integer-only result truncated to res width
+TEST_F(QuantumArithmeticTest, SqrtUIntTruthTable)
+{
+    auto reg = System::add_register("sqrt_reg", UnsignedInteger, 4);
+    auto res = System::add_register("sqrt_res", UnsignedInteger, 3);
+
+    for (uint64_t v = 0; v < 16; ++v) {
+        std::vector<System> state(1);
+        state[0].get(reg).value = v;
+        state[0].get(res).value = 0;
+        Sqrt_UInt(reg, res)(state);
+        EXPECT_EQ(state[0].get(res).value, ref_isqrt(v) & 0x7) << "v=" << v;
+        EXPECT_EQ(state[0].get(reg).value, v);
+    }
+}
+
+// Select_Bool_UInt_UInt: cond bit 0 picks lhs (cond=1) or rhs (cond=0)
+TEST_F(QuantumArithmeticTest, SelectBoolUIntUIntTruthTable)
+{
+    auto cond = System::add_register("sel_cond", Boolean, 1);
+    auto lhs = System::add_register("sel_lhs", UnsignedInteger, 3);
+    auto rhs = System::add_register("sel_rhs", UnsignedInteger, 5);
+    auto res = System::add_register("sel_res", UnsignedInteger, 4);
+
+    for (uint64_t c = 0; c < 2; ++c) {
+        for (uint64_t a = 0; a < 8; ++a) {
+            for (uint64_t b = 0; b < 32; ++b) {
+                std::vector<System> state(1);
+                state[0].get(cond).value = c;
+                state[0].get(lhs).value = a;
+                state[0].get(rhs).value = b;
+                state[0].get(res).value = 0;
+
+                Select_Bool_UInt_UInt("sel_cond", "sel_lhs", "sel_rhs", "sel_res")(state);
+
+                const uint64_t expected = (c & 1) ? (a & 0xf) : (b & 0xf);
+                EXPECT_EQ(state[0].get(res).value, expected) << "c=" << c << " a=" << a << " b=" << b;
+                EXPECT_EQ(state[0].get(lhs).value, a);
+                EXPECT_EQ(state[0].get(rhs).value, b);
+            }
+        }
+    }
+}
+
+// And/Or/Xor_UInt_UInt: bitwise ops on zero-extended mixed-width operands
+TEST_F(QuantumArithmeticTest, AndOrXorUIntUIntTruthTable)
+{
+    auto lhs = System::add_register("bit_lhs", UnsignedInteger, 3);
+    auto rhs = System::add_register("bit_rhs", UnsignedInteger, 5);
+    auto res_and = System::add_register("bit_res_and", UnsignedInteger, 4);
+    auto res_or = System::add_register("bit_res_or", UnsignedInteger, 4);
+    auto res_xor = System::add_register("bit_res_xor", UnsignedInteger, 4);
+
+    for (uint64_t a = 0; a < 8; ++a) {
+        for (uint64_t b = 0; b < 32; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(res_and).value = 0;
+            state[0].get(res_or).value = 0;
+            state[0].get(res_xor).value = 0;
+
+            And_UInt_UInt("bit_lhs", "bit_rhs", "bit_res_and")(state);
+            Or_UInt_UInt("bit_lhs", "bit_rhs", "bit_res_or")(state);
+            Xor_UInt_UInt("bit_lhs", "bit_rhs", "bit_res_xor")(state);
+
+            EXPECT_EQ(state[0].get(res_and).value, (a & b) & 0xf);
+            EXPECT_EQ(state[0].get(res_or).value, (a | b) & 0xf);
+            EXPECT_EQ(state[0].get(res_xor).value, (a ^ b) & 0xf);
+            EXPECT_EQ(state[0].get(lhs).value, a);
+            EXPECT_EQ(state[0].get(rhs).value, b);
+        }
+    }
+}
+
+// ============ Flag Operator Tests ============
+
+// Less_SInt_SInt: sign-extended full-precision comparison, mixed widths
+TEST_F(QuantumArithmeticTest, LessSIntSIntTruthTable)
+{
+    auto lhs = System::add_register("less_s_lhs", SignedInteger, 4);
+    auto rhs = System::add_register("less_s_rhs", SignedInteger, 3);
+    auto flag = System::add_register("less_s_flag", Boolean, 1);
+
+    for (uint64_t lbits = 0; lbits < 16; ++lbits) {
+        for (uint64_t rbits = 0; rbits < 8; ++rbits) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = lbits;
+            state[0].get(rhs).value = rbits;
+            state[0].get(flag).value = 0;
+
+            Less_SInt_SInt("less_s_lhs", "less_s_rhs", "less_s_flag")(state);
+
+            const uint64_t expected =
+                ref_sext(lbits, 4) < ref_sext(rbits, 3) ? 1 : 0;
+            EXPECT_EQ(state[0].get(flag).value, expected)
+                << "lhs=" << lbits << " rhs=" << rbits;
+            EXPECT_EQ(state[0].get(lhs).value, lbits);
+            EXPECT_EQ(state[0].get(rhs).value, rbits);
+        }
+    }
+}
+
+// Carry_UInt_UInt at out width 3: flag ^= (lhs + rhs >= 2^3), full sweep
+TEST_F(QuantumArithmeticTest, CarryUIntUIntTruthTable)
+{
+    auto lhs = System::add_register("carry_lhs", UnsignedInteger, 3);
+    auto rhs = System::add_register("carry_rhs", UnsignedInteger, 4);
+    auto res = System::add_register("carry_res", UnsignedInteger, 3);
+    auto flag = System::add_register("carry_flag", Boolean, 1);
+    constexpr size_t w = 3;
+
+    for (uint64_t a = 0; a < 8; ++a) {
+        for (uint64_t b = 0; b < 16; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(flag).value = 0;
+
+            Carry_UInt_UInt("carry_lhs", "carry_rhs", "carry_res", "carry_flag")(state);
+
+            const uint64_t expected =
+                (a >= (uint64_t{1} << w) || b >= (uint64_t{1} << w) - a) ? 1 : 0;
+            EXPECT_EQ(state[0].get(flag).value, expected) << "a=" << a << " b=" << b;
+        }
+    }
+}
+
+// Carry_UInt_UInt at out width 64 (boundary): predicate is 64-bit wraparound.
+// res only provides the width: its initial value is neither read nor written.
+TEST_F(QuantumArithmeticTest, CarryUIntUIntWidth64Boundary)
+{
+    auto lhs = System::add_register("carry64_lhs", UnsignedInteger, 64);
+    auto rhs = System::add_register("carry64_rhs", UnsignedInteger, 64);
+    auto res = System::add_register("carry64_res", UnsignedInteger, 64);
+    auto flag = System::add_register("carry64_flag", Boolean, 1);
+    constexpr uint64_t max = ~uint64_t{0};
+
+    const std::array<std::pair<std::pair<uint64_t, uint64_t>, uint64_t>, 4> cases = {{
+        {{{max, 1}}, 1},   // wraps to 0 < max
+        {{{1, 1}}, 0},     // 2 >= 1, no wrap
+        {{{max, max}}, 1}, // max - 1 < max
+        {{{max - 1, 1}}, 0},  // max, not < max-1
+    }};
+
+    for (const auto& [inputs, expected] : cases) {
+        std::vector<System> state;
+        state.emplace_back();
+        Init_Unsafe(lhs, inputs.first)(state);
+        Init_Unsafe(rhs, inputs.second)(state);
+        Init_Unsafe(res, 0x123456789abcdef0ULL)(state);  // garbage: width-only usage
+        Init_Unsafe(flag, 0)(state);
+
+        Carry_UInt_UInt(lhs, rhs, res, flag)(state);
+
+        EXPECT_EQ(state.size(), 1);
+        EXPECT_EQ(state[0].get(flag).value, expected)
+            << "a=" << inputs.first << " b=" << inputs.second;
+        EXPECT_EQ(state[0].get(res).value, 0x123456789abcdef0ULL);  // untouched
+    }
+
+    // Flag XOR semantics: preset flag flips the stored predicate bit
+    {
+        std::vector<System> state;
+        state.emplace_back();
+        Init_Unsafe(lhs, max)(state);
+        Init_Unsafe(rhs, 1)(state);
+        Init_Unsafe(flag, 1)(state);
+        Carry_UInt_UInt(lhs, rhs, res, flag)(state);
+        EXPECT_EQ(state[0].get(flag).value, 0);  // 1 ^ 1
+    }
+}
+
+// Overflow_SInt_SInt: mixed operand widths, sign-extended then judged at res
+// width w; reference follows the same-sign/result-sign-flip rule
+TEST_F(QuantumArithmeticTest, OverflowSIntSIntMixedWidths)
+{
+    auto lhs = System::add_register("ovf_lhs", SignedInteger, 4);
+    auto rhs = System::add_register("ovf_rhs", SignedInteger, 3);
+    auto res_w4 = System::add_register("ovf_res_w4", UnsignedInteger, 4);
+    auto res_w3 = System::add_register("ovf_res_w3", UnsignedInteger, 3);
+    auto flag_w4 = System::add_register("ovf_flag_w4", Boolean, 1);
+    auto flag_w3 = System::add_register("ovf_flag_w3", Boolean, 1);
+
+    auto reference = [](int64_t l, int64_t r, size_t w) {
+        const uint64_t mask = ref_width_mask(w);
+        const uint64_t A = static_cast<uint64_t>(l) & mask;
+        const uint64_t B = static_cast<uint64_t>(r) & mask;
+        const uint64_t S = (A + B) & mask;
+        const uint64_t signA = (A >> (w - 1)) & 1;
+        const uint64_t signB = (B >> (w - 1)) & 1;
+        const uint64_t signS = (S >> (w - 1)) & 1;
+        return (signA == signB) && (signS != signA) ? 1 : 0;
+    };
+
+    for (uint64_t lbits = 0; lbits < 16; ++lbits) {
+        for (uint64_t rbits = 0; rbits < 8; ++rbits) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = lbits;
+            state[0].get(rhs).value = rbits;
+            state[0].get(flag_w4).value = 0;
+            state[0].get(flag_w3).value = 0;
+
+            const int64_t l = ref_sext(lbits, 4);
+            const int64_t r = ref_sext(rbits, 3);
+            Overflow_SInt_SInt(lhs, rhs, res_w4, flag_w4)(state);
+            Overflow_SInt_SInt(lhs, rhs, res_w3, flag_w3)(state);
+
+            EXPECT_EQ(state[0].get(flag_w4).value, reference(l, r, 4))
+                << "lhs=" << lbits << " rhs=" << rbits << " w=4";
+            EXPECT_EQ(state[0].get(flag_w3).value, reference(l, r, 3))
+                << "lhs=" << lbits << " rhs=" << rbits << " w=3";
+        }
+    }
+}
+
+// MulOverflow_UInt_UInt: full-precision product vs res width
+TEST_F(QuantumArithmeticTest, MulOverflowUIntUIntTruthTable)
+{
+    auto lhs = System::add_register("mulovf_lhs", UnsignedInteger, 3);
+    auto rhs = System::add_register("mulovf_rhs", UnsignedInteger, 3);
+    auto res_w4 = System::add_register("mulovf_res_w4", UnsignedInteger, 4);
+    auto res_w6 = System::add_register("mulovf_res_w6", UnsignedInteger, 6);
+    auto flag_w4 = System::add_register("mulovf_flag_w4", Boolean, 1);
+    auto flag_w6 = System::add_register("mulovf_flag_w6", Boolean, 1);
+
+    for (uint64_t a = 0; a < 8; ++a) {
+        for (uint64_t b = 0; b < 8; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(flag_w4).value = 0;
+            state[0].get(flag_w6).value = 0;
+
+            MulOverflow_UInt_UInt(lhs, rhs, res_w4, flag_w4)(state);
+            MulOverflow_UInt_UInt(lhs, rhs, res_w6, flag_w6)(state);
+
+            // 3x3-bit products stay below 2^6, so the high half is always 0
+            EXPECT_EQ(state[0].get(flag_w4).value, (a * b) >= (uint64_t{1} << 4) ? 1 : 0);
+            EXPECT_EQ(state[0].get(flag_w6).value, (a * b) >= (uint64_t{1} << 6) ? 1 : 0);
+        }
+    }
+}
+
+// IsZero_UInt / Negative_SInt small truth tables
+TEST_F(QuantumArithmeticTest, IsZeroAndNegativeTruthTable)
+{
+    {
+        auto reg = System::add_register("iszero_reg", UnsignedInteger, 3);
+        auto flag = System::add_register("iszero_flag", Boolean, 1);
+        for (uint64_t v = 0; v < 8; ++v) {
+            std::vector<System> state(1);
+            state[0].get(reg).value = v;
+            state[0].get(flag).value = 0;
+            IsZero_UInt(reg, flag)(state);
+            EXPECT_EQ(state[0].get(flag).value, v == 0 ? 1 : 0) << "v=" << v;
+        }
+    }
+    {
+        auto reg = System::add_register("negative_reg", SignedInteger, 4);
+        auto flag = System::add_register("negative_flag", Boolean, 1);
+        for (uint64_t bits = 0; bits < 16; ++bits) {
+            std::vector<System> state(1);
+            state[0].get(reg).value = bits;
+            state[0].get(flag).value = 0;
+            Negative_SInt(reg, flag)(state);
+            EXPECT_EQ(state[0].get(flag).value, ref_sext(bits, 4) < 0 ? 1 : 0)
+                << "bits=" << bits;
+        }
+    }
+}
+
+// ============ Parameterized Width Sweep: Add / Mul / Div ============
+// Operands {1,2,3,5,8} x {1,2,3,5,8}, out width {1,2,4,8}.
+// Full sweep when the operand space is small; sampled values
+// (0, 1, all-ones, a few mids) once the total operand bits grow,
+// per the width & truncation convention test plan.
+class ArithmeticWidthSweep : public QuantumArithmeticTest,
+                             public ::testing::WithParamInterface<std::tuple<size_t, size_t, size_t>>
+{
+};
+
+TEST_P(ArithmeticWidthSweep, AddMulDivAgainstReference)
+{
+    const auto [lhs_w, rhs_w, out_w] = GetParam();
+    const uint64_t out_mask = ref_width_mask(out_w);
+
+    auto lhs = System::add_register("sweep_lhs", UnsignedInteger, lhs_w);
+    auto rhs = System::add_register("sweep_rhs", UnsignedInteger, rhs_w);
+    auto add_res = System::add_register("sweep_add_res", UnsignedInteger, out_w);
+    auto mul_res = System::add_register("sweep_mul_res", UnsignedInteger, out_w);
+    auto div_res = System::add_register("sweep_div_res", UnsignedInteger, out_w);
+
+    std::vector<uint64_t> lhs_vals, rhs_vals;
+    if (lhs_w + rhs_w <= 10) {
+        for (uint64_t v = 0; v <= ref_width_mask(lhs_w); ++v) lhs_vals.push_back(v);
+        for (uint64_t v = 0; v <= ref_width_mask(rhs_w); ++v) rhs_vals.push_back(v);
+    } else {
+        lhs_vals = ref_sample_values(lhs_w);
+        rhs_vals = ref_sample_values(rhs_w);
+    }
+
+    for (uint64_t a : lhs_vals) {
+        for (uint64_t b : rhs_vals) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+            state[0].get(add_res).value = 0;
+            state[0].get(mul_res).value = 0;
+            state[0].get(div_res).value = 0;
+
+            Add_UInt_UInt(lhs, rhs, add_res)(state);
+            Mul_UInt_UInt(lhs, rhs, mul_res)(state);
+            Div_UInt_UInt(lhs, rhs, div_res)(state);
+
+            ASSERT_EQ(state.size(), 1);
+            EXPECT_EQ(state[0].get(add_res).value, (a + b) & out_mask)
+                << "add: a=" << a << " b=" << b;
+            EXPECT_EQ(state[0].get(mul_res).value, (a * b) & out_mask)
+                << "mul: a=" << a << " b=" << b;
+            EXPECT_EQ(state[0].get(div_res).value, (b == 0 ? 0 : a / b) & out_mask)
+                << "div: a=" << a << " b=" << b;
+            EXPECT_EQ(state[0].get(lhs).value, a);
+            EXPECT_EQ(state[0].get(rhs).value, b);
+        }
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    WidthSweep,
+    ArithmeticWidthSweep,
+    ::testing::Combine(::testing::Values(1, 2, 3, 5, 8),
+                       ::testing::Values(1, 2, 3, 5, 8),
+                       ::testing::Values(1, 2, 4, 8)));
+
+// ============ Add_AnyInt_AnyInt_InPlace New Semantics ============
+
+// Equal-width unsigned regression: lhs += rhs (mod 2^N), full sweep
+TEST_F(QuantumArithmeticTest, AddAnyIntAnyIntInPlaceUnsignedFullSweep)
+{
+    auto lhs = System::add_register("anyint_lhs", UnsignedInteger, 4);
+    auto rhs = System::add_register("anyint_rhs", UnsignedInteger, 4);
+
+    for (uint64_t a = 0; a < 16; ++a) {
+        for (uint64_t b = 0; b < 16; ++b) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = b;
+
+            Add_AnyInt_AnyInt_InPlace("anyint_lhs", "anyint_rhs")(state);
+
+            EXPECT_EQ(state[0].get(lhs).value, (a + b) & 0xf);
+            EXPECT_EQ(state[0].get(rhs).value, b);
+        }
+    }
+}
+
+// NEW semantics: rhs is a narrower SignedInteger, read sign-extended.
+// lhs 6-bit UInt, rhs 3-bit SInt 0b111 = -1 → lhs += -1 (mod 64).
+TEST_F(QuantumArithmeticTest, AddAnyIntAnyIntInPlaceSignedNarrowRhs)
+{
+    auto lhs = System::add_register("anyint_s_lhs", UnsignedInteger, 6);
+    auto rhs = System::add_register("anyint_s_rhs", SignedInteger, 3);
+
+    for (uint64_t a = 0; a < 64; ++a) {
+        for (uint64_t rb = 0; rb < 8; ++rb) {
+            std::vector<System> state(1);
+            state[0].get(lhs).value = a;
+            state[0].get(rhs).value = rb;
+
+            Add_AnyInt_AnyInt_InPlace(lhs, rhs)(state);
+
+            const int64_t ext = ref_sext(rb, 3);
+            EXPECT_EQ(state[0].get(lhs).value, (a + static_cast<uint64_t>(ext)) & 0x3f)
+                << "a=" << a << " rhs_bits=" << rb;
+            EXPECT_EQ(state[0].get(rhs).value, rb);  // rhs bit pattern untouched
+        }
+    }
+}
+
+// Dagger round-trip with a signed narrow rhs: U then U† (and U† then U)
+// restores the original lhs for every rhs pattern.
+TEST_F(QuantumArithmeticTest, AddAnyIntAnyIntInPlaceSignedDaggerRoundTrip)
+{
+    auto lhs = System::add_register("anyint_d_lhs", UnsignedInteger, 6);
+    auto rhs = System::add_register("anyint_d_rhs", SignedInteger, 3);
+
+    for (uint64_t rb = 0; rb < 8; ++rb) {
+        Add_AnyInt_AnyInt_InPlace op(lhs, rhs);
+        for (uint64_t a = 0; a < 64; ++a) {
+            std::vector<System> fwd_first(1);
+            fwd_first[0].get(lhs).value = a;
+            fwd_first[0].get(rhs).value = rb;
+            op(fwd_first);
+            op.dag(fwd_first);
+            ASSERT_EQ(fwd_first.size(), 1);
+            EXPECT_EQ(fwd_first[0].get(lhs).value, a) << "fwd→dag rb=" << rb;
+
+            std::vector<System> dag_first(1);
+            dag_first[0].get(lhs).value = a;
+            dag_first[0].get(rhs).value = rb;
+            op.dag(dag_first);
+            op(dag_first);
+            ASSERT_EQ(dag_first.size(), 1);
+            EXPECT_EQ(dag_first[0].get(lhs).value, a) << "dag→fwd rb=" << rb;
+            EXPECT_EQ(dag_first[0].get(rhs).value, rb);
+        }
+    }
+}
+
+// Alias rejection: constructing with lhs == rhs always throws (always-on check)
+TEST_F(QuantumArithmeticTest, AddAnyIntAnyIntInPlaceAliasRejected)
+{
+    auto reg = System::add_register("anyint_alias", UnsignedInteger, 4);
+    EXPECT_THROW(Add_AnyInt_AnyInt_InPlace("anyint_alias", "anyint_alias"),
+                 std::invalid_argument);
+    EXPECT_THROW(Add_AnyInt_AnyInt_InPlace(reg, reg), std::invalid_argument);
+}
+
+// ============ check_inplace_unitarity for XOR-out ops ============
+// The debugger helper (reg_sizes + factory) also fits out-of-place XOR
+// operators: for a SelfAdjoint op, dag() == operator(), so the round-trip
+// check degenerates to U^2 = I and the output index (inputs ∪ res) must be
+// collision-free. Mixed widths {2, 3, 4} = 9 total bits (512 states).
+TEST_F(QuantumArithmeticTest, XorAndUIntUIntCheckInplaceUnitarity)
+{
+    auto xor_factory = [](std::vector<size_t> ids) -> Xor_UInt_UInt {
+        return Xor_UInt_UInt{ids[0], ids[1], ids[2]};
+    };
+    auto and_factory = [](std::vector<size_t> ids) -> And_UInt_UInt {
+        return And_UInt_UInt{ids[0], ids[1], ids[2]};
+    };
+
+    for (bool dagger : {false, true}) {
+        auto tt_xor = check_inplace_unitarity<Xor_UInt_UInt>({2, 3, 4}, xor_factory, dagger);
+        auto tt_and = check_inplace_unitarity<And_UInt_UInt>({2, 3, 4}, and_factory, dagger);
+
+        std::vector<bool> seen_xor(tt_xor.size(), false);
+        for (size_t out : tt_xor)
+            EXPECT_FALSE(seen_xor[out]) << "Non-bijective Xor: " << out << " seen twice",
+            seen_xor[out] = true;
+        std::vector<bool> seen_and(tt_and.size(), false);
+        for (size_t out : tt_and)
+            EXPECT_FALSE(seen_and[out]) << "Non-bijective And: " << out << " seen twice",
+            seen_and[out] = true;
+    }
 }

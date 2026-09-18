@@ -6,5 +6,6 @@ API 参考
 
    python
    dynamic_operator
+   rir
 
 本节提供 PySparQ 的完整 Python API 参考。

@@ -5,7 +5,7 @@ native QECC.Lang/QFVM plan) against a representative set of built-in
 operators: XOR-into arithmetic (``Add_UInt_UInt``, ``Assign``,
 ``Compare_UInt_UInt``, ``CustomArithmetic``, ``QRAMLoad``) and in-place
 bijective operators (``Add_UInt_UInt_InPlace``, ``Swap_General_General``,
-``Xgate_Bool``, ``FlipBools``).
+``X_Bool``, ``FlipBools``).
 
 Each operator is checked against the full Stage 1 matrix:
     * basis exhaustive / arbitrary nonzero targets + collision detection
@@ -351,7 +351,7 @@ class TestSwapGeneralGeneral:
 
 
 class TestXgateBool:
-    """Xgate_Bool: in-place bit flip at a given digit position."""
+    """X_Bool: in-place bit flip at a given digit position."""
 
     WIDTH = 3
 
@@ -362,7 +362,7 @@ class TestXgateBool:
         self.touched = ["b"]
 
     def make_op(self):
-        return ps.Xgate_Bool("b", 1)
+        return ps.X_Bool("b", 1)
 
     def test_basis_exhaustive_and_no_collisions(self):
         size = 1 << self.WIDTH

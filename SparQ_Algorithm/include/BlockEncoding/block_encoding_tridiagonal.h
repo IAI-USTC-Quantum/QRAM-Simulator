@@ -66,7 +66,7 @@ namespace qram_simulator {
 						}
 						(PlusOneAndOverflow(main_reg, "overflow")).conditioned_by_value(anc_UA, 2).dag(state);
 
-						Xgate_Bool("other", 0).conditioned_by_all_ones(anc_UA)(state);
+						X_Bool("other", 0).conditioned_by_all_ones(anc_UA)(state);
 
 						stateprep.dag(state);
 						CombineRegister(anc_UA, "other")(state);
@@ -95,7 +95,7 @@ namespace qram_simulator {
 						}
 						(PlusOneAndOverflow(main_reg, "overflow")).conditioned_by_value(anc_UA, 1).dag(state);
 
-						Xgate_Bool("other", 0).conditioned_by_all_ones(anc_UA)(state);
+						X_Bool("other", 0).conditioned_by_all_ones(anc_UA)(state);
 
 						stateprep.dag(state);
 						CombineRegister(anc_UA, "other")(state);
