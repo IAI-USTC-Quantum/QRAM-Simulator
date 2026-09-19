@@ -32,24 +32,6 @@ struct NConditionalSwap
 
 };
 
-struct GlobalPhase
-{
-	complex_t extra_global_phase;
-
-	GlobalPhase(complex_t extra_global_phase_)
-		: extra_global_phase(extra_global_phase_)
-	{}
-
-	void operator()(std::vector<System>& state)
-	{
-		for (auto& s : state)
-		{
-			s.amplitude *= extra_global_phase;
-		}
-	}
-
-};
-
 struct PauliX
 {
 	int reg1;

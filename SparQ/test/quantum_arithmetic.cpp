@@ -1051,10 +1051,10 @@ TEST_F(QuantumArithmeticTest, CarryUIntUIntWidth64Boundary)
     constexpr uint64_t max = ~uint64_t{0};
 
     const std::array<std::pair<std::pair<uint64_t, uint64_t>, uint64_t>, 4> cases = {{
-        {{{max, 1}}, 1},   // wraps to 0 < max
-        {{{1, 1}}, 0},     // 2 >= 1, no wrap
-        {{{max, max}}, 1}, // max - 1 < max
-        {{{max - 1, 1}}, 0},  // max, not < max-1
+        {{max, 1}, 1},   // wraps to 0 < max
+        {{1, 1}, 0},     // 2 >= 1, no wrap
+        {{max, max}, 1}, // max - 1 < max
+        {{max - 1, 1}, 0},  // max, not < max-1
     }};
 
     for (const auto& [inputs, expected] : cases) {
