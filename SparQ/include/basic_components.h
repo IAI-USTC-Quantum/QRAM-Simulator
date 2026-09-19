@@ -101,7 +101,8 @@ namespace qram_simulator
 		template<typename Ty>
 		Ty as(size_t size) const
 		{
-			uint64_t truncated_value = value & (pow2(size) - (size != 0));
+			/* pow2(64) overflows (shift count 64 is UB): mask manually */
+			uint64_t truncated_value = value & (size >= 64 ? ~uint64_t{0} : pow2(size) - (size != 0));
 
 			if constexpr (std::is_floating_point_v<Ty>)
 			{
