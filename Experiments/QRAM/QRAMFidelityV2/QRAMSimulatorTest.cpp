@@ -333,20 +333,22 @@ auto test1(size_t addr, size_t data, seed_t seed, const noise_t &noise, int tria
 }
 
 
-/* Ground truth for the qubit architecture: full evolution of all branches,
-*  no pruning. The pruned (normal) qubit mode is not implemented yet. */
-auto QRAM_qubit_full_algorithm(qram_qubit::QRAMCircuit& qram, seed_t seed)
+/* Qubit architecture: full (ground truth) vs normal (pruned) comparison */
+auto QRAM_qubit_algorithm(qram_qubit::QRAMCircuit& qram, std::string version, seed_t seed)
 {
-	profiler _("QubitFull");
+	profiler _(fmt::format("Qubit({})", version));
 	random_engine::get_instance().set_seed(seed);
-	qram.run_full();
+	qram.run(version);
 	return qram.sample_and_get_fidelity();
 }
 
-auto test_qubit_full(size_t addr, size_t data, seed_t seed, const noise_t& noise, int trials, size_t input_sz)
+auto test_qubit_compare(size_t addr, size_t data, seed_t seed, const noise_t& noise, int trials, size_t input_sz)
 {
-	double avg_fid = 0;
-	std::vector<double> fidelity_list(trials, 0);
+	double old_avg_fid = 0;
+	double new_avg_fid = 0;
+	std::vector<double> old_fidelity_list(trials, 0);
+	std::vector<double> new_fidelity_list(trials, 0);
+	size_t fail = 0;
 	for (int it = 0; it < trials; ++it)
 	{
 		profiler _("MainLoop");
@@ -354,17 +356,34 @@ auto test_qubit_full(size_t addr, size_t data, seed_t seed, const noise_t& noise
 		auto runseed = random_engine::get_instance().reseed();
 		fmt::print("{} / {} (seed={})\n", it, trials, runseed);
 
-		auto qram = configure_qram<qram_qubit::QRAMCircuit>(addr, data, noise, seed, input_sz);
-		auto fid = QRAM_qubit_full_algorithm(qram, runseed);
-		avg_fid += fid;
-		fidelity_list[it] = fid;
-		fmt::print("pass, fid_full={:.5f}\n", fid);
+		auto qram_old = configure_qram<qram_qubit::QRAMCircuit>(addr, data, noise, seed, input_sz);
+		auto old_fid = QRAM_qubit_algorithm(qram_old, qram_qubit::QRAMCircuit::FULL_VER, runseed);
+		old_avg_fid += old_fid;
+		old_fidelity_list[it] = old_fid;
+
+		auto qram_new = configure_qram<qram_qubit::QRAMCircuit>(addr, data, noise, seed, input_sz);
+		auto new_fid = QRAM_qubit_algorithm(qram_new, qram_qubit::QRAMCircuit::NORMAL_VER, runseed);
+		new_avg_fid += new_fid;
+		new_fidelity_list[it] = new_fid;
+
+		if (!ignorable(new_fid - old_fid))
+			fail++;
+		if (abs(old_fid - new_fid) > epsilon) {
+			fmt::print("fail, fid_full={:.5f}, fid_normal={:.5f}, seed={}\n", old_fid, new_fid, runseed);
+		}
+		else {
+			fmt::print("pass, fid_full={:.5f}, fid_normal={:.5f}\n", old_fid, new_fid);
+		}
 	}
-	avg_fid /= trials;
+	old_avg_fid /= trials;
+	new_avg_fid /= trials;
 
 	return std::make_tuple(
-		std::make_tuple("full_average_fidelity", avg_fid),
-		std::make_tuple("full_fidelity_list", fidelity_list)
+		std::make_tuple("old_average_fidelity", old_avg_fid),
+		std::make_tuple("new_average_fidelity", new_avg_fid),
+		std::make_tuple("old_fidelity_list", old_fidelity_list),
+		std::make_tuple("new_fidelity_list", new_fidelity_list),
+		std::make_tuple("failed", fail)
 	);
 }
 
@@ -386,7 +405,7 @@ void QRAMSimulatorTest(int argc, const char** argv)
 	}
 	else if (args.architecture == arch_qubit)
 	{
-		auto result = test_qubit_full(
+		auto result = test_qubit_compare(
 			args.addr_sz,
 			args.data_sz,
 			args.seed,

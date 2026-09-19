@@ -242,6 +242,10 @@ namespace qram_simulator {
 			bool is_good = false;
 			BranchGroup* good_ref = nullptr;
 			double relative_multiplier = 1.0;
+			/* set once the good group's final states have been materialized
+			from the reference branch (XOR mirror), after which the generic
+			prob/fidelity paths apply */
+			bool predicted = false;
 
 			BranchGroup(size_t addr) : address(addr)
 			{}
@@ -250,6 +254,8 @@ namespace qram_simulator {
 			{
 				branches = branches_input;
 				is_good = false;
+				predicted = false;
+				relative_multiplier = 1.0;
 			}
 
 			void set_good(BranchGroup* good_ref_)
@@ -265,7 +271,7 @@ namespace qram_simulator {
 
 			complex_t get_fidelity(const memory_t& memory) const
 			{
-				if (is_good) return good_ref->get_fidelity(memory);
+				if (is_good && !predicted) return good_ref->get_fidelity(memory);
 
 				complex_t ret = 0;
 				for (size_t i = 0; i < branches.size(); ++i)
@@ -295,12 +301,14 @@ namespace qram_simulator {
 
 			double get_prob() const
 			{
-				if (!is_good)
+				/* before materialization a good group only carries its input
+				weight; afterwards the generic state sum is exact */
+				if (is_good && !predicted)
 				{
 					double ret = 0;
 					for (size_t i = 0; i < branches.size(); ++i)
 					{
-						ret += branches[i].get_prob() * branch_probs[i];
+						ret += branch_probs[i];
 					}
 					return ret;
 				}
@@ -309,7 +317,7 @@ namespace qram_simulator {
 					double ret = 0;
 					for (size_t i = 0; i < branches.size(); ++i)
 					{
-						ret += branch_probs[i];
+						ret += branches[i].get_prob() * branch_probs[i];
 					}
 					return ret;
 				}

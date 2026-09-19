@@ -185,14 +185,15 @@ namespace qram_simulator {
 
 				sample_output();
 
-				if (valid_branch_group_view.size() == 0)
+				if (branch_groups.size() == 0)
 					return 0;
 
+				/* the good groups' relative_multiplier is already embedded in
+				their materialized amplitudes */
 				complex_t ret = 0;
 				for (size_t i = 0; i < branch_groups.size(); ++i)
 				{
-					ret += branch_groups[i].get_fidelity(memory)
-						* std::sqrt(branch_groups[i].relative_multiplier);
+					ret += branch_groups[i].get_fidelity(memory);
 				}
 				return abs_sqr(ret);
 			}
@@ -584,14 +585,19 @@ namespace qram_simulator {
 					time_step.get_multiplier_qubit(gamma, step, branch_groups,
 						first_good_branch_group, good_branch_group_ids);
 
-					auto&& ref_prob = branch_groups[first_good_branch_group].get_prob_damp(qubit_id);
+					auto&& ref_prob_full = branch_groups[first_good_branch_group].get_prob_damp(qubit_id);
+					const auto& refg = branch_groups[first_good_branch_group];
+					double ref_input = 0;
+					for (double bp : refg.branch_probs) ref_input += bp;
 
 					for (size_t i = 0; i < good_branch_group_ids.size(); ++i) {
 						size_t id = good_branch_group_ids[i];
+						double g_input = 0;
+						for (double bp : branch_groups[id].branch_probs) g_input += bp;
 						for (auto k = 0; k < damp_op_num; ++k) {
-							prob_damp[k] += ref_prob[k] /** multipliers[i] */
-								* branch_groups[id].relative_multiplier;
-							// * branch_groups[id].get_damp_prob();
+							prob_damp[k] += (ref_prob_full[k] / ref_input)
+								* branch_groups[id].relative_multiplier
+								* g_input;
 						}
 					}
 				}
@@ -811,13 +817,18 @@ namespace qram_simulator {
 				}
 				if (first_good_branch_group >= 0)
 				{
-					double first_good_branch_prob = branch_groups[first_good_branch_group].get_prob();
+					/* a group's get_prob() already carries its own input
+					weight; fold with the reference's per-unit-weight norm */
+					const auto& ref = branch_groups[first_good_branch_group];
+					double ref_input = 0;
+					for (double bp : ref.branch_probs) ref_input += bp;
+					double ref_unit_norm = ref.get_prob() / ref_input;
 					for (size_t i = 0; i < good_branch_group_ids.size(); ++i)
 					{
-						new_prob += first_good_branch_prob /* *multipliers[i]*/
-							* branch_groups[good_branch_group_ids[i]].relative_multiplier
-							* branch_groups[good_branch_group_ids[i]].get_prob();
-						// * branch_probs[good_branch_ids[i]];
+						const auto& g = branch_groups[good_branch_group_ids[i]];
+						double g_input = 0;
+						for (double bp : g.branch_probs) g_input += bp;
+						new_prob += ref_unit_norm * g.relative_multiplier * g_input;
 					}
 				}
 				return new_prob;
@@ -825,22 +836,20 @@ namespace qram_simulator {
 
 			void normalization()
 			{
-				double multiplier = get_normalization_factor_with_damping();
+				/* after materialization the good groups carry real states and
+				must be normalized exactly like the evolved ones */
+				double multiplier = 0;
+				for (auto& group : branch_groups) {
+					multiplier += group.get_prob();
+					check_nan(multiplier);
+				}
 
-				for (auto branch_group : valid_branch_group_view) {
-					// double p_state = branches[i].get_prob();
-					// if (p_state > epsilon) {
-					for (auto& branch : branch_group->branches)
+				for (auto& group : branch_groups) {
+					for (auto& branch : group.branches)
 					{
 						for (auto iter = branch.iterbeg(); iter != branch.iterend(); ++iter)
 							iter->amplitude /= sqrt(multiplier);
 					}
-
-					// branch_probs_out[i] = branch_probs[i] / multiplier * p_state;
-					// }
-					/*else {
-						branch_probs_out[i] = 0;
-					}*/
 				}
 			}
 
@@ -883,6 +892,59 @@ namespace qram_simulator {
 			//	//}
 			//}
 
+			/* Materialize the predicted final states of every good branch
+			*  group from the reference good group (the XOR mirror):
+			*
+			*    data_bus(c) := data_bus_ref(c') with c' = c XOR delta,
+			*    delta = (j_ref XOR d[addr_ref]) XOR (j XOR d[addr]),
+			*    amplitude := amplitude_ref * sqrt(relative_multiplier).
+			*
+			*  This is exact: the H-K0-H data-bus amplitudes depend only on
+			*  the Hamming weight of the error pattern relative to the ideal
+			*  output (window 2n is address- and input-independent), and the
+			*  address part is carried by relative_multiplier = (1-gamma)^dc.
+			*  After materialization the generic prob/sampling/fidelity paths
+			*  apply to good groups unchanged.
+			*/
+			void materialize_good_branches()
+			{
+				if (first_good_branch_group < 0) return;
+
+				auto& ref = branch_groups[first_good_branch_group];
+				for (size_t idx = 0; idx < good_branch_group_ids.size(); ++idx)
+				{
+					size_t id = good_branch_group_ids[idx];
+					auto& group = branch_groups[id];
+					double amp_factor = std::sqrt(group.relative_multiplier);
+
+					for (size_t b = 0; b < group.branches.size(); ++b)
+					{
+						auto& br = group.branches[b];
+						/* any reference branch carries the full 2^k data-bus
+						structure; pick the first with a surviving state */
+						Branch* ref_branch = nullptr;
+						for (auto& rb : ref.branches)
+							if (rb.system_states_sz > 0) { ref_branch = &rb; break; }
+						if (ref_branch == nullptr) continue;
+
+						size_t delta = (ref_branch->bus_input ^ memory[ref.address])
+							^ (br.bus_input ^ memory[group.address]);
+
+						br.system_states_sz = 0;
+						for (auto it = ref_branch->iterbeg(); it != ref_branch->iterend(); ++it)
+						{
+							if (br.system_states_sz >= br.system_states.size())
+								br.system_states.resize(br.system_states_sz + 1);
+							br.system_states[br.system_states_sz] = *it;
+							br.system_states[br.system_states_sz].data_bus = it->data_bus ^ delta;
+							br.system_states[br.system_states_sz].amplitude = it->amplitude * amp_factor;
+							++br.system_states_sz;
+						}
+					}
+					group.predicted = true;
+				}
+			}
+
 			/* Sample the output according to the branches and branch_probs*/
 			/* without damping */
 			void sample_output()
@@ -894,11 +956,6 @@ namespace qram_simulator {
 					double gamma = noise_parameters[OperationType::Damping];
 					if (first_good_branch_group >= 0)
 					{
-						/* Good branch gaurantees the identical system_states
-						*  (never splitted)
-						*/
-						// good_system_cache = branches[first_good_branch].get_good_branch_system();
-
 						time_step.get_multiplier_qubit(
 							gamma,
 							time_step.last_step(),
@@ -907,105 +964,58 @@ namespace qram_simulator {
 							good_branch_group_ids
 						);
 					}
-					//sample_output_with_damping();
-					//return;
 				}
+				materialize_good_branches();
+
 				profiler _("sample_output");
 
-				if (valid_branch_group_view.size() == 0)
+				if (branch_groups.size() == 0)
 				{
-					// no branch is calculated
+					// no branch at all
 					return;
 				}
 
-				/*	Sample from only 1 branch when:
-					Case 1: only 1 branch input (regardless good/bad)
-					Case 2: good only
-					Case 3: shortcircuit calculation (good only)
-				*/
-				else if (valid_branch_group_view.size() == 1)
-				{
-					double factor = valid_branch_group_view[0]->get_prob();
-					std::uniform_real_distribution<double> urd(0, factor);
-					double r = urd(random_engine::get_engine());
-
-					if (has_damping)
-						valid_branch_group_view[0]->sample_output_with_damping(final_system_state, r);
-					else
-						valid_branch_group_view[0]->sample_output_no_damping(final_system_state, r);
-
-					valid_branch_group_view[0]->remove_mismatch_state(final_system_state);
-					normalization();
-					return;
+				double factor = 0;
+				for (auto& group : branch_groups) {
+					factor += group.get_prob();
+					check_nan(factor);
 				}
-				else // valid_branch_group_view.size() > 1
+
+				std::uniform_real_distribution<double> urd(0, factor);
+				double r = urd(random_engine::get_engine());
+
+				bool set = false;
+				for (auto& group : branch_groups) {
+					set = group.sample_output_with_damping(final_system_state, r);
+					if (set) break;
+				}
+
+				if (!set)
 				{
-					double factor = get_normalization_factor();
-					std::uniform_real_distribution<double> urd(0, factor);
-					double r = urd(random_engine::get_engine());
-
-					// TODO:
-					// use binary search to optimize to O(nlog n)
-					bool set = false;
-					if (has_damping) {
-						for (auto branch_group : valid_branch_group_view) {
-							set = branch_group->sample_output_with_damping(final_system_state, r);
-							if (set) break;
-						}
-					}
-					else {
-						for (auto branch_group : valid_branch_group_view) {
-							set = branch_group->sample_output_no_damping(final_system_state, r);
-							if (set) break;
-						}
-					}
-
-					if (!set) // in the good branch
-					{
-						if (first_good_branch_group >= 0)
-						{
-							double factor = branch_groups[first_good_branch_group].get_prob();
-							std::uniform_real_distribution<double> urd(0, factor);
-							double r = urd(random_engine::get_engine());
-
-							if (has_damping)
-								set = branch_groups[first_good_branch_group].sample_output_with_damping
-								(final_system_state, r);
-							else
-								set = branch_groups[first_good_branch_group].sample_output_no_damping
-								(final_system_state, r);
-						}
-					}
-
-					if (!set)
-					{
-						// r may exceed the accumulated weights by floating-point
-						// residue; fall back to the last available state
-						for (auto branch_group : valid_branch_group_view) {
-							for (auto& branch : branch_group->branches) {
-								for (auto iter = branch.iterbeg(); iter != branch.iterend(); ++iter) {
-									if (!ignorable(std::abs(iter->amplitude))) {
-										final_system_state = iter->state.nz_elements;
-										set = true;
-									}
+					// r may exceed the accumulated weights by floating-point
+					// residue; fall back to the last available state
+					for (auto& group : branch_groups) {
+						for (auto& branch : group.branches) {
+							for (auto iter = branch.iterbeg(); iter != branch.iterend(); ++iter) {
+								if (!ignorable(std::abs(iter->amplitude))) {
+									final_system_state = iter->state.nz_elements;
+									set = true;
 								}
 							}
 						}
 					}
-
-					if (!set) // no state available at all
-					{
-						throw_bad_result();
-					}
-
-					for (auto branch_ptr : valid_branch_group_view) {
-						/*if (branch_probs[branch_ptr-branches.data()] < epsilon)
-							continue;*/
-						branch_ptr->remove_mismatch_state(final_system_state);
-					}
-
-					normalization();
 				}
+
+				if (!set) // no state available at all
+				{
+					throw_bad_result();
+				}
+
+				for (auto& group : branch_groups) {
+					group.remove_mismatch_state(final_system_state);
+				}
+
+				normalization();
 			}
 
 			/* Sample the output according to the branches and branch_probs*/

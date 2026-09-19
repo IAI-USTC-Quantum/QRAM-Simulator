@@ -251,10 +251,10 @@ $2^k$ 因子是 qubit 编码的内在输出宽度（每个数据比特携带一�
 
 1. ~~**qubit 噪声采样接通**~~（已完成）：`fill_bad_range` 已支持 qubit 架构（`time_step.cpp`），`arch2str` 补上 qubit 分支。
 2. ~~**Full（不剪枝）ground truth**~~（已完成）：`qram_qubit::QRAMCircuit` 补齐 `set_input_uniform`/`set_input_random`、`run_full()`（= 全分支演化）、`sample_and_get_fidelity()`；修复了 `BranchGroup::get_prob_damp` 的概率折算索引、`sample_output_*` 的权重口径（`branch_probs × |amp|²`）、`Branch::run_damp_full` 缺失的跳变复位（投影后须把该比特置回 $|0\rangle$）、`Branch::get_fidelity` 的实现。实验入口：`Experiment_QRAM_FidelityV2 --architecture qubit`（full-only）。
-3. **数据总线闭式预测（核心缺口，下一步）**：`QRAMLoad::_reconstruct`（`SparQ/src/qram.cpp:100-170`）与 `state_manipulator.cpp` 的 good 分支重构目前只做"标量乘子 + bus XOR 存储值"，需扩展为按定理 2 的 $2^k$ 分量写出（或惰性积态表示）。
-4. **qubit 版 good 分支接线**：`TimeStep::get_multiplier_qubit` 已实现地址部分（`time_step.h:186-207`），但 `Branch::get_multiplier` 包装处于注释状态（`qram_branch_qubit.h:213-225`）；pruned 模式下 good 分支组的采样/归一化路径（`sample_output` 的 good 回退、`get_normalization_factor_with_damping` 的 good 项）需要与数据总线闭式联合重做。
+3. ~~**数据总线闭式预测（核心缺口）**~~（已完成）：good 分支末态以 **XOR 镜像物化**实现——`data_bus ^= (b_out^{ref} ⊕ b_out^{good})`、振幅 × √relative_multiplier，直接从参考分支复制出 $2^k$ 分量（`materialize_good_branches`，`qram_circuit_qubit.h`）。数学依据即定理 2（Hamming 权重公式 + $d_i=2n$ 输入无关性），物化后所有通用路径（概率/采样/保真度）无需 good 特判。
+4. ~~**qubit 版 good 分支接线**~~（已完成）：`sample_output` 重写为物化后全组游走（与 full 模式同序同权重，保证同种子塌缩一致）；`normalization` 覆盖全部组；修复了 good 折算的**输入权重双重计数**（分组版 `get_prob()` 已含组输入权重，需除回参考组权重取单位范数——qutrit 扁平分支无此问题，移植时引入）。
 5. **跳变概率的数据部分折算**：qubit 版 `run_damp_full`（`qram_circuit_qubit.h`）已包含参考分支折算框架，按 §4.6 补上数据部分（输入无关、恒 $1/2$ 占据）即可。
-6. **验证**：对照 `run_full`（全演化，本步已备）与 `run_normal`（剪枝）在相同种子下的 `sample_and_get_fidelity` 一致性（沿用 `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp` 的 test1 框架，`--architecture qubit`），以及 good-only 模式（`QRAMLoadFast` 的 qubit 对应物）。
+6. ~~**验证**~~（已完成）：`test_qubit_compare`（`--architecture qubit`）在 1e-5 depol+damping、n=3..10、每点 50 种子下 **full/normal 全部一致（400/400）**；强噪声压力（1e-4~3e-4）150 试验亦全过；n=12 剪枝收益 17×（2565ms→150ms）。剩余：good-only 模式（`QRAMLoadFast` 的 qubit 对应物）。
 7. ~~**坏区间判据确认**~~（已完成）：`get_bad_range_qubit` 的"左孩子上溯父区间、右孩子取自身子树"逻辑经机制推导与 n=3 单错误注入验证为**构型家族分歧的正确包络**（node1 特判亦机制正确：根从不空闲），此前被误记为"疑似怪癖"。推导见 `qubit_error_propagation.md`。注意两点：纯阻尼通道可用更紧的纯子树判据；n≥4 的深层树上"沿空闲链多级爬升"是否越出 subtree(parent(v)) 未验证，剪枝实现时建议做一次 n=4/5 注入回归。
 
 ## 8. 结论
