@@ -332,6 +332,10 @@ namespace qram_simulator {
 		{
 			std::tie(l, r) = get_bad_range_qutrit(qubit);
 		}
+		else if (arch_type == arch_qubit)
+		{
+			std::tie(l, r) = get_bad_range_qubit(qubit);
+		}
 		else
 			throw_bad_switch_case();
 

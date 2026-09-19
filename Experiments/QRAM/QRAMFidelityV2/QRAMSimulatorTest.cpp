@@ -6,6 +6,7 @@
 #include "state_manipulator.h"
 #include "grover.h"
 #include "time_step.h"
+#include "qram_circuit_qubit.h"
 
 using namespace std;
 using namespace qram_simulator;
@@ -46,11 +47,8 @@ struct QRAMSimulatorTestArguments
 
 			if (architecture == arch_qutrit)
 				fmt::format_to(back_inserter(buf), " arch=qutrit");
-
-			/* In this version, qutrit architecture is supported only. */
-			//else if (architecture == arch_qubit)
-			//	// fmt::format_to(back_inserter(buf), " arch=qubit");
-			//	throw_bad_switch_case();
+			else if (architecture == arch_qubit)
+				fmt::format_to(back_inserter(buf), " arch=qubit");
 			else
 				throw_bad_switch_case();
 
@@ -206,7 +204,9 @@ inline QRAMSimulatorTestArguments qram_simulator_argument_parse(int argc, const 
 
 		if (versionstr == "new" ||
 			versionstr == "old" ||
-			versionstr == "fast")
+			versionstr == "fast" ||
+			versionstr == "full" ||
+			versionstr == "normal")
 			args.version = versionstr;
 	}
 
@@ -216,9 +216,9 @@ inline QRAMSimulatorTestArguments qram_simulator_argument_parse(int argc, const 
 		if (arch == "qutrit") {
 			args.architecture = arch_qutrit;
 		}
-		/*else if (arch == "qubit") {
+		else if (arch == "qubit") {
 			args.architecture = arch_qubit;
-		}*/
+		}
 		else {
 			throw_invalid_input();
 		}
@@ -333,17 +333,65 @@ auto test1(size_t addr, size_t data, seed_t seed, const noise_t &noise, int tria
 }
 
 
+/* Ground truth for the qubit architecture: full evolution of all branches,
+*  no pruning. The pruned (normal) qubit mode is not implemented yet. */
+auto QRAM_qubit_full_algorithm(qram_qubit::QRAMCircuit& qram, seed_t seed)
+{
+	profiler _("QubitFull");
+	random_engine::get_instance().set_seed(seed);
+	qram.run_full();
+	return qram.sample_and_get_fidelity();
+}
+
+auto test_qubit_full(size_t addr, size_t data, seed_t seed, const noise_t& noise, int trials, size_t input_sz)
+{
+	double avg_fid = 0;
+	std::vector<double> fidelity_list(trials, 0);
+	for (int it = 0; it < trials; ++it)
+	{
+		profiler _("MainLoop");
+		random_engine::get_instance().set_seed(seed + it);
+		auto runseed = random_engine::get_instance().reseed();
+		fmt::print("{} / {} (seed={})\n", it, trials, runseed);
+
+		auto qram = configure_qram<qram_qubit::QRAMCircuit>(addr, data, noise, seed, input_sz);
+		auto fid = QRAM_qubit_full_algorithm(qram, runseed);
+		avg_fid += fid;
+		fidelity_list[it] = fid;
+		fmt::print("pass, fid_full={:.5f}\n", fid);
+	}
+	avg_fid /= trials;
+
+	return std::make_tuple(
+		std::make_tuple("full_average_fidelity", avg_fid),
+		std::make_tuple("full_fidelity_list", fidelity_list)
+	);
+}
+
+
 void QRAMSimulatorTest(int argc, const char** argv)
 {
 	QRAMSimulatorTestArguments args = qram_simulator_argument_parse(argc, argv);
 	if (args.architecture == arch_qutrit)
 	{
 		auto result = test1(
-			args.addr_sz, 
-			args.data_sz, 
+			args.addr_sz,
+			args.data_sz,
 			args.seed,
-			args.generate_noise(), 
-			args.shots, 
+			args.generate_noise(),
+			args.shots,
+			args.input_size);
+		Outputter outputter;
+		outputter.make_output(args, result);
+	}
+	else if (args.architecture == arch_qubit)
+	{
+		auto result = test_qubit_full(
+			args.addr_sz,
+			args.data_sz,
+			args.seed,
+			args.generate_noise(),
+			args.shots,
 			args.input_size);
 		Outputter outputter;
 		outputter.make_output(args, result);
@@ -354,22 +402,23 @@ void QRAMSimulatorTest(int argc, const char** argv)
 
 int main(int argc, const char** argv) {
 
-#if 1
-	const char* test_argv[] = {
-		".",
-		"--addrsize", "10",
-		"--datasize", "3",
-		"--shots", "100",
-		"--inputsize", "500",
-		"--depolarizing", "1e-4",
-		"--damping", "1e-4",
-		"--seed", "123456789",
-		"--architecture", "qutrit",
-		"--experimentname", "qutrit_scheme"
-	};
-	argc = array_length<decltype(test_argv)>::value;
-	argv = test_argv;
-#endif
+	if (argc <= 1)
+	{
+		const char* test_argv[] = {
+			".",
+			"--addrsize", "10",
+			"--datasize", "3",
+			"--shots", "100",
+			"--inputsize", "500",
+			"--depolarizing", "1e-4",
+			"--damping", "1e-4",
+			"--seed", "123456789",
+			"--architecture", "qutrit",
+			"--experimentname", "qutrit_scheme"
+		};
+		argc = array_length<decltype(test_argv)>::value;
+		argv = test_argv;
+	}
 
 	QRAMSimulatorTest(argc, argv);
 	return 0;

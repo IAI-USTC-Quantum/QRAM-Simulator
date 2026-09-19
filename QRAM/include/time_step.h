@@ -277,10 +277,10 @@ namespace qram_simulator {
 		else { return '?'; }
 	}
 
-	constexpr const char* arch2str(int arch) 
+	constexpr const char* arch2str(int arch)
 	{
-		// if (arch == arch_qubit) return "qubit";
 		if (arch == arch_qutrit) return "qutrit";
+		if (arch == arch_qubit) return "qubit";
 		return "unknown_arch";
 	}
 

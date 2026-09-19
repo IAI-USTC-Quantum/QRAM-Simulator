@@ -51,6 +51,9 @@ int main()
 		TEST(QRAM_compare_test);
 		TEST(QRAMQutrit_FidelityTest);
 
+		/* QRAM qubit Test (full / no-pruning ground truth) */
+		TEST(QRAMQubit_FullCorrectnessTest);
+
 		/* Chebyshev test */
 		System::clear();
 		TEST(Chebyshev_test);

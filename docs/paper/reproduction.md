@@ -143,7 +143,7 @@ done
 | `--depolarizing` | 退极化噪声强度 | 0.0 |
 | `--damping` | 振幅阻尼噪声强度 | 0.0 |
 | `--seed` | 随机数种子 | 123456789 |
-| `--architecture` | QRAM 架构: `qutrit` 或 `standard` | qutrit |
+| `--architecture` | QRAM 架构: `qutrit` 或 `qubit`（qubit 当前仅 full 模式，作为 ground truth） | qutrit |
 | `--experimentname` | 实验名称标识 | test |
 
 ### 运行示例

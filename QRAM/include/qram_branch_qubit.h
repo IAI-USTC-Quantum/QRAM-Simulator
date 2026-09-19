@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "time_step.h"
 
@@ -263,10 +263,16 @@ namespace qram_simulator {
 				branches.clear();
 			}
 
-			complex_t get_fidelity()
+			complex_t get_fidelity(const memory_t& memory) const
 			{
-				throw_not_implemented();
-				return 0;
+				if (is_good) return good_ref->get_fidelity(memory);
+
+				complex_t ret = 0;
+				for (size_t i = 0; i < branches.size(); ++i)
+				{
+					ret += branch_probs[i] * branches[i].get_fidelity(memory);
+				}
+				return ret;
 			}
 
 			// 1. construct from
@@ -274,17 +280,14 @@ namespace qram_simulator {
 			// 3. calculate probability
 			Branch::damp_prob_type get_prob_damp(size_t qubit_id) const
 			{
-				size_t branch_sz = branches.size();
 				Branch::damp_prob_type ret;
-				if (branch_sz == 0) return ret;
 				ret.fill(0);
-				for (size_t bid = 0; bid < branch_sz; ++bid)
+				for (size_t bid = 0; bid < branches.size(); ++bid)
 				{
-					double prob = state_probs[bid];
 					auto&& damp_prob = branches[bid].get_prob_damp(qubit_id);
 					for (size_t i = 0; i < ret.size(); ++i)
 					{
-						ret[i] += damp_prob[i] * branch_probs[i];
+						ret[i] += damp_prob[i] * branch_probs[bid];
 					}
 				}
 				return ret;
@@ -314,23 +317,19 @@ namespace qram_simulator {
 
 			bool sample_output_no_damping(Branch::element_type& output, double& r)
 			{
-				for (size_t i = 0; i < state_probs.size(); ++i)
+				for (size_t i = 0; i < branches.size(); ++i)
 				{
-					if (r > state_probs[i]) {
-						r -= state_probs[i];
+					if (branch_probs[i] <= 0)
 						continue;
-					}
-					else {
-						for (auto iter = branches[i].iterbeg();
-							iter != branches[i].iterend(); ++iter)
-						{
-							if (r > abs_sqr(iter->amplitude))
-								r -= abs_sqr(iter->amplitude);
-							else {
-								output = iter->state.nz_elements;
-								return true;
-							}
+					for (auto iter = branches[i].iterbeg();
+						iter != branches[i].iterend(); ++iter)
+					{
+						double thisprob = branch_probs[i] * abs_sqr(iter->amplitude);
+						if (r < thisprob) {
+							output = iter->state.nz_elements;
+							return true;
 						}
+						r -= thisprob;
 					}
 				}
 				return false;
@@ -338,17 +337,19 @@ namespace qram_simulator {
 
 			bool sample_output_with_damping(Branch::element_type& output, double& r)
 			{
-				for (size_t i = 0; i < state_probs.size(); ++i)
+				for (size_t i = 0; i < branches.size(); ++i)
 				{
+					if (branch_probs[i] <= 0)
+						continue;
 					for (auto iter = branches[i].iterbeg();
 						iter != branches[i].iterend(); ++iter)
 					{
-						if (r > abs_sqr(iter->amplitude))
-							r -= abs_sqr(iter->amplitude);
-						else {
+						double thisprob = branch_probs[i] * abs_sqr(iter->amplitude);
+						if (r < thisprob) {
 							output = iter->state.nz_elements;
 							return true;
 						}
+						r -= thisprob;
 					}
 				}
 				return false;

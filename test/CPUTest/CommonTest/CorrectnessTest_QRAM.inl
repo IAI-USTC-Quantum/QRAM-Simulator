@@ -1,4 +1,6 @@
 
+#include "qram_circuit_qubit.h"
+
 template<typename QRAM_type = qram_qutrit::QRAMCircuit>
 QRAM_type configure_qram(size_t addr_sz, size_t data_sz, const noise_t& noise, seed_t seed, size_t input_sz)
 {
@@ -159,5 +161,55 @@ auto QRAMQutrit_FidelityTest()
 	};
 
 	QRAMQutrit_FidelityTestImpl(addr_sz, data_sz, seed, noise, shots, input_size);
+}
+
+
+/* Qubit architecture, full (no-pruning) simulation: ground truth checks */
+auto QRAMQubit_full_impl_1shot(size_t addr_sz, size_t data_sz,
+	const noise_t& noise, seed_t seed, size_t input_sz)
+{
+	auto qram = configure_qram<qram_qubit::QRAMCircuit>(addr_sz, data_sz, noise, seed, input_sz);
+	random_engine::get_instance().set_seed(seed);
+	qram.run_full();
+	return qram.sample_and_get_fidelity();
+}
+
+auto QRAMQubit_FullCorrectnessTest()
+{
+	/* Noiseless: full simulation must reproduce the ideal QRAM exactly */
+	for (size_t addr : { 2, 3, 4 })
+	{
+		for (size_t data : { 1, 2 })
+		{
+			noise_t noise_free;
+			auto fid = QRAMQubit_full_impl_1shot(addr, data, noise_free, 233, pow2(addr + data));
+			fmt::print("qubit full (noiseless): n={} k={} fid={:.15f}\n", addr, data, fid);
+			if (!ignorable(fid - 1.0))
+			{
+				TEST_FAIL("Qubit full simulation without noise should give fidelity 1.");
+			}
+		}
+	}
+
+	/* Noisy: deterministic under the same seed, fidelity within [0, 1] */
+	noise_t noise = {
+		{ OperationType::Depolarizing, 1e-3 },
+		{ OperationType::Damping, 1e-4 }
+	};
+	for (int it = 0; it < 20; ++it)
+	{
+		seed_t seed = 191781 + it;
+		auto fid1 = QRAMQubit_full_impl_1shot(4, 2, noise, seed, 16);
+		auto fid2 = QRAMQubit_full_impl_1shot(4, 2, noise, seed, 16);
+		fmt::print("qubit full (noisy): seed={} fid={:.5f}\n", seed, fid1);
+		if (std::isnan(fid1) || fid1 < 0 || fid1 > 1 + epsilon)
+		{
+			TEST_FAIL("Qubit full simulation fidelity out of range.");
+		}
+		if (fid1 != fid2)
+		{
+			TEST_FAIL("Qubit full simulation is not deterministic under the same seed.");
+		}
+	}
 }
 

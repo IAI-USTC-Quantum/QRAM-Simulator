@@ -74,6 +74,80 @@ namespace qram_simulator {
 				branch_groups = std::move(branch_groups_);
 			}
 
+			/* Fill branch_groups with n_inputs sampled (addr, bus) branches.
+			*  uniform = true  : equal input probability for each branch
+			*  uniform = false : input probability ~ U(0,1), normalized
+			*/
+			void _set_input_impl(size_t n_inputs, bool uniform)
+			{
+				static std::uniform_real_distribution<double> urd(0, 1);
+
+				if (addr_size + data_size > 64)
+					throw_invalid_input();
+
+				size_t max_branch_size = pow2(addr_size + data_size);
+				auto inputsz = std::min(n_inputs, max_branch_size);
+
+				std::vector<size_t> sampled_ids;
+				sampled_ids.reserve(inputsz);
+				std::vector<double> probs;
+				probs.reserve(inputsz);
+
+				double total_prob = 0;
+				if (max_branch_size < pow2(30) &&
+					inputsz * 1.0 / max_branch_size > 0.3)
+				{
+					std::vector<size_t> indices(max_branch_size);
+					std::iota(indices.begin(), indices.end(), 0);
+					for (size_t i = 0; i < inputsz; ++i)
+					{
+						std::uniform_int_distribution<size_t> ud(i, indices.size() - 1);
+						size_t a = ud(random_engine::get_engine());
+
+						double r = uniform ? 1.0 : urd(random_engine::get_engine());
+						sampled_ids.push_back(indices[a]);
+						probs.push_back(r);
+						total_prob += r;
+
+						std::swap(indices[i], indices[a]);
+					}
+				}
+				else
+				{
+					std::set<size_t> unique_id;
+					std::uniform_int_distribution<size_t> ud(0, max_branch_size - 1);
+					while (sampled_ids.size() < inputsz)
+					{
+						size_t a = ud(random_engine::get_engine());
+						if (!unique_id.insert(a).second)
+							continue;
+
+						double r = uniform ? 1.0 : urd(random_engine::get_engine());
+						sampled_ids.push_back(a);
+						probs.push_back(r);
+						total_prob += r;
+					}
+				}
+
+				branch_groups.clear();
+				std::map<size_t, size_t> group_of_addr;
+				for (size_t i = 0; i < inputsz; ++i)
+				{
+					size_t addr = sampled_ids[i] >> data_size;
+					bus_t bus = sampled_ids[i] - (addr << data_size);
+					auto [it, flag] = group_of_addr.try_emplace(addr, branch_groups.size());
+					if (flag)
+						branch_groups.emplace_back(addr);
+					auto& group = branch_groups[it->second];
+					group.branches_input.emplace_back(addr, data_size, bus);
+					group.branch_probs.push_back(probs[i] / total_prob);
+					group.state_probs.push_back(probs[i] / total_prob);
+				}
+			}
+
+			void set_input_random(size_t n_inputs) { _set_input_impl(n_inputs, false); }
+			void set_input_uniform(size_t n_inputs) { _set_input_impl(n_inputs, true); }
+
 			auto& get_branch_groups() const { return branch_groups; }
 			auto& get_operations() const { return operations; }
 			auto& get_branch_groups() { return branch_groups; }
@@ -90,12 +164,15 @@ namespace qram_simulator {
 				noise_parameters = noises;
 			}
 
+			inline bool is_noise_free() const { return noise_parameters.size() == 0; }
+			inline bool has_damping() const { return noise_parameters.find(OperationType::Damping) != noise_parameters.end(); }
+
 			/* generate noisy QRAM operation */
 			void initialize_system() {
 
 				profiler _("QRAMCircuit::initialize_system");
 				operations = time_step.generate(noise_parameters, Branch::qunit_type);
-				// good_branch_ids.clear();
+				good_branch_group_ids.clear();
 				first_good_branch_group = -1;
 				valid_branch_group_view.clear();
 				std::for_each(branch_groups.begin(), branch_groups.end(),
@@ -103,12 +180,8 @@ namespace qram_simulator {
 				);
 			}
 
-			double get_fidelity() {
-				profiler _("get_fidelity");
-				/*if (noise_parameters.find(OperationType::Damping) == noise_parameters.end())
-					sample_output();
-				else
-					sample_output_with_damping();*/
+			double sample_and_get_fidelity() {
+				profiler _("sample_and_get_fidelity");
 
 				sample_output();
 
@@ -118,10 +191,14 @@ namespace qram_simulator {
 				complex_t ret = 0;
 				for (size_t i = 0; i < branch_groups.size(); ++i)
 				{
-					ret += branch_groups[i].get_fidelity();
+					ret += branch_groups[i].get_fidelity(memory)
+						* std::sqrt(branch_groups[i].relative_multiplier);
 				}
-				// if (ret > 1) { throw_bad_result(); }
 				return abs_sqr(ret);
+			}
+
+			double get_fidelity() {
+				return sample_and_get_fidelity();
 			}
 
 
@@ -885,12 +962,8 @@ namespace qram_simulator {
 
 					if (!set) // in the good branch
 					{
-						if (first_good_branch_group < 0)
+						if (first_good_branch_group >= 0)
 						{
-							fmt::print(to_string());
-							throw_bad_result();
-						}
-						else {
 							double factor = branch_groups[first_good_branch_group].get_prob();
 							std::uniform_real_distribution<double> urd(0, factor);
 							double r = urd(random_engine::get_engine());
@@ -904,9 +977,24 @@ namespace qram_simulator {
 						}
 					}
 
-					if (!set) // still not get sampled?
+					if (!set)
 					{
-						fmt::print(to_string());
+						// r may exceed the accumulated weights by floating-point
+						// residue; fall back to the last available state
+						for (auto branch_group : valid_branch_group_view) {
+							for (auto& branch : branch_group->branches) {
+								for (auto iter = branch.iterbeg(); iter != branch.iterend(); ++iter) {
+									if (!ignorable(std::abs(iter->amplitude))) {
+										final_system_state = iter->state.nz_elements;
+										set = true;
+									}
+								}
+							}
+						}
+					}
+
+					if (!set) // no state available at all
+					{
 						throw_bad_result();
 					}
 
@@ -1110,14 +1198,31 @@ namespace qram_simulator {
 				run_bad();
 			}
 
+			/* Full run of all branches: no pruning, used as ground truth */
+			void run_full()
+			{
+				profiler _("QRAMCircuit::run_full");
+				run_all();
+			}
+
+			/* Pruned run: only bad branches + the reference good branch */
+			void run_normal()
+			{
+				profiler _("QRAMCircuit::run_normal");
+				run();
+			}
+
+			static constexpr auto FULL_VER = "full";
+			static constexpr auto NORMAL_VER = "normal";
+
 			void run(std::string version)
 			{
-				if (version == "old")
+				if (version == "old" || version == FULL_VER)
 				{
 					run_all();
 					return;
 				}
-				else if (version == "new")
+				else if (version == "new" || version == NORMAL_VER)
 				{
 					run();
 					return;

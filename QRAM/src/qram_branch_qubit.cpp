@@ -261,18 +261,20 @@ namespace qram_simulator
 			return ret;
 		}
 
-		//complex_t Branch::get_fidelity(const memory_t &memory) const
-		//{
-		//	auto expect_bus = bus_input ^ (memory[address]);
-		//	complex_t ret = 0;
-		//	for (auto iter = iterbeg(); iter != iterend(); ++iter)
-		//	{
-		//		if (iter->bus == expect_bus) {
-		//			ret += iter->amplitude;
-		//		}
-		//	}
-		//	return ret;
-		//}
+		complex_t Branch::get_fidelity(const memory_t &memory) const
+		{
+			if (good) return good_ref->get_fidelity(memory);
+
+			auto expect_bus = bus_input ^ (memory[address]);
+			complex_t ret = 0;
+			for (auto iter = iterbeg(); iter != iterend(); ++iter)
+			{
+				if (iter->data_bus == expect_bus) {
+					ret += iter->amplitude;
+				}
+			}
+			return ret;
+		}
 
 		std::string Branch::to_string() const
 		{
@@ -426,17 +428,19 @@ namespace qram_simulator
 
 		void Branch::run_damp_full(size_t qubit_id, size_t k)
 		{
-			/*for (auto& state : system_states)
+			/* project onto the jumped subspace (qubit_id == 1)
+			   and reset the jumped qubit to |0> */
+			size_t write = 0;
+			for (size_t i = 0; i < system_states_sz; ++i)
 			{
-			state.set_zero(qubit_id);
+				if (system_states[i].state.state_of(qubit_id) == ZeroState)
+					continue;
+				system_states[i].state.set_zero(qubit_id);
+				if (write != i)
+					system_states[write] = system_states[i];
+				++write;
 			}
-			try_merge();*/
-
-			auto&& pred = [qubit_id](SystemState& state)
-			{
-				return state.state.state_of(qubit_id) == 0;
-			};
-			remove_if(pred);
+			system_states_sz = write;
 		}
 
 		void Branch::remove_mismatch_state(const State::element_type& target_state)
