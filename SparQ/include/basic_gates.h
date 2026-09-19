@@ -783,15 +783,15 @@ namespace qram_simulator
 
 	// Deprecated aliases kept for source compatibility; see docs/naming_conventions.md.
 	// Remove in the next major version.
-	[[deprecated("use X_Bool")]] using Xgate_Bool = X_Bool;
-	[[deprecated("use Y_Bool")]] using Ygate_Bool = Y_Bool;
-	[[deprecated("use Z_Bool")]] using Zgate_Bool = Z_Bool;
-	[[deprecated("use S_Bool")]] using Sgate_Bool = S_Bool;
-	[[deprecated("use T_Bool")]] using Tgate_Bool = T_Bool;
-	[[deprecated("use RX_Bool")]] using RXgate_Bool = RX_Bool;
-	[[deprecated("use RY_Bool")]] using RYgate_Bool = RY_Bool;
-	[[deprecated("use RZ_Bool")]] using RZgate_Bool = RZ_Bool;
-	[[deprecated("use SX_Bool")]] using SXgate_Bool = SX_Bool;
-	[[deprecated("use U2_Bool")]] using U2gate_Bool = U2_Bool;
-	[[deprecated("use U3_Bool")]] using U3gate_Bool = U3_Bool;
+	using Xgate_Bool [[deprecated("use X_Bool")]] = X_Bool;
+	using Ygate_Bool [[deprecated("use Y_Bool")]] = Y_Bool;
+	using Zgate_Bool [[deprecated("use Z_Bool")]] = Z_Bool;
+	using Sgate_Bool [[deprecated("use S_Bool")]] = S_Bool;
+	using Tgate_Bool [[deprecated("use T_Bool")]] = T_Bool;
+	using RXgate_Bool [[deprecated("use RX_Bool")]] = RX_Bool;
+	using RYgate_Bool [[deprecated("use RY_Bool")]] = RY_Bool;
+	using RZgate_Bool [[deprecated("use RZ_Bool")]] = RZ_Bool;
+	using SXgate_Bool [[deprecated("use SX_Bool")]] = SX_Bool;
+	using U2gate_Bool [[deprecated("use U2_Bool")]] = U2_Bool;
+	using U3gate_Bool [[deprecated("use U3_Bool")]] = U3_Bool;
 }

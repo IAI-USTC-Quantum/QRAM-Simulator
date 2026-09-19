@@ -334,5 +334,5 @@ namespace qram_simulator
 	};
 
 	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
-	[[deprecated("use Hadamard_Partial")]] using Hadamard_PartialQubit = Hadamard_Partial;
+	using Hadamard_PartialQubit [[deprecated("use Hadamard_Partial")]] = Hadamard_Partial;
 }

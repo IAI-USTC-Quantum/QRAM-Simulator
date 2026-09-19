@@ -132,7 +132,7 @@ namespace qram_simulator {
 	};
 
 	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
-	[[deprecated("use InverseQFT")]] using inverseQFT = InverseQFT;
+	using inverseQFT [[deprecated("use InverseQFT")]] = InverseQFT;
 
 	/**
 	 * @brief 完整量子傅里叶变换

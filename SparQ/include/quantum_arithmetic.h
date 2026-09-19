@@ -3411,7 +3411,7 @@ namespace qram_simulator
 	};
 
 	// Deprecated aliases; see docs/naming_conventions.md. Remove in the next major version.
-	[[deprecated("use Add_AnyInt_AnyInt_InPlace")]] using AddAssign_AnyInt_AnyInt_InPlace = Add_AnyInt_AnyInt_InPlace;
-	[[deprecated("use Div_Sqrt_Arccos_UInt_UInt")]] using Div_Sqrt_Arccos_Int_Int = Div_Sqrt_Arccos_UInt_UInt;
-	[[deprecated("use Sqrt_Div_Arccos_Int_UInt")]] using Sqrt_Div_Arccos_Int_Int = Sqrt_Div_Arccos_Int_UInt;
+	using AddAssign_AnyInt_AnyInt_InPlace [[deprecated("use Add_AnyInt_AnyInt_InPlace")]] = Add_AnyInt_AnyInt_InPlace;
+	using Div_Sqrt_Arccos_Int_Int [[deprecated("use Div_Sqrt_Arccos_UInt_UInt")]] = Div_Sqrt_Arccos_UInt_UInt;
+	using Sqrt_Div_Arccos_Int_Int [[deprecated("use Sqrt_Div_Arccos_Int_UInt")]] = Sqrt_Div_Arccos_Int_UInt;
 } // namespace qram_simulator

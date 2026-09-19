@@ -1274,6 +1274,6 @@ namespace qram_simulator
 		std::vector<complex_t> my_linear_solver_reference(const SparseMatrix& mat, const DenseVector<double>& vec);
 
 		// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
-		[[deprecated("use QuantumBinarySearch_Fast")]] using QuantumBinarySearchFast = QuantumBinarySearch_Fast;
+		using QuantumBinarySearchFast [[deprecated("use QuantumBinarySearch_Fast")]] = QuantumBinarySearch_Fast;
 	} // namespace CKS
 }

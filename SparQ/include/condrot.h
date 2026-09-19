@@ -319,6 +319,6 @@ namespace qram_simulator
 	using CondRot_General_Bool = CondRot_General_Bool_Fast<Callable>;
 
 	template<typename Callable = std::function<u22_t(uint64_t)>>
-	[[deprecated("use CondRot_General_Bool_Fast")]] using CondRot_General_Bool_fast = CondRot_General_Bool_Fast<Callable>;
+	using CondRot_General_Bool_fast [[deprecated("use CondRot_General_Bool_Fast")]] = CondRot_General_Bool_Fast<Callable>;
 
 }

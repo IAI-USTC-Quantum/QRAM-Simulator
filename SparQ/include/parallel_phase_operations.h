@@ -229,5 +229,5 @@ namespace qram_simulator
 	};
 
 	// Deprecated alias; see docs/naming_conventions.md. Remove in the next major version.
-	[[deprecated("use GlobalPhase")]] using GlobalPhase_Int = GlobalPhase;
+	using GlobalPhase_Int [[deprecated("use GlobalPhase")]] = GlobalPhase;
 }
