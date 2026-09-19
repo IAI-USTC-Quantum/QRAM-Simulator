@@ -23,6 +23,7 @@
 ## 理论笔记：Qubit 架构剪枝与快速模拟
 
 - [qubit_qram_pruning.md](qubit_qram_pruning.md)：qubit 编码 QRAM 在振幅阻尼噪声下的分支预测理论。给出 H→K₀→H 结构的闭式解（good 分支数据输出振幅 $(1\pm a^{2n})/2$、Hamming 权重公式）、完整剪枝算法与复杂度分析，并对照现有代码列出实现缺口（`get_multiplier_qubit` 接线、`fill_bad_range` qubit 分支、`_reconstruct` 的 $2^k$ 分量写出）。
+- [qubit_error_propagation.md](qubit_error_propagation.md)：qubit 编码的**错误传播机制**理论走读与单错误注入验证。核心结论：qutrit 子树包含判据的真正依据是"路径外分量末态构型同一"（W 守卫冻结故障残留），qubit 因"空闲=指向左"不可区分导致残留沿祖先上拉迁移、构型家族分歧至 subtree(parent(v))——`get_bad_range_qubit` 的左孩子上溯规则正是该分歧包络（n=3 逐例实测吻合）；纯阻尼通道豁免（可用纯子树判据）。
 
 ## Paper 2: SparQ — [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
 
