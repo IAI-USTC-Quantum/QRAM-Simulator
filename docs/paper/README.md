@@ -20,6 +20,10 @@
 
 **复现指南**：[reproduction.md](reproduction.md)
 
+## 理论笔记：Qubit 架构剪枝与快速模拟
+
+- [qubit_qram_pruning.md](qubit_qram_pruning.md)：qubit 编码 QRAM 在振幅阻尼噪声下的分支预测理论。给出 H→K₀→H 结构的闭式解（good 分支数据输出振幅 $(1\pm a^{2n})/2$、Hamming 权重公式）、完整剪枝算法与复杂度分析，并对照现有代码列出实现缺口（`get_multiplier_qubit` 接线、`fill_bad_range` qubit 分支、`_reconstruct` 的 $2^k$ 分量写出）。
+
 ## Paper 2: SparQ — [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
 
 > *SparQ: A Sparse Quantum Circuit Simulator with Register-Level Abstraction*
