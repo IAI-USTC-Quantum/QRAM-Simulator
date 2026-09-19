@@ -564,7 +564,9 @@ def width_matrix_case(
 
     for combo in width_combos:
         specs = specs_factory(combo)
-        assert len(specs) == len(combo), (
+        # factories may pin extra fixed-width registers (e.g. the Boolean
+        # flag) beyond the swept combo widths
+        assert len(specs) >= len(combo), (
             f"{label}: specs_factory returned {len(specs)} specs for combo {combo}"
         )
         setup_registers(specs)
