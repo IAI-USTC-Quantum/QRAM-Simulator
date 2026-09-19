@@ -92,12 +92,15 @@ namespace qram_simulator {
 				double total_prob = 0;
 				std::set<size_t> unique_address;
 
-				for (size_t i = 0; i < inputsz; ++i)
+				/* rejection sampling: keep drawing until inputsz unique
+				branches are collected, so branch_probs stays aligned
+				with branches (duplicates must not consume an index) */
+				while (branches.size() < inputsz)
 				{
 					std::uniform_int_distribution<size_t> ud(0, max_branch_size - 1);
 
 					size_t a = ud(random_engine::get_engine());
-					if (unique_address.find(a) != unique_address.end())
+					if (!unique_address.insert(a).second)
 						continue;
 
 					// new input, generate the probability
@@ -105,7 +108,7 @@ namespace qram_simulator {
 
 					// use _indices[a] to mark the selected number
 					branches.emplace_back(a, data_size);
-					branch_probs[i] = r;
+					branch_probs[branches.size() - 1] = r;
 					total_prob += r;
 				}
 				for (size_t i = 0; i < inputsz; ++i)
@@ -169,24 +172,24 @@ namespace qram_simulator {
 				double total_prob = 0;
 				std::set<size_t> unique_id;
 
-				for (size_t i = 0; i < inputsz; ++i)
+				/* rejection sampling: keep drawing until inputsz unique
+				branches are collected, so branch_probs stays aligned
+				with branches (duplicates must not consume an index) */
+				while (branches.size() < inputsz)
 				{
 					std::uniform_int_distribution<size_t> ud(0, max_branch_size - 1);
 
 					size_t a = ud(random_engine::get_engine());
-					if (unique_id.find(a) != unique_id.end())
+					if (!unique_id.insert(a).second)
 						continue;
-
-					unique_id.insert(a);
 
 					// new input, generate the probability
 					double r = 1.0;
 
 					// use _indices[a] to mark the selected number
 					branches.emplace_back(a, data_size);
-					branch_probs[i] = r;
+					branch_probs[branches.size() - 1] = r;
 					total_prob += r;
-
 				}
 				for (size_t i = 0; i < inputsz; ++i)
 				{
