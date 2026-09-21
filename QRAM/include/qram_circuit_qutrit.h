@@ -83,7 +83,20 @@ namespace qram_simulator {
 			inline auto& get_operations() const { return operations; }
 			inline auto& get_operations() { return operations; }
 
-			inline void set_noise_models(const noise_t& noises) { noise_parameters = noises; }
+			inline void set_noise_models(const noise_t& noises)
+			{
+				/* 概率参数范围校验；Damping 要求 γ < 1（γ=1 会在一步内
+				   衰灭全部激发，使轨迹范数为 0，破坏 sample_output/normalization） */
+				for (auto& [type, p] : noises)
+				{
+					if (!(p >= 0.0 && p <= 1.0) ||
+						(type == OperationType::Damping && p >= 1.0))
+						throw std::runtime_error(
+							"set_noise_models: noise probability out of range "
+							"(must be in [0,1]; Damping requires gamma < 1)");
+				}
+				noise_parameters = noises;
+			}
 			inline auto& get_noise_models() { return noise_parameters; }
 			inline auto& get_noise_models() const { return noise_parameters; }
 			inline bool is_noise_free() const { return noise_parameters.size() == 0; }

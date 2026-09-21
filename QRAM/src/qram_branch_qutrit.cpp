@@ -258,7 +258,9 @@ namespace qram_simulator
 		{
 			size_t nodeid = qubit_id / 2;
 			auto iter = iterof(nodeid);
-			if (iter == iterend()) return 0;
+			/* absent 节点物理上是基态 (W,0)：data 位取 0，addr-qutrit 取 W。
+			   此前统一返回 0(==L)，使相位类噪声算子对基态节点误加 ω 相位。 */
+			if (iter == iterend()) return (qubit_id & 1) ? 0 : W;
 			if (qubit_id & 1)
 				return iter->second.data;
 			else

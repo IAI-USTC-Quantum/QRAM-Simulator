@@ -352,10 +352,14 @@ namespace qram_simulator {
 		for (auto&& [noise_type, noise_parameter] : noises)
 		{
 			size_t nqubits = 2 * (pow2(max_entangle_layer) - 1);
+			if (nqubits == 0)
+				continue;
 			std::binomial_distribution<size_t> bd(nqubits, noise_parameter);
 			size_t nerror = bd(random_engine::get_engine());
 
-			std::uniform_int_distribution<size_t> uid(0, nqubits);
+			/* 活跃位置集合为 [0, nqubits)，均匀整数分布必须用闭端点 nqubits-1；
+			   此前误写为 uid(0, nqubits)，使下标 nqubits（子树外的一个节点）也可被抽到 */
+			std::uniform_int_distribution<size_t> uid(0, nqubits - 1);
 			std::set<size_t> error_positions;
 			while (error_positions.size() < nerror)
 			{
@@ -397,10 +401,12 @@ namespace qram_simulator {
 		for (auto&& [noise_type, noise_parameter] : noises)
 		{
 			size_t nqubits = 2 * (pow2(max_entangle_layer) - 1);
+			if (nqubits == 0)
+				continue;
 			std::binomial_distribution<size_t> bd(nqubits, noise_parameter);
 			size_t nerror = bd(random_engine::get_engine());
 
-			std::uniform_int_distribution<size_t> uid(0, nqubits);
+			std::uniform_int_distribution<size_t> uid(0, nqubits - 1);
 			std::set<size_t> error_positions;
 			while (error_positions.size() < nerror)
 			{
