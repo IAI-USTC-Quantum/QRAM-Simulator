@@ -229,12 +229,14 @@ namespace qram_simulator
 
 		void SystemState::run_bitphaseflip(size_t qubit_id)
 		{
-			auto iter = state.nz_elements.find(qubit_id);
-			if (iter != state.nz_elements.end())
-			{
+			/* Y flip（与 qutrit 架构奇数位语义一致）：先翻转，翻转后为 1 时加 -1 相位，
+			   即 |0>->-|1>、|1>->|0>（ZX = iY，酉）。
+			   此前实现为 |1>->-|0>、|0>->|0>（秩 1 非酉，等价 -K1 衰减算子），
+			   会使 Depolarizing 轨迹丢失相干与权重，并触发 sample_output 的
+			   零范数 Bad-result 崩溃。 */
+			state.flip(qubit_id);
+			if (state.state_of(qubit_id) == OneState)
 				amplitude *= -1;
-				state.nz_elements.erase(iter);
-			}
 		}
 
 		void SystemState::run_depolarizing(size_t qubit_id, double depol_id)

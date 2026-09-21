@@ -64,8 +64,13 @@ namespace qram_simulator {
 					addr = W;
 					return data == 0;
 				}
-				if (addr == W) addr = R;
-				if (addr == R) addr = L;
+				if (addr == W) {
+					addr = R;
+					return false;
+				}
+				if (addr == R) {
+					addr = L;
+				}
 				return false;
 			}
 

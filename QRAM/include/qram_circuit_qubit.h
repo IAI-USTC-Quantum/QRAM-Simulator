@@ -161,6 +161,16 @@ namespace qram_simulator {
 				noise_parameters[t] = v;
 			}
 			void set_noise_models(const std::map<OperationType, double>& noises) {
+				/* 概率参数范围校验；Damping 要求 γ < 1（γ=1 会在一步内
+				   衰灭全部激发，使轨迹范数为 0，破坏 sample_output/normalization） */
+				for (auto& [type, p] : noises)
+				{
+					if (!(p >= 0.0 && p <= 1.0) ||
+						(type == OperationType::Damping && p >= 1.0))
+						throw std::runtime_error(
+							"set_noise_models: noise probability out of range "
+							"(must be in [0,1]; Damping requires gamma < 1)");
+				}
 				noise_parameters = noises;
 			}
 

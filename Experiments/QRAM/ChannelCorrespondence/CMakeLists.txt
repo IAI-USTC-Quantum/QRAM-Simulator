@@ -1,0 +1,10 @@
+project(Experiment_QRAM_ChannelCorrespondence)
+
+add_executable(Experiment_QRAM_ChannelCorrespondence
+    QutritCorrespondenceExporter.cpp)
+
+add_executable(Experiment_QRAM_ChannelCorrespondence_Qubit
+    QubitCorrespondenceExporter.cpp)
+
+target_link_libraries(Experiment_QRAM_ChannelCorrespondence SparQ)
+target_link_libraries(Experiment_QRAM_ChannelCorrespondence_Qubit SparQ)
