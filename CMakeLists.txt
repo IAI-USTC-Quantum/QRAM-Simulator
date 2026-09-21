@@ -59,17 +59,14 @@ else()
     message(STATUS "TBB not found - using OpenMP for parallelization")
 endif()
 
-# Google Test - Use FetchContent for consistent cross-platform builds
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.14.0
-)
+# Google Test - vendored under ThirdParty/googletest (v1.14.0)
+# 不用 FetchContent 从 github.com 拉取:Gitea runner 无法访问 github.com
+# (克隆失败会导致 configure/pip install 挂掉);vendored 源码树自包含,
+# PyPI sdist 用户侧构建同样受益。
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-message(STATUS "GTest configured via FetchContent")
+add_subdirectory(ThirdParty/googletest EXCLUDE_FROM_ALL)
+message(STATUS "GTest configured from ThirdParty (vendored v1.14.0)")
 
 if (UNIX)
 	add_compile_options(-fPIC)
