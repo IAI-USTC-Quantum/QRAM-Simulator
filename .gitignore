@@ -35,6 +35,7 @@
 .vscode/
 .vs/
 build*/
+.zcode/
 test/result/*.py
 *.7z
 *.rar
