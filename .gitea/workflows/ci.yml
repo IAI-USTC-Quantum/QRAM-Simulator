@@ -8,22 +8,22 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: qram-simulator-${{ gitea.ref }}
+  group: qram-simulator-ci-${{ gitea.ref }}
   cancel-in-progress: true
 
 jobs:
   cpu:
-    name: CPU C++ and Python
+    name: CPU C++ tests
     runs-on: ubuntu-latest
 
     steps:
       # 自包含步骤：runner 无法稳定访问 github.com（TLS 握手超时），
       # 因此不用 actions/checkout 与 actions/setup-python，
-      # 改为直接从本 Gitea 实例克隆 + 使用系统 Python。
+      # 改为直接从本 Gitea 实例克隆 + 使用系统工具链。
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ git libgomp1 python3-dev python3-pip python3-venv python-is-python3
+          sudo apt-get install -y cmake g++ git libgomp1
 
       - name: Check out repository
         env:
@@ -31,13 +31,6 @@ jobs:
         run: |
           git clone "https://${GITHUB_ACTOR}:${TOKEN}@${GITHUB_SERVER_URL#*//}/${GITHUB_REPOSITORY}.git" .
           git checkout --detach "$GITHUB_SHA"
-
-      - name: Install Python build dependencies
-        run: |
-          python3 -m venv "$RUNNER_TEMP/venv"
-          echo "PATH=$RUNNER_TEMP/venv/bin:$PATH" >> "$GITHUB_ENV"
-          "$RUNNER_TEMP/venv/bin/python" -m pip install --upgrade pip
-          "$RUNNER_TEMP/venv/bin/python" -m pip install numpy pybind11 pytest
 
       - name: Configure C++ tests
         run: |
@@ -52,12 +45,33 @@ jobs:
       - name: Run C++ tests
         run: ctest --test-dir build/ci --output-on-failure --parallel 2
 
-      - name: Build and install PySparQ
-        env:
-          CMAKE_ARGS: >-
-            -DCACHED_REGISTER_SIZE=8
-            -DBUILD_EXAMPLES=OFF
-        run: python -m pip install .
+  # SparQSim 以 add_subdirectory(submodule) 方式消费本仓库；
+  # 该 job 验证消费模式的开关组合可配置、核心库可编译。
+  consumer-mode:
+    name: Consumer mode (embedded build)
+    runs-on: ubuntu-latest
 
-      - name: Run Python tests
-        run: python -m pytest -q PySparQ/test
+    steps:
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libgomp1
+
+      - name: Check out repository
+        env:
+          TOKEN: ${{ secrets.GITEA_TOKEN }}
+        run: |
+          git clone "https://${GITHUB_ACTOR}:${TOKEN}@${GITHUB_SERVER_URL#*//}/${GITHUB_REPOSITORY}.git" .
+          git checkout --detach "$GITHUB_SHA"
+
+      - name: Configure in consumer mode
+        run: |
+          cmake -S . -B build/consumer \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DQRAM_BUILD_TESTS=OFF \
+            -DQRAM_BUILD_EXPERIMENTS=OFF \
+            -DQRAM_BUILD_PYTHON_BINDINGS=OFF \
+            -DBUILD_EXAMPLES=OFF
+
+      - name: Build core libraries
+        run: cmake --build build/consumer --target SparQ --parallel 2

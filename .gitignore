@@ -43,13 +43,8 @@ test/result/*.py
 # python
 __pycache__/
 *.pyd
-pyqsparse.egg-info/
+
+# Python build artifacts (qram_simulator bindings)
+*.egg-info/
 /wheelhouse/
-
-# Auto-generated version file (setuptools_scm)
-PySparQ/pysparq/_version.py
-
-# Sphinx documentation build
-docs/sphinx/build/
-docs/sphinx/_build/
-docs/sphinx/.venv/
+/dist/
