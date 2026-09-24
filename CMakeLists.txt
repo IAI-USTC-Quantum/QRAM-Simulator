@@ -80,6 +80,13 @@ if (UNIX)
 	add_compile_options(-fPIC)
 endif(UNIX)
 
+# MSVC: force UTF-8 source interpretation. Headers carry UTF-8 Chinese
+# comments; on legacy code pages (e.g. CP936) MSVC mis-decodes them, which
+# can merge an #ifdef line into a preceding comment and break the build.
+if (MSVC)
+	add_compile_options(/utf-8)
+endif()
+
 # if (MSVC)
 #   add_compile_options(/bigobj)
 #   add_compile_options(/FS)
