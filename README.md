@@ -8,15 +8,12 @@
 [![arXiv:SparQ](https://img.shields.io/badge/SparQ-arXiv%3A2503%2E15118-6f42c1.svg)](https://arxiv.org/abs/2503.15118)
 [![PyPI](https://img.shields.io/pypi/v/pysparq.svg)](https://pypi.org/project/pysparq/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Gitea](https://img.shields.io/badge/Gitea-agony%2FQRAM--Simulator-609926?logo=gitea)](https://git.chenzhaoyun.com/agony/QRAM-Simulator)
-[![Upstream GitHub](https://img.shields.io/badge/upstream-IAI--USTC--Quantum-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
+[![GitHub](https://img.shields.io/badge/GitHub-IAI--USTC--Quantum%2FQRAM--Simulator-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
+[![CI](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/QRAM-Simulator/)
 [![Quantum | AI](https://img.shields.io/badge/Quantum_Computing-AI-00e5ff?style=flat-square)](https://iai-ustc-quantum.github.io/)
-[![Gitea Actions](https://git.chenzhaoyun.com/agony/QRAM-Simulator/actions/workflows/ci.yml/badge.svg?branch=main)](https://git.chenzhaoyun.com/agony/QRAM-Simulator/actions)
 
 > **稀疏态量子模拟器，支持 Register Level Programming**
->
-> 当前开发仓库位于 Gitea；GitHub 仓库作为上游来源保留。
 
 ## 双软件架构
 
@@ -219,7 +216,7 @@ dist = ps.Probability.distribution(state, reg)  # 单寄存器完整结果分布
 
 ```bash
 # 克隆仓库
-git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
+git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 
 # 创建构建目录
