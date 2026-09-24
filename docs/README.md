@@ -1,6 +1,6 @@
 # QRAM-Simulator Documentation
 
-This directory contains documentation resources for the qram-simulator project
+This directory contains documentation resources for the QRAM-Simulator project
 (C++ core). Python bindings and the pysparq package live in the [SparQSim
 repository](https://github.com/IAI-USTC-Quantum/SparQSim).
 

@@ -7,9 +7,9 @@
 [![arXiv:QRAM](https://img.shields.io/badge/QRAM_Simulator-arXiv%3A2503%2E13832-b31b1b.svg)](https://arxiv.org/abs/2503.13832)
 [![arXiv:SparQ](https://img.shields.io/badge/SparQ-arXiv%3A2503%2E15118-6f42c1.svg)](https://arxiv.org/abs/2503.15118)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GitHub](https://img.shields.io/badge/GitHub-IAI--USTC--Quantum%2Fqram--simulator-181717?logo=github)](https://github.com/IAI-USTC-Quantum/qram-simulator)
-[![CI](https://github.com/IAI-USTC-Quantum/qram-simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/qram-simulator/actions/workflows/cmake-multi-platform.yml)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/qram-simulator/)
+[![GitHub](https://img.shields.io/badge/GitHub-IAI--USTC--Quantum%2FQRAM--Simulator-181717?logo=github)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
+[![CI](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/QRAM-Simulator/)
 
 > **稀疏态量子模拟器核心（C++），支持 Register Level Programming 与原生 QRAM**
 
@@ -19,10 +19,10 @@
 
 | 仓库 | 内容 | PyPI 包 |
 |------|------|---------|
-| **qram-simulator**（本仓库） | C++ 稀疏态模拟器核心 + 薄 Python 绑定 | `qram-simulator`（import `qram_simulator`） |
+| **QRAM-Simulator**（本仓库） | C++ 稀疏态模拟器核心 + 薄 Python 绑定 | `qram-simulator`（import `qram_simulator`） |
 | [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) | pysparq 全功能 Python 框架（算法、RIR、动态算子） | `pysparq` |
 
-SparQSim 以 git submodule（相对 URL `../qram-simulator.git`）方式引用本仓库并编译
+SparQSim 以 git submodule（相对 URL `../QRAM-Simulator.git`）方式引用本仓库并编译
 C++ 核心；两个仓库各自独立 tag/发版，pysparq 发版前将 submodule pin 到本仓库的
 对应 tag。
 
@@ -45,8 +45,8 @@ Add_UInt_UInt("a", "b", "result")(state);   // result = a + b
 ### 构建
 
 ```bash
-git clone https://github.com/IAI-USTC-Quantum/qram-simulator.git
-cd qram-simulator
+git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
+cd QRAM-Simulator
 mkdir build && cd build
 
 # 配置（CPU 版本；GPU/CUDA 后端当前暂缓，CMake 会构建 CPU-only 版本）
@@ -105,7 +105,7 @@ Add_UInt_UInt(addr_id, data_id, addr_id)(state);  // addr = addr + data = 3+5 = 
 ### 作为 CMake 子项目消费（SparQSim 的方式）
 
 ```cmake
-# submodule: git submodule add ../qram-simulator.git extern/qram-simulator
+# submodule: git submodule add ../QRAM-Simulator.git extern/qram-simulator
 set(QRAM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(QRAM_BUILD_EXPERIMENTS OFF CACHE BOOL "" FORCE)
 set(QRAM_BUILD_PYTHON_BINDINGS OFF CACHE BOOL "" FORCE)
@@ -206,7 +206,7 @@ outcome, prob = MeasureZ("q")(state)
 ## 项目结构
 
 ```
-qram-simulator/
+QRAM-Simulator/
 ├── SparQ/              # C++ 稀疏态模拟器核心
 │   ├── include/        # 头文件（运算符、系统操作）
 │   └── src/            # 源文件
@@ -223,7 +223,7 @@ qram-simulator/
 ## 发版流程
 
 1. 在 Gitea（开发主仓）合并变更到 main；
-2. 同步到 GitHub 上游 `IAI-USTC-Quantum/qram-simulator`；
+2. 同步到 GitHub 上游 `IAI-USTC-Quantum/QRAM-Simulator`；
 3. 更新 `CHANGELOG.md`，打 tag（`vX.Y.Z`，注意历史上已有 v0.1.x，新系列从 v0.2.0 起）；
 4. push tag 或创建 GitHub Release → `pypi-publish` 工作流自动构建
    cp310–313 × (manylinux / win_amd64) wheel + sdist 并发布到 PyPI

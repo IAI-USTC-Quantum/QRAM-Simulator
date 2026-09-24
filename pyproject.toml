@@ -18,7 +18,7 @@ authors = [{ name = "Agony", email = "chenzhaoyun@iai.ustc.edu.cn" }]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/IAI-USTC-Quantum/qram-simulator"
+Homepage = "https://github.com/IAI-USTC-Quantum/QRAM-Simulator"
 
 [project.optional-dependencies]
 dev = ["pybind11-stubgen", "pytest"]

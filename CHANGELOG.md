@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **仓库拆分**:本仓库（QRAM-Simulator monorepo）拆分为两个独立仓库,
-  本仓库成为纯 C++ 核心 `qram-simulator`,独立发版
+  本仓库名保留 QRAM-Simulator,转为纯 C++ 核心仓库独立发版
   (PyPI 包 `qram-simulator`,import 名 `qram_simulator`);
   PySparQ/pysparq 全功能 Python 框架迁移至 **SparQSim** 仓库,以 git
-  submodule(相对 URL `../qram-simulator.git`)引用并编译本仓库核心。
+  submodule(相对 URL `../QRAM-Simulator.git`)引用并编译本仓库核心。
   本条目之前的 PySparQ 相关历史条目见 SparQSim 仓库 CHANGELOG 及本文件
   git 历史(路径已随拆分移除,`git log --follow` 可追溯)
 - 根 CMakeLists 新增 `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS` /

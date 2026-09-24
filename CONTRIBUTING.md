@@ -50,8 +50,8 @@
 
 1. **克隆仓库**
    ```bash
-   git clone git@git.chenzhaoyun.com:agony/qram-simulator.git
-   cd qram-simulator
+   git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
+   cd QRAM-Simulator
    ```
 
 2. **创建构建目录**
@@ -169,8 +169,8 @@ QState qramLoad(const QState& address, const QState& data);
 ### 2. 创建功能分支
 
 ```bash
-git clone git@git.chenzhaoyun.com:agony/qram-simulator.git
-cd qram-simulator
+git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
+cd QRAM-Simulator
 git checkout -b feature/your-feature-name
 ```
 

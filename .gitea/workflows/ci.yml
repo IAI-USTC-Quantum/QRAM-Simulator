@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: qram-simulator-${{ gitea.ref }}
+  group: qram-simulator-ci-${{ gitea.ref }}
   cancel-in-progress: true
 
 jobs:

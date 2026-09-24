@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-qram-simulator is the C++ core of a sparse-state quantum circuit simulator with
+QRAM-Simulator (repo name kept; PyPI package `qram-simulator`) is the C++ core of a
+sparse-state quantum circuit simulator with
 native QRAM support and a "Register Level Programming" paradigm. The full-featured
 Python framework (pysparq) lives in the separate SparQSim repository, which consumes
 this repository as a git submodule; this repo ships only a thin `qram_simulator`
@@ -95,7 +96,7 @@ This repository is supported by two papers with distinct contributions:
 
 ## Documentation
 
-- **C++ API docs**: Doxygen → `docs/api/html/`, deployed at `https://iai-ustc-quantum.github.io/qram-simulator/api/` (workflow `.github/workflows/docs.yml`)
+- **C++ API docs**: Doxygen → `docs/api/html/`, deployed at `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (workflow `.github/workflows/docs.yml`)
 - Python/Sphinx documentation moved to the SparQSim repository
 
 The Gitea repository runs CPU C++ tests and a consumer-mode configure check through
@@ -107,10 +108,10 @@ The Gitea repository runs CPU C++ tests and a consumer-mode configure check thro
 the GitHub upstream remote.**
 
 Repository role:
-- `origin` → `git@git.chenzhaoyun.com:agony/qram-simulator.git` (Gitea, primary)
-- `upstream` → `git@github.com:IAI-USTC-Quantum/qram-simulator.git` (GitHub, releases)
+- `origin` → `git@git.chenzhaoyun.com:agony/QRAM-Simulator.git` (Gitea, primary)
+- `upstream` → `git@github.com:IAI-USTC-Quantum/QRAM-Simulator.git` (GitHub, releases)
 
-SparQSim consumes this repo via submodule with a **relative URL** (`../qram-simulator.git`),
+SparQSim consumes this repo via submodule with a **relative URL** (`../QRAM-Simulator.git`),
 which resolves correctly on both Gitea and GitHub — do not rewrite it to an absolute URL.
 
 ### CI Verification Before Submitting to Upstream
@@ -118,8 +119,8 @@ which resolves correctly on both Gitea and GitHub — do not rewrite it to an ab
 **CRITICAL: Always verify CI passes on fork before submitting PR to upstream.**
 
 1. Push changes to fork: `git push origin <branch-name>`
-2. Check CI status on fork: `gh run list --repo Agony5757/qram-simulator`
-3. View CI details: `gh run view <run-id> --repo Agony5757/qram-simulator`
+2. Check CI status on fork: `gh run list --repo Agony5757/QRAM-Simulator`
+3. View CI details: `gh run view <run-id> --repo Agony5757/QRAM-Simulator`
 4. Only after all CI checks pass, create PR to upstream
 
 ### CI Jobs
