@@ -128,9 +128,8 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 
-INPUT                  = SparQ/include/ \
-                         QRAM/include/ \
-                         bindings/python/
+INPUT                  = Common/include/ \
+                         QRAM/include/
 INPUT_ENCODING         = UTF-8
 INPUT_FILE_ENCODING    =
 FILE_PATTERNS          = *.c \

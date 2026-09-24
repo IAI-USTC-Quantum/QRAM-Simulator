@@ -36,8 +36,7 @@ jobs:
         run: |
           cmake -S . -B build/ci \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCACHED_REGISTER_SIZE=8 \
-            -DBUILD_EXAMPLES=OFF
+            -DCACHED_REGISTER_SIZE=8
 
       - name: Build C++ tests
         run: cmake --build build/ci --parallel 2
@@ -69,9 +68,7 @@ jobs:
           cmake -S . -B build/consumer \
             -DCMAKE_BUILD_TYPE=Release \
             -DQRAM_BUILD_TESTS=OFF \
-            -DQRAM_BUILD_EXPERIMENTS=OFF \
-            -DQRAM_BUILD_PYTHON_BINDINGS=OFF \
-            -DBUILD_EXAMPLES=OFF
+            -DQRAM_BUILD_EXPERIMENTS=OFF
 
       - name: Build core libraries
-        run: cmake --build build/consumer --target SparQ --parallel 2
+        run: cmake --build build/consumer --target SparQ_QRAMSimulator --parallel 2

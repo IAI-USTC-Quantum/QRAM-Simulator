@@ -2,6 +2,9 @@ project(SparQ_Common)
 
 file(GLOB_RECURSE src ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 add_library(${PROJECT_NAME} STATIC ${src})
+# fmt is defined by ThirdParty/CMakeLists.txt (added later from the root);
+# PUBLIC because basic.h/logger.h expose fmt headers to all consumers.
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt)
 
 if (CUDA_FOUND)
     file(GLOB_RECURSE cuda_src ${CMAKE_CURRENT_SOURCE_DIR}/cuda/*.cu)

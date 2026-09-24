@@ -1,6 +1,6 @@
 
 add_executable(ExecutabilityTest ExecutabilityTest.cpp)
-target_link_libraries(ExecutabilityTest SparQ)
+target_link_libraries(ExecutabilityTest SparQ_QRAMSimulator SparQ_Common)
 
 add_executable(CorrectnessTest CorrectnessTest.cpp)
-target_link_libraries(CorrectnessTest SparQ)
+target_link_libraries(CorrectnessTest SparQ_QRAMSimulator SparQ_Common)

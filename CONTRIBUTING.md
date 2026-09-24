@@ -84,15 +84,8 @@
 
 ### Python 绑定开发
 
-本仓库自带薄绑定（`qram_simulator` 包）：
-
-```bash
-pip install pybind11 pytest   # pybind11 不在 ThirdParty，来自构建环境
-pip install .                 # 构建 qram_simulator wheel
-pytest bindings/python/test
-```
-
-全功能 pysparq 框架的开发见 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)
+本仓库为纯 C++ 基座，不含 Python 绑定。`pysparq` 与 `qram_simulator` 两个包的
+开发均在 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim) 进行
 （其以 submodule 引用本仓库）。
 
 ## 编码规范

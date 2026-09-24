@@ -132,8 +132,8 @@ Variant      ::= "_InPlace" | "_Full" | "_Fast" | "_Partial"
 - **C++ 侧**:改名所在的头文件在同名命名空间内提供
   `[[deprecated("use NewName")]] using OldName = NewName;`。
 - **移除政策**:别名保留至下一个大版本。
-- 外部消费者视角:`PySparQ/consumer_runtime_inventory.json` 记录的外部依赖旧名
-  (如 `Xgate_Bool`)在别名期内继续可用;下游应在此期间迁移到新名。
+- 外部消费者视角:SparQSim 仓库 `PySparQ/consumer_runtime_inventory.json` 记录的
+  外部依赖旧名(如 `Xgate_Bool`)在别名期内继续可用;下游应在此期间迁移到新名。
 
 ## 11. 审计对照表
 

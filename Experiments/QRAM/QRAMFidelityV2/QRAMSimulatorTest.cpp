@@ -4,7 +4,6 @@
 #include "argparse.h"
 #include "logger.h"
 #include "state_manipulator.h"
-#include "grover.h"
 #include "time_step.h"
 #include "qram_circuit_qubit.h"
 

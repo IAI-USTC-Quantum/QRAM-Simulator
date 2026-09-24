@@ -29,10 +29,8 @@ docs/
 - **[API Docs](https://iai-ustc-quantum.github.io/QRAM-Simulator/api/)**: Auto-generated Doxygen documentation
 
 ### For Python Users
-Python bindings are published as the `pysparq` package from the [SparQSim
-repository](https://github.com/IAI-USTC-Quantum/SparQSim); a thin direct API to
-the C++ core (`qram_simulator`) is built from this repository's
-`bindings/python/`.
+Python bindings (`pysparq` and `qram_simulator`) are built and published from
+the [SparQSim repository](https://github.com/IAI-USTC-Quantum/SparQSim).
 
 ### For Researchers
 - **[Paper Documentation](paper/)**: Reproduction guides and paper-related resources
@@ -46,9 +44,9 @@ the C++ core (`qram_simulator`) is built from this repository's
 
 API 文档使用 [Doxygen](https://www.doxygen.nl/) 生成，涵盖以下模块：
 
-- **SparQ** - 稀疏量子态模拟器核心库
-- **QRAM** - 量子随机存取存储器实现
-- **qram_simulator bindings** - 薄 Python 绑定（`bindings/python/`）
+- **Common** - 公共组件（矩阵、随机引擎、错误处理等）
+- **QRAM** - 量子随机存取存储器实现（Qutrit/Qubit 两种架构）
+- SparQ 稀疏态模拟器与 Python 绑定位于 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)
 
 ### 生成 API 文档
 
@@ -67,7 +65,7 @@ open docs/api/html/index.html
 
 Doxygen 配置文件位于项目根目录的 `Doxyfile`，主要配置包括：
 
-- **输入目录**: `SparQ/include/`, `QRAM/include/`, `bindings/python/`
+- **输入目录**: `Common/include/`, `QRAM/include/`
 - **输出目录**: `docs/api/`
 - **递归解析**: 启用（RECURSIVE = YES）
 - **提取所有代码**: 启用（EXTRACT_ALL = YES）

@@ -36,15 +36,17 @@ QRAM Simulator 是一个用于模拟**量子随机存取存储器（QRAM）**和
 ## 2. 核心模块
 
 ```
-QRAM-Simulator/
+QRAM-Simulator/          （纯 C++ 基座仓）
 ├── Common/           # 共享基础设施
-├── SparQ/            # 稀疏态模拟器核心
-├── QRAM/             # QRAM 电路实现
-├── SparQ_Algorithm/  # 高层量子算法
-├── PySparQ/          # Python 绑定
-├── Experiments/      # 实验代码
-└── ThirdParty/       # 第三方依赖（Eigen）
+├── QRAM/             # QRAM 电路实现（Qutrit/Qubit）
+├── Experiments/      # QRAM 论文实验
+├── test/             # C++ 测试（Common/QRAM 归属部分）
+└── ThirdParty/       # 第三方依赖（Eigen、fmt 等）
 ```
+
+> SparQ/（稀疏态模拟器核心）、SparQ_Algorithm/（高层算法）、PySparQ/（Python
+> 绑定）与算法类实验已迁至 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)，
+> 下文相关章节保留为架构参考。
 
 ### 2.1 Common/ - 共享基础设施
 
@@ -137,7 +139,7 @@ QRAM/
   - GPU 内存镜像：`memory_dev`（`thrust::device_vector`）
   - 与 SparQ CUDA 算子无缝集成
 
-### 2.4 SparQ_Algorithm/ - 高层算法
+### 2.4 SparQ_Algorithm/ - 高层算法（已迁至 SparQSim 仓库）
 
 **职责**：基于 SparQ 和 QRAM 实现高级量子算法
 
@@ -157,7 +159,7 @@ QRAM/
 - 统一的 `run()` 接口
 - 支持算法级别的噪声注入
 
-### 2.5 PySparQ/ - Python 绑定
+### 2.5 PySparQ/ - Python 绑定（已迁至 SparQSim 仓库）
 
 **职责**：提供 Python API，使 Python 用户能够使用所有 C++ 功能
 
@@ -420,6 +422,9 @@ Experiments/
 ---
 
 ## 5. 扩展性
+
+> 添加量子门、算法与 Python 绑定的开发流程现位于 SparQSim 仓库
+> （SparQ/SparQ_Algorithm/PySparQ 均已迁出本仓库），以下保留为参考。
 
 ### 5.1 添加新量子门
 

@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QRAM-Simulator (repo name kept; PyPI package `qram-simulator`) is the C++ core of a
-sparse-state quantum circuit simulator with
-native QRAM support and a "Register Level Programming" paradigm. The full-featured
-Python framework (pysparq) lives in the separate SparQSim repository, which consumes
-this repository as a git submodule; this repo ships only a thin `qram_simulator`
-binding under `bindings/python/`.
+QRAM-Simulator (repo name kept) is the **pure C++ base repository** of the QRAM
+circuit simulator: the Qutrit/Qubit QRAM circuit cores (`QRAM/`), shared
+infrastructure (`Common/`) and the QRAM paper experiments (`Experiments/`).
+The SparQ framework — sparse-state simulator (`SparQ/`), algorithm library
+(`SparQ_Algorithm/`), all Python bindings (pysparq and qram_simulator) and the
+quantum-algorithm experiments — lives in the separate **SparQSim** repository,
+which consumes this repository as a git submodule. Dependency direction:
+**SparQSim → QRAM-Simulator** (this repo must never reference SparQSim code).
 
 ## Build Commands
 
@@ -22,19 +24,12 @@ make -j$(nproc)
 # Run tests
 cd build && ctest --output-on-failure
 
-# Run specific CPU test binary
-./build/bin/SparQ_Example
+# Run specific test binary
+./build/bin/CorrectnessTest
 
 # Consumer mode (what SparQSim's build does)
 cmake .. -DCMAKE_BUILD_TYPE=Release \
-    -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF -DBUILD_EXAMPLES=OFF
-
-# Thin Python bindings (requires pip-installed pybind11 in the environment)
-pip install pybind11
-cmake .. -DQRAM_BUILD_PYTHON_BINDINGS=ON -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF
-
-# qram_simulator wheel from this repo
-pip install .
+    -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF
 
 # Format/lint (pre-commit)
 pre-commit run --all-files
@@ -42,48 +37,37 @@ pre-commit run --all-files
 
 ## Architecture
 
-### Core Paradigm: Register Level Programming
-
-Instead of composing circuits from individual gates, SparQ operates directly on named registers using `uint64_t` storage. High-level arithmetic operations (Add, Mult, Shift) are applied to registers directly and automatically decomposed into gates internally. Development flows top-down: write high-level algorithm modules first, then refine with register operations.
-
 ### Key C++ Components
 
-- **`SparQ/include/sparse_state_simulator.h`** — Core state representation using `map<QIndex, Complex>` (only non-zero amplitudes stored); umbrella header that pulls in all operator headers
-- **`SparQ/include/system_operations.h`** — Register management (creation, lifecycle, storage types: UnsignedInteger, SignedInteger, Boolean)
-- **`SparQ/include/quantum_arithmetic.h`** — Register-level arithmetic (Add_UInt_UInt, Mult_UInt_ConstUInt, Shift, etc.)
-- **`SparQ/include/basic_gates.h`** — Single-qubit gates (`X_Bool` … `U3_Bool`, plus the parameterized carriers `Phase_Bool` / `Rot_Bool`); operator naming follows `docs/naming_conventions.md`
-- **`SparQ/include/qft.h`** — Optimized QFT implementation
-- **`SparQ/include/qram.h`** — QRAM load operations
-- **`SparQ/include/condrot.h`** — Conditional rotations
-- **`SparQ/include/hadamard.h`** — Hadamard on integer registers
 - **`QRAM/include/`** — Two QRAM circuit implementations:
-  - `QRAMCircuit_qutrit` — More efficient, tree-based
-  - `QRAMCircuit_qubit` — Hardware-compatible
-- **`SparQ_Algorithm/`** — High-level algorithms (state preparation, block encoding, Hamiltonian simulation, QDA)
-- **`Common/`** — Shared math, matrix, logging, error handling infrastructure
+  - `qram_circuit_qutrit.h` — More efficient, tree-based
+  - `qram_circuit_qubit.h` — Hardware-compatible (implementations live in `QRAM/src/*.cpp`)
+  - `time_step.h` — QRAM tree time-step bookkeeping
+- **`Common/`** — Shared math, matrix, logging, error handling, random engine,
+  `state_manipulator.h` (full-amplitude reference QRAM application)
+- **`ThirdParty/`** — vendored Eigen, fmt, googletest, argparse
 
 ### Include Graph (do not break)
 
 Header search paths are wired by the single global `include_directories()` at the
 root CMakeLists; all includes are flat filenames. Known hard edges:
 
-- `SparQ` **includes** `QRAM` headers (`basic_components.h` → `qram_circuit_qutrit.h`,
-  `qram.h` uses `qram_qutrit::QRAMCircuit` extensively) — SparQ is not separable from QRAM
-- `Common` ↔ `QRAM` is a circular include pair (`state_manipulator.h` ↔ `time_step.h`)
-- The umbrella `SparQ` target is defined in `SparQ_Algorithm/src/CMakeLists.txt`, not in `SparQ/`
+- `Common` ↔ `QRAM` is a circular include pair (`state_manipulator.h` ↔ `time_step.h`) —
+  both stay in this repository
+- `SparQ` headers (now in SparQSim) include `QRAM`/`Common` headers one-way;
+  the reverse must never happen
 
-### Thin Python Bindings
+### CMake Targets
 
-- **`bindings/python/`** — deliberately minimal pybind11 surface (`System`, `SparseState`,
-  basic gates/arithmetic, QFT, measurement, QRAM load, StatePrint). No `conditioned_by_*`
-  control surface. The full binding lives in SparQSim's `PySparQ/core.cpp`.
-- When the C++ API changes, both binding surfaces may need updates — cross-reference
-  the change in both CHANGELOGs.
+- `SparQ_QRAMSimulator` (QRAM/src), `SparQ_Common` (Common/src) — the two exported
+  libraries; both carry the flat include layout via `BUILD_INTERFACE`/`INSTALL_INTERFACE`
+- The umbrella `SparQ` target is defined in the **SparQSim** repository
+  (links the two targets above plus its local `SparQ_Simulator`/`SparQ_Algorithm`)
+- Options: `QRAM_BUILD_TESTS` (test/), `QRAM_BUILD_EXPERIMENTS` (Experiments/)
 
 ## Code Style
 
 - **C++**: LLVM-based clang-format with 4-space indent, 120 column limit, attach braces. Run `clang-format -i` via pre-commit.
-- **Python**: black (line-length=100), isort (profile=black), flake8
 - **CMake**: cmake-format + cmake-lint
 - ThirdParty code is excluded from all formatting/linting rules
 
@@ -91,16 +75,16 @@ root CMakeLists; all includes are flat filenames. Known hard edges:
 
 This repository is supported by two papers with distinct contributions:
 
-- **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, Register Level Programming paradigm, sparse state optimization, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`, `Experiments/ErrorFiltration/`
-- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim). Code: `SparQ/`, `SparQ_Algorithm/`, `Experiments/QFT/`, `Experiments/Grover/`, `Experiments/QDA/`, `Experiments/QCNN/`
+- **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`
+- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library. Code: `SparQ/`, `SparQ_Algorithm/` and the algorithm experiments — all in the SparQSim repository
 
 ## Documentation
 
-- **C++ API docs**: Doxygen → `docs/api/html/`, deployed at `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (workflow `.github/workflows/docs.yml`)
-- Python/Sphinx documentation moved to the SparQSim repository
+- **C++ API docs**: Doxygen → `docs/api/html/`, deployed at `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (workflow `.github/workflows/docs.yml`), input = `Common/include` + `QRAM/include`
+- Python/Sphinx documentation lives in the SparQSim repository
 
 The Gitea repository runs CPU C++ tests and a consumer-mode configure check through
-`.gitea/workflows/ci.yml`.
+`.gitea/workflows/ci.yml` (consumer-mode builds the `SparQ_QRAMSimulator` target).
 
 ## Git Workflow
 
@@ -128,20 +112,19 @@ which resolves correctly on both Gitea and GitHub — do not rewrite it to an ab
 The CI workflows include:
 - **cmake-multi-platform.yml** (GitHub): Build + ctest on Ubuntu (GCC C++17/C++20), Windows (MSVC)
 - **docs.yml** (GitHub): Doxygen build
-- **pypi-publish.yml** (GitHub): cibuildwheel cp310–313 × (manylinux/win) + sdist → PyPI `qram-simulator` on `v*` tags
 - **ci.yml** (Gitea): CPU C++ tests + consumer-mode configure check
 
 ## Releasing
 
 Tag `vX.Y.Z` (history already contains v0.1.x from the monorepo era — the new
-independent series starts at **v0.2.0**). Version for the Python package comes
-from setuptools-scm over this repo's tags. After a core release, bump the
+independent series starts at **v0.2.0**). This repo is source-only: no PyPI
+package is published from here (`pysparq` / `qram-simulator` wheels are built
+in the SparQSim repository). After a core release, bump the
 submodule pin in SparQSim if pysparq needs the changes.
 
 ## Dependencies
 
-Vendored in `ThirdParty/`: Eigen 3.4.0, fmt, googletest (v1.14.0), argparse.
-pybind11 is **not** vendored — it comes from the Python build environment
-(`pip install pybind11`; pyproject build-system.requires covers wheel builds).
+Vendored in `ThirdParty/`: Eigen 3.4.0, fmt, googletest (v1.14.0, consumed by
+SparQSim's test suite via the submodule), argparse.
 External requirements: OpenMP (required), TBB (optional parallelization).
 CUDA is currently force-disabled pending the CondRot primitive refactor.

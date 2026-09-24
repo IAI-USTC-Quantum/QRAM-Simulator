@@ -1,4 +1,5 @@
 
+#include "qram_circuit_qutrit.h"
 #include "qram_circuit_qubit.h"
 
 template<typename QRAM_type = qram_qutrit::QRAMCircuit>
@@ -69,101 +70,6 @@ auto QRAM_compare_test()
 	QRAM_compare_test(addr, data, seed, noise, trials, input_sz);
 }
 
-
-auto QRAMQutrit_FidelityTestImpl_1shot(size_t addr_sz, size_t data_sz, QRAMInputGenerator& gen,
-	const noise_t& noise, size_t input_size, std::string version, size_t addr, size_t data)
-{
-	std::vector<System> state;
-	gen.generate_input(state);
-
-	/****** QRAM Initialize ******/
-	qram_qutrit::QRAMCircuit qram = qram_qutrit::QRAMCircuit(addr_sz, data_sz);
-	qram.set_memory_random();
-	qram.set_noise_models(noise);
-
-	QRAMLoad::version = version;
-	QRAMLoad(&qram, addr, data)(state);
-	QRAMLoad::version = "noisefree";
-	QRAMLoad(&qram, addr, data)(state);
-	complex_t fidelity = 0;
-
-	for (auto& s : state)
-	{
-		auto p = std::make_pair(s.get(addr).value, s.get(data).value);
-		if (std::find(gen.unique_set.begin(), gen.unique_set.end(), p)
-			!= gen.unique_set.end())
-		{
-			fidelity += std::conj(s.amplitude) / std::sqrt(gen.input_sz);
-		}
-	}
-	return abs_sqr(fidelity);
-}
-
-
-auto QRAMQutrit_FidelityTestImpl(size_t addr_sz, size_t data_sz,
-	seed_t seed, const noise_t& noise, size_t shots, size_t input_size)
-{
-	size_t max_input_size;
-
-	if (addr_sz + data_sz >= 32)
-		max_input_size = pow2(32);
-	else
-		max_input_size = pow2(addr_sz + data_sz);
-
-	input_size = std::min(input_size, max_input_size);
-
-	auto addr = System::add_register("addr", UnsignedInteger, addr_sz);
-	auto data = System::add_register("data", UnsignedInteger, data_sz);
-
-	QRAMInputGenerator gen(addr_sz, data_sz, input_size, addr, data);
-
-	double sum_fidelity_normal = 0;
-	double sum_fidelity_full = 0;
-
-	for (size_t i = 0; i < shots; ++i)
-	{
-		random_engine::get_instance().set_seed(seed + i);
-		auto fidelity_normal = QRAMQutrit_FidelityTestImpl_1shot(addr_sz, data_sz, gen, noise, input_size, "normal", addr, data);
-
-		random_engine::get_instance().set_seed(seed + i);
-		auto fidelity_full = QRAMQutrit_FidelityTestImpl_1shot(addr_sz, data_sz, gen, noise, input_size, "full", addr, data);
-
-		fmt::print("Fidelity normal/full = {}, {}\n", fidelity_normal, fidelity_full); 
-		if (std::isnan(fidelity_normal) || std::isnan(fidelity_full))
-		{
-			TEST_FAIL("Fidelity is NaN");
-		}	
-		if (std::abs(fidelity_normal - fidelity_full) > 1e-6)
-		{
-			TEST_FAIL("Fidelity is not equal for normal and full versions");
-		}
-		sum_fidelity_normal += fidelity_normal;
-		sum_fidelity_full += fidelity_full;
-	}
-
-	if (std::abs(sum_fidelity_normal - sum_fidelity_full) > 1e-6)
-	{
-		TEST_FAIL("Fidelity is not equal for normal and full versions");
-	}
-}
-
-auto QRAMQutrit_FidelityTest()
-{
-	size_t addr_sz = 5;
-	size_t data_sz = 3;
-	size_t shots = 100;
-	size_t input_size = 100;
-	seed_t seed = 1234;
-
-	noise_t noise = {
-		{ OperationType::Depolarizing, 1e-3},
-		{ OperationType::Damping, 1e-4 }
-	};
-
-	QRAMQutrit_FidelityTestImpl(addr_sz, data_sz, seed, noise, shots, input_size);
-}
-
-
 /* Qubit architecture, full (no-pruning) simulation: ground truth checks */
 auto QRAMQubit_full_impl_1shot(size_t addr_sz, size_t data_sz,
 	const noise_t& noise, seed_t seed, size_t input_sz)
@@ -212,4 +118,3 @@ auto QRAMQubit_FullCorrectnessTest()
 		}
 	}
 }
-
