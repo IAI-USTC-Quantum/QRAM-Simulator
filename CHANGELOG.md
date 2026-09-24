@@ -10,9 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **仓库拆分**:本仓库（QRAM-Simulator monorepo）拆分为两个独立仓库,
-  本仓库名保留 QRAM-Simulator,转为纯 C++ 核心仓库独立发版
-  (PyPI 包 `qram-simulator`,import 名 `qram_simulator`);
+- **第二轮分仓:SparQ 框架整体迁出,本仓库收敛为纯 C++ QRAM 基座**。
+  `SparQ/`、`SparQ_Algorithm/`、`bindings/python/`（薄绑定）、`examples/`、
+  算法系实验（QDA/Grover/StatePreparation/QCNN/QFT/CKS/Shor/GHZ/
+  ErrorFiltration/GPUTime）与依赖 SparQ 算子的 QRAMFidelity(v1)/QRAM_Qubit
+  全部迁至 SparQSim 仓库;CommonTest 按归属拆分（算法块随完整版留在
+  SparQSim,本仓库保留 Common 与纯 QRAM 部分）。依赖方向固化为
+  **SparQSim → QRAM-Simulator**;本仓库不再包含任何 SparQ 代码与 Python 组件,
+  `qram-simulator` 包改由 SparQSim 仓库构建发布
+- 伞形 `SparQ` CMake 目标随 SparQ_Algorithm 迁出（现定义于 SparQSim 根
+  CMakeLists）;本仓库导出目标收敛为 `SparQ_Common` + `SparQ_QRAMSimulator`
+  （平铺头文件 BUILD_INTERFACE 随目标暴露,供 SparQSim 组合）,
+  `SparQ_Common` 补 PUBLIC 链接 fmt
+- 构建开关收敛为 `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS`
+  （`QRAM_BUILD_PYTHON_BINDINGS` 与 `BUILD_EXAMPLES` 移除）;
+  consumer-mode CI 改 `--target SparQ_QRAMSimulator`
+- **第一轮拆分**:本仓库（QRAM-Simulator monorepo）拆分为两个独立仓库,
+  本仓库名保留 QRAM-Simulator,转为纯 C++ 核心仓库独立发版;
   PySparQ/pysparq 全功能 Python 框架迁移至 **SparQSim** 仓库,以 git
   submodule(相对 URL `../QRAM-Simulator.git`)引用并编译本仓库核心。
   本条目之前的 PySparQ 相关历史条目见 SparQSim 仓库 CHANGELOG 及本文件
