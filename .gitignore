@@ -42,6 +42,7 @@ test/result/*.py
 
 # python
 __pycache__/
+*.pyd
 pyqsparse.egg-info/
 /wheelhouse/
 
