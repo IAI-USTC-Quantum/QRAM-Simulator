@@ -8,6 +8,7 @@ on:
       - '**.md'
       - 'LICENSE'
       - 'docs/**'
+      - 'Doxyfile'
       - '.pre-commit-config.yaml'
   pull_request:
     branches: [ "main", "develop" ]
@@ -15,6 +16,7 @@ on:
       - '**.md'
       - 'LICENSE'
       - 'docs/**'
+      - 'Doxyfile'
       - '.pre-commit-config.yaml'
 
 concurrency:
@@ -30,31 +32,13 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: 'true'
-
-    - id: setup-python
-      name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
 
     - name: Install Documentation Dependencies
       run: |
-        "${{ env.pythonLocation }}/bin/python" -m pip install -r docs/sphinx/requirements.txt
-        sudo apt-get update && sudo apt-get install -y doxygen graphviz pandoc libgomp1 cmake ninja-build g++ python3-dev
-
-    - name: Install pysparq for notebook execution
-      run: |
-        "${{ env.pythonLocation }}/bin/python" -m pip install --no-cache-dir .
+        sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
     - name: Generate Doxygen Documentation
       run: doxygen Doxyfile
-
-    - name: Build Sphinx Documentation
-      run: |
-        cd docs/sphinx
-        make html
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4
@@ -62,7 +46,6 @@ jobs:
         name: documentation
         path: |
           docs/api/html/
-          docs/sphinx/build/html/
         retention-days: 30
 
     - name: Prepare Pages directory
@@ -72,10 +55,6 @@ jobs:
 
         # Landing page
         cp docs/index.html pages-deploy/index.html
-
-        # Sphinx docs (Python API)
-        mkdir -p pages-deploy/python
-        cp -r docs/sphinx/build/html/* pages-deploy/python/
 
         # Doxygen docs (C++ API)
         mkdir -p pages-deploy/api

@@ -9,7 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **仓库拆分**:本仓库（QRAM-Simulator monorepo）拆分为两个独立仓库,
+  本仓库成为纯 C++ 核心 `qram-simulator`,独立发版
+  (PyPI 包 `qram-simulator`,import 名 `qram_simulator`);
+  PySparQ/pysparq 全功能 Python 框架迁移至 **SparQSim** 仓库,以 git
+  submodule(相对 URL `../qram-simulator.git`)引用并编译本仓库核心。
+  本条目之前的 PySparQ 相关历史条目见 SparQSim 仓库 CHANGELOG 及本文件
+  git 历史(路径已随拆分移除,`git log --follow` 可追溯)
+- 根 CMakeLists 新增 `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS` /
+  `QRAM_BUILD_PYTHON_BINDINGS` 开关,供 SparQSim 以 add_subdirectory
+  方式消费(测试/实验默认 ON,绑定默认 OFF)
+
+### Removed
+- `PySparQ/`、旧 `pyproject.toml`、`.cibuildwheel-hooks/`、`docs/sphinx/`、
+  Python 示例与各 workflow 中的 Python 作业(全部迁往 SparQSim)
+
 ### Added
+- **qram_simulator 薄 Python 绑定**(`bindings/python/`):刻意最小化的
+  核心原语 API——System/SparseState 寄存器管理、Init/Hadamard/X、
+  Add 算术族、QFT、MeasureZ/Reset/Probability、PartialTrace、
+  QRAMCircuit_qutrit/QRAMLoad、StatePrint;含 pytest 冒烟测试
+- 根 `pyproject.toml`(qram-simulator 包):scikit-build-core + setuptools-scm,
+  wheel 构建经 cmake.define 关闭 tests/experiments,sdist 保持自包含
 - **宽度与截断约定**(`docs/operators.md` 新章,权威契约):LSB 对齐;读扩展由
   名字槽位承载(`_UInt_` 零扩展 / `_SInt_` 符号扩展 / `AnyInt` 按寄存器声明
   类型),release 构建同样成立;结果 `mod 2^out_width` XOR 写入,输出宽度可与

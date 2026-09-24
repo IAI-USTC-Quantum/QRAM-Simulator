@@ -50,8 +50,8 @@
 
 1. **克隆仓库**
    ```bash
-   git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
-   cd QRAM-Simulator
+   git clone git@git.chenzhaoyun.com:agony/qram-simulator.git
+   cd qram-simulator
    ```
 
 2. **创建构建目录**
@@ -84,12 +84,16 @@
 
 ### Python 绑定开发
 
-如需开发 Python 绑定（PySparQ）：
+本仓库自带薄绑定（`qram_simulator` 包）：
 
 ```bash
-cd PySparQ
-pip install -e .
+pip install pybind11 pytest   # pybind11 不在 ThirdParty，来自构建环境
+pip install .                 # 构建 qram_simulator wheel
+pytest bindings/python/test
 ```
+
+全功能 pysparq 框架的开发见 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)
+（其以 submodule 引用本仓库）。
 
 ## 编码规范
 
@@ -165,8 +169,8 @@ QState qramLoad(const QState& address, const QState& data);
 ### 2. 创建功能分支
 
 ```bash
-git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
-cd QRAM-Simulator
+git clone git@git.chenzhaoyun.com:agony/qram-simulator.git
+cd qram-simulator
 git checkout -b feature/your-feature-name
 ```
 

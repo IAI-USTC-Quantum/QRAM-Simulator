@@ -27,7 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -42,6 +41,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
+      # 构建 qram_simulator 薄绑定（pyproject 的 cmake.define 已关闭
+      # tests/experiments/examples，无需 googletest）
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22
         env:
@@ -60,7 +61,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -84,7 +84,7 @@ jobs:
     if: github.repository_owner == 'IAI-USTC-Quantum' && (github.event_name == 'push' || github.event_name == 'release')
     environment:
       name: pypi
-      url: https://pypi.org/project/pysparq/
+      url: https://pypi.org/project/qram-simulator/
 
     steps:
       - uses: actions/download-artifact@v4

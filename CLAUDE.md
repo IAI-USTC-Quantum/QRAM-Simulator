@@ -4,20 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QRAM-Simulator is a sparse-state quantum circuit simulator with native QRAM support and a "Register Level Programming" paradigm. It consists of two components:
-- **QRAM-Simulator** (C++): High-performance sparse-state simulator core
-- **PySparQ** (Python bindings via pybind11): High-level API for algorithm development
+qram-simulator is the C++ core of a sparse-state quantum circuit simulator with
+native QRAM support and a "Register Level Programming" paradigm. The full-featured
+Python framework (pysparq) lives in the separate SparQSim repository, which consumes
+this repository as a git submodule; this repo ships only a thin `qram_simulator`
+binding under `bindings/python/`.
 
 ## Build Commands
 
 ```bash
-# CPU build
+# CPU build (tests + experiments on by default)
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
-
-# GPU build (requires CUDA toolkit)
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_CUDA=ON
 make -j$(nproc)
 
 # Run tests
@@ -26,13 +24,16 @@ cd build && ctest --output-on-failure
 # Run specific CPU test binary
 ./build/bin/SparQ_Example
 
-# Python package — use uv venv ONLY (do not use pip or conda)
-uv venv .venv && source .venv/bin/activate
-uv pip install -e PySparQ/
+# Consumer mode (what SparQSim's build does)
+cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF -DBUILD_EXAMPLES=OFF
 
-# Run Python tests (from project root)
-source .venv/bin/activate
-pytest PySparQ/test/ -v
+# Thin Python bindings (requires pip-installed pybind11 in the environment)
+pip install pybind11
+cmake .. -DQRAM_BUILD_PYTHON_BINDINGS=ON -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF
+
+# qram_simulator wheel from this repo
+pip install .
 
 # Format/lint (pre-commit)
 pre-commit run --all-files
@@ -46,7 +47,7 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 
 ### Key C++ Components
 
-- **`SparQ/include/sparse_state_simulator.h`** — Core state representation using `map<QIndex, Complex>` (only non-zero amplitudes stored)
+- **`SparQ/include/sparse_state_simulator.h`** — Core state representation using `map<QIndex, Complex>` (only non-zero amplitudes stored); umbrella header that pulls in all operator headers
 - **`SparQ/include/system_operations.h`** — Register management (creation, lifecycle, storage types: UnsignedInteger, SignedInteger, Boolean)
 - **`SparQ/include/quantum_arithmetic.h`** — Register-level arithmetic (Add_UInt_UInt, Mult_UInt_ConstUInt, Shift, etc.)
 - **`SparQ/include/basic_gates.h`** — Single-qubit gates (`X_Bool` … `U3_Bool`, plus the parameterized carriers `Phase_Bool` / `Rot_Bool`); operator naming follows `docs/naming_conventions.md`
@@ -60,22 +61,23 @@ Instead of composing circuits from individual gates, SparQ operates directly on 
 - **`SparQ_Algorithm/`** — High-level algorithms (state preparation, block encoding, Hamiltonian simulation, QDA)
 - **`Common/`** — Shared math, matrix, logging, error handling infrastructure
 
-### Python Bindings
+### Include Graph (do not break)
 
-- **`PySparQ/pysparq/`** — pybind11 bindings exposing the full C++ API
-- All register-level operations are exposed: `Add_UInt_UInt`, `Add_ConstUInt`, `Mult_UInt_ConstUInt`, `Hadamard_Int`, `QRAMLoad`, etc.
+Header search paths are wired by the single global `include_directories()` at the
+root CMakeLists; all includes are flat filenames. Known hard edges:
 
-## Sphinx Documentation
+- `SparQ` **includes** `QRAM` headers (`basic_components.h` → `qram_circuit_qutrit.h`,
+  `qram.h` uses `qram_qutrit::QRAMCircuit` extensively) — SparQ is not separable from QRAM
+- `Common` ↔ `QRAM` is a circular include pair (`state_manipulator.h` ↔ `time_step.h`)
+- The umbrella `SparQ` target is defined in `SparQ_Algorithm/src/CMakeLists.txt`, not in `SparQ/`
 
-The Sphinx docs use the **Furo** theme, which provides a sidebar table of contents automatically. When writing `.rst` documentation, if a `.. contents::` directive is used for an inline TOC, it **must** include the `:class:` attribute to suppress the Furo duplication warning:
+### Thin Python Bindings
 
-```rst
-.. contents:: 目录
-   :local:
-   :class: this-will-duplicate-information-and-it-is-still-useful-here
-```
-
-Without `:class: this-will-duplicate-information-and-it-is-still-useful-here`, Furo will emit a warning about duplicated TOC information. This applies to all `.rst` files under `docs/sphinx/source/`.
+- **`bindings/python/`** — deliberately minimal pybind11 surface (`System`, `SparseState`,
+  basic gates/arithmetic, QFT, measurement, QRAM load, StatePrint). No `conditioned_by_*`
+  control surface. The full binding lives in SparQSim's `PySparQ/core.cpp`.
+- When the C++ API changes, both binding surfaces may need updates — cross-reference
+  the change in both CHANGELOGs.
 
 ## Code Style
 
@@ -89,15 +91,14 @@ Without `:class: this-will-duplicate-information-and-it-is-still-useful-here`, F
 This repository is supported by two papers with distinct contributions:
 
 - **QRAM-Simulator** ([arXiv:2503.13832](https://arxiv.org/abs/2503.13832)): QRAM simulation, Register Level Programming paradigm, sparse state optimization, noise models, error filtration. Code: `QRAM/`, `Experiments/QRAM/`, `Experiments/ErrorFiltration/`
-- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim), PySparQ Python API, GPU acceleration. Code: `SparQ/`, `SparQ_Algorithm/`, `PySparQ/`
+- **SparQ** ([arXiv:2503.15118](https://arxiv.org/abs/2503.15118)): General-purpose sparse-state simulator, extended algorithm library (QFT, Grover, QDA, QCNN, Hamiltonian sim). Code: `SparQ/`, `SparQ_Algorithm/`, `Experiments/QFT/`, `Experiments/Grover/`, `Experiments/QDA/`, `Experiments/QCNN/`
 
 ## Documentation
 
-The upstream project documentation remains available on GitHub Pages:
-- **Landing page**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/` (source: `docs/index.html`)
-- **C++ API docs**: `https://iai-ustc-quantum.github.io/QRAM-Simulator/api/` (source: Doxygen → `docs/api/html/`)
+- **C++ API docs**: Doxygen → `docs/api/html/`, deployed at `https://iai-ustc-quantum.github.io/qram-simulator/api/` (workflow `.github/workflows/docs.yml`)
+- Python/Sphinx documentation moved to the SparQSim repository
 
-The Gitea repository runs CPU C++ and Python validation through
+The Gitea repository runs CPU C++ tests and a consumer-mode configure check through
 `.gitea/workflows/ci.yml`.
 
 ## Git Workflow
@@ -106,124 +107,40 @@ The Gitea repository runs CPU C++ and Python validation through
 the GitHub upstream remote.**
 
 Repository role:
-- `origin` → `git@git.chenzhaoyun.com:agony/QRAM-Simulator.git`
-- `upstream` → `git@github.com:IAI-USTC-Quantum/QRAM-Simulator.git`
+- `origin` → `git@git.chenzhaoyun.com:agony/qram-simulator.git` (Gitea, primary)
+- `upstream` → `git@github.com:IAI-USTC-Quantum/qram-simulator.git` (GitHub, releases)
+
+SparQSim consumes this repo via submodule with a **relative URL** (`../qram-simulator.git`),
+which resolves correctly on both Gitea and GitHub — do not rewrite it to an absolute URL.
 
 ### CI Verification Before Submitting to Upstream
 
 **CRITICAL: Always verify CI passes on fork before submitting PR to upstream.**
 
 1. Push changes to fork: `git push origin <branch-name>`
-2. Check CI status on fork: `gh run list --repo Agony5757/QRAM-Simulator`
-3. View CI details: `gh run view <run-id> --repo Agony5757/QRAM-Simulator`
+2. Check CI status on fork: `gh run list --repo Agony5757/qram-simulator`
+3. View CI details: `gh run view <run-id> --repo Agony5757/qram-simulator`
 4. Only after all CI checks pass, create PR to upstream
-
-### Typical Workflow
-
-```bash
-# Sync fork with upstream first
-gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
-git fetch origin
-git rebase origin/main
-
-# Create feature branch from origin (fork)
-git checkout -b feature/my-feature origin/main
-
-# Push to fork
-git push origin feature/my-feature
-
-# Check CI status on fork
-gh run list --repo Agony5757/QRAM-Simulator --limit 3
-
-# After CI passes, create PR to upstream
-gh pr create --repo IAI-USTC-Quantum/QRAM-Simulator \
-    --head Agony5757:feature/my-feature \
-    --title "feat: description" \
-    --body "Summary and test plan"
-```
-
-### Sync Fork with Upstream
-
-```bash
-gh repo sync Agony5757/QRAM-Simulator --source IAI-USTC-Quantum/QRAM-Simulator --branch main
-git fetch origin
-git rebase origin/main
-```
 
 ### CI Jobs
 
-The CI workflow includes:
-- **Build**: Ubuntu (GCC C++17/C++20), Windows (MSVC)
-- **Test**: C++ unit tests via ctest
-- **Python Tests**: Multiple Python versions (3.9, 3.11, 3.12) on Ubuntu and Windows
-- **Docs**: Doxygen + Sphinx documentation build
+The CI workflows include:
+- **cmake-multi-platform.yml** (GitHub): Build + ctest on Ubuntu (GCC C++17/C++20), Windows (MSVC)
+- **docs.yml** (GitHub): Doxygen build
+- **pypi-publish.yml** (GitHub): cibuildwheel cp310–313 × (manylinux/win) + sdist → PyPI `qram-simulator` on `v*` tags
+- **ci.yml** (Gitea): CPU C++ tests + consumer-mode configure check
 
-## Critical: CKS/QDA Python Porting Status
+## Releasing
 
-**CKS 和 QDA Python 实现的端到端 fidelity 测试状态：**
-
-### CKS (Chebyshev-Kothari-Somma Linear Solver)
-
-Python 实现在 `PySparQ/pysparq/algorithms/cks_solver.py` 中，包括：
-- `ChebyshevPolynomialCoefficient` ✓ (数学正确性测试通过)
-- `get_coef_positive_only` / `get_coef_common` ✓ (酉性验证通过)
-- `SparseMatrix` ✓
-- `TOperator` ✓ (结构正确)
-- `QuantumWalk` / `QuantumWalkNSteps` ✓ (结构正确)
-
-**未完成：端到端 fidelity 测试**
-
-- `test_cks_integration.py::TestQuantumWalkFidelity` 中的 `test_quantum_walk_chebyshev_fidelity` 已用真实量子行走执行替代 TODO 注释，对应 C++ `CorrectnessTest_Common.inl` 中的 `Chebyshev_test()`（fidelity >= 0.999）
-- `test_lcu_linear_solver_fidelity` 同样，对应 `linear_solver_theory_compare_test()`（fidelity >= 0.9999）
-
-**已知限制**：`QuantumBinarySearch._find_column_position` 的逆操作在某些情况下未完全 uncompute，可能导致 `RemoveRegister` 调用时出现 `RuntimeError`。
-
-### QDA (Quantum Discrete Adiabatic Linear Solver)
-
-Python 实现在 `PySparQ/pysparq/algorithms/qda_solver.py` 中，包括：
-- `compute_fs` ✓ (数学正确性测试通过)
-- `compute_rotation_matrix` ✓ (酉性验证通过)
-- `chebyshev_T` ✓
-- `dolph_chebyshev` / `compute_fourier_coeffs` ✓
-- `WalkS` / `BlockEncodingHs` / `LCU` / `Filtering` ✓
-- `BlockEncodingHs.dag()` ✓ (已实现，21 步逆操作)
-- `qda_solve()` ✓ (已重写，正确的 `n_bits` 和步数公式)
-
-**端到端 fidelity 测试已激活**：`test_walks_fidelity_tridiagonal` 和 `test_walks_fidelity_via_qram` 已启用，与 C++ `CorrectnessTest_QDA_CompareList.inl` 参考值对比（要求 diff < 1e-5）
-
-### 下一步行动
-
-1. **完善 QDA 结果提取**：`qda_solve` 当前返回 `np.linalg.solve` 的经典结果，真正的量子振幅提取逻辑是 TODO
-2. **修复 CKS uncompute 边界情况**：解决 `QuantumBinarySearch._find_column_position` 的逆操作清理问题
-3. **完善 QDA `is_positive_definite=True` 分支测试**：当前测试聚焦于 `is_positive_definite=False` (Neg) 情况
-
-## Python Test Structure
-
-```
-PySparQ/test/
-  conftest.py             fresh_system fixture (autouse), helpers
-  test_doc_examples.py     示例代码可执行性测试
-  test_dynamic_operator.py
-  algorithms/
-    conftest.py           tridiagonal_matrix, random_unitary, simple_linear_system fixtures
-    test_cks_integration.py    CKS 数学正确性 + 端到端 fidelity 测试
-    test_cks_solver.py         CKS 各组件单元测试
-    test_qda_integration.py    QDA 数学正确性 + 端到端 fidelity 测试
-    test_qda_solver.py         QDA 各组件单元测试
-    test_condition_mixin.py     条件操作符测试
-    test_grover.py             Grover 测试
-    test_shor.py               Shor 测试
-    test_state_preparation.py  态制备测试
-    test_block_encoding.py      块编码测试
-    test_qram_utils.py         QRAM 工具测试
-```
-
-### Python API Design
-
-- `pysparq/algorithms/*.py` 中的算法类（`TOperator`, `QuantumWalk` 等）继承自 `ControllableOperatorMixin`，提供 `.conditioned_by_*()` 方法链和 `.dag()` 逆操作
-- `pysparq/` 包有两套 API：旧版（可变状态 + `ps.System.clear()` 中间调用）标记为 deprecated
-- 量子态 `ps.SparseState` 是 pybind11 C++ 对象，**不支持 deepcopy/pickle**，原地变异是预期行为（与 C++ 实现一致）
+Tag `vX.Y.Z` (history already contains v0.1.x from the monorepo era — the new
+independent series starts at **v0.2.0**). Version for the Python package comes
+from setuptools-scm over this repo's tags. After a core release, bump the
+submodule pin in SparQSim if pysparq needs the changes.
 
 ## Dependencies
 
-All vendored in `ThirdParty/`: Eigen 3.4.0, fmt, pybind11, argparse. External requirements: OpenMP (required), CUDA 12+ (optional GPU), TBB (optional parallelization), Google Test (fetched via CMake FetchContent).
+Vendored in `ThirdParty/`: Eigen 3.4.0, fmt, googletest (v1.14.0), argparse.
+pybind11 is **not** vendored — it comes from the Python build environment
+(`pip install pybind11`; pyproject build-system.requires covers wheel builds).
+External requirements: OpenMP (required), TBB (optional parallelization).
+CUDA is currently force-disabled pending the CondRot primitive refactor.
