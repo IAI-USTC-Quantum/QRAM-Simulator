@@ -7,6 +7,9 @@
 输入：
     fidelity_scan.csv  —— fidelity 模式输出（fig 3）
     perf_scan.csv      —— perf 模式输出（fig 4）
+
+风格：PRA（APS）单栏 3.4 in / 双栏 7.0 in，正文字号 8 pt，出图后按原尺寸
+插入 LaTeX（\\columnwidth / \\textwidth），图中文字即为最终印刷字号。
 """
 
 import csv
@@ -19,6 +22,29 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+# APS/PRA 常规：无标题，(a)/(b) 角标在轴内；Helvetica 类无衬线小字号
+matplotlib.rcParams.update({
+    "font.size": 8,
+    "axes.labelsize": 8,
+    "xtick.labelsize": 7,
+    "ytick.labelsize": 7,
+    "legend.fontsize": 6.5,
+    "legend.title_fontsize": 6.5,
+    "lines.linewidth": 1.1,
+    "lines.markersize": 3.2,
+    "axes.linewidth": 0.7,
+    "xtick.major.width": 0.7,
+    "ytick.major.width": 0.7,
+    "xtick.minor.width": 0.5,
+    "ytick.minor.width": 0.5,
+    "grid.linewidth": 0.4,
+    "legend.borderpad": 0.3,
+    "legend.handlelength": 1.5,
+    "legend.handletextpad": 0.5,
+    "legend.columnspacing": 0.9,
+    "legend.labelspacing": 0.3,
+})
 
 COLORS = {0.0: "#7f7f7f", 1e-5: "#1f77b4", 1e-4: "#ff7f0e", 1e-3: "#d62728"}
 MARKERS = {0.0: "D", 1e-5: "o", 1e-4: "s", 1e-3: "^"}
@@ -37,6 +63,7 @@ def load_csv(path):
                     fid=float(row["fid"]),
                     time_ms=float(row["time_run_ms"]) + float(row["time_sample_ms"]),
                     states=int(row["states"]),
+                    branches=int(row.get("branches") or 0),
                 )
             )
     return rows
@@ -53,69 +80,45 @@ def aggregate_mean(rows, key_fields, value_field):
 
 
 def style_axis(ax):
-    ax.grid(True, color="#cccccc", linewidth=0.7, alpha=0.6)
+    ax.grid(True, color="#cccccc", linewidth=0.4, alpha=0.6)
     ax.set_axisbelow(True)
+    ax.tick_params(direction="in", top=True, right=True)
+
+
+def panel_tag(ax, tag, x=0.03, y=0.95):
+    ax.text(x, y, tag, transform=ax.transAxes, fontsize=8,
+            ha="left", va="top", fontweight="bold")
 
 
 def plot_fidelity(rows, out_dir):
     qubit = [r for r in rows if r["arch"] == "qubit" and r["version"] == "full"]
     fid = aggregate_mean(qubit, ["eps", "n"], "fid")
 
-    fig, (ax_a, ax_b) = plt.subplots(2, 1, figsize=(3.4, 4.9))
+    fig, ax = plt.subplots(figsize=(3.4, 2.5))
 
-    # ---- (a) qubit encoding, eps sweep ----
     for eps in (1e-5, 1e-4, 1e-3):
         ns = sorted(n for (e, n) in fid if e == eps)
-        ax_a.plot(ns, [fid[(eps, n)] for n in ns], "-o", color=COLORS[eps],
-                  markersize=5, label=r"$10^{-%d}$" % round(-math.log10(eps)))
-    ax_a.set_title(r"(a) qubit encoding, $\varepsilon=\gamma$ sweep")
-    ax_a.set_ylabel("Fidelity (qubit)")
-    ax_a.set_ylim(0.0, 1.02)
-    ax_a.legend(title=r"$\varepsilon=\gamma$", loc="center left")
-    ax_a.tick_params(labelbottom=False)
-    style_axis(ax_a)
+        ax.plot(ns, [fid[(eps, n)] for n in ns], "-o", color=COLORS[eps],
+                label=r"$10^{-%d}$" % round(-math.log10(eps)))
+    ax.set_xlabel("address size $n$")
+    ax.set_ylabel("Fidelity")
+    ax.set_ylim(0.0, 1.02)
+    ax.set_xlim(2.6, 10.4)
+    ax.legend(title=r"$\varepsilon=\gamma$", loc="lower left")
+    style_axis(ax)
 
-    # ---- (b) qubit vs qutrit at 1e-5 ----
-    qutrit = [r for r in rows if r["arch"] == "qutrit"]
-    fid_q = aggregate_mean(qutrit, ["n"], "fid")
-    ns_q = sorted(fid_q)
-    ns_b = sorted(n for (e, n) in fid if e == 1e-5)
-    ax_b.plot(ns_b, [fid[(1e-5, n)] for n in ns_b], "-o", color="#d62728",
-              markersize=5, label="qubit")
-    ax_b.plot(ns_q, [fid_q[n] for n in ns_q], "--s", color="#1f77b4",
-              markersize=5, label="qutrit")
-    ax_b.set_title(r"(b) qubit vs. qutrit at $\varepsilon=\gamma=10^{-5}$")
-    ax_b.set_xlabel("address size $n$")
-    ax_b.set_ylabel("Fidelity")
-    ax_b.set_ylim(0.0, 1.02)
-    ax_b.legend(loc="center left")
-    style_axis(ax_b)
-
-    # inset：1e-5 下两条线的放大图
-    lo = min(min(fid[(1e-5, n)] for n in ns_b), min(fid_q[n] for n in ns_q))
-    ylo = math.floor((lo - 0.002) * 1000) / 1000
-    inset = ax_b.inset_axes([0.52, 0.14, 0.44, 0.38])
-    inset.plot(ns_b, [fid[(1e-5, n)] for n in ns_b], "-o", color="#d62728",
-               markersize=3, linewidth=1)
-    inset.plot(ns_q, [fid_q[n] for n in ns_q], "--s", color="#1f77b4",
-               markersize=3, linewidth=1)
-    inset.set_ylim(ylo, 1.0005)
-    inset.tick_params(labelsize=7)
-    inset.grid(True, color="#cccccc", linewidth=0.5, alpha=0.6)
-    inset.text(0.06, 0.12, "zoom", transform=inset.transAxes, fontsize=7, style="italic")
-
-    fig.tight_layout()
+    fig.tight_layout(pad=0.3)
     fig.savefig(out_dir / "fig_fidelity.pdf")
-    fig.savefig(out_dir / "fig_fidelity.png", dpi=200)
+    fig.savefig(out_dir / "fig_fidelity.png", dpi=300)
     plt.close(fig)
 
 
 def plot_perf(rows, out_dir):
     per = aggregate_mean(rows, ["eps", "n", "version"], "time_ms")
-    states = aggregate_mean(rows, ["eps", "n", "version"], "states")
+    branches = aggregate_mean(rows, ["eps", "n", "version"], "branches")
 
     ns = sorted({n for (_, n, _) in per})
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(7.0, 2.9))
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(7.0, 2.55))
 
     for eps in (0.0, 1e-5, 1e-4, 1e-3):
         color = COLORS[eps]
@@ -123,29 +126,30 @@ def plot_perf(rows, out_dir):
         label = r"$10^{-%d}$" % round(-math.log10(eps)) if eps > 0 else "0"
         ls_full = "-." if eps == 0.0 else "-"
         for ax, data, ylab in ((ax_a, per, "time per query (ms)"),
-                               (ax_b, states, "evolved branch states")):
+                               (ax_b, branches, "explicitly simulated branches")):
             ax.plot(ns, [data[(eps, n, "full")] for n in ns], ls_full, marker=marker,
-                    color=color, markersize=5, label=label)
+                    color=color, label=label)
             ax.plot(ns, [data[(eps, n, "normal")] for n in ns], ":", marker=marker,
-                    color=color, markersize=5, markerfacecolor="none")
+                    color=color, markerfacecolor="none")
     ax_a.set_yscale("log")
-    ax_a.set_title("(a) runtime")
     ax_a.set_xlabel("address size $n$")
     ax_a.set_ylabel("time per query (ms)")
+    panel_tag(ax_a, "(a)")
     ax_b.set_yscale("log")
-    ax_b.set_title("(b) explicitly evolved branch states")
     ax_b.set_xlabel("address size $n$")
-    ax_b.set_ylabel("evolved branch states")
+    ax_b.set_ylabel("explicitly simulated branches")
+    panel_tag(ax_b, "(b)")
     for ax in (ax_a, ax_b):
+        ax.set_xticks(ns)
         style_axis(ax)
 
     handles, labels = ax_a.get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=4,
+    fig.legend(handles, labels, loc="lower center", ncol=5,
                title="solid: full   dotted: pruned;   $\\varepsilon=\\gamma$:",
-               bbox_to_anchor=(0.5, -0.02))
-    fig.tight_layout(rect=(0, 0.15, 0.98, 1))
+               bbox_to_anchor=(0.5, -0.01))
+    fig.tight_layout(rect=(0, 0.16, 1, 1), pad=0.3)
     fig.savefig(out_dir / "fig_perf.pdf")
-    fig.savefig(out_dir / "fig_perf.png", dpi=200)
+    fig.savefig(out_dir / "fig_perf.png", dpi=300)
     plt.close(fig)
 
 

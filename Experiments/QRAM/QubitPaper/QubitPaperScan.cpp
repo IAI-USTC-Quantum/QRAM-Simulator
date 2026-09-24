@@ -76,6 +76,15 @@ size_t count_explicit_states(const qram_qubit::QRAMCircuit& qram)
 	return count;
 }
 
+/* 实际被显式演化的分支数（bad + 参考 good）；full 模式下等于全部输入分支。 */
+size_t count_explicit_branches(const qram_qubit::QRAMCircuit& qram)
+{
+	size_t count = 0;
+	for (const auto* group : qram.valid_branch_group_view)
+		count += group->branches.size();
+	return count;
+}
+
 double now_ms_since(std::chrono::steady_clock::time_point t0)
 {
 	return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
@@ -87,6 +96,7 @@ struct QubitTrajectoryResult
 	double time_run_ms = 0;
 	double time_sample_ms = 0;
 	size_t states = 0;
+	size_t branches = 0;
 };
 
 QubitTrajectoryResult run_qubit_once(size_t addr_sz, const std::map<OperationType, double>& noise,
@@ -101,6 +111,7 @@ QubitTrajectoryResult run_qubit_once(size_t addr_sz, const std::map<OperationTyp
 	result.time_run_ms = now_ms_since(t0);
 
 	result.states = count_explicit_states(qram);
+	result.branches = count_explicit_branches(qram);
 
 	auto t1 = std::chrono::steady_clock::now();
 	result.fid = qram.sample_and_get_fidelity();
@@ -150,7 +161,7 @@ seed_t derive_run_seed(size_t trajectory)
 void run_fidelity(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "fidelity_scan.csv");
-	csv << "arch,eps,n,traj,runseed,version,fid,time_run_ms,time_sample_ms,states\n";
+	csv << "arch,eps,n,traj,runseed,version,fid,time_run_ms,time_sample_ms,states,branches\n";
 
 	constexpr size_t trials = 200;
 	const std::vector<double> eps_list = {1e-5, 1e-4, 1e-3};
@@ -165,7 +176,7 @@ void run_fidelity(const std::filesystem::path& outdir)
 					auto r = run_qubit_once(n, noise, k_base_seed, k_branches, run_seed, version);
 					csv << std::setprecision(12) << "qubit," << eps << ',' << n << ',' << traj << ','
 						<< run_seed << ',' << version << ',' << r.fid << ',' << r.time_run_ms << ','
-						<< r.time_sample_ms << ',' << r.states << '\n';
+						<< r.time_sample_ms << ',' << r.states << ',' << r.branches << '\n';
 				}
 				std::cout << "qubit eps=" << eps << " n=" << n << " traj " << traj + 1 << "/" << trials << "\r";
 				std::cout.flush();
@@ -194,7 +205,7 @@ void run_fidelity(const std::filesystem::path& outdir)
 void run_perf(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "perf_scan.csv");
-	csv << "arch,eps,n,traj,runseed,version,fid,time_run_ms,time_sample_ms,states\n";
+	csv << "arch,eps,n,traj,runseed,version,fid,time_run_ms,time_sample_ms,states,branches\n";
 
 	constexpr size_t trials = 10;
 	const std::vector<double> eps_list = {0.0, 1e-5, 1e-4, 1e-3};
@@ -209,7 +220,7 @@ void run_perf(const std::filesystem::path& outdir)
 					auto r = run_qubit_once(n, noise, k_base_seed, k_branches, run_seed, version);
 					csv << std::setprecision(12) << "qubit," << eps << ',' << n << ',' << traj << ','
 						<< run_seed << ',' << version << ',' << r.fid << ',' << r.time_run_ms << ','
-						<< r.time_sample_ms << ',' << r.states << '\n';
+						<< r.time_sample_ms << ',' << r.states << ',' << r.branches << '\n';
 				}
 				std::cout << "eps=" << eps << " n=" << n << " traj " << traj + 1 << "/" << trials << "\r";
 				std::cout.flush();

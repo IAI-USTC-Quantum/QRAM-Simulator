@@ -1,7 +1,7 @@
 project(Experiment_QRAM_QubitPaper)
 
-file(GLOB_RECURSE src ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-
-add_executable(${PROJECT_NAME} ${src})
-
+add_executable(${PROJECT_NAME} QubitPaperScan.cpp)
 target_link_libraries(${PROJECT_NAME} SparQ)
+
+add_executable(${PROJECT_NAME}Verify QubitPaperVerify.cpp)
+target_link_libraries(${PROJECT_NAME}Verify SparQ)
