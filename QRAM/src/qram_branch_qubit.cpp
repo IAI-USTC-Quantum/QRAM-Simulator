@@ -254,6 +254,40 @@ namespace qram_simulator
 			}
 		}
 
+		Branch::Branch(size_t addr, size_t bus_sz, bus_t bus) {
+			bus_size = bus_sz;
+			address = addr;
+			bus_input = bus;
+			if (bus_sz >= 30)
+				throw_invalid_input();
+			system_states.resize(pow2(bus_sz + 1));
+			reset();
+		}
+
+		Branch::Branch(size_t branchid, size_t bus_sz)
+		{
+			bus_size = bus_sz;
+			address = branchid >> bus_sz;
+			bus_input = branchid - (address << bus_sz);
+			if (bus_sz >= 30)
+				throw_invalid_input();
+			system_states.resize(pow2(bus_sz + 1));
+			reset();
+		}
+
+		void Branch::set_good(Branch* first_good_ptr)
+		{
+			good = true;
+			good_ref = first_good_ptr;
+		}
+
+		std::optional<Branch::element_type> Branch::get_good_branch_system() const
+		{
+			if (system_states.size() == 0) return std::nullopt;
+
+			return system_states.begin()->state.nz_elements;
+		}
+
 		double Branch::get_prob() const
 		{
 			double ret = 0;
@@ -280,7 +314,6 @@ namespace qram_simulator
 
 		std::string Branch::to_string() const
 		{
-			// return fmt::format("|{}> |{:d}>\n{}", complex2str(amplitude), address, bus, state.nz_elements);
 			std::vector<char> buf;
 			fmt::format_to(std::back_inserter(buf), "|{}>", address);
 			if (system_states_sz > 1) {
@@ -399,12 +432,9 @@ namespace qram_simulator
 					return ignorable(std::abs(s.amplitude));
 				};
 
-				// sort(system_states.begin(), system_states.end(), std::less<SystemState>());
-
 				std::sort(iterbeg(), iterend());
 				auto iter = unique_and_merge(iterbeg(), iterend(), std::equal_to<SystemState>(), fn);
 				iter = std::remove_if(iterbeg(), iter, remove);
-				// system_states.resize(distance(system_states.begin(), iter));
 				system_states_sz = std::distance(iterbeg(), iter);
 			}
 		}
@@ -460,6 +490,123 @@ namespace qram_simulator
 		void Branch::remove_all_state()
 		{
 			system_states_sz = 0;
+		}
+
+		void BranchGroup::reset()
+		{
+			branches = branches_input;
+			is_good = false;
+			predicted = false;
+			relative_multiplier = 1.0;
+		}
+
+		void BranchGroup::set_good(BranchGroup* good_ref_)
+		{
+			is_good = true;
+			good_ref = good_ref_;
+		}
+
+		void BranchGroup::set_empty_state()
+		{
+			branches.clear();
+		}
+
+		complex_t BranchGroup::get_fidelity(const memory_t& memory) const
+		{
+			if (is_good && !predicted) return good_ref->get_fidelity(memory);
+
+			complex_t ret = 0;
+			for (size_t i = 0; i < branches.size(); ++i)
+			{
+				ret += branch_probs[i] * branches[i].get_fidelity(memory);
+			}
+			return ret;
+		}
+
+		Branch::damp_prob_type BranchGroup::get_prob_damp(size_t qubit_id) const
+		{
+			Branch::damp_prob_type ret;
+			ret.fill(0);
+			for (size_t bid = 0; bid < branches.size(); ++bid)
+			{
+				auto&& damp_prob = branches[bid].get_prob_damp(qubit_id);
+				for (size_t i = 0; i < ret.size(); ++i)
+				{
+					ret[i] += damp_prob[i] * branch_probs[bid];
+				}
+			}
+			return ret;
+		}
+
+		double BranchGroup::get_prob() const
+		{
+			/* before materialization a good group only carries its input
+			weight; afterwards the generic state sum is exact */
+			if (is_good && !predicted)
+			{
+				double ret = 0;
+				for (size_t i = 0; i < branches.size(); ++i)
+				{
+					ret += branch_probs[i];
+				}
+				return ret;
+			}
+			else
+			{
+				double ret = 0;
+				for (size_t i = 0; i < branches.size(); ++i)
+				{
+					ret += branches[i].get_prob() * branch_probs[i];
+				}
+				return ret;
+			}
+		}
+
+		bool BranchGroup::sample_output_no_damping(Branch::element_type& output, double& r)
+		{
+			for (size_t i = 0; i < branches.size(); ++i)
+			{
+				if (branch_probs[i] <= 0)
+					continue;
+				for (auto iter = branches[i].iterbeg();
+					iter != branches[i].iterend(); ++iter)
+				{
+					double thisprob = branch_probs[i] * abs_sqr(iter->amplitude);
+					if (r < thisprob) {
+						output = iter->state.nz_elements;
+						return true;
+					}
+					r -= thisprob;
+				}
+			}
+			return false;
+		}
+
+		bool BranchGroup::sample_output_with_damping(Branch::element_type& output, double& r)
+		{
+			for (size_t i = 0; i < branches.size(); ++i)
+			{
+				if (branch_probs[i] <= 0)
+					continue;
+				for (auto iter = branches[i].iterbeg();
+					iter != branches[i].iterend(); ++iter)
+				{
+					double thisprob = branch_probs[i] * abs_sqr(iter->amplitude);
+					if (r < thisprob) {
+						output = iter->state.nz_elements;
+						return true;
+					}
+					r -= thisprob;
+				}
+			}
+			return false;
+		}
+
+		void BranchGroup::remove_mismatch_state(const Branch::element_type& target)
+		{
+			for (auto& branch : branches) {
+				branch.remove_mismatch_state(target);
+			}
 		}
 
 	} // namespace qram_qubit
