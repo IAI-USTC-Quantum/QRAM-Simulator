@@ -181,7 +181,10 @@ Example:
         .value("Prob", StatePrintDisplay::Prob)
         .export_values();
 
-    BIND_SELF_ADJOINT_OPERATOR(StatePrint)
+    // StatePrint — declared as a plain class_ (NOT via the macro): the macro's
+    // void(SparseState&) __call__ overload would shadow the py::object overload
+    // below on exact-type matches and silently return None.
+    py::class_<StatePrint, SelfAdjointOperator>(m, "StatePrint")
         .def(py::init<int32_t>(), py::arg("disp") = 0)
         .def(py::init<int32_t, int>(), py::arg("disp"), py::arg("precision"))
         .def(py::init<StatePrintDisplay>(), py::arg("disp"))

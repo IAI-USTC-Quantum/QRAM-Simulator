@@ -63,8 +63,10 @@ exclude = [
     "/CMakeSettings.json",
 ]
 
+# __version__ is read from dist-info at runtime (importlib.metadata) — no
+# generated _version.py needed (scikit-build-core excludes gitignored files
+# from wheels, which silently dropped the written file).
 [tool.setuptools_scm]
-write_to = "bindings/python/qram_simulator/_version.py"
 fallback_version = "0.0.0"
 
 [tool.cibuildwheel]

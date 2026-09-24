@@ -23,7 +23,7 @@ def test_register_lifecycle():
     assert qs.System.name_of(qs.System.get_id("q")) == "q"
     assert qs.System.size_of("q") == 4
     assert qs.System.type_of("q") == qs.StateStorageType.UnsignedInteger
-    assert qs.System.status_of("q") is False  # not yet activated by a state
+    assert qs.System.status_of("q") is True  # add_register activates the register
 
 
 def test_init_hadamard_measure_roundtrip():

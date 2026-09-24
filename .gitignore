@@ -48,6 +48,3 @@ __pycache__/
 *.egg-info/
 /wheelhouse/
 /dist/
-
-# Auto-generated version file (setuptools_scm)
-bindings/python/qram_simulator/_version.py

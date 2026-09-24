@@ -23,11 +23,13 @@ Basic Usage:
 
 from ._core import *  # noqa: F401,F403
 
-# Import version from auto-generated _version.py
+# Version from installed dist-info metadata. setuptools-scm's write_to file
+# is excluded from wheels by scikit-build-core's gitignore filtering (a latent
+# bug that shipped pysparq<=0.1.1 with __version__ == "0.0.0.dev0"), so read
+# the metadata instead, which always carries the setuptools-scm version.
 try:
-    from ._version import __version__, __version_tuple__
-except ImportError:
-    __version__ = "0.0.0.dev0"
-    __version_tuple__ = (0, 0, 0, "dev0")
+    from importlib.metadata import PackageNotFoundError, version as _dist_version
 
-del __version_tuple__  # only __version__ is part of the public surface
+    __version__: str = _dist_version("qram-simulator")
+except PackageNotFoundError:  # source tree without metadata
+    __version__ = "0.0.0.dev0"
