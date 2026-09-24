@@ -106,6 +106,29 @@ add_subdirectory(Common)
 add_subdirectory(QRAM)
 add_subdirectory(SparQ)
 add_subdirectory(SparQ_Algorithm)
+
+# Expose the flat header layout to consumers that link the umbrella target
+# (e.g. SparQSim's PySparQ bindings, which live OUTSIDE this subtree).
+# The include_directories() call at the top of this file only reaches targets
+# inside this directory tree. BUILD_INTERFACE serves add_subdirectory
+# consumers; INSTALL_INTERFACE matches the flat include/ layout installed by
+# the install(DIRECTORY ...) rules at the bottom of this file.
+include(GNUInstallDirs)
+set(QRAM_CORE_INCLUDE_DIRS
+    ${PROJECT_SOURCE_DIR}/Common/include
+    ${PROJECT_SOURCE_DIR}/QRAM/include
+    ${PROJECT_SOURCE_DIR}/SparQ_Algorithm/include
+    ${PROJECT_SOURCE_DIR}/SparQ/include
+    ${PROJECT_SOURCE_DIR}/ThirdParty
+    ${PROJECT_SOURCE_DIR}/ThirdParty/argparse
+    ${PROJECT_SOURCE_DIR}/ThirdParty/fmt/include
+    ${PROJECT_SOURCE_DIR}/ThirdParty/eigen-3.4.0
+)
+target_include_directories(SparQ INTERFACE
+    "$<BUILD_INTERFACE:${QRAM_CORE_INCLUDE_DIRS}>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
 add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
 
 if(QRAM_BUILD_TESTS)
@@ -129,7 +152,7 @@ if(QRAM_BUILD_PYTHON_BINDINGS)
 endif()
 
 # --- Install rules ---
-include(GNUInstallDirs)
+# (GNUInstallDirs is included above, before the SparQ INTERFACE includes)
 
 set(INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/QRAMSimulator")
 
