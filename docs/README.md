@@ -1,6 +1,8 @@
 # QRAM-Simulator Documentation
 
-This directory contains documentation resources for the QRAM-Simulator project.
+This directory contains documentation resources for the qram-simulator project
+(C++ core). Python bindings and the pysparq package live in the [SparQSim
+repository](https://github.com/IAI-USTC-Quantum/SparQSim).
 
 ## Directory Structure
 
@@ -11,7 +13,6 @@ docs/
 ├── architecture.md    # Project architecture documentation
 ├── operators.md       # C++ quantum arithmetic operators documentation
 ├── naming_conventions.md  # Operator naming rules (authoritative)
-├── pysparq.md         # PySparQ Python bindings documentation
 ├── paper/             # Paper-related documentation
 │   ├── README.md
 │   └── reproduction.md
@@ -28,14 +29,17 @@ docs/
 - **[API Docs](https://iai-ustc-quantum.github.io/QRAM-Simulator/api/)**: Auto-generated Doxygen documentation
 
 ### For Python Users
-- **[PySparQ Documentation](pysparq.md)**: Python bindings user guide and API reference, including the native RIR (QECC.Lang) interpreter
+Python bindings are published as the `pysparq` package from the [SparQSim
+repository](https://github.com/IAI-USTC-Quantum/SparQSim); a thin direct API to
+the C++ core (`qram_simulator`) is built from this repository's
+`bindings/python/`.
 
 ### For Researchers
 - **[Paper Documentation](paper/)**: Reproduction guides and paper-related resources
 
 ## Languages
 
-- English: [operators.md](operators.md), [pysparq.md](pysparq.md)
+- English: [operators.md](operators.md), [architecture.md](architecture.md)
 - 中文: [operators.md](operators.md) (operators doc includes Chinese annotations)
 
 ## API 文档
@@ -44,7 +48,7 @@ API 文档使用 [Doxygen](https://www.doxygen.nl/) 生成，涵盖以下模块�
 
 - **SparQ** - 稀疏量子态模拟器核心库
 - **QRAM** - 量子随机存取存储器实现
-- **PySparQ** - Python 绑定接口
+- **qram_simulator bindings** - 薄 Python 绑定（`bindings/python/`）
 
 ### 生成 API 文档
 
@@ -63,7 +67,7 @@ open docs/api/html/index.html
 
 Doxygen 配置文件位于项目根目录的 `Doxyfile`，主要配置包括：
 
-- **输入目录**: `SparQ/include/`, `QRAM/include/`, `PySparQ/include/`, `PySparQ/`
+- **输入目录**: `SparQ/include/`, `QRAM/include/`, `bindings/python/`
 - **输出目录**: `docs/api/`
 - **递归解析**: 启用（RECURSIVE = YES）
 - **提取所有代码**: 启用（EXTRACT_ALL = YES）
@@ -72,7 +76,7 @@ Doxygen 配置文件位于项目根目录的 `Doxyfile`，主要配置包括：
 
 ## 持续集成
 
-CPU C++ 与 PySparQ 测试已集成到 Gitea Actions，每次提交到
-main/develop 分支或创建 Pull Request 时自动运行。
+CPU C++ 测试已集成到 Gitea Actions，每次提交到 main/develop 分支或创建
+Pull Request 时自动运行。
 
 查看 CI 配置: `.gitea/workflows/ci.yml`

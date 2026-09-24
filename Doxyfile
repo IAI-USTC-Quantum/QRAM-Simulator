@@ -130,8 +130,7 @@ WARN_LOGFILE           =
 
 INPUT                  = SparQ/include/ \
                          QRAM/include/ \
-                         PySparQ/include/ \
-                         PySparQ/
+                         bindings/python/
 INPUT_ENCODING         = UTF-8
 INPUT_FILE_ENCODING    =
 FILE_PATTERNS          = *.c \

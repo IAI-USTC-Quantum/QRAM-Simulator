@@ -21,8 +21,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-# Enable testing
-enable_testing()
+# Enable testing (only when the test targets are built; consumers embedding
+# this project via add_subdirectory, e.g. SparQSim, turn QRAM_BUILD_TESTS OFF)
+option(QRAM_BUILD_TESTS "Build C++ test targets (SparQ/test, test/)" ON)
+option(QRAM_BUILD_EXPERIMENTS "Build experiment programs (Experiments/)" ON)
+option(QRAM_BUILD_PYTHON_BINDINGS "Build the thin qram_simulator pybind11 bindings" OFF)
+if(QRAM_BUILD_TESTS)
+    enable_testing()
+endif()
 
 option(QRAM_ENABLE_CUDA "Enable CUDA GPU support" OFF)
 
@@ -65,8 +71,10 @@ endif()
 # PyPI sdist 用户侧构建同样受益。
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-add_subdirectory(ThirdParty/googletest EXCLUDE_FROM_ALL)
-message(STATUS "GTest configured from ThirdParty (vendored v1.14.0)")
+if(QRAM_BUILD_TESTS)
+    add_subdirectory(ThirdParty/googletest EXCLUDE_FROM_ALL)
+    message(STATUS "GTest configured from ThirdParty (vendored v1.14.0)")
+endif()
 
 if (UNIX)
 	add_compile_options(-fPIC)
@@ -90,15 +98,27 @@ endif()
 add_subdirectory(Common)
 add_subdirectory(QRAM)
 add_subdirectory(SparQ)
-add_subdirectory(SparQ/test)
 add_subdirectory(SparQ_Algorithm)
 add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
-add_subdirectory(test)
-add_subdirectory(Experiments)
 
-# PySparQ requires pybind11
-if(pybind11_FOUND)
-    add_subdirectory(PySparQ)
+if(QRAM_BUILD_TESTS)
+    add_subdirectory(SparQ/test)
+    add_subdirectory(test)
+endif()
+
+if(QRAM_BUILD_EXPERIMENTS)
+    add_subdirectory(Experiments)
+endif()
+
+# Thin Python bindings for the qram_simulator PyPI package.
+# The full pysparq bindings live in the SparQSim repository, which consumes
+# this project as a git submodule and keeps QRAM_BUILD_PYTHON_BINDINGS=OFF
+# to avoid building a second binding module.
+if(QRAM_BUILD_PYTHON_BINDINGS)
+    if(NOT pybind11_FOUND)
+        message(FATAL_ERROR "QRAM_BUILD_PYTHON_BINDINGS=ON requires pybind11")
+    endif()
+    add_subdirectory(bindings/python)
 endif()
 
 # --- Install rules ---
