@@ -48,3 +48,12 @@ __pycache__/
 *.egg-info/
 /wheelhouse/
 /dist/
+
+# 文档构建产物（Doxygen XML/HTML 与 Sphinx 站点，docs.yml CI 生成）
+docs/api/
+docs/sphinx/build/
+# pybind11-stubgen 生成的 Python API 类型桩（docs.yml CI 注入）
+docs/sphinx/source/api_stubs/
+
+# 本地虚拟环境
+.venv*/

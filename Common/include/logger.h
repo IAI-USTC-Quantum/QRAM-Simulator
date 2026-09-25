@@ -5,36 +5,51 @@
 
 namespace qram_simulator {
 
+	/// 时间单位换算常量（以纳秒为 1）
 	constexpr double nanosec = 1;
-	constexpr double microsec = nanosec / 1e3;
-	constexpr double millisec = microsec / 1e3;
-	constexpr double sec = millisec / 1e3;
-	constexpr double minute = sec / 60;
-	constexpr double hour = minute / 60;
-	constexpr double day = hour / 24;
+	constexpr double microsec = nanosec / 1e3;  ///< 微秒
+	constexpr double millisec = microsec / 1e3; ///< 毫秒
+	constexpr double sec = millisec / 1e3;      ///< 秒
+	constexpr double minute = sec / 60;         ///< 分
+	constexpr double hour = minute / 60;        ///< 时
+	constexpr double day = hour / 24;           ///< 天
 
+	/// 当前日期时间的字符串（完整格式）
 	std::string _datetime();
 
+	/// 当前日期时间的字符串（简明格式，用于文件名）
 	std::string _datetime_simple();
 
+	/**
+	 * @brief 简单计时器：构造时记录起点，get 返回经过时间。
+	 */
 	struct timer {
+		/// 计时起点（steady_clock）
 		std::chrono::time_point<std::chrono::steady_clock> startpoint;
 		timer() {
 			startpoint = std::chrono::steady_clock::now();
 		}
+		/// 距起点的经过时间（按 unit 换算，默认单位为纳秒）
 		inline double get(double unit) const {
 			std::chrono::nanoseconds m = std::chrono::steady_clock::now() - startpoint;
 			return std::chrono::duration_cast<std::chrono::nanoseconds>(m).count() * unit;
 		}
 	};
 
+	/**
+	 * @brief 文件日志单例。
+	 *
+	 * 首次 instance() 时自动创建带时间戳的日志文件（log-*.txt），
+	 * 提供 info / error 两级写入、栈式计时器与 flush。
+	 */
 	struct Logger {
 		std::ofstream out;
 		bool on = true;
 		std::vector<timer> timers;
 		Logger() { }
 
-		static Logger& instance()
+		/// 取 Logger 单例（首次调用自动新建日志文件并开启写入）
+	static Logger& instance()
 		{
 			static Logger static_logger;
 			static bool init = false;
@@ -48,7 +63,8 @@ namespace qram_simulator {
 			return static_logger;
 		}
 
-		inline static std::string autofilename(std::string prefix, std::string postfix) {
+	/// 生成 "前缀 + 时间戳 + 后缀" 形式的自动文件名
+	inline static std::string autofilename(std::string prefix, std::string postfix) {
 			return prefix + _datetime_simple() + postfix;
 		}
 
@@ -84,10 +100,12 @@ namespace qram_simulator {
 		inline Logger& datetime() {
 			return info(_datetime());
 		}
-		inline void timer_start() {
-			timers.push_back(timer());
-		}
-		inline double timer_end(double unit = sec) {
+	/// 压入一个新计时器
+	inline void timer_start() {
+		timers.push_back(timer());
+	}
+	/// 弹出栈顶计时器并返回经过时间（unit 换算，默认秒）
+	inline double timer_end(double unit = sec) {
 			if (timers.size() == 0) {
 				return 0.0;
 			}
@@ -100,14 +118,19 @@ namespace qram_simulator {
 		}
 	};
 
+	/// 写一条 INFO 日志
 	inline void log_info(std::string msg) {
 		Logger::instance().info(msg);
 	}
 
+	/// 写一条 ERROR 日志
 	inline void log_error(std::string msg) {
 		Logger::instance().error(msg);
 	}
 
+	/**
+	 * @brief 单个函数的性能档案：调用计数与累计耗时（栈式计时）。
+	 */
 	struct profile {
 		size_t ncalls = 0;
 		double time = 0;
@@ -139,6 +162,13 @@ namespace qram_simulator {
 		return ret;
 	}
 
+	/**
+	 * @brief RAII 函数剖面器：构造计时进入、析构退出，按函数名聚合。
+	 *
+	 * 配合 FunctionProfiler 宏使用（在函数入口声明
+	 * `volatile profiler _profilehelper_(__FUNCTION__);`），
+	 * print_profiler 输出各函数的调用次数与累计耗时。
+	 */
 	struct profiler {
 		static std::map<std::string, profile*> profiles;
 		static bool on;
@@ -240,10 +270,12 @@ namespace qram_simulator {
 		static std::string get_all_profiles_v2();
 	};
 
+/// 在函数入口声明 RAII 剖面器（配合 profiler::print_profiler 输出）
 #define FunctionProfiler volatile profiler _profilehelper_(__FUNCTION__)
 
 	extern Logger logger;
 
+	/// 格式化后同时打印到 stdout 并写入日志
 	template <typename... Ty>
 	void print_and_log(std::string fmt_str, Ty&&...args) {
 		std::string str = format(fmt_str, std::forward<Ty>(args)...);
@@ -252,12 +284,21 @@ namespace qram_simulator {
 		logger.flush();
 	}
 
+	/**
+	 * @brief 在线统计量：边记录边累计均值 / 方差 / 标准差。
+	 *
+	 * @tparam Ty 记录值类型（须可转 double）
+	 */
 	template<typename Ty>
 	struct Statistic
 	{
+		/// 原始记录
 		std::vector<Ty> records;
+		/// 累计和
 		double sum = 0;
+		/// 累计平方和
 		double sum_sqr = 0;
+		/// 记录条数
 		size_t shots = 0;
 
 		inline Ty simple_record(Ty r) {
@@ -297,10 +338,16 @@ namespace qram_simulator {
 		}
 	};
 
-	using StatisticDouble = Statistic<double>;
-	using StatisticInt = Statistic<int>;
-	using StatisticSize = Statistic<size_t>;
+	using StatisticDouble = Statistic<double>;  ///< double 统计别名
+	using StatisticInt = Statistic<int>;        ///< int 统计别名
+	using StatisticSize = Statistic<size_t>;    ///< size_t 统计别名
 
+	/**
+	 * @brief 实验结果输出器：按 Python 类模板生成 .py 结果文件。
+	 *
+	 * 以模板字符串填充实验名 / 变量 / 结果 / 时间 / 剖面信息，
+	 * 输出可直接被 Python 侧导入分析的 Experiment-*.py 文件。
+	 */
 	struct Outputter
 	{
 		// std::string template_str;
