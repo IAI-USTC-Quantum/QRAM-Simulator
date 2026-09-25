@@ -1,9 +1,10 @@
 name: Publish Python Package
 
-# tag（v*）或 GitHub Release 触发 → cibuildwheel 出多平台 wheel + sdist
-# → PyPI trusted publishing（OIDC，无 token；PyPI 端需预配置 environment
-# "pypi" 的 trusted publisher：owner=IAI-USTC-Quantum,
-# repo=QRAM-Simulator, workflow=pypi-publish.yml）。
+# Triggered by a tag (v*) or a GitHub Release -> cibuildwheel builds
+# multi-platform wheels + sdist -> PyPI trusted publishing (OIDC, no
+# token; the PyPI side needs a trusted publisher preconfigured for
+# environment "pypi": owner=IAI-USTC-Quantum, repo=QRAM-Simulator,
+# workflow=pypi-publish.yml).
 on:
   push:
     tags: ['v*']
@@ -23,8 +24,8 @@ jobs:
   build_wheels:
     name: Build wheels (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    # Gitea 也会扫描 .github/workflows，但其 runner 访问不了 github.com
-    # → 仅 GitHub 上游执行
+    # Gitea also scans .github/workflows, but its runners cannot reach
+    # github.com -> run on the GitHub upstream only
     if: github.repository_owner == 'IAI-USTC-Quantum'
     strategy:
       matrix:
@@ -32,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # setuptools-scm 需要 git 历史推导版本号
+          # setuptools-scm needs the git history to derive the version
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -43,7 +44,8 @@ jobs:
         with:
           cmake-version: '3.26.x'
 
-      # Windows：给 cibuildwheel 子进程注入 MSVC 环境（Ninja 需要 cl）
+      # Windows: inject the MSVC environment into cibuildwheel subprocesses
+      # (Ninja needs cl)
       - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
 
@@ -53,9 +55,10 @@ jobs:
         uses: pypa/cibuildwheel@v2.22
         env:
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
-          # 暂不支持 musllinux / 32 位 / macOS（详见 pyproject.toml [tool.cibuildwheel]）
+          # musllinux / 32-bit / macOS unsupported for now (see
+          # pyproject.toml [tool.cibuildwheel])
           CIBW_SKIP: "*-musllinux_* *-win32 *-macos*"
-          # OpenMP 运行时（manylinux 容器默认缺失）
+          # OpenMP runtime (missing by default in manylinux containers)
           CIBW_BEFORE_ALL_LINUX: "yum install -y libgomp"
 
       - uses: actions/upload-artifact@v4
@@ -81,7 +84,7 @@ jobs:
           python -m pip install --upgrade pip build setuptools-scm
           python -m build --sdist
 
-      - name: 自包含校验（sdist 须携带全部构建所需源码）
+      - name: Self-containment check (sdist must carry all sources needed to build)
         run: |
           tar -tzf dist/qram_simulator-*.tar.gz | grep -q "QRAM/include/qram_circuit_qubit.h"
           tar -tzf dist/qram_simulator-*.tar.gz | grep -q "Common/include/basic.h"
@@ -98,7 +101,7 @@ jobs:
     name: Publish to PyPI
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    # workflow_dispatch 手动触发只构建不发布
+    # Manual workflow_dispatch runs build only, no publishing
     if: >-
       github.repository_owner == 'IAI-USTC-Quantum' &&
       (github.event_name == 'push' || github.event_name == 'release')

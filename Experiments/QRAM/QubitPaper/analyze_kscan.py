@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""分析 kscan.csv：qubit vs qutrit 保真度随 k 和 n 的标度。
+"""Analyze kscan.csv: qubit vs qutrit fidelity scaling with k and n.
 
-输出：均值表（含 SEM）、deficit 比值、log-log 斜率拟合、汇总图 fig_kscan.pdf。
+Outputs: mean table (with SEM), deficit ratios, log-log slope fits, and the
+summary figure fig_kscan.pdf.
 """
 
 import csv
@@ -44,7 +45,7 @@ def main():
         m, s = stats(groups[(arch, eps, n, k)])
         return m, s
 
-    # ---- (a) k 依赖（n=8 固定） ----
+    # ---- (a) k dependence (n=8 fixed) ----
     print("== deficit (1-F) vs k, n=8 ==")
     for eps in (1e-5, 1e-4):
         print(f"eps={eps:g}")
@@ -56,7 +57,7 @@ def main():
             print(f"  k={k}: qubit={mq:.5f}±{sq:.5f} (def {dq:.2e})  "
                   f"qutrit={mt:.5f}±{st:.5f} (def {dt:.2e})  ratio={ratio:.2f}")
 
-    # ---- (b) n 标度（eps=1e-4, k∈{1,5}） ----
+    # ---- (b) n scaling (eps=1e-4, k∈{1,5}) ----
     print("== log-log slope of deficit vs n, eps=1e-4 ==")
     ns = [4, 6, 8, 10]
     for k in (1, 5):
@@ -73,7 +74,7 @@ def main():
             pts = " ".join(f"n{n}:{1-get(arch,1e-4,n,k)[0]:.3e}" for n in ns)
             print(f"  k={k} {arch}: slope={slope:.2f}   ({pts})")
 
-    # ---- 图 ----
+    # ---- figure ----
     fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(7.2, 3.0))
     ks = (1, 2, 3, 5)
     style = {"qubit": dict(color="#d62728", marker="o", ls="-"),

@@ -1,20 +1,22 @@
-# qram_simulator 绑定层的功能冒烟测试。
-# 运行：pytest bindings/python/test（需先 pip install .，本地或 CI 均可）
+# Functional smoke tests for the qram_simulator binding layer.
+# Run: pytest bindings/python/test (requires `pip install .` first, locally or in CI)
 #
-# 语义备注（与 C++ 实现保持一致）：
-# - QRAMFullAmp::apply 内部调用 qutrit QRAMCircuit::run(version)，后者在
-#   未设置噪声时直接抛异常，因此 QRAMFullAmp 的用例均注入近零噪声。
+# Semantics note (kept consistent with the C++ implementation):
+# - QRAMFullAmp::apply internally calls qutrit QRAMCircuit::run(version),
+#   which raises when no noise is set; therefore all QRAMFullAmp test cases
+#   inject near-zero noise.
 
 import pytest
 
 import qram_simulator as qs
 
-# 近零噪声：满足 run(version) 的"必须非空"约束，物理上近似无噪演化
+# Near-zero noise: satisfies the "must be non-empty" constraint of
+# run(version) while being physically close to noiseless evolution
 TINY_NOISE = {qs.OperationType.Depolarizing: 1e-15}
 
 
 def test_module_surface():
-    # 核心导出齐全（绑定层接口回归护栏）
+    # All core exports present (regression guard for the binding surface)
     for name in (
         "QRAMCircuitQubit",
         "QRAMCircuitQutrit",
@@ -29,7 +31,7 @@ def test_module_surface():
         "ARCH_QUBIT",
         "ARCH_QUTRIT",
     ):
-        assert hasattr(qs, name), f"缺少导出: {name}"
+        assert hasattr(qs, name), f"missing export: {name}"
     assert isinstance(qs.__version__, str)
 
 
@@ -55,12 +57,13 @@ def test_qubit_noise_free_fidelity():
     qram.set_memory_random()
     qram.set_input_uniform(20)
     qram.run_normal()
-    # 无噪声时采样保真度应回到 1
+    # With no noise, the sampled fidelity should return to 1
     assert qram.sample_and_get_fidelity() == pytest.approx(1.0, abs=1e-9)
 
 
 def test_qutrit_noise_free_fidelity():
-    # run_normal 直接调用不走 run(version) 的噪声门控，无噪可用
+    # run_normal is called directly and bypasses the noise gate of
+    # run(version), so noiseless operation is allowed
     qs.set_seed(7)
     qram = qs.QRAMCircuitQutrit(3, 2)
     qram.set_memory_random()
@@ -101,7 +104,7 @@ def test_qubit_noisy_fidelity_in_range():
 
 
 def test_qubit_run_versions_consistent():
-    # 剪枝运行与不剪枝基准在无噪声下应给出一致结果
+    # Pruned and unpruned runs should agree in the noiseless case
     def run(fn):
         qs.set_seed(2024)
         qram = qs.QRAMCircuitQubit(2, 2)
@@ -122,7 +125,7 @@ def test_time_step_schedule():
 
     noise_free = ts.generate({}, qs.ARCH_QUBIT)
     assert len(noise_free) > 0
-    assert str(noise_free)  # 可打印
+    assert str(noise_free)  # printable
 
     noisy = ts.generate({qs.OperationType.Depolarizing: 1e-3}, qs.ARCH_QUTRIT)
     assert len(noisy) > 0
@@ -136,7 +139,8 @@ def test_time_step_schedule():
 
 
 def test_full_amp_zero_address_identity():
-    # 地址 |0…0> 装载 mem[0]=0 → 态不变（与比特序约定无关的精确断言）
+    # Loading address |0...0> with mem[0]=0 leaves the state unchanged
+    # (an exact assertion independent of the bit-ordering convention)
     qs.set_seed(5)
     manipulator = qs.QRAMFullAmp(2, 2, [0, 0, 0, 0])
     manipulator.set_noise_models(TINY_NOISE)
@@ -149,14 +153,15 @@ def test_full_amp_zero_address_identity():
 
 
 def test_full_amp_uniform_address_loading():
-    # |a>|00> 均匀叠加（addr 比特 {0,1}，data 比特 {2,3}，小端约定）
-    # + memory=[0,1,2,3] → 装载后 4 个基矢各 1/4 概率，data 字互不相同
+    # Uniform superposition of |a>|00> (addr qubits {0,1}, data qubits
+    # {2,3}, little-endian convention) + memory=[0,1,2,3] -> after loading,
+    # each of the 4 basis states has probability 1/4 with distinct data words
     qs.set_seed(5)
     manipulator = qs.QRAMFullAmp(2, 2, [0, 1, 2, 3])
     manipulator.set_noise_models(TINY_NOISE)
     state = [0.0j] * 16
     for addr in range(4):
-        state[addr] = 0.5 + 0.0j  # data 比特（高位）为 0
+        state[addr] = 0.5 + 0.0j  # data qubits (high bits) are 0
     out = manipulator.apply(state, [0, 1], [2, 3], [], version="normal")
 
     probs = [abs(c) ** 2 for c in out]
@@ -165,11 +170,12 @@ def test_full_amp_uniform_address_loading():
     assert nonzero == pytest.approx([0.25, 0.25, 0.25, 0.25], abs=1e-6)
     nonzero_idx = [i for i, p in enumerate(probs) if p > 1e-6]
     data_words = {i >> 2 for i in nonzero_idx}
-    assert len(data_words) == 4  # 四个地址装载出四个互不相同的 data 字
+    assert len(data_words) == 4  # four addresses load four distinct data words
 
 
 def test_full_amp_deterministic_given_seed():
-    # 同种子 + 新实例 → apply 结果逐位一致（内部采样走全局随机引擎）
+    # Same seed + fresh instance -> bit-identical apply results
+    # (internal sampling goes through the global random engine)
     state = [0.0j] * 16
     for addr in range(4):
         state[addr] = 0.5 + 0.0j

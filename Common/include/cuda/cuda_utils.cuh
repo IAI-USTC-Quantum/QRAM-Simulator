@@ -73,12 +73,12 @@ namespace qram_simulator {
 	}
 
 	__device__ inline bool cuda_bit_parity(unsigned int v) {
-		// 使用 CUDA 的 __popc 函数计算位数，然后检查奇偶性
+		// Count bits with CUDA's __popc, then check the parity
 		return (__popc(v) & 1) != 0;
 	}
 
 	__device__ inline bool cuda_bit_parity(unsigned long long v) {
-		// 使用 CUDA 的 __popcll 函数计算64位整数中的位数
+		// Count bits of a 64-bit integer with CUDA's __popcll
 		return (__popcll(v) & 1) != 0;
 	}
 	

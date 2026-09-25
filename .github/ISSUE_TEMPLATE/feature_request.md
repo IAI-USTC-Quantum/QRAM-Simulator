@@ -1,40 +1,40 @@
 ---
-name: 功能请求
-about: 为项目提出新功能建议
+name: Feature Request
+about: Suggest a new feature for the project
 title: '[Feature] '
 labels: enhancement
 assignees: ''
 ---
 
-## 功能描述
+## Feature Description
 
-<!-- 清晰简洁地描述你希望添加的功能 -->
+<!-- Describe clearly and concisely the feature you would like added -->
 
-## 使用场景
+## Use Cases
 
-<!-- 描述这个功能将在什么场景下使用，解决什么问题 -->
+<!-- Describe the scenarios in which this feature would be used and what problem it solves -->
 
-### 背景
+### Background
 
-[描述背景信息]
+[Describe the background information]
 
-### 目标用户
+### Target Users
 
-[这个功能主要服务于哪些用户]
+[Which users does this feature primarily serve]
 
-### 使用示例
+### Usage Example
 
 ```cpp
-// 期望的 C++ API 使用示例
-QRAMSimulator sim(10);  // 10 量子比特
+// Desired C++ API usage example
+QRAMSimulator sim(10);  // 10 qubits
 sim.load(address, data);
 auto result = sim.execute();
 ```
 
-或 Python：
+Or Python:
 
 ```python
-# 期望的 Python API 使用示例
+# Desired Python API usage example
 import pyqsparse
 
 sim = pyqsparse.QRAMSimulator(10)
@@ -42,14 +42,14 @@ sim.load(address, data)
 result = sim.execute()
 ```
 
-## 期望的 API/接口
+## Desired API/Interface
 
-<!-- 如果适用，描述你期望的接口设计 -->
+<!-- If applicable, describe your desired interface design -->
 
-### 提议的接口
+### Proposed Interface
 
 ```cpp
-// 类/函数声明示例
+// Example class/function declaration
 class NewFeature {
 public:
     NewFeature(int param);
@@ -57,41 +57,41 @@ public:
 };
 ```
 
-### 参数说明
+### Parameter Description
 
-| 参数 | 类型 | 说明 |
+| Parameter | Type | Description |
 |------|------|------|
-| `param` | `int` | 参数描述 |
-| `input` | `Input` | 输入描述 |
+| `param` | `int` | Parameter description |
+| `input` | `Input` | Input description |
 
-## 替代方案
+## Alternative Solutions
 
-<!-- 描述你考虑过的其他替代方案 -->
+<!-- Describe any alternative solutions you have considered -->
 
-### 方案 1: [方案名称]
+### Option 1: [option name]
 
-[描述]
+[Description]
 
-**优点:**
+**Pros:**
 - ...
 
-**缺点:**
+**Cons:**
 - ...
 
-### 方案 2: [方案名称]
+### Option 2: [option name]
 
-[描述]
+[Description]
 
-**优点:**
+**Pros:**
 - ...
 
-**缺点:**
+**Cons:**
 - ...
 
-## 额外上下文
+## Additional Context
 
-<!-- 任何其他相关信息，如参考文档、相关项目等 -->
+<!-- Any other relevant information, such as reference documentation or related projects -->
 
-- 相关文献: [链接]
-- 参考实现: [链接]
-- 相关 Issue: #123
+- Related literature: [link]
+- Reference implementation: [link]
+- Related issue: #123

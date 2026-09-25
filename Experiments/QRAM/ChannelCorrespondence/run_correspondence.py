@@ -1,22 +1,32 @@
 #!/usr/bin/env python3
-"""qutrit QRAM（QRAM-Simulator）↔ 电路级 channel 模拟（uniqc）对应实验驱动。
+"""Driver for the correspondence experiment between the qutrit QRAM
+(QRAM-Simulator) and circuit-level channel simulation (uniqc).
 
-消费 QutritCorrespondenceExporter 导出的 schedule.json / reference.json：
+Consumes schedule.json / reference.json exported by QutritCorrespondenceExporter:
 
-  Stage 0  无噪声桥正确性：编码门电路在 uniqc statevector 后端的输出分布
-           vs QRAM-Simulator 无噪声 run 的精确分布 —— 必须逐位相等。
-  Stage 1  固定噪声实现化：提取的噪声算子（type+coef → 确定性 unitary，
-           镜像 SubBranch::run_depolarizing 等的 floor 选择规则）作为门插入
-           —— vs 同一 seed 调度的 run_full 精确分布，必须相等。
-  Stage 2  channel 级（正题）：噪声位置上放置信道
-             mode b = 提取出的位置（该次实现化中噪声出现的地方）；
-             mode c = 每步全活跃位置（与轨迹平均统计对应的口径）。
-           数据位用 Pauli 信道（与 OriginIR-ext 文本信道语义一致），
-           qutrit 位用 8 元 Weyl 混合的 Kraus（超出 OriginIR-ext 文本信道集，
-           经同一 QuTiP 密度矩阵后端的 kraus2q 原语注入）。
-           对比口径：renormalize 与否 × {经典分布 fidelity, TVD, 量子 fidelity}。
+  Stage 0  noise-free bridge correctness: output distribution of the encoded
+           gate circuit on the uniqc statevector backend vs the exact
+           distribution of the QRAM-Simulator noise-free run -- must match
+           bit by bit.
+  Stage 1  fixed-noise realization: the extracted noise operators
+           (type+coef -> deterministic unitary, mirroring the floor selection
+           rules of SubBranch::run_depolarizing etc.) inserted as gates
+           -- vs the exact distribution of run_full on the same-seed schedule,
+           must be equal.
+  Stage 2  channel level (the main event): channels placed at noise positions
+             mode b = the extracted positions (where noise occurred in that
+             realization);
+             mode c = all active positions per step (the convention matching
+             trajectory-averaged statistics).
+           Data qubits use a Pauli channel (same semantics as the OriginIR-ext
+           text channel); qutrit qubits use an 8-element Weyl-mixture Kraus
+           (beyond the OriginIR-ext text channel set, injected via the kraus2q
+           primitive of the same QuTiP density-matrix backend).
+           Comparison metrics: renormalized or not x {classical distribution
+           fidelity, TVD, quantum fidelity}.
 
-用法（在含 uniqc 的解释器下，例如 UnifiedQuantum/.venv/bin/python）：
+Usage (with an interpreter that has uniqc installed, e.g.
+UnifiedQuantum/.venv/bin/python):
   python run_correspondence.py --dir results/depol002 --stage all
 """
 
@@ -39,7 +49,7 @@ def omega(k: int) -> complex:
 
 
 # --------------------------------------------------------------------------
-# JSON 门 IR → uniqc.Circuit（Stage 0/1 用）
+# JSON gate IR -> uniqc.Circuit (used by Stage 0/1)
 # --------------------------------------------------------------------------
 
 class _NullCtx:
@@ -51,7 +61,7 @@ class _NullCtx:
 
 
 def gate(c: Circuit, op: str, qubits, ctrls=(), theta=None):
-    """应用一个带（正/负极性）控制集的门。负控制用 X 包裹成正常控制。"""
+    """Apply a gate with a (positive/negative polarity) control set. Negative controls are wrapped with X into normal controls."""
     ctrls = list(ctrls)
     neg = [q for q, v in ctrls if v == 0]
     pos = [q for q, v in ctrls if v == 1]
@@ -77,8 +87,9 @@ def gate(c: Circuit, op: str, qubits, ctrls=(), theta=None):
 
 
 def emit_transposition(c: Circuit, qs, pi: int, pj: int, extra_ctrls=()):
-    """qs[k] ↔ 索引 bit k。基矢置换 (pi ↔ pj)，整体受 extra_ctrls 控制。
-    与 C++ 侧 emit_transposition 相同的共轭算法。"""
+    """qs[k] <-> index bit k. Basis-state transposition (pi <-> pj), overall
+    controlled by extra_ctrls. Same conjugation algorithm as the C++ side's
+    emit_transposition."""
     k = len(qs)
     D = [b for b in range(k) if ((pi >> b) & 1) != ((pj >> b) & 1)]
     if not D:
@@ -107,17 +118,17 @@ def emit_transposition(c: Circuit, qs, pi: int, pj: int, extra_ctrls=()):
         gate(c, "X", [qs[p]], extra_ctrls)
 
 
-# addr-qutrit 能级（4×4 索引 = 2*bit(a1)+bit(a0)）：W=0, L=1, R=2, dead=3
-QUTRIT_A1 = {0: 2, 2: 1, 1: 0}     # rotate_A1: L→W, W→R, R→L  (旧→新)
-QUTRIT_A1_2 = {0: 1, 1: 2, 2: 0}   # rotate_A2(置换): W→L, L→R, R→W
+# addr-qutrit levels (4x4 index = 2*bit(a1)+bit(a0)): W=0, L=1, R=2, dead=3
+QUTRIT_A1 = {0: 2, 2: 1, 1: 0}     # rotate_A1: L->W, W->R, R->L  (old->new)
+QUTRIT_A1_2 = {0: 1, 1: 2, 2: 0}   # rotate_A2 (permutation): W->L, L->R, R->W
 
 
 def emit_qutrit_perm(c: Circuit, a1: int, a0: int, mapping):
-    """3-循环分解为 2 个对换，对换用共轭法在 (a1,a0) 上发射。bit0=a0, bit1=a1。"""
+    """A 3-cycle decomposed into 2 transpositions; transpositions are emitted on (a1,a0) by conjugation. bit0=a0, bit1=a1."""
     qs = [a0, a1]
     m = dict(mapping)
     m.setdefault(3, 3)
-    # 把映射分解成对换（应用顺序 = 发射顺序：升序 (cycle[0], cycle[i]) 合成出原映射）
+    # Decompose the mapping into transpositions (application order = emission order: ascending (cycle[0], cycle[i]) compose back into the original mapping)
     seen = set()
     trans = []
     for x in sorted(m):
@@ -136,25 +147,27 @@ def emit_qutrit_perm(c: Circuit, a1: int, a0: int, mapping):
 
 
 def emit_qutrit_phase(c: Circuit, a1: int, a0: int, s: int):
-    """diag：φ(L)=ω^s、φ(R)=ω^{2s}、φ(W)=1（SubBranch::run_A2 的相位语义）。"""
+    """diag: φ(L)=ω^s, φ(R)=ω^{2s}, φ(W)=1 (phase semantics of SubBranch::run_A2)."""
     gate(c, "U1", [a0], [(a1, 0)], theta=TWO_PI_3 * s)
     gate(c, "U1", [a1], [(a0, 0)], theta=2.0 * TWO_PI_3 * s)
 
 
 def emit_swap_then_phase_r(c: Circuit, a1: int, a0: int):
-    """BitPhaseFlip（addr）：addr_flip 后对 R 能级加 -1 相位。（已随 Depolarizing-only 收编，
-    保留作为 QUTRIT Weyl 族分解的组成原语备用。）"""
+    """BitPhaseFlip (addr): applies a -1 phase to the R level after addr_flip.
+    (Already absorbed into Depolarizing-only; kept as a constituent primitive
+    for QUTRIT Weyl-family decomposition.)"""
     c.swap(a1, a0)
     gate(c, "U1", [a1], [(a0, 0)], theta=math.pi)
 
 
 def apply_noise_unitary(c: Circuit, o: dict, enc: dict):
-    """Stage 1：把提取的 Depolarizing 算子按 QRAM-Simulator 的 floor 规则落成
-    确定性 unitary（抽样完成后已形成具体的 X/Z/Y 或 qutrit Weyl 算子）。"""
+    """Stage 1: realize the extracted Depolarizing operator as a deterministic
+    unitary following QRAM-Simulator's floor rules (after sampling it has
+    already become a concrete X/Z/Y or qutrit Weyl operator)."""
     node = enc["nodes"][o["node"]]
     coef = o["coef"]
     if o["type"] != "Depolarizing":
-        raise ValueError(f"仅支持 Depolarizing（收到 {o['type']}；Damping 为 M3）")
+        raise ValueError(f"Only Depolarizing is supported (got {o['type']}; Damping is M3)")
     if o["sub"] == "data":
         q = node["d"]
         k = math.floor(3 * coef)
@@ -182,11 +195,11 @@ def apply_noise_unitary(c: Circuit, o: dict, enc: dict):
 
 
 def build_circuit(sched: dict, noise: str) -> Circuit:
-    """noise: 'skip'（Stage 0）| 'unitary'（Stage 1）"""
+    """noise: 'skip' (Stage 0) | 'unitary' (Stage 1)"""
     enc = sched["encoding"]
     c = Circuit()
-    # 触碰全部 qubit（X·X 恒等）：uniqc 对未触碰 qubit 会做压缩重排，
-    # 显式注册后索引映射才是 qubit k ↔ 基矢 bit k
+    # Touch every qubit (X*X is identity): uniqc compacts and reorders untouched
+    # qubits; after explicit registration the index mapping is qubit k <-> basis bit k
     for q in range(enc["num_qubits"]):
         c.x(q)
         c.x(q)
@@ -209,14 +222,14 @@ def build_circuit(sched: dict, noise: str) -> Circuit:
 
 
 # --------------------------------------------------------------------------
-# 分布提取与比较
+# Distribution extraction and comparison
 # --------------------------------------------------------------------------
 
 def detect_index_bit_order() -> str:
-    """探测 uniqc statevector 的基矢索引 bit 约定：qubit 0 是 LSB 还是 MSB。"""
+    """Probe the basis-index bit convention of the uniqc statevector: whether qubit 0 is the LSB or the MSB."""
     c = Circuit()
     c.x(0)
-    c.h(1)  # 保证电路有 2 个 qubit
+    c.h(1)  # make sure the circuit has 2 qubits
     c.h(1)
     sim = Simulator(backend_type="statevector")
     probs = np.abs(np.asarray(sim.simulate_statevector(c.originir))) ** 2
@@ -264,11 +277,11 @@ def compare_dist(name: str, got: dict, want: dict, tol: float) -> bool:
 
 
 # --------------------------------------------------------------------------
-# Stage 1-d / Stage 2-d：Damping 路径（单 Kraus 轨迹回放 + 信道级 full/nojump）
+# Stage 1-d / Stage 2-d: Damping paths (single-Kraus trajectory replay + channel-level full/nojump)
 # --------------------------------------------------------------------------
 
 def be_transposition(be, qs, pi: int, pj: int, extra_ctrls=()):
-    """emit_transposition 的后端版（密度矩阵上直接施加）。"""
+    """Backend version of emit_transposition (applied directly on the density matrix)."""
     k = len(qs)
     D = [b for b in range(k) if ((pi >> b) & 1) != ((pj >> b) & 1)]
     if not D:
@@ -298,7 +311,7 @@ def be_transposition(be, qs, pi: int, pj: int, extra_ctrls=()):
 
 
 def apply_depol_unitary_be(be, o: dict, enc: dict):
-    """Depolarizing 的确定性酉（后端版，混合配置的 Stage 1-d 回放用）。"""
+    """Deterministic unitary of Depolarizing (backend version, used for the Stage 1-d replay of mixed configurations)."""
     node = enc["nodes"][o["node"]]
     if o["sub"] == "data":
         q = node["d"]
@@ -343,20 +356,20 @@ def apply_depol_unitary_be(be, o: dict, enc: dict):
 
 
 def apply_jump_kraus(be, o: dict, enc: dict):
-    """Damp_Full 固定结果的跳变（单 Kraus，无 √γ 因子——权重由位置抽样概率承载）。"""
+    """Damp_Full jump with a fixed outcome (single Kraus, no √γ factor -- the weight is carried by the position sampling probability)."""
     node = enc["nodes"][o["node"]]
     if o["sub"] == "data":
         K = np.array([[0.0, 1.0], [0.0, 0.0]], dtype=complex)  # |0><1|
         be.kraus1q(node["d"], [K.reshape(-1).tolist()])
     else:
         K = np.zeros((4, 4), dtype=complex)
-        K[0, 1 if o["outcome"] == 0 else 2] = 1.0  # |W><L| 或 |W><R|
+        K[0, 1 if o["outcome"] == 0 else 2] = 1.0  # |W><L| or |W><R|
         be.kraus2q(node["a1"], node["a0"], [K.reshape(-1).tolist()])
 
 
 def apply_k0_kraus(be, enc: dict, gamma: float, jumps: bool):
-    """Damp_Common 的编码侧对应：作用于全部节点自由度。
-    jumps=False → 仅 K0（nojump 模式）；jumps=True → 教科书 3 能级 AD 完整信道。"""
+    """Encoding-side counterpart of Damp_Common: acts on all node degrees of freedom.
+    jumps=False -> K0 only (nojump mode); jumps=True -> the full textbook 3-level AD channel."""
     s = math.sqrt(1.0 - gamma)
     for node in enc["nodes"]:
         if jumps:
@@ -375,7 +388,7 @@ def apply_k0_kraus(be, enc: dict, gamma: float, jumps: bool):
 
 
 def excitation_weights(be, enc: dict):
-    """从当前密度矩阵对角线读各自由度的激发权重（次归一化轨迹系的 faithful 镜像用）。"""
+    """Read the excitation weight of each degree of freedom from the current density-matrix diagonal (used by the faithful mirror of the sub-normalized trajectory ensemble)."""
     diag = np.asarray(be.density_matrix.diag())
     s = float(np.real(np.sum(diag)))
     n = enc["num_qubits"]
@@ -394,11 +407,14 @@ def excitation_weights(be, enc: dict):
 
 
 def apply_faithful_kraus(be, enc: dict, gamma: float, entangle_max: int):
-    """忠实镜像：逐步复现他们采样方案的平均效果（ρ 依赖的非线性映射）。
-    跳变只可能出现在被抽中的活跃位置（节点 < 2^L−1）：K0 分支权重 1−γw/S、
-    跳变分支 √(γ·w_k/S)·M_k（轨迹不归一化，贡献 = (γw_k/S)·M_kρM_k†）；
-    非活跃节点只承受 Damp_Common 的纯 K0。
-    非线性映射在平均 ρ 上取权重，与逐轨迹平均有一阶以上的差异（README 说明）。"""
+    """Faithful mirror: step-by-step reproduction of the average effect of their
+    sampling scheme (a ρ-dependent nonlinear map).
+    Jumps can only occur at the active positions that were drawn (nodes < 2^L-1):
+    K0 branch weight 1-γw/S, jump branch √(γ·w_k/S)·M_k (trajectories are not
+    renormalized, contribution = (γw_k/S)·M_kρM_k†);
+    inactive nodes only undergo the pure K0 of Damp_Common.
+    The nonlinear map takes its weights on the averaged ρ, which differs from the
+    per-trajectory average at first order and beyond (see README)."""
     weights, s = excitation_weights(be, enc)
     if s <= 0:
         return
@@ -457,9 +473,11 @@ def marginal_from_rho(rho, sched: dict, order: str) -> dict:
 
 
 def replay_trajectory(sched: dict, order: str):
-    """Stage 1-d：按导出的实现化（含 Damp_Full 的 outcome）逐算子回放。
-    门 = 酉；Depolarizing = 确定性酉；Damp_Common = K0 单 Kraus（全树）；
-    Damp_Full = 固定结果跳变单 Kraus（nojump 跳过）。返回次归一化 ρ 与边缘分布。"""
+    """Stage 1-d: operator-by-operator replay of the exported realization
+    (including Damp_Full outcomes).
+    Gates = unitary; Depolarizing = deterministic unitary; Damp_Common = K0
+    single Kraus (whole tree); Damp_Full = fixed-outcome jump single Kraus
+    (nojump skipped). Returns the sub-normalized ρ and the marginal distribution."""
     enc = sched["encoding"]
     be = init_backend(sched)
     for st in sched["steps"]:
@@ -471,7 +489,7 @@ def replay_trajectory(sched: dict, order: str):
                 apply_depol_unitary_be(be, o, enc)
             elif o["type"] == "Damp_Full":
                 if o.get("outcome", -2) == -2:
-                    raise ValueError("Damp_Full 缺 outcome（需由导出器复刻执行记录）")
+                    raise ValueError("Damp_Full is missing outcome (the exporter must replicate the execution record)")
                 if o.get("outcome", -1) >= 0:
                     apply_jump_kraus(be, o, enc)
             elif o["type"] == "Damp_Common":
@@ -483,11 +501,11 @@ def replay_trajectory(sched: dict, order: str):
 
 
 def run_stage2_damping(sched: dict, order: str, damp_mode: str, depol_mode: str = "c"):
-    """Stage 2-d：damp_mode ∈ {full, nojump, faithful}。
-    full    = 每步（Damp_Common 出现处）对全部节点自由度施加教科书 3 能级 AD 信道（TP）；
-    nojump  = 仅 K0 单 Kraus（非 TP，trace = 无跳变生存概率）；
-    faithful= 逐幅度复现其采样方案平均效果的 ρ 依赖映射（见 apply_faithful_kraus）。
-    Depolarizing（混合配置）按 depol_mode b/c 位置策略施加信道。"""
+    """Stage 2-d: damp_mode ∈ {full, nojump, faithful}.
+    full     = at each Damp_Common occurrence, apply the textbook 3-level AD channel (TP) to all node degrees of freedom;
+    nojump   = K0 single Kraus only (non-TP, trace = no-jump survival probability);
+    faithful = ρ-dependent map reproducing the average effect of their sampling scheme amplitude by amplitude (see apply_faithful_kraus).
+    Depolarizing (mixed configuration) applies channels per the depol_mode b/c position strategy."""
     enc = sched["encoding"]
     noise_cfg = sched["noise"]
     be = init_backend(sched)
@@ -516,12 +534,14 @@ def run_stage2_damping(sched: dict, order: str, damp_mode: str, depol_mode: str 
 
 
 # --------------------------------------------------------------------------
-# qubit 架构：噪声原语 / 逐 case 回放 / 信道级
+# qubit architecture: noise primitives / per-case replay / channel level
 # --------------------------------------------------------------------------
 
-# run_bitphaseflip（库已修复为 Y flip）：|0>→−|1>、|1>→|0>（ZX = iY，酉）。
-# 旧实现为 |0>→|0>、|1>→−|0>（秩 1 非酉）——重复态相干抵消曾致零范数轨迹与
-# sample_output 崩溃；修复后 qubit 架构 Depolarizing 恢复为保范数轨迹。
+# run_bitphaseflip (library already fixed to a Y flip): |0>->-|1>, |1>->|0> (ZX = iY, unitary).
+# The old implementation was |0>->|0>, |1>->-|0> (rank-1, non-unitary) -- coherent
+# cancellation on repeated states used to cause zero-norm trajectories and
+# sample_output crashes; after the fix, qubit-architecture Depolarizing is
+# restored to norm-preserving trajectories.
 QUBIT_M = np.array([[0.0, 1.0], [-1.0, 0.0]], dtype=complex)
 
 
@@ -555,7 +575,7 @@ def apply_qubit_noise_op_be(be, o: dict, enc: dict):
             be.kraus1q(q, [QUBIT_M.reshape(-1).tolist()])
     elif t == "Damp_Full":
         if o.get("outcome", -2) == -2:
-            raise ValueError("Damp_Full 缺 outcome（需由导出器复刻执行记录）")
+            raise ValueError("Damp_Full is missing outcome (the exporter must replicate the execution record)")
         if o.get("outcome", -1) >= 0:
             K = np.array([[0.0, 1.0], [0.0, 0.0]], dtype=complex)  # |0><1|
             be.kraus1q(q, [K.reshape(-1).tolist()])
@@ -564,8 +584,9 @@ def apply_qubit_noise_op_be(be, o: dict, enc: dict):
 
 
 def replay_trajectory_qubit(sched: dict, order: str):
-    """Stage 1（qubit）：逐算子回放。Depolarizing k=2（bitphaseflip）以单 Kraus M
-    实现（物理相干语义）；Damp 算子同 qutrit 结构（全为 1q）。"""
+    """Stage 1 (qubit): operator-by-operator replay. Depolarizing k=2
+    (bitphaseflip) is realized as the single Kraus M (physical coherent
+    semantics); Damp operators follow the qutrit structure (all 1q)."""
     enc = sched["encoding"]
     be = init_backend(sched)
     for st in sched["steps"]:
@@ -580,11 +601,11 @@ def replay_trajectory_qubit(sched: dict, order: str):
 
 
 def run_stage2_qubit(sched: dict, order: str, mode: str):
-    """Stage 2（qubit）。mode ∈ {depol_textbook, depol_faithful, full, nojump, faithful}：
-    depol_*  = 活跃位置 [0, 2(2^L−1)) × 边缘概率 p；textbook = TP Pauli 去极化；
-               faithful = {I, X, Z, M} 混合（M 非 TP → 轨迹系综物理上次归一化）；
-    damping* = Damp_Common 出现处对全树每 qubit 施加；full = 教科书 AD（TP）、
-               nojump = 仅 K0、faithful = ρ 依赖跳变混合（仅活跃节点）。"""
+    """Stage 2 (qubit). mode ∈ {depol_textbook, depol_faithful, full, nojump, faithful}:
+    depol_*  = active positions [0, 2(2^L-1)) with marginal probability p; textbook = TP Pauli depolarizing;
+               faithful = {I, X, Z, M} mixture (M is non-TP -> the trajectory ensemble is physically sub-normalized);
+    damping* = applied to every qubit of the whole tree at Damp_Common occurrences; full = textbook AD (TP),
+               nojump = K0 only, faithful = ρ-dependent jump mixture (active nodes only)."""
     enc = sched["encoding"]
     noise_cfg = sched["noise"]
     be = init_backend(sched)
@@ -640,7 +661,7 @@ def run_stage2_qubit(sched: dict, order: str, mode: str):
 
 
 # --------------------------------------------------------------------------
-# Stage 2：QuTiP 密度矩阵后端直接驱动（信道级）
+# Stage 2: direct drive on the QuTiP density-matrix backend (channel level)
 # --------------------------------------------------------------------------
 
 def be_gate(be, op: str, qubits, ctrls=(), theta=None):
@@ -667,30 +688,31 @@ def be_gate(be, op: str, qubits, ctrls=(), theta=None):
 
 
 def qutrit_unitary_4x4(coef: float) -> np.ndarray:
-    """qutrit Depolarizing 的 8 元 Weyl unitary 的 4×4 嵌入（死态恒等）。
-    索引 = 2·bit(a1)+bit(a0)：W=0, L=1, R=2, dead=3。"""
+    """4x4 embedding of the 8-element Weyl unitary of qutrit Depolarizing
+    (identity on the dead state).
+    Index = 2·bit(a1)+bit(a0): W=0, L=1, R=2, dead=3."""
     k = math.floor(8 * coef)
     perm = {0: 2, 2: 1, 1: 0} if k in (0, 4, 6) else (
         {0: 1, 1: 2, 2: 0} if k in (2, 5, 7) else None)
     s = 2 if k in (3, 6, 7) else 1
     U = np.zeros((4, 4), dtype=complex)
-    U[3, 3] = 1.0  # 死态恒等
+    U[3, 3] = 1.0  # identity on the dead state
     for old in range(3):
         new = perm[old] if perm else old
         ph = 1.0
         if k in (1, 4, 5, 6, 7):
-            # 相位按 run_A2 语义挂在置换前的能级上：L→ω^s，R→ω^{2s}
+            # Per run_A2 semantics the phase attaches to the pre-permutation level: L->ω^s, R->ω^{2s}
             ph = omega(s) if old == 1 else (omega(2 * s) if old == 2 else 1.0)
         U[new, old] = ph
     return U
 
 
 def apply_channel_at(be, o: dict, enc: dict, noise_cfg: dict, p_scale: float = 1.0):
-    """在提取位置上放置信道。p 为 QRAM 噪声模型里 Depolarizing 的逐位概率。"""
+    """Place a channel at the extracted position. p is the per-qubit probability of Depolarizing in the QRAM noise model."""
     node = enc["nodes"][o["node"]]
     p = noise_cfg[o["type"]] * p_scale
     if o["type"] != "Depolarizing":
-        raise ValueError(f"仅支持 Depolarizing（收到 {o['type']}；Damping 为 M3）")
+        raise ValueError(f"Only Depolarizing is supported (got {o['type']}; Damping is M3)")
     if o["sub"] == "data":
         be.depolarizing(node["d"], p)
     else:
@@ -721,9 +743,10 @@ def run_stage2(sched: dict, mode: str, order: str):
                 apply_channel_at(be, o, enc, noise_cfg)
         if mode == "c" and noise_cfg:
             n_active = 2 * ((2 ** st["entangle_max"]) - 1)
-            # 修复闭区间采样后：每步 nerror ~ Binomial(n_active, p) 均匀落入
-            # [0, n_active) 的 n_active 个活跃位置 → 每位置边缘概率恰为 p；
-            # n_active=0（entangle_max=0）的步无噪声。
+            # After the closed-interval sampling fix: each step's nerror ~ Binomial(n_active, p)
+            # falls uniformly into the n_active active positions of [0, n_active)
+            # -> each position's marginal probability is exactly p;
+            # steps with n_active=0 (entangle_max=0) carry no noise.
             for pos in range(n_active):
                 for t in noise_cfg:
                     apply_channel_at(be, {
@@ -747,10 +770,13 @@ def run_stage2(sched: dict, mode: str, order: str):
 
 
 def run_stage2_originir(sched: dict, order: str, outdir):
-    """mode b 的 OriginIR-ext 文本路径：数据位信道以文本 opcode 内联注入
-    （Depolarizing/BitFlip/PhaseFlip/PauliError1Q，与 OriginIR-ext 信道语句同语义）；
-    qutrit 位（addr 子系统）的 8 元 Weyl 混合超出文本信道集 → 仅当调度中不存在
-    addr 位噪声时该文本才是完整电路，可直接跑标准 Simulator 路径并与直驱结果对拍。"""
+    """OriginIR-ext text path for mode b: data-qubit channels are injected
+    inline as text opcodes (Depolarizing/BitFlip/PhaseFlip/PauliError1Q, same
+    semantics as OriginIR-ext channel statements); the 8-element Weyl mixture on
+    qutrit qubits (addr subsystem) exceeds the text channel set -> the text is a
+    complete circuit only when the schedule contains no addr-qubit noise, in
+    which case it can run directly on the standard Simulator path and be
+    cross-checked against the direct-drive result."""
     enc = sched["encoding"]
     noise_cfg = sched["noise"]
     c = Circuit()
@@ -770,7 +796,7 @@ def run_stage2_originir(sched: dict, order: str, outdir):
                      theta=o.get("theta"))
             elif o["kind"] == "noise":
                 if o["type"] != "Depolarizing":
-                    raise ValueError(f"仅支持 Depolarizing（收到 {o['type']}）")
+                    raise ValueError(f"Only Depolarizing is supported (got {o['type']})")
                 if o["sub"] == "data":
                     c.add_gate("Depolarizing", enc["nodes"][o["node"]]["d"],
                                params=noise_cfg["Depolarizing"])
@@ -779,8 +805,8 @@ def run_stage2_originir(sched: dict, order: str, outdir):
     text = c.originir
     (outdir / "circuit_channels.originir").write_text(text)
     if n_addr_ops:
-        print(f"  [originir] 文本已导出，但含 {n_addr_ops} 个 qutrit(addr) 位噪声"
-              f"——超出 OriginIR-ext 文本信道集，完整模拟走 kraus 直驱路径")
+        print(f"  [originir] text exported, but it contains {n_addr_ops} qutrit(addr)-qubit noise ops"
+              f" -- beyond the OriginIR-ext text channel set; full simulation goes through the direct kraus path")
         return None
     rho = np.asarray(Simulator(backend_type="density_matrix_qutip").simulate_density_matrix(text))
     n = enc["num_qubits"]
@@ -797,12 +823,12 @@ def run_stage2_originir(sched: dict, order: str, outdir):
 
 
 # --------------------------------------------------------------------------
-# 主流程
+# Main flow
 # --------------------------------------------------------------------------
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", required=True, help="exporter 输出目录（含 schedule.json / reference.json）")
+    ap.add_argument("--dir", required=True, help="exporter output directory (containing schedule.json / reference.json)")
     ap.add_argument("--stage", default="all", choices=["0", "1", "2", "all"])
     ap.add_argument("--tol", type=float, default=1e-9)
     args = ap.parse_args()
@@ -815,18 +841,18 @@ def main():
                          if o["kind"] == "noise"}
     unsupported = sched_noise_types - {"Depolarizing", "Damp_Full", "Damp_Common"}
     if unsupported:
-        print(f"FAILED: 调度含未支持噪声类型 {unsupported}")
+        print(f"FAILED: schedule contains unsupported noise types {unsupported}")
         sys.exit(1)
     has_damp = bool(sched_noise_types & {"Damp_Full", "Damp_Common"})
     arch = sched.get("arch", "qutrit")
     order = detect_index_bit_order()
-    print(f"uniqc statevector 索引约定: qubit0={'LSB' if order == 'lsb' else 'MSB'}")
+    print(f"uniqc statevector index convention: qubit0={'LSB' if order == 'lsb' else 'MSB'}")
 
     summary = {"dir": str(d), "index_order": order}
     ok = True
 
     if args.stage in ("0", "all"):
-        print("\n== Stage 0: 无噪声桥正确性（编码门电路 vs QRAM-Simulator 无噪声 run）==")
+        print("\n== Stage 0: noise-free bridge correctness (encoded gate circuit vs QRAM-Simulator noise-free run) ==")
         c = build_circuit(sched, "skip")
         sim = Simulator(backend_type="statevector")
         psi = np.asarray(sim.simulate_statevector(c.originir))
@@ -838,7 +864,7 @@ def main():
 
     if args.stage in ("1", "all"):
         if arch == "qubit":
-            print("\n== Stage 1（qubit）: 逐随机 case 回放（门 + Depolarizing 酉/Kraus + K0/跳变单 Kraus）==")
+            print("\n== Stage 1 (qubit): per-random-case replay (gates + Depolarizing unitary/Kraus + K0/jump single Kraus) ==")
             n_cases = 0
             case_ok = True
             for sched_file in sorted(d.glob("schedule_r*.json")):
@@ -850,12 +876,12 @@ def main():
                 rho, dist = replay_trajectory_qubit(cs, order)
                 case_ok &= compare_dist(f"case r{ridx}", dist, want, args.tol)
                 n_cases += 1
-            print(f"  逐 case 回放: {n_cases} 个随机实现化，{'全部精确匹配' if case_ok else '存在不匹配'}")
+            print(f"  per-case replay: {n_cases} random realizations, {'all exact matches' if case_ok else 'mismatches present'}")
             ok &= case_ok
             summary["stage1"] = {"arch": "qubit", "cases": n_cases, "cases_ok": bool(case_ok)}
         elif has_damp:
-            print("\n== Stage 1-d: 逐随机 case 回放（门 + Depolarizing 酉 + K0 单 Kraus + "
-                  "固定结果跳变单 Kraus）==")
+            print("\n== Stage 1-d: per-random-case replay (gates + Depolarizing unitary + K0 single Kraus + "
+                  "fixed-outcome jump single Kraus) ==")
             n_cases = 0
             case_ok = True
             for sched_file in sorted(d.glob("schedule_r*.json")):
@@ -867,12 +893,12 @@ def main():
                 rho, dist = replay_trajectory(cs, order)
                 case_ok &= compare_dist(f"case r{ridx}", dist, want, args.tol)
                 n_cases += 1
-            print(f"  逐 case 回放: {n_cases} 个随机实现化（次归一化口径），"
-                  f"{'全部精确匹配' if case_ok else '存在不匹配'}")
+            print(f"  per-case replay: {n_cases} random realizations (sub-normalized convention), "
+                  f"{'all exact matches' if case_ok else 'mismatches present'}")
             ok &= case_ok
             summary["stage1d"] = {"cases": n_cases, "cases_ok": bool(case_ok)}
         else:
-            print("\n== Stage 1: 逐随机 case 精确对拍（抽样完成 → 具体算子 → 确定性 unitary 门）==")
+            print("\n== Stage 1: exact per-random-case cross-check (sampling done -> concrete operators -> deterministic unitary gates) ==")
             n_cases = 0
             case_ok = True
             for sched_file in sorted(d.glob("schedule_r*.json")):
@@ -887,9 +913,9 @@ def main():
                 dist = marginal_address_bus(np.abs(psi) ** 2, cs, order)
                 case_ok &= compare_dist(f"case r{ridx}", dist, want, args.tol)
                 n_cases += 1
-            print(f"  逐 case 对拍: {n_cases} 个随机实现化，{'全部精确匹配' if case_ok else '存在不匹配'}")
+            print(f"  per-case cross-check: {n_cases} random realizations, {'all exact matches' if case_ok else 'mismatches present'}")
             ok &= case_ok
-            # r=0 汇总行 + 模型交叉验证（库修复后 native 与 model 应逐位一致）
+            # r=0 summary row + model cross-validation (after the library fix, native and model should agree bit by bit)
             c = build_circuit(sched, "unitary")
             psi = np.asarray(Simulator(backend_type="statevector")
                              .simulate_statevector(c.originir))
@@ -902,7 +928,7 @@ def main():
 
     if args.stage in ("2", "all"):
         if arch == "qubit":
-            print("\n== Stage 2（qubit）: channel 级模拟 ==")
+            print("\n== Stage 2 (qubit): channel-level simulation ==")
             psi_ideal = np.asarray(Simulator(backend_type="statevector").simulate_statevector(
                 build_circuit(sched, "skip").originir))
             s_qram = ref.get("survival", sum(ref["avg_dist"].values()))
@@ -926,8 +952,8 @@ def main():
                     "F_quantum_vs_ideal": float(np.real(np.conj(psi_ideal) @ rho @ psi_ideal)),
                 }
                 rows[mode] = row
-                print(f"  [{mode:15s}] F_cls(归一)={row['F_classical_norm']:.6f}  "
-                      f"F_cls(不归一)={row['F_classical_unnorm']:.6f}  TVD={row['TVD']:.6f}  "
+                print(f"  [{mode:15s}] F_cls(norm)={row['F_classical_norm']:.6f}  "
+                      f"F_cls(unnorm)={row['F_classical_unnorm']:.6f}  TVD={row['TVD']:.6f}  "
                       f"trace(ρ)={trace:.6f}  QRAM survival={s_qram:.6f}  "
                       f"F_quantum={row['F_quantum_vs_ideal']:.6f}")
             fid_row = {
@@ -949,7 +975,7 @@ def main():
                   f"trace(faithful) = {fid_row['trace_faithful']}   "
                   f"QRAM survival = {fid_row['qram_survival']}")
         elif has_damp:
-            print("\n== Stage 2-d: channel 级阻尼模拟（full = 教科书 3 能级 AD 信道；nojump = 仅 K0）==")
+            print("\n== Stage 2-d: channel-level damping simulation (full = textbook 3-level AD channel; nojump = K0 only) ==")
             psi_ideal = np.asarray(Simulator(backend_type="statevector").simulate_statevector(
                 build_circuit(sched, "skip").originir))
             s_qram = ref.get("survival", sum(ref["avg_dist"].values()))
@@ -971,8 +997,8 @@ def main():
                     "F_quantum_vs_ideal": float(np.real(np.conj(psi_ideal) @ rho @ psi_ideal)),
                 }
                 rows[mode] = row
-                print(f"  [{mode:6s}] F_cls(归一)={row['F_classical_norm']:.6f}  "
-                      f"F_cls(不归一)={row['F_classical_unnorm']:.6f}  TVD={row['TVD']:.6f}  "
+                print(f"  [{mode:6s}] F_cls(norm)={row['F_classical_norm']:.6f}  "
+                      f"F_cls(unnorm)={row['F_classical_unnorm']:.6f}  TVD={row['TVD']:.6f}  "
                       f"trace(ρ)={trace:.6f}  QRAM survival={s_qram:.6f}  "
                       f"F_quantum={row['F_quantum_vs_ideal']:.6f}")
             fid_row = {
@@ -986,8 +1012,8 @@ def main():
             }
             summary["stage2d"] = rows
             summary["fidelity_metrics_damp"] = fid_row
-            print("  -- 生存率与 fidelity 口径（nojump.trace ↔ QRAM survival；"
-                  "F_quantum(full) ↔ avg_overlap_fid）--")
+            print("  -- survival and fidelity conventions (nojump.trace <-> QRAM survival; "
+                  "F_quantum(full) <-> avg_overlap_fid) --")
             print(f"  uniqc trace(nojump) = {fid_row['trace_nojump']:.6f}   "
                   f"QRAM survival = {fid_row['qram_survival']:.6f}")
             print(f"  uniqc F_quantum(full) = {fid_row['F_quantum_full']:.6f}   "
@@ -996,10 +1022,10 @@ def main():
                   f"incoh = {fid_row['qram_avg_fid_incoh']:.6f}   "
                   f"post = {fid_row['qram_avg_fidelity']:.6f}")
         else:
-            print("\n== Stage 2: channel 级模拟（QuTiP 密度矩阵后端）==")
+            print("\n== Stage 2: channel-level simulation (QuTiP density-matrix backend) ==")
             noise_ops_b = [(st["step"], o) for st in sched["steps"] for o in st["ops"]
                            if o["kind"] == "noise"]
-            print(f"  提取噪声位置数（mode b）: {len(noise_ops_b)}")
+            print(f"  number of extracted noise positions (mode b): {len(noise_ops_b)}")
             psi_ideal = np.asarray(Simulator(backend_type="statevector").simulate_statevector(
                 build_circuit(sched, "skip").originir))
 
@@ -1008,8 +1034,8 @@ def main():
                 _, direct_dist = run_stage2(sched, "b", order)
                 diff = max(abs(oi_dist.get(k, 0.0) - direct_dist.get(k, 0.0))
                            for k in set(oi_dist) | set(direct_dist))
-                print(f"  [originir 文本路径] vs kraus 直驱 mode b: max|ΔP| = {diff:.3e}"
-                      f" -> {'一致' if diff < 1e-9 else '不一致'}")
+                print(f"  [originir text path] vs kraus direct-drive mode b: max|ΔP| = {diff:.3e}"
+                      f" -> {'consistent' if diff < 1e-9 else 'inconsistent'}")
 
             rows = {}
             for mode in ("b", "c"):
@@ -1038,10 +1064,11 @@ def main():
                     rows[f"{mode}:{ref_name}"] = row
                     print(f"  [mode {mode} vs {ref_name}] F_unnorm={f_unnorm:.6f}  "
                           f"F_norm={f_norm:.6f}  TVD={row['TVD']:.6f}  trace(ρ)={trace:.6f}  "
-                          f"QRAM存活={s_qram:.6f}  F_quantum={f_quantum:.6f}")
+                          f"QRAM survival={s_qram:.6f}  F_quantum={f_quantum:.6f}")
 
-            # fidelity 口径对比：F_quantum（=⟨ψ_ideal|ρ|ψ_ideal⟩ = E|⟨ψ_ideal|ψ_traj⟩|²）
-            # 对 QRAM 侧四个统计量 —— 分离「后选择 / 树敏感计数 / 分支相干组合」三个来源
+            # Fidelity-convention comparison: F_quantum (= <ψ_ideal|ρ|ψ_ideal> = E|<ψ_ideal|ψ_traj>|²)
+            # against the four QRAM-side statistics -- separating the three sources:
+            # post-selection / tree-sensitive counting / branch-coherent combination
             fid_row = {
                 "F_quantum_uniqc_mode_b": rows["b:native"]["F_quantum_vs_ideal"],
                 "F_quantum_uniqc_mode_c": rows["c:native"]["F_quantum_vs_ideal"],
@@ -1052,17 +1079,17 @@ def main():
             }
             summary["stage2"] = rows
             summary["fidelity_metrics"] = fid_row
-            print("  -- fidelity 口径对比（统计意义上应一致的是 F_quantum(mode c) vs avg_overlap_fid）--")
+            print("  -- fidelity convention comparison (the pair that should agree statistically is F_quantum(mode c) vs avg_overlap_fid) --")
             print(f"  uniqc F_quantum(mode c)      = {fid_row['F_quantum_uniqc_mode_c']:.6f}")
-            print(f"  QRAM avg_overlap_fid(无后选择,树敏感) = {fid_row['qram_avg_overlap_fid']:.6f}")
-            print(f"  QRAM avg_fid_nopost(无后选择,树不敏感) = {fid_row['qram_avg_fid_nopost']:.6f}")
-            print(f"  QRAM avg_fid_incoh(分支投影组合)       = {fid_row['qram_avg_fid_incoh']:.6f}")
-            print(f"  QRAM avg_fidelity(逐shot树后选择版)    = {fid_row['qram_avg_fidelity']:.6f}")
+            print(f"  QRAM avg_overlap_fid(no post-selection, tree-sensitive) = {fid_row['qram_avg_overlap_fid']:.6f}")
+            print(f"  QRAM avg_fid_nopost(no post-selection, tree-insensitive) = {fid_row['qram_avg_fid_nopost']:.6f}")
+            print(f"  QRAM avg_fid_incoh(branch projection combination)       = {fid_row['qram_avg_fid_incoh']:.6f}")
+            print(f"  QRAM avg_fidelity(per-shot tree post-selection)         = {fid_row['qram_avg_fidelity']:.6f}")
 
     (d / "driver_summary.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False))
-    print(f"\n结果写入 {d}/driver_summary.json")
+    print(f"\nresults written to {d}/driver_summary.json")
     if not ok:
-        print("FAILED: Stage 0/1 精确匹配未通过")
+        print("FAILED: Stage 0/1 exact match did not pass")
         sys.exit(1)
     print("PASSED")
 

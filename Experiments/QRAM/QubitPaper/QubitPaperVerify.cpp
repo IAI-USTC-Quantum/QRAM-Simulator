@@ -1,39 +1,39 @@
-/* QubitPaperVerify.cpp —— qubit 编码 QRAM 论文核心命题的针对性数值验证。
+/* QubitPaperVerify.cpp — targeted numerical verification of the core propositions of the qubit-encoded QRAM paper.
  *
- * 与 QubitPaperScan.cpp 同一协议：k_data_bits=3、k_base_seed 定 memory+输入、
- * 每轨迹 derive_run_seed(traj) 定噪声历史；所有分支级读数在 sample_output() 之前完成。
+ * Same protocol as QubitPaperScan.cpp: k_data_bits=3, k_base_seed fixes memory+input,
+ * per-trajectory derive_run_seed(traj) fixes the noise history; all branch-level readouts happen before sample_output().
  *
- * 用法：Experiment_QRAM_QubitPaperVerify <mode> [outdir]
+ * Usage: Experiment_QRAM_QubitPaperVerify <mode> [outdir]
  *
- *   hamming  命题1+2（H→K0^d→H 闭式、no-jump 条件错误二阶）：
- *            单地址(addr=0)单总线(j=0)输入分支，damping-only，拒绝采样 no-jump
- *            轨迹（无 Damp_Full 操作），dump 全部 system_states 的 (word, amplitude)。
- *            大 γ 拒绝采样不可行时退化为"直接构造纯 K0 电路"（与 no-jump 轨迹逐比特
- *            等价，等价性在可同时采样的点上实测验证并打印）。
- *   avgfid   命题2（一阶/二阶分离）：damping-only，500 分支均匀输入，n∈{3,5,8}，
- *            每条轨迹 run_full 后采样前计算末态保真度 F=|<Ψ_ideal|ψ>|²/<ψ|ψ>
- *            （Ψ_ideal 只含树回 idle 的分量），记录该轨迹是否采到 Damp_Full。
- *            每点先跑 100 条（简报协议）；在 rare-event 窗口（1e-4≤γ≤3e-3，及
- *            n≤5 的 γ=1e-5）自适应加跑至 ≥120 条 fired（inf>0.5）轨迹，
- *            使全体平均 infidelity 的一阶斜率有足够统计（超出 100 条的行仍写入
- *            同一 CSV，traj 序号延续）。
- *   qutrit   命题3（qutrit 标量预测）：n=k=3 全覆盖 64 分支，no-jump 轨迹下逐分支
- *            对拍 显式权重比 |amp_i|²/|amp_ref|² vs 解析计数器 (1-γ)^Δc，
- *            以及归一化后与理想输出的保真度（应为 1）。
- *   auditn3  命题4（family-divergence 规则）：n=3 穷举单故障注入
- *            （7 节点 × {addr,data} 槽 × 全部切片 × {BitFlip, Damp_Full}），
- *            实测损伤地址集 vs 预测坏区间（BitFlip→get_bad_range_qubit，
- *            Damp_Full→get_bad_range_qutrit）。损伤 = 输出字错误 ∪ 配置族偏离参考族
- *            （参考族 = 预测区间外第一个地址的终态树配置集合；全树均匀 stray 视为
- *            可预测的单一家族，不计入损伤）。match=1 表示实测⊆预测（containment），
- *            match=-1 表示该槽位 jump 点火概率恒为 0（该时刻该比特全体分支均无
- *            激发，jump 在此物理上不可能发生，属空场景）。
- *            BitFlip 用 audit 同款 append+run_bad；Damp_Full 用逐切片驱动器在注入
- *            点先做精确点火概率求和 Σ get_prob_damp（无其它损耗源时即真点火概率），
- *            再对所有分支施加确定性投影 Branch::run_damp_full —— 与
- *            QRAMCircuit::run_damp_full 轮盘赌"点火"分支逐操作相同，但免掉重试。
- *            驱动器本身在审计前与 run_bad 做了逐比特对拍。
- *            memory[i]=i（字两两不同，排除"读错单元格但内容巧合相同"的漏检）。
+ *   hamming  Propositions 1+2 (H→K0^d→H closed form; second-order no-jump conditional error):
+ *            single-address (addr=0) single-bus (j=0) input branch, damping-only, rejection-sample no-jump
+ *            trajectories (no Damp_Full ops), dumping (word, amplitude) of all system_states.
+ *            When rejection sampling is infeasible at large gamma, fall back to "directly constructing a pure K0 circuit"
+ *            (bitwise equivalent to a no-jump trajectory; equivalence measured and printed where both are sampleable).
+ *   avgfid   Proposition 2 (first/second-order separation): damping-only, 500 uniformly drawn branches, n∈{3,5,8};
+ *            per trajectory, after run_full and before sampling, compute final-state fidelity F=|<Ψ_ideal|ψ>|²/<ψ|ψ>
+ *            (Ψ_ideal keeps only tree-back-to-idle components), and record whether a Damp_Full was drawn.
+ *            Each point first runs 100 trajectories (brief protocol); in the rare-event window (1e-4≤γ≤3e-3, and
+ *            γ=1e-5 for n≤5) adaptively extend to ≥120 fired (inf>0.5) trajectories,
+ *            so the first-order slope of the ensemble-mean infidelity has enough statistics (rows beyond 100 still go
+ *            into the same CSV, trajectory indices continue).
+ *   qutrit   Proposition 3 (qutrit scalar prediction): n=k=3, all 64 branches covered; per branch on no-jump trajectories
+ *            cross-check the explicit weight ratio |amp_i|²/|amp_ref|² vs the analytic counter (1-γ)^Δc,
+ *            plus the fidelity to the ideal output after normalization (should be 1).
+ *   auditn3  Proposition 4 (family-divergence rule): n=3 exhaustive single-fault injection
+ *            (7 nodes × {addr,data} slots × all slices × {BitFlip, Damp_Full}),
+ *            measured damaged-address set vs predicted bad range (BitFlip→get_bad_range_qubit,
+ *            Damp_Full→get_bad_range_qutrit). Damage = wrong output word ∪ config family deviating from the reference
+ *            (reference = terminal tree-config set of the first address outside the predicted range; a uniform whole-tree
+ *            stray counts as one predictable family, not damage). match=1 means measured⊆predicted (containment),
+ *            match=-1 means the jump firing probability for that slot is identically 0 (no branch has that bit
+ *            excited at that time, so the jump is physically impossible there — a vacuous case).
+ *            BitFlip uses the same append+run_bad as audit; Damp_Full uses the per-slice driver, which at the injection
+ *            point first sums the exact firing probability Σ get_prob_damp (the true firing probability absent other loss sources),
+ *            then applies the deterministic projection Branch::run_damp_full to all branches — identical,
+ *            operation by operation, to QRAMCircuit::run_damp_full roulette-"firing" the branches, minus the retries.
+ *            The driver itself was cross-checked bitwise against run_bad before the audit.
+ *            memory[i]=i (pairwise distinct words rule out missed detections from "wrong cell but coincidentally equal content").
  */
 
 #include <algorithm>
@@ -110,7 +110,7 @@ std::string join_set(const std::set<size_t>& s)
 	return ret;
 }
 
-/* 单分支输入：一个 branch group（address），一个 branch（bus 输入 j） */
+/* Single-branch input: one branch group (address), one branch (bus input j) */
 void set_single_branch(qram_qubit::QRAMCircuit& qram, size_t address, bus_t bus)
 {
 	auto& groups = qram.get_branch_groups();
@@ -122,9 +122,9 @@ void set_single_branch(qram_qubit::QRAMCircuit& qram, size_t address, bus_t bus)
 	g.state_probs.push_back(1.0);
 }
 
-/* 直接构造纯 K0（no-jump）操作序列：无故障切片 + 每片一个 Damp_Common(gamma)。
- * 与"采样到零故障的轨迹"逐操作相同（noise_one_step 在零故障时也只追加
- * Damp_Common），用于大 γ 下拒绝采样不可行的网格点。 */
+/* Directly construct a pure K0 (no-jump) operation sequence: fault-free slices + one Damp_Common(gamma) per slice.
+ * Identical, operation by operation, to "a trajectory sampled with zero faults" (noise_one_step appends only
+ * Damp_Common on zero faults too); used at grid points where rejection sampling is infeasible at large γ. */
 void overwrite_with_k0_only(qram_qubit::QRAMCircuit& qram, double gamma)
 {
 	TimeSlices k0ops;
@@ -162,7 +162,7 @@ void run_hamming(const std::filesystem::path& outdir)
 	constexpr size_t attempt_cap = 30000;
 	const std::vector<size_t> n_list = {2, 3, 4, 5, 6, 8};
 
-	/* 冒烟自检：gamma=0 时 prob(b_out)=1，其余字为 0 */
+	/* Smoke self-check: at gamma=0, prob(b_out)=1 and all other words are 0 */
 	{
 		const size_t n = 3;
 		random_engine::get_instance().set_seed(k_base_seed);
@@ -202,14 +202,14 @@ void run_hamming(const std::filesystem::path& outdir)
 				seed_t seed = k_base_seed + 1000003 * attempts;
 				++attempts;
 				random_engine::get_instance().set_seed(seed);
-				qram.set_memory_random();   /* 每条轨迹重新随机 memory：b_out 随之变化 */
+				qram.set_memory_random();   /* re-randomize memory per trajectory: b_out changes with it */
 				qram.prepare_all();
 				if (has_damp_full_op(qram))
-					continue;               /* 拒绝：含 jump 的轨迹 */
+					continue;               /* reject: trajectory contains a jump */
 
 				qram.run_bad();
 
-				/* 首个被接收轨迹：与直接 K0 构造对拍（同一 memory） */
+				/* First accepted trajectory: cross-check against the direct K0 construction (same memory) */
 				if (!equiv_checked) {
 					size_t ni1 = 0;
 					auto amps_ref = collect_word_amps(qram, ni1);
@@ -231,7 +231,7 @@ void run_hamming(const std::filesystem::path& outdir)
 						<< " (non_idle " << ni1 << " vs " << ni2 << ")\n";
 					equiv_checked = true;
 
-					/* 恢复被对拍覆盖的状态：重跑被接收的轨迹 */
+					/* Restore the state clobbered by the cross-check: rerun the accepted trajectory */
 					random_engine::get_instance().set_seed(seed);
 					qram.set_memory_random();
 					qram.prepare_all();
@@ -251,7 +251,7 @@ void run_hamming(const std::filesystem::path& outdir)
 			}
 
 			if (accepted == 0) {
-				/* 大 γ：no-jump 轨迹概率指数小，退化为直接 K0 构造（逐操作等价） */
+				/* Large γ: no-jump trajectories are exponentially unlikely, fall back to the direct K0 construction (operation-wise equivalent) */
 				random_engine::get_instance().set_seed(k_base_seed + 424242);
 				qram.set_memory_random();
 				qram.prepare_all();
@@ -282,10 +282,10 @@ void run_hamming(const std::filesystem::path& outdir)
 
 void run_avgfid(const std::filesystem::path& outdir)
 {
-	/* 续跑支持：统计已有 CSV 中每个 (n,gamma) 的 (轨迹数, fired 数)；
-	 * 已完成的点跳过，未完成的点从断点轨迹号继续追加。
-	 * 注意：CSV 用 setprecision(17) 打印 double，std::stod 精确往返，
-	 * 因此 (n,gamma) 可作为 double 键安全匹配。 */
+	/* Resume support: tally (trajectories, fired count) per (n,gamma) already in the CSV;
+	 * completed points are skipped, incomplete points append from the saved trajectory index.
+	 * Note: the CSV prints doubles with setprecision(17); std::stod round-trips exactly,
+	 * so (n,gamma) is safe to match as a double key. */
 	std::map<std::pair<size_t, double>, std::pair<size_t, size_t>> done;
 	auto path = outdir / "verify_avgfid.csv";
 	if (std::filesystem::exists(path)) {
@@ -317,7 +317,7 @@ void run_avgfid(const std::filesystem::path& outdir)
 	constexpr size_t trials = 100;
 	const std::vector<size_t> n_list = {3, 5, 8};
 
-	/* 轨迹末态与理想输出的重叠（采样前；只有树回 idle 且字正确的分量有贡献） */
+	/* Overlap of the trajectory final state with the ideal output (pre-sampling; only tree-idle, correct-word components contribute) */
 	auto ideal_overlap = [](qram_qubit::QRAMCircuit& qram) -> complex_t {
 		complex_t overlap = 0;
 		for (auto& g : qram.branch_groups) {
@@ -333,7 +333,7 @@ void run_avgfid(const std::filesystem::path& outdir)
 		return overlap;
 	};
 
-	/* 冒烟自检：gamma=0 时 infidelity = 0 */
+	/* Smoke self-check: infidelity = 0 at gamma=0 */
 	{
 		random_engine::get_instance().set_seed(k_base_seed);
 		qram_qubit::QRAMCircuit qram(3, k);
@@ -360,9 +360,9 @@ void run_avgfid(const std::filesystem::path& outdir)
 		qram.set_noise_models(damp_only(0.0));
 		qram.set_input_uniform(k_branches);
 
-		/* rare-event 窗口内加跑至 target_fires 条 fired 轨迹（受 cap 限制）；
-		 * fired 判定 = infidelity > 0.5（fired jump → inf≈1；未点火 → ≤1e-3，
-		 * 间隔 3 个数量级，判定稳健）。大 γ 点 100 条即饱和，不加跑。 */
+		/* Inside the rare-event window, extend up to target_fires fired trajectories (capped);
+		 * fired := infidelity > 0.5 (fired jump → inf≈1; no fire → ≤1e-3,
+		 * 3 orders of magnitude apart, a robust criterion). At large γ, 100 trajectories saturate; no extension. */
 		const size_t target_fires = 120;
 		const size_t traj_cap = (n == 3 ? 150000 : n == 5 ? 15000 : 10000);
 
@@ -414,10 +414,10 @@ void run_qutrit(const std::filesystem::path& outdir)
 	constexpr size_t n = 3, k = 3;
 	constexpr size_t target_traj = 5;
 	constexpr size_t attempt_cap = 100000;
-	const size_t n_branches = pow2(n + k); /* 全覆盖 8 地址 × 8 总线值 */
+	const size_t n_branches = pow2(n + k); /* full coverage: 8 addresses × 8 bus values */
 
 	auto process = [&](qram_qutrit::QRAMCircuit& qram, double gamma, size_t traj) {
-		/* 解析计数器：branch 0 为参考，relative_multiplier = (1-gamma)^Δc */
+		/* Analytic counter: branch 0 is the reference, relative_multiplier = (1-gamma)^Δc */
 		std::vector<size_t> ids;
 		for (size_t i = 1; i < qram.branches.size(); ++i)
 			ids.push_back(i);
@@ -444,7 +444,7 @@ void run_qutrit(const std::filesystem::path& outdir)
 		}
 	};
 
-	/* 冒烟自检：gamma=0 时 ratio=1、fidelity=1 */
+	/* Smoke self-check: ratio=1 and fidelity=1 at gamma=0 */
 	{
 		random_engine::get_instance().set_seed(k_base_seed);
 		qram_qutrit::QRAMCircuit qram(n, k);
@@ -487,7 +487,7 @@ void run_qutrit(const std::filesystem::path& outdir)
 			++attempts;
 			random_engine::get_instance().set_seed(seed);
 			qram_qutrit::QRAMCircuit qram(n, k);
-			qram.set_memory_random();       /* 每条轨迹重新随机 memory */
+			qram.set_memory_random();       /* re-randomize memory per trajectory */
 			qram.set_noise_models(damp_only(gamma));
 			qram.set_input_uniform(n_branches);
 			qram.pick_all();
@@ -504,14 +504,15 @@ void run_qutrit(const std::filesystem::path& outdir)
 
 /* ------------------------------ mode auditn3 ------------------------------ */
 
-/* 逐切片驱动器：复刻 QRAMCircuit::run_bad 的算符分派（仅 noise-free 电路的
- * 6 种算符，其它算符直接报错），在 inject_slice 切片结束后施加注入：
- *   fault=0 (BitFlip)：run_bitflip(pos)（与 append+run_bad 相同的效果）；
- *   fault=1 (Damp_Full)：先求和精确点火概率 exc = Σ_groups get_prob_damp(pos)[0]
- *     （noise-free 下 norm=1，exc 即 run_damp_full 轮盘赌的点火概率），
- *     再对所有分支施加确定性投影 Branch::run_damp_full(pos,0) —— 与轮盘赌
- *     "点火"分支逐操作相同。
- * 返回 exc（BitFlip 恒为 1）。 */
+/* Per-slice driver: replicates QRAMCircuit::run_bad's operator dispatch (only the 6
+ * operator kinds of a noise-free circuit; anything else errors out), applying the injection
+ * right after slice inject_slice ends:
+ *   fault=0 (BitFlip): run_bitflip(pos) (same effect as append+run_bad);
+ *   fault=1 (Damp_Full): first sum the exact firing probability exc = Σ_groups get_prob_damp(pos)[0]
+ *     (noise-free ⇒ norm=1, so exc is the roulette firing probability of run_damp_full),
+ *     then apply the deterministic projection Branch::run_damp_full(pos,0) to all branches —
+ *     identical, operation by operation, to the roulette "firing" the branches.
+ * Returns exc (always 1 for BitFlip). */
 double run_with_injection(qram_qubit::QRAMCircuit& qram, size_t inject_slice,
 	size_t pos, int fault)
 {
@@ -560,7 +561,7 @@ double run_with_injection(qram_qubit::QRAMCircuit& qram, size_t inject_slice,
 	return exc;
 }
 
-/* 全状态签名（驱动器 vs run_bad 的逐比特对拍用） */
+/* Full-state signature (for the bitwise driver-vs-run_bad cross-check) */
 std::string state_signature(qram_qubit::QRAMCircuit& qram)
 {
 	std::string sig;
@@ -589,21 +590,21 @@ void run_auditn3(const std::filesystem::path& outdir)
 	random_engine::get_instance().set_seed(k_base_seed);
 	qram_qubit::QRAMCircuit qram(n, k);
 	{
-		/* 字两两不同的 memory：读错单元格必然给出错误字，排除巧合漏检 */
+		/* Memory with pairwise distinct words: reading the wrong cell necessarily yields a wrong word, ruling out coincidental misses */
 		memory_t mem(pow2(n));
 		for (size_t i = 0; i < mem.size(); ++i) mem[i] = i;
 		qram.set_memory(mem);
 	}
 	qram.set_noise_models({});
-	qram.set_input_uniform(pow2(n + k));    /* 全覆盖 64 分支，均匀权重 */
+	qram.set_input_uniform(pow2(n + k));    /* all 64 branches covered, uniform weights */
 
 	qram.prepare_all();
 	const size_t n_slices = qram.operations.time_slices.size();
-	const size_t n_pos = 2 * (pow2(n) - 1); /* 7 节点 × {addr,data} 槽 = 14 */
+	const size_t n_pos = 2 * (pow2(n) - 1); /* 7 nodes × {addr,data} slots = 14 */
 	std::cout << "[auditn3] n=3, pos=" << n_pos << " slots, slices=" << n_slices
 		<< " (full_step=" << qram.time_step.full_step() << ")\n";
 
-	/* 驱动器对拍：无注入的逐切片驱动必须与 run_bad 逐比特一致 */
+	/* Driver cross-check: the per-slice driver without injection must match run_bad bitwise */
 	{
 		qram.prepare_all();
 		qram.run_bad();
@@ -651,15 +652,15 @@ void run_auditn3(const std::filesystem::path& outdir)
 				++st.total;
 
 				if (fire_prob < 1e-15) {
-					/* 该时刻该比特在全体分支中激发概率恒为 0：
-					 * jump 物理上不可能发生（空场景），不计入一致性统计 */
+				/* The excitation probability of this bit is identically 0 across all
+				 * branches at this time: the jump is physically impossible (a vacuous case), excluded from the consistency stats */
 					++st.vacuous;
 					csv << fault_name << ',' << pos << ',' << slot << ',' << slice
 						<< ',' << join_set(predicted) << ",vacuous,-1\n";
 					continue;
 				}
 
-				/* 实测：wrong-bus 集 + 每个地址的终态配置族 */
+				/* Measured: wrong-bus set + terminal config families per address */
 				std::set<size_t> wrongbus;
 				std::map<size_t, std::set<std::set<size_t>>> families;
 				for (auto& g : qram.branch_groups) {
@@ -676,8 +677,8 @@ void run_auditn3(const std::filesystem::path& outdir)
 					}
 				}
 
-				/* 参考族 = 预测区间外第一个地址的配置族；
-				 * 损伤 = wrong-bus ∪ 配置族偏离参考族 */
+				/* Reference family = the config family of the first address outside the
+				 * predicted range; damage = wrong-bus ∪ config family deviating from the reference family */
 				std::set<size_t> measured = wrongbus;
 				size_t ref_addr = SIZE_MAX;
 				for (size_t a = 0; a < pow2(n); ++a)

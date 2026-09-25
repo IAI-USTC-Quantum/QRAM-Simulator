@@ -1,26 +1,26 @@
 /*
  * QutritCorrespondenceExporter
  *
- * qutrit QRAM（QRAM-Simulator，TimeStep 轨迹级噪声模型）与电路级 channel 模拟
- * （UnifiedQuantum/uniqc，OriginIR-ext 内联噪声信道 + 密度矩阵后端）对应实验的
- * C++ 导出端：
- *   1. 构造 qram_qutrit::QRAMCircuit，设定 memory / noise_t / seed / uniform 输入；
- *   2. 从 QRAMCircuit::operations（TimeStep::generate 产物）提取：
- *        - 逐步逻辑算子 → qutrit→qubit 编码后的门序列（含控制极性）；
- *        - 采样得到的噪声算子 {step, type, pos, coef}（位置即“噪声信道位置”）；
- *   3. run_full() 精确轨迹演化 → 参考 output 分布（单次 + 多轨迹平均 + 自带 fidelity）；
- *   4. 全部写入 schedule.json / reference.json，供 Python 侧（uniqc）驱动消费。
+ * C++ export side of the correspondence experiment between qutrit QRAM (QRAM-Simulator,
+ * TimeStep trajectory-level noise model) and circuit-level channel simulation
+ * (UnifiedQuantum/uniqc, OriginIR-ext inline noise channels + density-matrix backend):
+ *   1. Build qram_qutrit::QRAMCircuit; set memory / noise_t / seed / uniform input;
+ *   2. Extract from QRAMCircuit::operations (TimeStep::generate output):
+ *        - per-step logical operators → gate sequence after qutrit→qubit encoding (with control polarities);
+ *        - sampled noise operators {step, type, pos, coef} (the position is the "noise channel position");
+ *   3. run_full() exact trajectory evolution → reference output distributions (single run + multi-trajectory average + built-in fidelity);
+ *   4. Write everything to schedule.json / reference.json for the Python-side (uniqc) driver to consume.
  *
- * 编码约定（与 run_correspondence.py 严格一致）：
- *   - address 寄存器：addr_size 个 qubit，地址 bit b ↔ qubit b；
- *   - bus 寄存器：data_size 个 qubit，bus digit d ↔ qubit addr_size + d；
- *   - 路由节点 v（堆编号，v ∈ [0, 2^addr-1)）：
- *       a1 = addr+data+3v, a0 = addr+data+3v+1（qutrit 能级编码）, d = addr+data+3v+2；
- *       W=(a1,a0)=|00>（基态），L=|01>，R=|10>，|11> 为不可达死态；
- *   - 噪声位 pos：node = pos/2，子系统 = pos%2（0 → addr-qutrit 的 (a1,a0)，1 → data 位）。
+ * Encoding conventions (strictly consistent with run_correspondence.py):
+ *   - address register: addr_size qubits, address bit b ↔ qubit b;
+ *   - bus register: data_size qubits, bus digit d ↔ qubit addr_size + d;
+ *   - routing node v (heap-indexed, v ∈ [0, 2^addr-1)):
+ *       a1 = addr+data+3v, a0 = addr+data+3v+1 (qutrit level encoding), d = addr+data+3v+2;
+ *       W=(a1,a0)=|00> (ground state), L=|01>, R=|10>, |11> is an unreachable dead state;
+ *   - noise position pos: node = pos/2, subsystem = pos%2 (0 → (a1,a0) of the addr-qutrit, 1 → the data qubit).
  *
- * 门 IR：{"op": "X"|"SWAP"|"CNOT"|"U1", "q": [...], "ctrl": [[qubit, 期望值], ...], "theta": ...}
- *   CNOT 的 q=[control, target]；U1 = diag(1, e^{i·theta})；ctrl 空表 = 无控制。
+ * Gate IR: {"op": "X"|"SWAP"|"CNOT"|"U1", "q": [...], "ctrl": [[qubit, expected value], ...], "theta": ...}
+ *   CNOT takes q=[control, target]; U1 = diag(1, e^{i·theta}); empty ctrl list = no controls.
  */
 
 #include <cmath>
@@ -99,8 +99,8 @@ string gate_u1(double theta, size_t t, const vector<Ctrl>& cs)
 		t, ctrls2str(cs), theta);
 }
 
-/* 在 qubit 列表 qs（bit i ↔ qs[i]）上发射基矢置换 (pi ↔ pj)，整体受 cs 控制。
- * 标准共轭法：X 包裹 + CNOT 共轭把置换化到单 bit 翻转的多控 X。 */
+/* Emit the basis transposition (pi ↔ pj) on qubit list qs (bit i ↔ qs[i]), controlled overall by cs.
+ * Standard conjugation: X wrapping + CNOT conjugation reduces the permutation to multi-controlled X on single-bit flips. */
 void emit_transposition(vector<string>& out, const vector<size_t>& qs,
 	uint64_t pi, uint64_t pj, const vector<Ctrl>& cs)
 {
@@ -142,8 +142,8 @@ void emit_transposition(vector<string>& out, const vector<size_t>& qs,
 		out.push_back(gate_x(qs[p], cs));
 }
 
-/* 节点 v 的 internal_swap：(a1,a0,d) 上 (0,0,0)↔(0,1,0) 与 (0,0,1)↔(1,0,0)。
- * bit 顺序 (a1,a0,d) = (bit0,bit1,bit2)。 */
+/* internal_swap of node v: (0,0,0)↔(0,1,0) and (0,0,1)↔(1,0,0) on (a1,a0,d).
+ * Bit order (a1,a0,d) = (bit0,bit1,bit2). */
 void emit_internal_swap(vector<string>& out, const Encoding& enc, size_t v, const vector<Ctrl>& cs)
 {
 	vector<size_t> qs = { enc.node_a1(v), enc.node_a0(v), enc.node_d(v) };
@@ -151,7 +151,7 @@ void emit_internal_swap(vector<string>& out, const Encoding& enc, size_t v, cons
 	emit_transposition(out, qs, 0b100, 0b001, cs);
 }
 
-/* 逻辑算子 → 门序列。镜像 QRAMCircuit::run_valid_branches 的 dispatch 语义。 */
+/* Logical operators → gate sequence. Mirrors the dispatch semantics of QRAMCircuit::run_valid_branches. */
 vector<string> translate_op(const Operation& op, const Encoding& enc, const memory_t& memory)
 {
 	vector<string> out;
@@ -167,7 +167,7 @@ vector<string> translate_op(const Operation& op, const Encoding& enc, const memo
 	case OperationType::CopyIn:
 	case OperationType::CopyOut:
 	{
-		/* SWAP(bus[digit], node0.data)；伴随的 try_merge 为 no-op */
+		/* SWAP(bus[digit], node0.data); the accompanying try_merge is a no-op */
 		out.push_back(gate_swap(enc.bus_qubit(op.targets[0]), enc.node_d(0), {}));
 		break;
 	}
@@ -180,7 +180,7 @@ vector<string> translate_op(const Operation& op, const Encoding& enc, const memo
 		}
 		else
 		{
-			/* layer ℓ-1 的每个节点按 addr 方向对 child 做 internal_swap */
+			/* each node of layer ℓ-1 applies internal_swap to its child in the addr direction */
 			size_t lower = pow2(layer - 1) - 1, upper = pow2(layer) - 2;
 			for (size_t v = lower; v <= upper; ++v)
 			{
@@ -261,8 +261,8 @@ string noise_type_name(OperationType t)
 	}
 }
 
-/* 设定输入分支：uniform = 地址+bus 全均匀叠加（输出分布退化为均匀，仅作对照）；
- * zerobus = 地址均匀叠加、bus=0（主配置：输出 (a, memory[a]) 非平凡，分布可检验） */
+/* Set input branches: uniform = full uniform superposition of address+bus (the output distribution degenerates to uniform; control only);
+ * zerobus = uniform superposition of addresses with bus=0 (main configuration: outputs (a, memory[a]) are nontrivial and the distribution is checkable) */
 void set_input(qram_qutrit::QRAMCircuit& q, const string& mode)
 {
 	auto& branches = q.branches;
@@ -330,8 +330,8 @@ string memory2str(const memory_t& memory)
 	return ret + "]";
 }
 
-/* schedule.json：config + encoding + input + 逐步（门 + 噪声算子，保持 pack 内顺序）。
- * damp_outcomes：Damp_Full 的第二次抽样结果（key = (step, pos)；-2 表示未记录）。 */
+/* schedule.json: config + encoding + input + per-step (gates + noise operators, preserving in-pack order).
+ * damp_outcomes: results of Damp_Full's second draw (key = (step, pos); -2 means not recorded). */
 string export_schedule(const qram_qutrit::QRAMCircuit& q, const Encoding& enc,
 	const noise_t& noise, seed_t seed, const string& input_mode,
 	const std::map<std::pair<size_t, size_t>, int>& damp_outcomes = {})
@@ -454,17 +454,17 @@ memory_t parse_memory(const string& csv, size_t addr_size, size_t data_size)
 	}
 	if (memory.size() != pow2(addr_size))
 		throw std::runtime_error("memory size mismatch");
-	/* get_fidelity 的 expect_bus 直接 XOR 原始 memory 值，只有 data_size 位以内的
-	 * 取值才是合法输入（set_memory_random 同约定）——越界值会被静默判 0 贡献 */
+	/* get_fidelity's expect_bus XORs the raw memory value directly, so only values within
+	 * data_size bits are legal inputs (same convention as set_memory_random) — out-of-range values silently count as 0 contribution */
 	for (auto v : memory)
 		if (v >= pow2(data_size))
 			throw std::runtime_error("memory entry exceeds data_size bits");
 	return memory;
 }
 
-/* 模型级（注释语义）噪声算子：先把显式 (W,0) 归一化为 absent，再按纯状态函数作用。
- * 库侧 rotate_A1 穿透 / state_of(absent) / 采样闭区间已修复后，本轨迹与原生
- * run_valid_branches 应逐位一致 —— 保留作为修复的交叉验证。 */
+/* Model-level (comment semantics) noise operators: first normalize explicit (W,0) to absent, then apply as pure state functions.
+ * After the library-side fixes to rotate_A1 passthrough / state_of(absent) / the closed sampling interval, this trajectory should agree
+ * bitwise with native run_valid_branches — kept as a cross-validation of those fixes. */
 void model_normalize(qram_qutrit::QRAMState& st)
 {
 	for (auto it = st.nz_elements.begin(); it != st.nz_elements.end();)
@@ -478,7 +478,7 @@ void model_normalize(qram_qutrit::QRAMState& st)
 
 void model_addr_cycle(qram_qutrit::QRAMState& st, size_t v, int ground_target)
 {
-	/* ground_target: A1 → R（W→R→L→W），A1² → L（W→L→R→W） */
+	/* ground_target: A1 → R (W→R→L→W), A1² → L (W→L→R→W) */
 	auto it = st.nz_elements.find(v);
 	if (it == st.nz_elements.end())
 	{
@@ -558,7 +558,7 @@ void model_noise_op(qram_qutrit::QRAMCircuit& q, const Operation& op)
 	}
 }
 
-/* Damp_Full 的采样结果（第二次抽样）：outcome ∈ {-1=不跳, 0=L跳/data跳, 1=R跳} */
+/* Sampled result of Damp_Full (second draw): outcome ∈ {-1=no jump, 0=L jump/data jump, 1=R jump} */
 struct DampOutcome
 {
 	size_t step;
@@ -566,9 +566,9 @@ struct DampOutcome
 	int outcome;
 };
 
-/* 复刻 QRAMCircuit::run_damp_full 的采样（pick_all 路径：first_good_branch==-1，
-   multiplier 预处理自动跳过）。逐 RNG draw 对齐：prob_damp 计算无 RNG、
-   恰好一次 uniform01。返回采样结果并记入日志。 */
+/* Replicates QRAMCircuit::run_damp_full's sampling (pick_all path: first_good_branch==-1,
+   multiplier preprocessing auto-skipped). Aligned per RNG draw: prob_damp computation uses no RNG,
+   exactly one uniform01. Returns the sampled result and logs it. */
 int replica_damp_full(qram_qutrit::QRAMCircuit& q, size_t qubit_id, size_t step,
 	std::vector<DampOutcome>* log)
 {
@@ -600,8 +600,8 @@ int replica_damp_full(qram_qutrit::QRAMCircuit& q, size_t qubit_id, size_t step,
 	return outcome;
 }
 
-/* 模型语义轨迹：逻辑算子走原生 dispatch（对表示不敏感），噪声算子走 model_noise_op；
- * Damp 算子走复刻拦截（Damp_Common 直通原生、Damp_Full 复刻采样并记日志）。 */
+/* Model-semantics trajectory: logical operators go through the native dispatch (representation-insensitive), noise operators through model_noise_op;
+ * Damp operators go through the replica interception (Damp_Common passes through native, Damp_Full replicates the sampling and logs it). */
 void run_model_trajectory(qram_qutrit::QRAMCircuit& q, bool verbose,
 	std::vector<DampOutcome>* damp_log)
 {
@@ -648,7 +648,7 @@ void run_model_trajectory(qram_qutrit::QRAMCircuit& q, bool verbose,
 	q.clear_zero_elements();
 }
 
-/* 调试用：复刻 run_valid_branches 的 dispatch，逐 pack 打印 branch 状态 */
+/* Debug aid: replicates run_valid_branches's dispatch, printing branch state per pack */
 void run_valid_branches_traced(qram_qutrit::QRAMCircuit& q)
 {
 	int step = 0;
@@ -758,7 +758,7 @@ int main(int argc, const char** argv)
 	Encoding enc{ addr_size, data_size };
 	std::filesystem::create_directories(outdir);
 
-	/* 1) 无噪声参考（Stage 0 基准） */
+	/* 1) Noise-free reference (Stage 0 baseline) */
 	map<string, double> noisefree_dist;
 	{
 		qram_qutrit::QRAMCircuit q0(addr_size, data_size, memory);
@@ -767,15 +767,15 @@ int main(int argc, const char** argv)
 		noisefree_dist = collect_output_distribution(q0);
 	}
 
-	/* 2) 噪声配置：前 export_runs 条轨迹逐条导出调度（schedule_r{i}.json，驱动逐随机
-	 *    case 精确对拍），r=0 兼容导出 schedule.json；每条轨迹 run_valid_branches 后：
-	 *      - 输出分布（realization dist，Stage 1 逐 case 基准 + 轨迹平均）；
-	 *      - 三个无后选择 fidelity 参考量（在 sample_and_get_fidelity 破坏 branch 前计算）：
-	 *          fid_nopost   = |Σ_i p_i·F_i|²，F_i = bus 正确的振幅和（不采样树构型）
-	 *          fid_overlap  = |Σ_i p_i·G_i|²，G_i = bus 正确且树回基态的振幅和
-	 *                         = |⟨ψ_ideal|ψ_traj⟩|²，与驱动 F_quantum 严格同口径
-	 *          fid_incoh    = Σ_i p_i|F_i|²，分支投影（非相干）组合
-	 *      - 最后才调 sample_and_get_fidelity（逐 shot 树后选择版，avg_fidelity）。 */
+	/* 2) Noisy configuration: the first export_runs trajectories each export their schedule (schedule_r{i}.json, for the
+	 *    driver's exact per-random-case cross-check), r=0 additionally exported as schedule.json; after run_valid_branches per trajectory:
+	 *      - output distribution (realization dist, Stage 1 per-case ground-truth reference + trajectory average);
+	 *      - three post-selection-free reference fidelity quantities (computed before sample_and_get_fidelity clobbers the branches):
+	 *          fid_nopost   = |Σ_i p_i·F_i|², F_i = amplitude sum with correct bus (no tree-configuration sampling)
+	 *          fid_overlap  = |Σ_i p_i·G_i|², G_i = amplitude sum with correct bus and tree back to ground
+	 *                         = |⟨ψ_ideal|ψ_traj⟩|², strictly the same convention as the driver's F_quantum
+	 *          fid_incoh    = Σ_i p_i|F_i|², incoherent combination of branch projections
+	 *      - only then call sample_and_get_fidelity (per-shot tree-post-selected version, avg_fidelity). */
 	string schedule_str;
 	map<string, double> single_run_dist;
 	map<string, double> avg_dist;
@@ -787,7 +787,7 @@ int main(int argc, const char** argv)
 	{
 		qram_qutrit::QRAMCircuit q(addr_size, data_size, memory);
 		q.set_noise_models(noise);
-		random_engine::set_seed(seed);   /* 原生轨迹从指定种子起跑（模型循环重放同一序列） */
+		random_engine::set_seed(seed);   /* native trajectories start from the given seed (the model loop replays the same sequence) */
 		set_input(q, input_mode);
 
 		static auto tree_is_ground = [](const qram_qutrit::QRAMState& st)
@@ -810,7 +810,7 @@ int main(int argc, const char** argv)
 			for (auto& [k, v] : d)
 				avg_dist[k] += v;
 
-			/* 三个无后选择 fidelity（读 branches，纯计算无 RNG） */
+			/* The three post-selection-free fidelities (read the branches; pure computation, no RNG) */
 			complex_t coh = 0, ov = 0;
 			double incoh = 0;
 			auto& branches = q.get_branches();
@@ -836,24 +836,24 @@ int main(int argc, const char** argv)
 			fid_overlap_sum += abs_sqr(ov);
 			fid_incoh_sum += incoh;
 
-			/* sample_and_get_fidelity 会做采样并删失 subbranch，必须放在最后 */
+			/* sample_and_get_fidelity samples and truncates subbranches, so it must come last */
 			fidelity_sum += q.sample_and_get_fidelity();
 		}
 		for (auto& [k, v] : avg_dist)
 			v /= (double)runs;
 	}
 
-	/* 3) 复刻轨迹（模型语义 + Damp_Full 第二次抽样拦截）：
-	 *    逐 RNG draw 重放与原生完全相同的随机序列；前 export_runs 条轨迹导出调度
-	 *    （schedule_r{i}.json，Damp_Full 带 outcome 字段）并与原生逐轨迹分布
-	 *    断言一致 —— 不一致说明复刻有误。 */
+	/* 3) Replica trajectories (model semantics + Damp_Full second-draw interception):
+	 *    replay exactly the same random sequence as native, RNG draw by draw; the first export_runs trajectories export
+	 *    their schedules (schedule_r{i}.json, Damp_Full carries the outcome field) and are asserted
+	 *    consistent with the native per-trajectory distributions — a mismatch means the replica is wrong. */
 	map<string, double> model_single_run_dist;
 	map<string, double> model_avg_dist;
 	double model_fidelity_sum = 0.0;
 	{
 		qram_qutrit::QRAMCircuit q(addr_size, data_size, memory);
 		q.set_noise_models(noise);
-		random_engine::set_seed(seed);   /* 重放与原生完全相同的调度序列 */
+		random_engine::set_seed(seed);   /* replay exactly the same schedule sequence as native */
 		set_input(q, input_mode);
 		for (size_t r = 0; r < runs; ++r)
 		{
@@ -868,7 +868,7 @@ int main(int argc, const char** argv)
 
 			if (r < export_runs)
 			{
-				/* 复刻 vs 原生逐轨迹一致性校验 */
+				/* Replica vs native per-trajectory consistency check */
 				auto& nd = realization_dists[r];
 				for (auto& [k, v] : nd)
 					if (std::abs(d[k] - v) > 1e-12)

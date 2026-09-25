@@ -1,7 +1,8 @@
 name: Python Bindings
 
-# pybind11 绑定层的守护 CI：wheel 构建安装 + pytest 冒烟。
-# 发布（tag → PyPI trusted publishing）见 pypi-publish.yml。
+# Guard CI for the pybind11 binding layer: wheel build + install +
+# pytest smoke tests. Publishing (tag -> PyPI trusted publishing) is in
+# pypi-publish.yml.
 on:
   push:
     branches: [ "main", "develop" ]
@@ -33,8 +34,8 @@ jobs:
   test:
     name: wheel + pytest (${{ matrix.os }}, py${{ matrix.python }})
     runs-on: ${{ matrix.os }}
-    # Gitea 也会扫描 .github/workflows，但其 runner 访问不了 github.com
-    # → 仅 GitHub 上游执行
+    # Gitea also scans .github/workflows, but its runners cannot reach
+    # github.com -> run on the GitHub upstream only
     if: github.repository_owner == 'IAI-USTC-Quantum'
     strategy:
       fail-fast: false
@@ -54,9 +55,10 @@ jobs:
         with:
           cmake-version: '3.26.x'
 
-      # scikit-build-core 用 Ninja generator，需要 cl 在 PATH 中
-      #（裸 windows runner 的 pwsh 不带 MSVC 环境，否则报
-      # CMAKE_CXX_COMPILER not set, after EnableLanguage）
+      # scikit-build-core uses the Ninja generator, which needs cl on PATH
+      # (the bare windows runner's pwsh lacks the MSVC environment;
+      # otherwise it fails with CMAKE_CXX_COMPILER not set, after
+      # EnableLanguage)
       - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
 

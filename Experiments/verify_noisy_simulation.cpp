@@ -1,20 +1,20 @@
 /*
- * verify_noisy_simulation — QRAM-Simulator（符号稀疏树轨迹引擎）↔ 电路级噪声模拟 对拍
+ * verify_noisy_simulation — QRAM-Simulator (symbolic sparse-tree trajectory engine) ↔ circuit-level noise simulation cross-check
  *
- * 以一组确定性实验保证 qutrit / qubit 两种架构的 QRAM 噪声模拟（TimeStep 调度 +
- * Depolarizing / Damping）与一个独立的电路级实现一致。电路级实现为本文件内置的
- * 自含模拟器（与符号树引擎零共享代码）：
- *   - Statevector 引擎：无噪声桥（S0）与逐随机 case 回放（S1，含单 Kraus 跳变）；
- *   - 稀疏密度矩阵引擎：信道级模拟（S2，Kraus 信道族）。
- * 门/信道统一为「局域矩阵 + 控制极性集」原语，无需门分解。
+ * Deterministic experiments guarantee that QRAM noise simulation for the qutrit / qubit
+ * architectures (TimeStep schedule + Depolarizing / Damping) agrees with an independent
+ * circuit-level implementation: the self-contained simulator built into this file (zero code shared with the symbolic tree engine):
+ *   - Statevector engine: noise-free bridge (S0) and per-random-case replay (S1, incl. single Kraus jumps);
+ *   - Sparse density-matrix engine: channel-level simulation (S2, Kraus channel families).
+ * Gates/channels are unified as "local matrix + control polarity set" primitives; no gate decomposition needed.
  *
- *   S0  无噪声桥：编码电路输出分布 vs QRAMCircuit 无噪声 run —— 逐位相等（1e-9）；
- *   S1  逐随机 case：抽样完成（含 Damp_Full 第二次抽样 outcome，由复刻执行拦截）后
- *       落成确定算子回放 —— 逐 case 逐位相等（1e-9，次归一化口径）；
- *   S2  信道级 faithful 镜像（其采样方案的平均效果）：F_cls / TVD / trace↔survival /
- *       F_quantum↔avg_overlap_fid 阈值断言。
+ *   S0  Noise-free bridge: encoded-circuit output distribution vs QRAMCircuit noise-free run — bitwise equal (1e-9);
+ *   S1  Per-random-case: after sampling completes (incl. the Damp_Full second-draw outcome,
+ *       intercepted by the replica execution), replay with deterministic operators — per-case bitwise equal (1e-9, sub-normalized convention);
+ *   S2  Channel-level faithful mirror (average effect of its sampling scheme): F_cls / TVD /
+ *       trace↔survival / F_quantum↔avg_overlap_fid threshold assertions.
  *
- * 失败返回非零退出码，由 ctest / CI 捕获。
+ * Failures return a nonzero exit code, caught by ctest / CI.
  */
 
 #include <cmath>
@@ -39,14 +39,14 @@ using namespace qram_simulator;
 namespace {
 
 using cplx = complex<double>;
-using Matrix = vector<cplx>;  // 行主序 d×d
-using Ctrl = pair<size_t, int>;  // (qubit, 期望值)
+using Matrix = vector<cplx>;  // row-major d×d
+using Ctrl = pair<size_t, int>;  // (qubit, expected value)
 
 constexpr double PI_ = 3.14159265358979323846;
 constexpr double SQRT2_INV = 0.70710678118654752440;
 
 /* ==========================================================================
- * 1. 自含电路模拟引擎（qubit q ↔ 索引 bit q；局域矩阵 bit0 ↔ qs[0]）
+ * 1. Self-contained circuit simulation engine (qubit q ↔ index bit q; local-matrix bit0 ↔ qs[0])
  * ========================================================================== */
 
 void apply_local_state(vector<cplx>& psi, const vector<size_t>& qs, const Matrix& M,
@@ -82,7 +82,7 @@ void apply_local_state(vector<cplx>& psi, const vector<size_t>& qs, const Matrix
 
 using RhoMap = unordered_map<uint64_t, cplx>;  // key = (i << n) | j
 
-/* ρ ← Σ_k K_k ρ K_k†（局域 Kraus 族；控制不满足处为恒等——按行/列独立判定） */
+/* ρ ← Σ_k K_k ρ K_k† (local Kraus family; identity where the control is unsatisfied — judged independently per row/column) */
 void apply_kraus_rho(RhoMap& rho, size_t n, const vector<size_t>& qs,
 	const vector<Matrix>& Ks, const vector<Ctrl>& ctrls = {})
 {
@@ -100,8 +100,8 @@ void apply_kraus_rho(RhoMap& rho, size_t n, const vector<size_t>& qs,
 			idx = (idx & ~(1ull << qs[k])) | (((lo >> k) & 1) << qs[k]);
 		return idx;
 	};
-	/* A = P·K·P + (I−P)⊗I：控制不满足的一侧取恒等（幅度 1），满足的一侧按 K。
-	 * 信道（无控制集）时两侧恒满足；多 Kraus 按 Σ_k K_k ρ K_k† 独立累加（不跨 k 混合）。 */
+	/* A = P·K·P + (I−P)⊗I: identity (amplitude 1) on the side where the control is
+	 * unsatisfied, K on the satisfied side. For a channel (no control set) both sides always hold; multiple Kraus accumulate independently per Σ_k K_k ρ K_k† (no mixing across k). */
 	RhoMap out;
 	out.reserve(rho.size() * 2);
 	for (auto& [key, v] : rho)
@@ -160,7 +160,7 @@ double rho_trace(const RhoMap& rho, size_t n)
 	return s;
 }
 
-/* 对角线上满足 mask（(qubit,值) 列表）的权重和 */
+/* Sum of diagonal weights satisfying mask (list of (qubit, value)) */
 double rho_mask_weight(const RhoMap& rho, size_t n, const vector<Ctrl>& mask)
 {
 	double s = 0;
@@ -177,7 +177,7 @@ double rho_mask_weight(const RhoMap& rho, size_t n, const vector<Ctrl>& mask)
 }
 
 /* ==========================================================================
- * 2. 矩阵库
+ * 2. Matrix library
  * ========================================================================== */
 
 Matrix mat_id(size_t d)
@@ -191,10 +191,10 @@ Matrix mat_x() { return { 0.0, 1.0, 1.0, 0.0 }; }
 Matrix mat_z() { return { 1.0, 0.0, 0.0, -1.0 }; }
 Matrix mat_h() { return { SQRT2_INV, SQRT2_INV, SQRT2_INV, -SQRT2_INV }; }
 
-/* qutrit data 位 depolarizing k=2（bitphaseflip）：|0>→−|1>、|1>→|0> */
+/* qutrit data-qubit depolarizing k=2 (bitphaseflip): |0>→−|1>, |1>→|0> */
 Matrix mat_xz() { return { 0.0, 1.0, -1.0, 0.0 }; }
 
-Matrix mat_swap2()  // 2q SWAP，qs={x,y}（bit0=x）
+Matrix mat_swap2()  // 2q SWAP, qs={x,y} (bit0=x)
 {
 	Matrix m(16);
 	m[0] = 1.0; m[4 * 2 + 1] = 1.0; m[4 * 1 + 2] = 1.0; m[4 * 3 + 3] = 1.0;
@@ -207,9 +207,9 @@ Matrix scaled(Matrix m, cplx s)
 	return m;
 }
 
-/* qutrit 4×4（基矢 (a1,a0)：W=0, L=1, R=2, dead=3；qs={a1,a0}） */
+/* qutrit 4×4 (basis (a1,a0): W=0, L=1, R=2, dead=3; qs={a1,a0}) */
 
-Matrix qutrit_perm(bool a1_first)  /* true: A1（W→R→L→W）；false: A1²（W→L→R→W） */
+Matrix qutrit_perm(bool a1_first)  /* true: A1 (W→R→L→W); false: A1² (W→L→R→W) */
 {
 	Matrix m(16);
 	if (a1_first)
@@ -236,7 +236,7 @@ Matrix qutrit_phase(int s)
 	return m;
 }
 
-Matrix qutrit_weyl(int k)  /* 8 元 Weyl：相位挂在置换前能级（镜像 run_depolarizing 顺序） */
+Matrix qutrit_weyl(int k)  /* 8-element Weyl: phase attached to the pre-permutation level (mirrors run_depolarizing order) */
 {
 	bool do_phase = k == 1 || k == 4 || k == 5 || k == 6 || k == 7;
 	int s = (k == 3 || k == 6 || k == 7) ? 2 : 1;
@@ -251,7 +251,7 @@ Matrix qutrit_weyl(int k)  /* 8 元 Weyl：相位挂在置换前能级（镜像 
 	return out;
 }
 
-/* qutrit 内部交换：3q 局域 qs={a1,a0,d}（bit0=a1）：(W,0)↔(L,0)、(W,1)↔(R,0) */
+/* qutrit internal swap: 3q local qs={a1,a0,d} (bit0=a1): (W,0)↔(L,0), (W,1)↔(R,0) */
 Matrix qutrit_internal_swap()
 {
 	Matrix m(64);
@@ -282,18 +282,18 @@ Matrix jump_2q()  /* |0><1| */
 	return { 0.0, 1.0, 0.0, 0.0 };
 }
 
-Matrix qutrit_jump(int level)  /* |W><L|（0）或 |W><R|（1） */
+Matrix qutrit_jump(int level)  /* |W><L| (0) or |W><R| (1) */
 {
 	Matrix m(16);
 	m[level == 0 ? 1 : 2] = 1.0;
 	return m;
 }
 
-/* qubit 架构 bitphaseflip（库已修复为 Y flip）：|0>→−|1>、|1>→|0>（ZX = iY，酉） */
+/* qubit-architecture bitphaseflip (library already fixed to Y flip): |0>→−|1>, |1>→|0> (ZX = iY, unitary) */
 Matrix qubit_M() { return mat_xz(); }
 
 /* ==========================================================================
- * 3. 编码与调度 → 局域算子序列（镜像两种架构 dispatch 的逻辑算子部分）
+ * 3. Encoding and schedule → local operator sequence (mirrors the logical-operator part of both architectures' dispatch)
  * ========================================================================== */
 
 struct Encoding
@@ -381,8 +381,8 @@ vector<StepPlan> translate_schedule(const TimeSlices& slices, const Encoding& en
 						}
 						else
 						{
-							/* QRAM 只对被父节点路由选中的 child 做 internal_swap
-							 * （L→左 child，R→右 child）；未选中的 ground (W,0) 不动 */
+							/* QRAM applies internal_swap only to the child selected by the
+							 * parent node's routing (L→left child, R→right child); the unselected ground (W,0) stays put */
 							size_t pb = enc.node_base((v - 1) / 2);
 							bool is_left = (v % 2 == 1);
 							emit({ base, base + 1, base + 2 }, qutrit_internal_swap(),
@@ -458,17 +458,17 @@ vector<StepPlan> translate_schedule(const TimeSlices& slices, const Encoding& en
 			}
 			}
 		}
-		plan[s].entangle_max = 0;  // 由构建方覆写
+			plan[s].entangle_max = 0;  // overwritten by the builder
 		(void)step;
 	}
 	return plan;
 }
 
 /* ==========================================================================
- * 4. 噪声算子的电路级原语
+ * 4. Circuit-level primitives of noise operators
  * ========================================================================== */
 
-/* S1 回放：噪声算子 → 局域矩阵序列（含单 Kraus，次归一化） */
+/* S1 replay: noise operators → local matrix sequence (incl. single Kraus, sub-normalized) */
 vector<pair<vector<size_t>, Matrix>> replay_noise(const NoiseEntry& o, const Encoding& enc)
 {
 	vector<pair<vector<size_t>, Matrix>> out;
@@ -521,7 +521,7 @@ vector<pair<vector<size_t>, Matrix>> replay_noise(const NoiseEntry& o, const Enc
 }
 
 /* ==========================================================================
- * 5. 对拍工具与参考侧
+ * 5. Cross-check utilities and reference side
  * ========================================================================== */
 
 int g_failures = 0;
@@ -657,7 +657,7 @@ double overlap_fid(const vector<cplx>& psi_ideal, const RhoMap& rho, size_t n)
 	return s.real();
 }
 
-/* ---------- qutrit 参考侧 ---------- */
+/* ---------- qutrit reference side ---------- */
 
 void set_input_qutrit(qram_qutrit::QRAMCircuit& q)
 {
@@ -683,7 +683,7 @@ map<string, double> dist_qutrit(const qram_qutrit::QRAMCircuit& q)
 	return dist;
 }
 
-/* qutrit 复刻执行：拦截 Damp_Full 采样（逐 RNG draw 对齐，恰好一次 uniform01） */
+/* qutrit replica execution: intercepts Damp_Full sampling (aligned per RNG draw, exactly one uniform01) */
 void replica_run_qutrit(qram_qutrit::QRAMCircuit& q, int step0,
 	vector<NoiseEntry>* noise_log)
 {
@@ -745,7 +745,7 @@ void replica_run_qutrit(qram_qutrit::QRAMCircuit& q, int step0,
 	q.clear_zero_elements();
 }
 
-/* qutrit 无后选择 overlap fidelity（树敏感）：|Σ p_a G_a|² */
+/* qutrit post-selection-free overlap fidelity (tree-sensitive): |Σ p_a G_a|² */
 double overlap_fid_qutrit(const qram_qutrit::QRAMCircuit& q, const memory_t& memory)
 {
 	auto& branches = q.get_branches();
@@ -767,7 +767,7 @@ double overlap_fid_qutrit(const qram_qutrit::QRAMCircuit& q, const memory_t& mem
 	return abs_sqr(s);
 }
 
-/* ---------- qubit 参考侧 ---------- */
+/* ---------- qubit reference side ---------- */
 
 void set_input_qubit(qram_qubit::QRAMCircuit& q)
 {
@@ -880,7 +880,7 @@ double overlap_fid_qubit(const qram_qubit::QRAMCircuit& q, const memory_t& memor
 }
 
 /* ==========================================================================
- * 6. 实验驱动
+ * 6. Experiment driver
  * ========================================================================== */
 
 struct Experiment
@@ -892,7 +892,7 @@ struct Experiment
 	seed_t seed = 20260921;
 	size_t runs = 300;
 	size_t cases = 6;
-	int stages = 0;  // bit0: S0；bit1: S1；bit2: S2
+	int stages = 0;  // bit0: S0; bit1: S1; bit2: S2
 	double f_min = 0.99;
 	double tvd_max = 0.05;
 	double trace_gap = 0.02;
@@ -952,7 +952,7 @@ References build_references(const Experiment& E, const memory_t& memory)
 		R.survival = 0;
 		for (auto& [k, v] : R.avg) R.survival += v;
 
-		/* 复刻轨迹：outcome 拦截 + 逐轨迹一致性 + case 导出 */
+		/* Replica trajectories: outcome interception + per-trajectory consistency + case export */
 		random_engine::set_seed(E.seed);
 		set_input_qutrit(q);
 		for (size_t r = 0; r < E.runs; ++r)
@@ -1031,14 +1031,14 @@ References build_references(const Experiment& E, const memory_t& memory)
 	return R;
 }
 
-/* S2 信道级（faithful；mode：full / nojump / faithful / depol_textbook） */
+/* S2 channel level (faithful; mode: full / nojump / faithful / depol_textbook) */
 pair<RhoMap, map<string, double>> run_stage2(const vector<StepPlan>& plan,
 	const Encoding& enc, size_t n, const string& mode,
 	double depol, double damping)
 {
 	RhoMap rho;
 	vector<cplx> psi0 = initial_state(enc);
-	/* 相干初始态：|ψ><ψ| */
+	/* Coherent initial state: |ψ><ψ| */
 	for (size_t i = 0; i < psi0.size(); ++i)
 	{
 		if (psi0[i] == cplx(0.0, 0.0)) continue;
@@ -1053,7 +1053,7 @@ pair<RhoMap, map<string, double>> run_stage2(const vector<StepPlan>& plan,
 	{
 		for (auto& g : st.gates)
 			apply_kraus_rho(rho, n, g.qs, { g.M }, g.ctrls);
-		/* Depolarizing 信道（活跃位置 [0, 2(2^L−1))，边缘概率 p） */
+		/* Depolarizing channel (active positions [0, 2(2^L−1)), marginal probability p) */
 		if (depol > 0)
 		{
 			size_t n_active = 2 * ((1ull << st.entangle_max) - 1);
@@ -1081,7 +1081,7 @@ pair<RhoMap, map<string, double>> run_stage2(const vector<StepPlan>& plan,
 				}
 			}
 		}
-		/* Damping（Damp_Common 出现处全树施加） */
+		/* Damping (applied to the whole tree wherever Damp_Common occurs) */
 		for (auto& o : st.noises)
 		{
 			if (o.type != OperationType::Damp_Common) continue;
@@ -1112,7 +1112,7 @@ pair<RhoMap, map<string, double>> run_stage2(const vector<StepPlan>& plan,
 					}
 					continue;
 				}
-				/* nojump / faithful：先取当前权重 */
+					/* nojump / faithful: take the current weights first */
 				auto w_of = [&](const vector<Ctrl>& mask)
 				{ return rho_mask_weight(rho, n, mask); };
 				if (enc.qutrit)
@@ -1125,7 +1125,7 @@ pair<RhoMap, map<string, double>> run_stage2(const vector<StepPlan>& plan,
 					}
 					else
 					{
-						/* K0 分支整体乘 a = sqrt(1 − γw/S)（含基态部分——轨迹系综权重语义） */
+						/* The K0 branch is scaled overall by a = sqrt(1 − γw/S) (incl. the ground-state part — trajectory-ensemble weight semantics) */
 						double a = active ? sqrt(max(1.0 - gamma * (wL + wR) / S, 0.0)) : 1.0;
 						apply_kraus_rho(rho, n, { base + 1, base },
 							{ scaled(qutrit_k0(gamma), a),
@@ -1183,7 +1183,7 @@ void run_experiment(const Experiment& E)
 	{
 		auto d = dist_of_psi(R.psi_ideal, enc);
 		double md = max_diff(d, R.noisefree);
-		check(md < 1e-9, "S0 无噪声桥", fmt::format("max|ΔP|={:.2e}", md));
+		check(md < 1e-9, "S0 noise-free bridge", fmt::format("max|ΔP|={:.2e}", md));
 	}
 	if (E.stages & 2)
 	{
@@ -1214,7 +1214,7 @@ void run_experiment(const Experiment& E)
 					[&]{ double t=0; for (auto& [k,v]:R.case_dist[c]) t+=v; return t; }());
 			}
 		}
-		check(all_ok, "S1 逐随机 case 回放", fmt::format("{} cases, worst={:.2e}",
+		check(all_ok, "S1 per-random-case replay", fmt::format("{} cases, worst={:.2e}",
 			R.case_plan.size(), worst));
 	}
 	if (E.stages & 4)
@@ -1241,7 +1241,7 @@ void run_experiment(const Experiment& E)
 			? [&]{ map<string, double> m; for (auto& [k, v] : d) m[k] = v / tr; return m; }()
 			: d);
 		double fq = overlap_fid(R.psi_ideal, rho, n);
-		check(f_cls > E.f_min, "S2 faithful F_cls(归一)", fmt::format("{:.4f}", f_cls));
+		check(f_cls > E.f_min, "S2 faithful F_cls (normalized)", fmt::format("{:.4f}", f_cls));
 		check(t < E.tvd_max, "S2 faithful TVD", fmt::format("{:.4f}", t));
 		check(fabs(tr - sr) < E.trace_gap, "S2 trace↔survival",
 			fmt::format("trace={:.4f} survival={:.4f}", tr, sr));
@@ -1255,10 +1255,10 @@ void run_experiment(const Experiment& E)
 
 int main()
 {
-	fmt::print("verify_noisy_simulation: qutrit/qubit QRAM ↔ 自含电路噪声模拟器 对拍\n\n");
+	fmt::print("verify_noisy_simulation: qutrit/qubit QRAM ↔ self-contained circuit noise simulator cross-check\n\n");
 
-	/* qutrit 架构 */
-	run_experiment({ "qutrit / 无噪声桥", true, 0, 0, 20260921, 8, 0, 1 });
+	/* qutrit architecture */
+	run_experiment({ "qutrit / noise-free bridge", true, 0, 0, 20260921, 8, 0, 1 });
 	run_experiment({ "qutrit / depol p=0.02 / S1", true, 0.02, 0, 20260921, 8, 6, 2 });
 	run_experiment({ "qutrit / depol p=0.3 / S1", true, 0.3, 0, 777, 8, 6, 2 });
 	run_experiment({ "qutrit / damp γ=0.05 / S1", true, 0, 0.05, 20260921, 8, 6, 2 });
@@ -1269,8 +1269,8 @@ int main()
 	run_experiment({ "qutrit / mixed p=γ=0.02 / S2", true, 0.02, 0.02, 20260921, 300, 1, 4,
 		0.995, 0.05, 0.02, 0.05 });
 
-	/* qubit 架构 */
-	run_experiment({ "qubit / 无噪声桥", false, 0, 0, 20260921, 8, 0, 1 });
+	/* qubit architecture */
+	run_experiment({ "qubit / noise-free bridge", false, 0, 0, 20260921, 8, 0, 1 });
 	run_experiment({ "qubit / depol p=0.02 / S1", false, 0.02, 0, 20260921, 8, 6, 2 });
 	run_experiment({ "qubit / depol p=0.3 / S1", false, 0.3, 0, 777, 8, 6, 2 });
 	run_experiment({ "qubit / damp γ=0.05 / S1", false, 0, 0.05, 20260921, 8, 6, 2 });
@@ -1281,6 +1281,6 @@ int main()
 	run_experiment({ "qubit / mixed p=γ=0.02 / S2", false, 0.02, 0.02, 20260921, 300, 1, 4,
 		0.995, 0.05, 0.01, 0.05 });
 
-	fmt::print("\n{} 项断言失败\n", g_failures);
+	fmt::print("\n{} assertion(s) failed\n", g_failures);
 	return g_failures ? 1 : 0;
 }

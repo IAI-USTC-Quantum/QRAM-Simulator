@@ -5,23 +5,23 @@
 namespace qram_simulator {
 
 	/**
-	 * @brief Python 风格的整数 range 迭代器。
+	 * @brief Python-style integer range iterator.
 	 *
-	 * 支持 range(stop) 与 range(start, stop[, step])，可用于基于范围的
-	 * for 循环：`for (size_t i : range(4))`。
+	 * Supports range(stop) and range(start, stop[, step]); usable in
+	 * range-based for loops: `for (size_t i : range(4))`.
 	 */
 	class range {
 	private:
 		size_t start, stop, step;
 
 	public:
-		/// 构造 [0, stop) 区间
+		/// Construct the interval [0, stop)
 		range(size_t stop) : start(0), stop(stop), step(1) {}
-		/// 构造 [start, stop) 区间，步长 step
+		/// Construct the interval [start, stop) with step size step
 		range(size_t start, size_t stop, size_t step = 1)
             : start(start), stop(stop), step(step) {}
 
-		/// 迭代器：按步长推进，以 stop 为界
+		/// Iterator: advances by the step size, bounded by stop
 		class iterator {
 		private:
 			size_t current, step, stop;
@@ -31,52 +31,53 @@ namespace qram_simulator {
 			iterator(size_t current, size_t step, size_t stop)
 				: current(current), step(step), stop(stop) {}
 
-			/// 解引用：返回当前位置
+			/// Dereference: return the current position
 			inline size_t operator*() const { return current; }
 
-			/// 前进一步
+			/// Advance one step
 			inline iterator& operator++() {
 				current += step;
 				return *this;
 			}
 
-			/// 判断是否仍在区间内（与哨兵 end 比较）
+			/// Check whether still inside the interval (compared against the end sentinel)
 			inline bool operator!=(const iterator& other) const {
 				return (step > 0) ? (current < stop) : (current > stop);
 			}
 		};
 
-		/// 起始迭代器
+		/// Iterator to the beginning
 		inline iterator begin() const { return iterator(start, step, stop); }
-		/// 终止哨兵迭代器
+		/// End sentinel iterator
 		inline iterator end() const { return iterator(stop, step, stop); }
 	};
 
 	/**
-	 * @brief 任意多个容器的笛卡尔积迭代器。
+	 * @brief Cartesian product iterator over any number of containers.
 	 *
-	 * 类似 Python 的 itertools.product：按最后一个容器优先的顺序
-	 * 遍历所有组合，每次解引用得到各容器当前元素的 tuple。
-	 * 用法：`for (auto [i, j] : product(vecA, vecB))`。
+	 * Similar to Python's itertools.product: traverses all combinations
+	 * with the last container varying fastest; each dereference yields a
+	 * tuple of the current elements of all containers.
+	 * Usage: `for (auto [i, j] : product(vecA, vecB))`.
 	 */
 	template <typename... Containers>
 	class product {
 	private:
 		std::tuple<Containers...> containers;
 
-		/// 取第 I 个容器的起始迭代器
+		/// Get the begin iterator of the I-th container
 		template <size_t I>
 		auto get_begin() const {
 			return std::begin(std::get<I>(containers));
 		}
 
-		/// 取第 I 个容器的终止迭代器
+		/// Get the end iterator of the I-th container
 		template <size_t I>
 		auto get_end() const {
 			return std::end(std::get<I>(containers));
 		}
 
-		/// 进位式递增：从第 I 个容器起逐个推进，全满则返回 false
+		/// Carry-style increment: advance the containers one by one starting from the I-th; return false when all are exhausted
 		template <size_t I>
 		bool increment(std::tuple<typename Containers::iterator...>& current) const {
 			auto& it = std::get<I>(current);
@@ -89,14 +90,14 @@ namespace qram_simulator {
 			return false;
 		}
 
-		/// 打包全部容器的起始迭代器
+		/// Pack the begin iterators of all containers
 		template <size_t... Is>
 		auto get_all_begins(std::index_sequence<Is...>) const {
 			return std::make_tuple(get_begin<Is>()...);
 		}
 
 	public:
-		/// 以若干容器构造笛卡尔积视图
+		/// Construct a Cartesian product view from several containers
 		product(const Containers&... cs)
 			: containers(cs...) {}
 
@@ -104,7 +105,7 @@ namespace qram_simulator {
 		//product(Args&&... cs)
 		//    : containers(std::forward<Args>(cs)...) {}
 
-		/// 笛卡尔积迭代器
+		/// Cartesian product iterator
 		class iterator {
 		private:
 			const product* parent;
@@ -122,28 +123,28 @@ namespace qram_simulator {
 				}
 			}
 
-			/// 解引用：返回各容器当前元素组成的 tuple
+			/// Dereference: return a tuple of the current elements of all containers
 			auto operator*() const {
 				return std::apply([](auto&&... its) {
 					return std::make_tuple(*its...);
 					}, current);
 			}
 
-			/// 前进到下一个组合
+			/// Advance to the next combination
 			iterator& operator++() {
 				is_end = !parent->increment<sizeof...(Containers) - 1>(current);
 				return *this;
 			}
 
-			/// 与哨兵 end 比较（是否遍历完毕）
+			/// Compare against the end sentinel (whether traversal is finished)
 			bool operator!=(const iterator& other) const {
 				return is_end != other.is_end;
 			}
 		};
 
-		/// 起始迭代器
+		/// Iterator to the beginning
 		iterator begin() const { return iterator(this); }
-		/// 终止哨兵迭代器
+		/// End sentinel iterator
 		iterator end() const { return iterator(this, true); }
 	};
 }

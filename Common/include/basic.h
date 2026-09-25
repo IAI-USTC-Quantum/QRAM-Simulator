@@ -17,37 +17,37 @@
 
 namespace qram_simulator {
 
-	/// 复数模方 |c|^2
+	/// Squared modulus |c|^2 of a complex number
 	template<typename Ty>
 	constexpr auto abs_sqr(const std::complex<Ty>& c) -> Ty {
 		return std::real(c) * std::real(c) + std::imag(c) * std::imag(c);
 	}
 
-	/// 取整数 n 的第 digit 位（0 为最低位）
+	/// Get the digit-th bit of integer n (0 is the least significant bit)
 	HOST_DEVICE constexpr bool get_digit(uint64_t n, size_t digit)
 	{ 
 		return (n >> digit) & 1; 
 	}
 
-	/// 取第 digit 位并按 maxdigit 反转位序（最高位变最低位）
+	/// Get the digit-th bit with bit order reversed according to maxdigit (most significant becomes least significant)
 	HOST_DEVICE	constexpr bool get_digit_reverse(uint64_t n, size_t digit, size_t maxdigit)
 	{
 		return (n >> (maxdigit - digit - 1)) & 1;
 	}
 
-	/// 2 的 n 次幂（n < 64）
+	/// 2 to the n-th power (n < 64)
 	HOST_DEVICE	constexpr uint64_t pow2(size_t n)
 	{ 
 		return (static_cast<uint64_t>(1ull)) << (n);
 	}
 
-	/// width 位全 1 掩码（width=64 时为全 1）
+	/// All-ones mask of width bits (all ones when width=64)
 	HOST_DEVICE constexpr uint64_t width_mask(size_t width)
 	{
 		return width == 64 ? ~uint64_t{0} : pow2(width) - 1;
 	}
 
-	/// 整数以 2 为底的对数（向下取整，n>0）
+	/// Base-2 logarithm of an integer (rounded down, n>0)
 	constexpr size_t log2(uint64_t n) {
 		size_t ret = 0;
 		while (n > 1) {
@@ -57,7 +57,7 @@ namespace qram_simulator {
 		return ret;
 	}
 
-	/// 振幅向量概率和（模方和）
+	/// Probability sum of an amplitude vector (sum of squared moduli)
 	template<typename Ty>
 	Ty amp_sum(const std::vector<std::complex<Ty>>& amps)
 	{
@@ -66,18 +66,18 @@ namespace qram_simulator {
 		return val;
 	}
 
-	/// |v| < eps 判定（数值零）
+	/// Test |v| < eps (numerically zero)
 	HOST_DEVICE	constexpr bool ignorable(const double v, double eps) {
 		if (v > -eps && v < eps) return true;
 		else return false;
 	}
 
-	/// |v| < epsilon 判定（默认容差）
+	/// Test |v| < epsilon (default tolerance)
 	HOST_DEVICE	constexpr bool ignorable(const double v) {
 		return ignorable(v, epsilon);
 	}
 
-	/// 复数模方可忽略判定
+	/// Test whether the squared modulus of a complex number is ignorable
 	template<typename Ty>
 	constexpr bool ignorable(const std::complex<Ty>& v) {
 		Ty value = abs_sqr(v);
@@ -85,7 +85,7 @@ namespace qram_simulator {
 		else return false;
 	}
 
-	/// 归一化校验：概率和偏离 1 超出容差时抛出异常
+	/// Normalization check: throws an exception if the probability sum deviates from 1 beyond tolerance
 	template<typename Ty>
 	void check_normalization(const std::vector<std::complex<Ty>>& amps)
 	{
@@ -94,19 +94,19 @@ namespace qram_simulator {
 			throw_bad_result();
 	}
 
-	/// 整数 i 的第 digit 位是否为 1
+	/// Whether the digit-th bit of integer i is 1
 	HOST_DEVICE	constexpr inline bool digit1(uint64_t i, size_t digit)
 	{
 		return (i >> digit) & 1;
 	}
 
-	/// 整数 i 的第 digit 位是否为 0
+	/// Whether the digit-th bit of integer i is 0
 	HOST_DEVICE	constexpr inline bool digit0(uint64_t i, size_t digit)
 	{
 		return !digit1(i, digit);
 	}
 
-	/// 翻转整数 i 的第 digit 位（XOR 掩码）
+	/// Flip the digit-th bit of integer i (XOR mask)
 	HOST_DEVICE	constexpr uint64_t flip_digit(uint64_t i, size_t digit)
 	{
 		auto m = pow2(digit);
@@ -116,7 +116,7 @@ namespace qram_simulator {
 		return i ^ m;
 	}
 
-	/// 补码编码：负数 data 映射到 data_sz 位无符号（补码）
+	/// Two's-complement encoding: maps negative data to a data_sz-bit unsigned value (two's complement)
 	constexpr uint64_t make_complement(int64_t data, size_t data_sz)
 	{
 		if (data_sz == 64 || data >= 0) {
@@ -125,14 +125,14 @@ namespace qram_simulator {
 		return pow2(data_sz) + data;
 	}
 
-	/// 补码解码：data_sz 位无符号还原为有符号（符号位扩展）
+	/// Two's-complement decoding: restores a data_sz-bit unsigned value to signed (sign extension)
 	HOST_DEVICE	constexpr int64_t get_complement(uint64_t data, size_t data_sz)
 	{
 		return data_sz ? (int64_t)(data << (64 - data_sz)) >> (64 - data_sz) : 0;
 	}
 
-	// 整数平方根（下取整）：纯整数逐位算法，无浮点参与，
-	// CPU 与 CUDA 结果按位一致（docs/operators.md《宽度与截断约定》）
+	// Integer square root (floored): a pure integer digit-by-digit algorithm with no floating point involved,
+	// so CPU and CUDA results agree bit for bit (docs/operators.md "Width and Truncation Conventions")
 	HOST_DEVICE inline uint64_t isqrt_u64(uint64_t n)
 	{
 		uint64_t rem = 0, root = 0;
@@ -153,9 +153,9 @@ namespace qram_simulator {
 	}
 #endif
 
-	/// @brief 定点有理数编码：把 [0,1) 的 data 编为 data_sz 位定点整数。
+	/// @brief Fixed-point rational encoding: encodes data in [0,1) as a data_sz-bit fixed-point integer.
 	///
-	/// 越界（data ≥ 1 或 < 0）返回 0。
+	/// Returns 0 when out of range (data >= 1 or < 0).
 	HOST_DEVICE	constexpr uint64_t get_rational(double data, size_t data_sz)
 	{
 		// profiler _("Common");
@@ -174,16 +174,16 @@ namespace qram_simulator {
 		return ret;
 	}
 
-	/// complex_t 的字典序比较（set/map 键用）
+	/// Lexicographic comparison of complex_t (for set/map keys)
 	bool operator<(const complex_t& lhs, const complex_t& rhs);
-	/// 十进制转二进制字符串（高位补零到 size 位）
+	/// Decimal to binary string (zero-padded at the high end to size bits)
 	std::string dec2bin(uint64_t n, size_t size);
 
-	/// get_rational 的 IEEE754 位级实现（按 double 尾数截断）
+	/// IEEE754 bit-level implementation of get_rational (truncated per the double mantissa)
 	size_t get_rational_IEEE754(double data, size_t data_sz);
 
 	/* Helper class array_length */
-	/// 数组长度萃取工具骨架（array_length<T>::value 为数组长度）
+	/// Array-length trait skeleton (array_length<T>::value is the array length)
 	template<typename Ty = void>
 	struct array_length
 	{};
@@ -200,7 +200,7 @@ namespace qram_simulator {
 		static constexpr int value = sz;
 	};
 
-	/// 第 layerid 层的满节点下标区间 [lower, upper]（层内编号）
+	/// Range [lower, upper] of full-node indices at layer layerid (numbering within the layer)
 	constexpr std::pair<size_t, size_t> get_layer_range(size_t layerid)
 	{
 		size_t lower = pow2(layerid + 1) - 2;
@@ -208,7 +208,7 @@ namespace qram_simulator {
 		return { lower, upper };
 	}
 
-	/// 第 layerid 层的树节点编号区间 [lower, upper]（层序编号）
+	/// Range [lower, upper] of tree-node indices at layer layerid (level-order numbering)
 	constexpr std::pair<size_t, size_t> get_layer_node_range(size_t layerid) 
 	{
 		size_t lower = pow2(layerid) - 1;
@@ -224,7 +224,7 @@ namespace qram_simulator {
 	template<typename T>
 	using _remove_cvref_t = typename _remove_cvref<T>::type;
 
-	/// 任意类型指针统一转 void*（map2vec 等映射辅助用）
+	/// Uniformly convert a pointer of any type to void* (used by map2vec and other mapping helpers)
 	template<typename Ty>
 	void* to_voidptr(Ty ptr)  {
 		using T_ptr_t = _remove_cvref_t<Ty>;
@@ -233,7 +233,7 @@ namespace qram_simulator {
 		return reinterpret_cast<void*>(const_cast<clear_pointer_type>(ptr));
 	}
 
-	/// std::map 转为 (键指针, 值指针) 的向量（供 C 接口遍历）
+	/// Convert a std::map into a vector of (key pointer, value pointer) pairs (for C-interface traversal)
 	template<typename KeyTy, typename ValTy>
 	void map2vec(std::vector<std::pair<void*, void*>>& vec, const std::map<KeyTy, ValTy>& map1) {
 		vec.clear();
@@ -245,9 +245,9 @@ namespace qram_simulator {
 		}
 	}
 
-	/// @brief 用指定引擎随机填充数据树。
+	/// @brief Randomly fill the data tree with the given engine.
 	///
-	/// 每个内存槽独立采样 U(0, 2^memory_size - 1)。
+	/// Each memory slot is independently sampled from U(0, 2^memory_size - 1).
 	template<typename EngineType, typename MemoryContainer>
 	void random_memory(MemoryContainer& memory, size_t memory_size, EngineType& engine) {
 		size_t size = memory.size();
@@ -259,12 +259,12 @@ namespace qram_simulator {
 		}
 	}
 
-	/// 用全局随机引擎随机填充数据树（size_t 槽版本）
+	/// Randomly fill the data tree using the global random engine (size_t-slot version)
 	inline void random_memory(std::vector<size_t>& memory, size_t memory_size) {
 		random_memory(memory, memory_size, random_engine::get_engine());
 	}
 
-	/// 相邻去重并合并：pred 判定相邻等值时用 fn 合并到前者
+	/// Adjacent deduplication with merging: when pred reports adjacent equal values, fn merges the latter into the former
 	template <typename FwdIt, typename Pred, typename Func>
 	FwdIt unique_and_merge(FwdIt first, FwdIt last, Pred pred, Func fn)
 	{
@@ -281,7 +281,7 @@ namespace qram_simulator {
 		return ++result;
 	}
 
-	/// 排序 → 相邻等值合并 → 按谓词移除 → 物理删除 的复合清理流程
+	/// Composite cleanup pipeline: sort -> merge adjacent equal values -> remove by predicate -> physically erase
 	template<typename ContainerTy, typename PredLt, typename PredEq, typename MergeFn, typename EraseFn>
 	void sort_merge_unique_erase(ContainerTy& vec, PredLt lt, PredEq eqn, MergeFn fn, EraseFn erase)
 	{
@@ -291,7 +291,7 @@ namespace qram_simulator {
 		vec.erase(iter, vec.end());
 	}
 
-	/// 按谓词删除 map 中满足条件的元素（C++20 std::erase_if 的 C++17 替代）
+	/// Erase the elements of a map satisfying a predicate (C++17 substitute for C++20 std::erase_if)
 	template< class Key, class T, class Compare, class Alloc, class Pred >
 	void erase_if(std::map<Key, T, Compare, Alloc>& c, Pred pred) {
 		for (auto i = c.begin(), last = c.end(); i != last; ) {
@@ -304,7 +304,7 @@ namespace qram_simulator {
 		}
 	}
 
-	/// 从 [0, 2^size) 无放回采样 n_samples 个互异下标到 samples
+	/// Sample n_samples distinct indices without replacement from [0, 2^size) into samples
 	template<typename Rng>
 	void choice_from(std::set<size_t>& samples, int size, size_t n_samples, Rng& g)
 	{
@@ -315,7 +315,7 @@ namespace qram_simulator {
 		}
 	}
 
-	/// 等距采样：[min, max] 上生成 points 个数（含端点）
+	/// Evenly spaced sampling: generate points values over [min, max] (endpoints included)
 	inline std::vector<double> linspace(double min, double max, size_t points) {
 		double delta = (max - min) / (points - 1);
 		std::vector<double> ret;
@@ -326,7 +326,7 @@ namespace qram_simulator {
 		return ret;
 	}
 
-	/// 样本均值与标准差（无偏性未修正，按总体方差计算）
+	/// Sample mean and standard deviation (uncorrected for bias, computed as the population variance)
 	inline std::pair<double, double> mean_std(const std::vector<double>& m) {
 		auto sq = [](double m, double y) {
 			return m + y * y;
@@ -340,7 +340,7 @@ namespace qram_simulator {
 
 	}
 
-	/// 复数转 "a±bj" 字符串
+	/// Convert a complex number to an "a±bj" string
 	inline std::string complex2str(const std::complex<double>& x)
 	{
 		if (x.imag() > 0)
@@ -349,7 +349,7 @@ namespace qram_simulator {
 			return fmt::format("{}-{}j", x.real(), -x.imag());
 	}
 
-	/// 复数向量转 "[a±bj, …]" 字符串
+	/// Convert a vector of complex numbers to an "[a±bj, ...]" string
 	inline std::string complex2str(const std::vector<complex_t>& vec)
 	{
 		std::string ret = "[";
@@ -365,7 +365,7 @@ namespace qram_simulator {
 	}
 
 
-	/// 向量转 "[v1,v2,…]" 字符串（可自定义括号与分隔符）
+	/// Convert a vector to a "[v1,v2,...]" string (brackets and separator customizable)
 	template<typename Ty>
 	std::string vec2str(const std::vector<Ty>& v, std::string lb = "[", std::string rb = "]", std::string sep = ",")
 	{
@@ -380,13 +380,13 @@ namespace qram_simulator {
 		return lb + ret.str() + rb;
 	}
 
-	/// 数字转字符串（std::to_string 包装）
+	/// Convert a number to a string (std::to_string wrapper)
 	template<typename Ty>
 	std::string num2str(Ty num) {
 		return std::to_string(num);
 	}
 
-	/// 64 位整数置 1 位计数（popcount）
+	/// Population count (popcount) of a 64-bit integer
 	inline size_t bitcount(uint64_t n)
 	{
 #if defined(_MSC_VER)
@@ -403,7 +403,7 @@ namespace qram_simulator {
 #endif
 	}
 
-	/// 32 位整数置 1 位计数（popcount）
+	/// Population count (popcount) of a 32-bit integer
 	inline size_t bitcount(uint32_t n)
 	{
 #if defined(_MSC_VER)
@@ -420,7 +420,7 @@ namespace qram_simulator {
 #endif
 	}
 
-	/// 64 位整数置 1 位奇偶性
+	/// Parity of set bits in a 64-bit integer
 	inline bool bit_parity(uint64_t n)
 	{
 #if defined(_MSC_VER)
@@ -432,7 +432,7 @@ namespace qram_simulator {
 #endif
 	}
 
-	/// 32 位整数置 1 位奇偶性
+	/// Parity of set bits in a 32-bit integer
 	inline bool bit_parity(uint32_t n)
 	{
 #if defined(_MSC_VER)
@@ -444,7 +444,7 @@ namespace qram_simulator {
 #endif
 	}
 
-	/// 态向量范数平方（概率和）
+	/// Squared norm of a state vector (probability sum)
 	inline double norm2(const std::vector<complex_t>& state)
 	{
 		double sum = 0;
@@ -455,9 +455,9 @@ namespace qram_simulator {
 		return sum;
 	}
 
-	/// @brief 态向量对目标态的内积保真度 |<state|target>|。
+	/// @brief Inner-product fidelity |<state|target>| of a state vector against a target state.
 	///
-	/// 长度不一致抛出运行时异常；空向量返回 0。
+	/// Throws a runtime exception on length mismatch; returns 0 for empty vectors.
 	template<typename Ty>
 	inline double get_fidelity(const std::vector<Ty>& state,
 		const std::vector<complex_t>& target)
@@ -482,7 +482,7 @@ namespace qram_simulator {
 		return std::abs(sum);
 	}
 
-	/// 实向量对目标向量的重叠 |<state|target>|（经典分布版本）
+	/// Overlap |<state|target>| of a real vector against a target vector (classical distribution version)
 	inline double get_fidelity(const std::vector<double>& state,
 		const std::vector<double>& target)
 	{
@@ -500,7 +500,7 @@ namespace qram_simulator {
 		return std::abs(sum);
 	}
 
-	/// 校验容器严格递增且无重复（有序唯一性检查）
+	/// Check that a container is strictly increasing with no duplicates (sorted-uniqueness check)
 	template<typename ContainerTy>
 	bool check_unique_sort(const ContainerTy& cont)
 	{
@@ -518,7 +518,7 @@ namespace qram_simulator {
 		return true;
 	}
 
-	/// 校验迭代器区间严格递增且无重复（有序唯一性检查）
+	/// Check that an iterator range is strictly increasing with no duplicates (sorted-uniqueness check)
 	template<typename Iter>
 	bool check_unique_sort(Iter beg, Iter end)
 	{
@@ -539,9 +539,9 @@ namespace qram_simulator {
 	/* Concatenate value sequentially by its value and length(size)
 	* Low to High
 	*/
-	/// @brief 把 (值, 位宽) 序列按低位到高位拼接为单一整数。
+	/// @brief Concatenate a (value, width) sequence into a single integer, low bits to high bits.
 	///
-	/// 如 [(5,3),(1,2)] → 5 | (1<<3) = 13。
+	/// E.g. [(5,3),(1,2)] -> 5 | (1<<3) = 13.
 	size_t concat_value(const std::vector<std::pair<size_t, size_t>>& values);
 
 }

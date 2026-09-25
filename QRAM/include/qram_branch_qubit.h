@@ -5,152 +5,152 @@
 namespace qram_simulator {
 	namespace qram_qubit {
 
-		/// State 内部布局常量：地址槽位下标（相对 nz_location）
+		/// State internal layout constant: address slot index (relative to nz_location)
 		constexpr size_t Addr = 0;
-		/// State 内部布局常量：数据槽位下标（相对 nz_location）
+		/// State internal layout constant: data slot index (relative to nz_location)
 		constexpr size_t Data = 1;
-		/// 比特基态常量：|0>
+		/// Qubit basis state constant: |0>
 		constexpr bool ZeroState = false;
-		/// 比特基态常量：|1>
+		/// Qubit basis state constant: |1>
 		constexpr bool OneState = true;
 
 		/**
-		 * @brief 以非零基态节点集合表示的稀疏计算基态。
+		 * @brief A sparse computational basis state represented by the set of non-zero basis nodes.
 		 *
-		 * 完整二叉 QRAM 树的状态只需记录处于 |1> 的节点位置
-		 * （nz_elements），其余节点隐含为 |0>；树的层序编号满足
-		 * left/right/parent 的位运算关系。所有门操作以稀疏集合的
-		 * 增删实现，复杂度与非零元素数同阶。
+		 * The state of a complete binary QRAM tree only needs to record the node positions
+		 * in |1> (nz_elements); all other nodes are implicitly |0>. The level-order numbering of the tree
+		 * satisfies the bitwise left/right/parent relations. All gate operations are implemented
+		 * as insertions/deletions on the sparse set, with complexity on the order of the number of non-zero elements.
 		 */
 		struct State
 		{
-			/// 处于 |1> 的节点位置集合（非零元素）
+			/// Set of node positions in |1> (non-zero elements)
 			std::set<size_t> nz_elements;
 
 			using element_type = decltype(nz_elements);
 			using data_type = element_type::key_type;
 			using iterator_type = decltype(nz_elements.begin());
 
-			/// 按字典序比较（set 的自然序）
+			/// Lexicographic comparison (natural order of the set)
 			bool operator<(const State& rhs) const;
-			/// 集合相等判定
+			/// Set equality test
 			bool operator==(const State& rhs) const;
-			/// 返回第 layerid 层的元素迭代器区间 [begin, end)
+			/// Returns the element iterator range [begin, end) of layer layerid
 			std::pair<iterator_type, iterator_type> get_layer_iter(size_t layerid);
-			/// 收集第 layerid 层的非零节点编号
+			/// Collects the non-zero node indices of layer layerid
 			void get_layer_nonzero_nodes(size_t layerid, std::set<size_t>& nodes);
-			/// 收集第 layerid 层的非零父节点编号
+			/// Collects the non-zero parent node indices of layer layerid
 			void get_layer_nonzero_parent_nodes(size_t layerid, std::set<size_t>& nodes);
-			/// 兼容接口：qubit 基态无零振幅元素可清理，恒为空操作
+			/// Compatibility interface: a qubit basis state has no zero-amplitude elements to clean up, so this is always a no-op
 			inline void clear_zero_elements() {}
 
-			/// @brief 由层号与层内位置编码非零元素位置。
-			/// @param layer 层号 @param pos 层内位置 @param lr 左(0)/右(1)子节点
-			/// @return 节点在 nz_elements 中的位置键
+			/// @brief Encodes a non-zero element location from a layer number and an in-layer position.
+			/// @param layer Layer number @param pos In-layer position @param lr Left (0) / right (1) child
+			/// @return The location key of the node in nz_elements
 			constexpr static size_t get_nz_location(size_t layer, size_t pos, size_t lr);
-			/// @brief 由节点位置与其左右子标志编码非零元素位置。
-			/// @param node_location 节点位置 @param lr 左(0)/右(1)子节点
+			/// @brief Encodes a non-zero element location from a node location and a left/right child flag.
+			/// @param node_location Node location @param lr Left (0) / right (1) child
 			constexpr static size_t get_nz_location(size_t node_location, size_t lr);
-			/// 节点 node_location 的左子节点位置
+			/// Location of the left child of node node_location
 			constexpr static size_t left_of(size_t node_location);
-			/// 节点 node_location 的右子节点位置
+			/// Location of the right child of node node_location
 			constexpr static size_t right_of(size_t node_location);
-			/// 节点 node_location 的父节点位置
+			/// Location of the parent of node node_location
 			constexpr static size_t parent_of(size_t node_location);
-			/// 判断位置 nz_location 处的比特是否为 |1>
+			/// Checks whether the qubit at location nz_location is |1>
 			bool state_of(size_t nz_location) const;
-			/// 总线输入：把总线第 digit 位写入地址槽
+			/// Bus input: writes bus bit digit into the address slot
 			void busin(bus_t& bus, size_t digit);
-			/// 总线输出：把地址槽读出到总线第 digit 位
+			/// Bus output: reads the address slot out to bus bit digit
 			void busout(bus_t& bus, size_t digit);
-			/// 翻转位置 nz_location 处的比特（X 门）
+			/// Flips the qubit at location nz_location (X gate)
 			void flip(size_t nz_location);
-			/// 条件非门：condition 为真时翻转 nz_location
+			/// Conditional NOT: flips nz_location when condition is true
 			void cnot(size_t nz_location, bool condition);
-			/// 任意两个位置 nz_l / nz_r 的一般交换
+			/// General swap between two arbitrary locations nz_l / nz_r
 			void general_swap(size_t nz_l, size_t nz_r);
-			/// 节点 node_location 内部（地址槽-数据槽）交换
+			/// Internal (address slot - data slot) swap within node node_location
 			void internal_swap(size_t node_location);
-			/// 第 layerid 层全部节点的内部交换
+			/// Internal swap of all nodes at layer layerid
 			void internal_swap_layer(size_t layerid);
-			/// 地址拷贝：按方向 a 把地址槽写入数据槽（FirstCopy）
+			/// Address copy: writes the address slot into the data slot in direction a (FirstCopy)
 			void acopy(bool a);
-			/// 节点 node_location 处的受控交换（CSWAP）
+			/// Controlled swap (CSWAP) at node node_location
 			void cswap(size_t node_location);
-			/// 第 layerid 层全部节点的受控交换
+			/// Controlled swap of all nodes at layer layerid
 			void cswap_layer(size_t layerid);
-			/// 把位置 qubit_id 处的比特置零（噪声 SetZero）
+			/// Sets the qubit at location qubit_id to zero (noise SetZero)
 			void set_zero(size_t qubit_id);
-			/// 清空全部非零元素（回到全 |0>）
+			/// Clears all non-zero elements (back to all |0>)
 			inline void clear() { nz_elements.clear(); }
 		};
 
 		/**
-		 * @brief 带数据总线与振幅的系统态（分支轨迹的单个元素）。
+		 * @brief System state with a data bus and an amplitude (a single element of a branch trajectory).
 		 *
-		 * 由稀疏树态 State、data_size 位数据总线 data_bus 与复振幅
-		 * amplitude 组成；run_* 系列把门 / 噪声操作同时作用在树态与
-		 * 总线上，演化出一条轨迹。
+		 * Composed of the sparse tree state State, the data_size-bit data bus data_bus,
+		 * and the complex amplitude; the run_* series applies gate / noise operations
+		 * to the tree state and the bus simultaneously, evolving one trajectory.
 		 */
 		struct SystemState
 		{
-			/// 稀疏树态
+			/// Sparse tree state
 			State state;
-			/// 数据总线（data_size 位整数）
+			/// Data bus (a data_size-bit integer)
 			bus_t data_bus;
-			/// 总线位宽
+			/// Bus width
 			size_t bus_size;
-			/// 轨迹振幅（噪声衰减作用于该系数）
+			/// Trajectory amplitude (noise damping acts on this coefficient)
 			std::complex<double> amplitude = 1.0;
 
 			using element_type = typename State::element_type;
 
 			SystemState() = default;
-			/// @brief 以给定总线初值构造。
-			/// @param bus_ 总线值 @param bus_sz 总线位宽
+			/// @brief Constructs with the given initial bus value.
+			/// @param bus_ Bus value @param bus_sz Bus width
 			SystemState(bus_t bus_, size_t bus_sz) : data_bus(bus_), bus_size(bus_sz)
 			{
 			}
 			SystemState(const SystemState& other) = default;
 
-			/// 按 (总线值, 树态) 字典序比较
+			/// Lexicographic comparison by (bus value, tree state)
 			inline bool operator<(const SystemState& rhs) const noexcept
 			{
 				return std::tie(data_bus, state) < std::tie(rhs.data_bus, rhs.state);
 			}
-			/// 相等判定（总线值与树态均相同）
+			/// Equality test (same bus value and tree state)
 			inline bool operator==(const SystemState& rhs) const noexcept
 			{
 				return std::tie(data_bus, state) == std::tie(rhs.data_bus, rhs.state);
 			}
 
-			/// 地址拷贝：按方向 a 写入数据槽
+			/// Address copy: writes into the data slot in direction a
 			void run_acopy(bool a);
-			/// 节点 node 处的普通交换
+			/// Plain swap at node node
 			void run_swap(size_t node);
-			/// 节点 node 处的受控交换
+			/// Controlled swap at node node
 			void run_cswap(size_t node);
-			/// 位置 qubit_id 处的比特翻转（噪声）
+			/// Bit flip at location qubit_id (noise)
 			void run_bitflip(size_t qubit_id);
-			/// 位置 qubit_id 处的相位翻转（噪声，振幅取负）
+			/// Phase flip at location qubit_id (noise, amplitude negated)
 			void run_phaseflip(size_t qubit_id, double depol_id);
-			/// 位置 qubit_id 处的比特-相位联合翻转（噪声）
+			/// Combined bit-phase flip at location qubit_id (noise)
 			void run_bitphaseflip(size_t qubit_id);
-			/// 位置 qubit_id 处的去极化（噪声）
+			/// Depolarizing at location qubit_id (noise)
 			void run_depolarizing(size_t qubit_id, double depol_id);
-			/// 位置 qubit_id 处置零（噪声）
+			/// Set to zero at location qubit_id (noise)
 			void set_zero(size_t qubit_id);
-			/// 总线输入第 digit 位
+			/// Bus input of bit digit
 			void run_busin(size_t digit);
-			/// 总线输出第 digit 位
+			/// Bus output of bit digit
 			void run_busout(size_t digit);
 
-			/// 公共振幅衰减：按非零元素数乘 sqrt(1-gamma)^|nz|
+			/// Common amplitude damping: multiplies by sqrt(1-gamma)^|nz| per the number of non-zero elements
 			inline void run_damp_common(double gamma)
 			{
 				amplitude *= std::pow(std::sqrt(1 - gamma), state.nz_elements.size());
 			}
-			/// 清空树态并复位振幅
+			/// Clears the tree state and resets the amplitude
 			inline void clear()
 			{
 				state.clear();
@@ -159,76 +159,76 @@ namespace qram_simulator {
 		};
 
 		/**
-		 * @brief 单条 (address, bus_input) 输入分支的轨迹容器。
+		 * @brief Trajectory container of a single (address, bus_input) input branch.
 		 *
-		 * 持有一组 SystemState（同一输入在噪声 / 合并下分裂出的多条
-		 * 轨迹），支持与数据树对照的保真度计算与输出采样。
+		 * Holds a set of SystemState (multiple trajectories split from the same input
+		 * under noise / merging), and supports fidelity computation against the data tree and output sampling.
 		 */
 		struct Branch {
 
-			/// 架构标识：qubit
+			/// Architecture identifier: qubit
 			constexpr static int qunit_type = arch_qubit;
 
 			using state_type = SystemState;
 			using element_type = typename state_type::element_type;
-			/// Damping 概率数组类型（qubit 架构单元素）
+			/// Damping probability array type (single element in the qubit architecture)
 			using damp_prob_type = std::array<double, 1>;
 
-			/// 分支地址
+			/// Branch address
 			size_t address = 0;
-			/// 总线位宽
+			/// Bus width
 			size_t bus_size = 1;
-			/// 输入总线值
+			/// Input bus value
 			bus_t bus_input = 0;
-			/// Damping 相对乘子（相对基准好分支，预测振幅用）
+			/// Relative Damping multiplier (relative to the reference good branch, used for amplitude prediction)
 			double relative_multiplier = 1;
-			/// 好分支的预测基准（第一条好分支指针）
+			/// Prediction reference for good branches (pointer to the first good branch)
 			Branch* good_ref = nullptr;
 		private:
 			bool good = false;
 		public:
 
-			/// 该分支的全部轨迹（含分裂）
+			/// All trajectories of this branch (including split ones)
 			std::vector<SystemState> system_states;
-			/// 有效轨迹条数（system_states 的前 system_states_sz 条有效）
+			/// Number of valid trajectories (the first system_states_sz entries of system_states are valid)
 			size_t system_states_sz = 0;
-			/// 分支编号：(address << bus_size) + bus_input
+			/// Branch ID: (address << bus_size) + bus_input
 			inline size_t get_branchid() const { return (address << bus_size) + bus_input; }
 
-			/// 标记本分支为好分支并绑定预测基准
+			/// Marks this branch as a good branch and binds the prediction reference
 			void set_good(Branch* first_good_ptr);
 
-			/// 本分支是否为好分支（装载结果与数据树一致）
+			/// Whether this branch is a good branch (loading result consistent with the data tree)
 			inline bool is_good() const
 			{
 				return good;
 			}
 
-			/// 有效轨迹起始迭代器
+			/// Iterator to the beginning of valid trajectories
 			inline auto iterbeg()
 			{
 				return system_states.begin();
 			}
 
-			/// 有效轨迹起始迭代器（const）
+			/// Iterator to the beginning of valid trajectories (const)
 			inline auto iterbeg() const
 			{
 				return system_states.begin();
 			}
 
-			/// 有效轨迹终止迭代器
+			/// Iterator to the end of valid trajectories
 			inline auto iterend()
 			{
 				return system_states.begin() + system_states_sz;
 			}
 
-			/// 有效轨迹终止迭代器（const）
+			/// Iterator to the end of valid trajectories (const)
 			inline auto iterend() const
 			{
 				return system_states.begin() + system_states_sz;
 			}
 
-			/// 按谓词 pred 移除不满足的轨迹并收缩有效长度
+			/// Removes trajectories not satisfying predicate pred and shrinks the valid length
 			template<typename Pred>
 			inline void remove_if(Pred pred)
 			{
@@ -236,7 +236,7 @@ namespace qram_simulator {
 				system_states_sz = iter - iterbeg();
 			}
 
-			/// 复位为单条初始轨迹（总线初值 bus_input），清除好分支标记
+			/// Resets to a single initial trajectory (initial bus value bus_input), clearing the good-branch flag
 			inline void reset() {
 				system_states_sz = 1;
 				system_states[0] = std::move(SystemState(bus_input, bus_size));
@@ -245,121 +245,121 @@ namespace qram_simulator {
 			}
 
 			Branch() = default;
-			/// @brief 以显式 (地址, 总线值) 构造。
-			/// @param addr 地址 @param bus_sz 总线位宽 @param bus 总线值
+			/// @brief Constructs with an explicit (address, bus value).
+			/// @param addr Address @param bus_sz Bus width @param bus Bus value
 			Branch(size_t addr, size_t bus_sz, bus_t bus);
-			/// @brief 以分支编号构造（自动拆出地址与总线值）。
+			/// @brief Constructs from a branch ID (address and bus value extracted automatically).
 			/// @param branchid (address << bus_sz) | bus_input
-			/// @param bus_sz 总线位宽
+			/// @param bus_sz Bus width
 			Branch(size_t branchid, size_t bus_sz);
 			Branch(const Branch& old_branch) = default;
 
-			/// 按 (地址, 输入总线, 轨迹集合) 字典序比较
+			/// Lexicographic comparison by (address, input bus, trajectory set)
 			inline bool operator<(const Branch& other) const {
 				return std::tie(address, bus_input, system_states) <
 					std::tie(other.address, other.bus_input, other.system_states);
 			}
 
-			/// 相等判定
+			/// Equality test
 			inline bool operator==(const Branch& other) const {
 				return std::tie(address, bus_input, system_states) ==
 					std::tie(other.address, other.bus_input, other.system_states);
 			}
 
-			/// 本分支轨迹的概率总和（振幅模方和）
+			/// Total probability of this branch's trajectories (sum of squared amplitude moduli)
 			double get_prob() const;
-			/// 与数据树对照的保真度振幅（未取模方）
+			/// Fidelity amplitude against the data tree (modulus not squared)
 			complex_t get_fidelity(const memory_t& memory) const;
-			/// 返回可读字符串表示
+			/// Returns a human-readable string representation
 			std::string to_string() const;
-			/// 从数据树 memory 取第 digit 位到总线（FetchData）
+			/// Fetches bit digit from the data tree memory to the bus (FetchData)
 			void run_fetchdata(memory_t& memory, size_t digit);
-			/// 总线 Hadamard 变换
+			/// Hadamard transform on the bus
 			void run_hadamard();
-			/// 合并相同的轨迹（振幅相加）
+			/// Merges identical trajectories (amplitudes added up)
 			void try_merge();
 
-			/// 取好分支基准轨迹的树态（本分支为好分支时有效）
+			/// Tree state of the reference good branch trajectory (valid when this branch is a good branch)
 			std::optional<element_type> get_good_branch_system() const;
 
-			/// 公共振幅衰减（同 SystemState::run_damp_common）
+			/// Common amplitude damping (same as SystemState::run_damp_common)
 			void run_damp_common(double gamma);
 
-			/// 返回 Damping 下的轨迹概率（按 qubit_id 处激发数修正）
+			/// Returns the trajectory probability under Damping (corrected by the excitation count at qubit_id)
 			damp_prob_type get_prob_damp(size_t qubit_id) const;
 
-			/// 完整振幅衰减：qubit_id 处按衰减步数 k 分裂轨迹
+			/// Full amplitude damping: splits trajectories at qubit_id by damping step count k
 			void run_damp_full(size_t qubit_id, size_t k);
 
-			/// 移除与目标树态不匹配的轨迹（输出采样后清理）
+			/// Removes trajectories not matching the target tree state (cleanup after output sampling)
 			void remove_mismatch_state(const State::element_type& target_state);
-			/// 移除全部轨迹
+			/// Removes all trajectories
 			void remove_all_state();
 
-			/// 清空有效轨迹（置 system_states_sz = 0）
+			/// Clears valid trajectories (sets system_states_sz = 0)
 			inline void clear_all_state() { system_states_sz = 0; }
 
 		};
 
 		/**
-		 * @brief 同一地址的全部输入分支聚合（qubit 架构的剪枝单元）。
+		 * @brief Aggregation of all input branches at the same address (the pruning unit of the qubit architecture).
 		 *
-		 * BranchGroup 以地址为单位聚合 Branch：好地址的组只需物化基准
-		 * 分支（XOR 镜像预测），坏地址的组逐条演化；组级提供概率、
-		 * 保真度与输出采样接口，QRAMCircuit 以 BranchGroup 为粒度
-		 * 管理 good/bad 剪枝。
+		 * BranchGroup aggregates Branch per address: groups at good addresses only need to materialize
+		 * the reference branch (XOR mirror prediction), while groups at bad addresses are evolved one by one;
+		 * the group level provides probability, fidelity, and output sampling interfaces, and QRAMCircuit
+		 * manages good/bad pruning at BranchGroup granularity.
 		 */
 		struct BranchGroup
 		{
-			/// 组地址
+			/// Group address
 			size_t address;
-			/// 输入侧分支 |ui(input)>
+			/// Input-side branches |ui(input)>
 			std::vector<Branch> branches_input; // |ui(input)>
-			/// 演化后的分支 |ui>
+			/// Evolved branches |ui>
 			std::vector<Branch> branches;       // |ui>
-			/// 各分支概率 <ui|ui>
+			/// Per-branch probabilities <ui|ui>
 			std::vector<double> branch_probs;   // <ui|ui>
-			/// 各态概率 <ψi|ψi>
+			/// Per-state probabilities <ψi|ψi>
 			std::vector<double> state_probs;    // <ψi|ψi>
 
-			/// 本组是否为好组（地址不在坏分支区间）
+			/// Whether this group is a good group (address outside the bad branch interval)
 			bool is_good = false;
-			/// 好组的预测基准（第一好组指针）
+			/// Prediction reference for good groups (pointer to the first good group)
 			BranchGroup* good_ref = nullptr;
-			/// Damping 相对乘子（相对基准好组）
+			/// Relative Damping multiplier (relative to the reference good group)
 			double relative_multiplier = 1.0;
 			/* set once the good group's final states have been materialized
 			from the reference branch (XOR mirror), after which the generic
 			prob/fidelity paths apply */
-			/// 基准好分支的系统态已物化（XOR 镜像）后置位，此后走通用概率/保真度路径
+			/// Set once the reference good branch's system states have been materialized (XOR mirror), after which the generic probability/fidelity paths apply
 			bool predicted = false;
 
-			/// @brief 以地址 addr 构造空组。
+			/// @brief Constructs an empty group at address addr.
 			BranchGroup(size_t addr) : address(addr)
 			{}
 
-			/// 复位全部分支与标记
+			/// Resets all branches and flags
 			void reset();
-			/// 标记为好组并绑定预测基准
+			/// Marks as a good group and binds the prediction reference
 			void set_good(BranchGroup* good_ref_);
-			/// 清空全部分支态（保留分支框架）
+			/// Clears all branch states (branch skeleton kept)
 			void set_empty_state();
 
-			/// 与数据树对照的保真度振幅（未取模方）
+			/// Fidelity amplitude against the data tree (modulus not squared)
 			complex_t get_fidelity(const memory_t& memory) const;
 
-			/// Damping 下的轨迹概率
+			/// Trajectory probability under Damping
 			Branch::damp_prob_type get_prob_damp(size_t qubit_id) const;
 
-			/// 本组全部分支的概率总和
+			/// Total probability of all branches in this group
 			double get_prob() const;
 
-			/// 无 Damping 输出采样：r 为均匀随机数，返回是否采样成功
+			/// Output sampling without Damping: r is a uniform random number; returns whether sampling succeeded
 			bool sample_output_no_damping(Branch::element_type& output, double& r);
-			/// 含 Damping 输出采样：r 为均匀随机数，返回是否采样成功
+			/// Output sampling with Damping: r is a uniform random number; returns whether sampling succeeded
 			bool sample_output_with_damping(Branch::element_type& output, double& r);
 
-			/// 移除与目标树态不匹配的分支态
+			/// Removes branch states not matching the target tree state
 			void remove_mismatch_state(const Branch::element_type& target);
 		};
 	} // namespace qram_qubit

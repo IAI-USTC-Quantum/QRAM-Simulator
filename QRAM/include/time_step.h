@@ -4,59 +4,59 @@
 
 namespace qram_simulator {
 
-	/// qutrit 架构标识常量（TimeStep::generate 的 arch_type 参数取值）
+	/// qutrit architecture identifier constant (value of the arch_type parameter of TimeStep::generate)
 	constexpr int arch_qutrit = 0x1A1A;
-	/// qubit 架构标识常量（TimeStep::generate 的 arch_type 参数取值）
+	/// qubit architecture identifier constant (value of the arch_type parameter of TimeStep::generate)
 	constexpr int arch_qubit = 0x1B1B;
 
 	/**
-	 * @brief QRAM 操作类型枚举。
+	 * @brief Enumeration of QRAM operation types.
 	 *
-	 * 既是噪声模型的键类型（noise_t 的键），也是 Operation 的类型标签。
-	 * 噪声成员的取值为发生概率，须在 [0, 1] 内；其中 Damping 要求
-	 * gamma < 1（gamma = 1 会在一步内衰灭全部激发，破坏采样与归一化）。
+	 * Serves both as the key type of the noise model (the key of noise_t) and as the type tag of Operation.
+	 * Noise members are occurrence probabilities that must lie in [0, 1]; Damping additionally
+	 * requires gamma < 1 (gamma = 1 would extinguish all excitations in a single step, breaking sampling and normalization).
 	 */
 	enum class OperationType {
-		Begin,             ///< 枚举哨兵（不使用）
-		ControlSwap,       ///< 受控交换（路由）
-		HadamardData,      ///< 数据总线上的 Hadamard
-		CopyIn,            ///< 拷入（busin）
-		CopyOut,           ///< 拷出（busout）
-		SwapInternal,      ///< 节点内部交换
-		FirstCopy,         ///< 首层拷贝（acopy）
-		FetchData,         ///< 从数据树取数（fetchdata）
+		Begin,             ///< Enum sentinel (unused)
+		ControlSwap,       ///< Controlled swap (routing)
+		HadamardData,      ///< Hadamard on the data bus
+		CopyIn,            ///< Copy in (busin)
+		CopyOut,           ///< Copy out (busout)
+		SwapInternal,      ///< Internal swap within a node
+		FirstCopy,         ///< First-layer copy (acopy)
+		FetchData,         ///< Fetch data from the data tree (fetchdata)
 		// Noise Op
-		SetZero,           ///< 噪声：置零
-		Damping,           ///< 噪声：振幅衰减（gamma < 1）
-		Damp_Common,       ///< 噪声：公共振幅衰减
-		Damp_Full,         ///< 噪声：完整振幅衰减
-		BitFlip,           ///< 噪声：比特翻转
-		PhaseFlip,         ///< 噪声：相位翻转
-		BitPhaseFlip,      ///< 噪声：比特-相位联合翻转
-		Depolarizing,      ///< 噪声：去极化
+		SetZero,           ///< Noise: set to zero
+		Damping,           ///< Noise: amplitude damping (gamma < 1)
+		Damp_Common,       ///< Noise: common amplitude damping
+		Damp_Full,         ///< Noise: full amplitude damping
+		BitFlip,           ///< Noise: bit flip
+		PhaseFlip,         ///< Noise: phase flip
+		BitPhaseFlip,      ///< Noise: combined bit-phase flip
+		Depolarizing,      ///< Noise: depolarizing
 		// Identity
-		Identity_Active,   ///< 恒等操作（活跃比特）
-		Identity_Inactive, ///< 恒等操作（非活跃比特）
-		End                ///< 枚举哨兵（不使用）
+		Identity_Active,   ///< Identity operation (active qubit)
+		Identity_Inactive, ///< Identity operation (inactive qubit)
+		End                ///< Enum sentinel (unused)
 	};
 
-	/// 噪声模型：{操作类型: 发生概率}
+	/// Noise model: {operation type: occurrence probability}
 	using noise_t = std::map<OperationType, double>;
 
 	/**
-	 * @brief 单个量子操作。
+	 * @brief A single quantum operation.
 	 *
-	 * 描述一次门 / 噪声事件：类型、目标比特（或节点）编号及可选的
-	 * 噪声系数（如 Damping 的 gamma）。
+	 * Describes one gate / noise event: the type, the target qubit (or node)
+	 * indices, and optional noise coefficients (e.g. gamma of Damping).
 	 */
 	struct Operation {
-		/// 操作类型
+		/// Operation type
 		OperationType type;
-		/// 目标比特 / 节点编号
+		/// Target qubit / node indices
 		std::vector<size_t> targets;
-		/// 噪声系数（可选）
+		/// Noise coefficients (optional)
 		std::vector<double> coefficients;
-		/// 是否为共轭转置（逆）操作
+		/// Whether this is the conjugate-transpose (inverse) operation
 		bool dagger = false;
 
 		Operation(OperationType type_, std::vector<size_t> targets_)
@@ -69,27 +69,27 @@ namespace qram_simulator {
 
 		Operation(const Operation& oldop) = default;
 
-		/// 返回目标编号列表
+		/// Returns the list of target indices
 		inline std::vector<size_t> get_targets() const { return targets; }
-		/// 返回本操作的逆操作
+		/// Returns the inverse of this operation
 		Operation reverse();
-		/// 返回可读字符串表示
+		/// Returns a human-readable string representation
 		std::string to_string() const;
 	};
 
 	/**
-	 * @brief 同一时间片内并发执行的操作集合。
+	 * @brief A set of operations executed concurrently within one time slice.
 	 *
-	 * QRAM 树中互不相邻的节点可在同一时间片并行操作，OperationPack
-	 * 把它们打包为一个调度单元，以 name 标识。
+	 * Mutually non-adjacent nodes of the QRAM tree can be operated on in parallel
+	 * within the same time slice; OperationPack bundles them into one scheduling unit identified by name.
 	 */
 	struct OperationPack {
-		/// 本时间片内的操作列表
+		/// List of operations within this time slice
 		std::list<Operation> operations;
-		/// 操作组名称（调度调试用）
+		/// Operation pack name (for schedule debugging)
 		std::string name;
 
-		/// 返回逆操作组：按原顺序逐个取逆后重排
+		/// Returns the inverse operation pack: reverses the order and inverts each operation
 		inline OperationPack reverse() {
 			OperationPack ret;
 			for (auto iter = operations.rbegin(); iter != operations.rend(); ++iter) {
@@ -98,14 +98,14 @@ namespace qram_simulator {
 			ret.name = name + "^";
 			return ret;
 		}
-		/// 本操作组是否为空
+		/// Whether this pack is empty
 		inline bool empty() const { return operations.size() == 0; }
-		/// 设置操作组名称
+		/// Sets the pack name
 		inline void set_name(std::string s) { name = s; }
-		/// 追加单个操作
+		/// Appends a single operation
 		inline void append(Operation op) { operations.push_back(op); }
-		/// @brief 追加另一操作组的全部操作并拼接名称。
-		/// @param ops 被并入的操作组
+		/// @brief Appends all operations of another pack and concatenates the names.
+		/// @param ops The pack being merged in
 		inline void append(OperationPack ops) {
 			for (auto& op : ops.operations) {
 				append(op);
@@ -113,32 +113,32 @@ namespace qram_simulator {
 			name += "->";
 			name += ops.name;
 		}
-		/// 返回可读字符串表示
+		/// Returns a human-readable string representation
 		std::string to_string() const;
 	};
 
 	/**
-	 * @brief 完整 QRAM 装载调度：按时间片顺序排列的 OperationPack 序列。
+	 * @brief Complete QRAM loading schedule: a sequence of OperationPacks ordered by time slice.
 	 */
 	struct TimeSlices {
-		/// 时间片列表（第 i 个元素为第 i 个时间片的操作组）
+		/// List of time slices (the i-th element is the operation pack of the i-th time slice)
 		std::vector<OperationPack> time_slices;
 
-		/// 清空调度
+		/// Clears the schedule
 		inline void clear() {
 			time_slices.clear();
 		}
-		/// 追加单个时间片
+		/// Appends a single time slice
 		inline void append(const OperationPack &op) {
 			time_slices.emplace_back(op);
 		}
-		/// 追加另一调度的全部时间片
+		/// Appends all time slices of another schedule
 		inline void append(const TimeSlices &ts) {
 			for (auto& tslice : ts.time_slices) {
 				append(tslice);
 			}
 		}
-		/// 返回逆调度：整体反序并逐组取逆
+		/// Returns the inverse schedule: reversed as a whole with each pack inverted
 		inline TimeSlices reverse() {
 			TimeSlices ret;
 			for (auto iter = time_slices.rbegin(); iter != time_slices.rend(); ++iter) {
@@ -147,20 +147,20 @@ namespace qram_simulator {
 			return ret;
 		}
 
-		/// 返回可读字符串表示
+		/// Returns a human-readable string representation
 		std::string to_string() const;
 	};
 
 	/**
-	 * @brief 连续区间集合（坏分支区间的合并表示）。
+	 * @brief A set of continuous intervals (merged representation of bad branch ranges).
 	 *
-	 * 以 [l1,r1],[l2,r2],... 的有序不相交区间集合表示地址集合，
-	 * merge 按 4 种相交情形归并新区间 [l,r]，accept 判断地址 t 是否
-	 * 落在集合内。用于 TimeStep 的 bad range 计算。
+	 * Represents an address set as an ordered collection of disjoint intervals [l1,r1],[l2,r2],...;
+	 * merge incorporates a new interval [l,r] according to 4 intersection cases, and accept checks whether
+	 * address t falls inside the set. Used for TimeStep's bad range computation.
 	 */
 	struct ContinuousRange
 	{
-		/// 区间端点序列：[l1,r1,l2,r2,...]
+		/// Sequence of interval endpoints: [l1,r1,l2,r2,...]
 		std::vector<int> range_bound;
 
 		// [l1,r1],[l2,r2],[l3,r3],[l4,r4] new=[l5,r5]
@@ -169,146 +169,146 @@ namespace qram_simulator {
 		// (out x, out y)
 		// (out x, in y)
 		ContinuousRange() = default;
-		/// 构造单区间 [l, r]
+		/// Constructs a single interval [l, r]
 		ContinuousRange(int l, int r);
 
-		/// 清空全部区间
+		/// Clears all intervals
 		void clear();
-		/// 归并新区间 [l, r]（保持有序不相交）
+		/// Merges in a new interval [l, r] (staying ordered and disjoint)
 		void merge(int l, int r);
-		/// 判断 t 是否落在任一区间内
+		/// Checks whether t falls within any interval
 		bool accept(int t) const;
-		/// 返回可读字符串表示
+		/// Returns a human-readable string representation
 		operator std::string();
 	};
 
 	/**
-	 * @brief QRAM 装载电路的时序与噪声调度器。
+	 * @brief Timing and noise scheduler for the QRAM loading circuit.
 	 *
-	 * 依据地址 / 数据宽度推导每个时间片的路由、拷贝与交换操作
-	 * （generate_step），并可按噪声模型在每个时间片后插入噪声操作，
-	 * 生成完整 TimeSlices 调度（generate）。QRAMCircuit 内部持有
-	 * TimeStep 实例。另提供坏分支区间（bad range）推导：给定某一
-	 * 出错的比特 / 节点，得到会装载出错误数据的地址区间。
+	 * Derives the routing, copy, and swap operations of each time slice from the address / data width
+	 * (generate_step), and can insert noise operations after each time slice according to a noise model,
+	 * producing the complete TimeSlices schedule (generate). QRAMCircuit holds
+	 * a TimeStep instance internally. Also provides bad branch range (bad range) derivation: given some
+	 * faulty qubit / node, it derives the address range that would load wrong data.
 	 */
 	struct TimeStep
 	{
-		/// 地址位宽
+		/// Address width
 		size_t addr_size;
-		/// 数据位宽
+		/// Data width
 		size_t data_size;
 
-		/// 坏分支区间集合（fill_bad_range 填充）
+		/// Bad branch interval set (filled by fill_bad_range)
 		ContinuousRange cr;
-		/// 无噪调度缓存（init_noise_free 生成）
+		/// Cached noise-free schedule (generated by init_noise_free)
 		TimeSlices time_slices_noise_free;
 
 		/**
-		 * @brief 构造调度器。
-		 * @param addr_sz 地址位宽
-		 * @param data_sz 数据位宽
+		 * @brief Constructs the scheduler.
+		 * @param addr_sz Address width
+		 * @param data_sz Data width
 		 */
 		TimeStep(size_t addr_sz, size_t data_sz);
-		/// 完整装载流程的总时间片数
+		/// Total number of time slices of the full loading procedure
 		size_t full_step() const;
-		/// 返回第 in_step 步对应的输出（拷出）时间片编号
+		/// Returns the output (copy-out) time slice index corresponding to step in_step
 		size_t out(size_t in_step) const;
-		/// 最后一个时间片编号
+		/// Index of the last time slice
 		size_t last_step() const;
 
-		/// 第 step 步的地址拷贝目标层（方向），无操作返回 -1
+		/// Target layer (direction) of the address copy at step step; returns -1 if there is no operation
 		int acopy(size_t step) const;
-		/// 第 step 步地址拷贝对应的输出时间片，无则返回 -1
+		/// Output time slice of the address copy at step step; returns -1 if none
 		int acopy_out(size_t step) const;
-		/// 第 step 步的数据拷贝目标位，无操作返回 -1
+		/// Target bit of the data copy at step step; returns -1 if there is no operation
 		int dcopy(size_t step) const;
-		/// 第 step 步数据拷贝对应的输出时间片，无则返回 -1
+		/// Output time slice of the data copy at step step; returns -1 if none
 		int dcopy_out(size_t step) const;
-		/// 第 layer 层路由阶段的起始时间片
+		/// Starting time slice of the routing phase of layer layer
 		size_t route_begin(size_t layer) const;
-		/// 第 layer 层路由等待阶段的起始时间片
+		/// Starting time slice of the routing-wait phase of layer layer
 		size_t route_wait_begin(size_t layer) const;
-		/// 第 step 步在 layer 层是否走奇数（右）子树路由
+		/// Whether step step routes through the odd (right) subtree at layer layer
 		bool route_odd(size_t step, size_t layer) const;
-		/// 第 step 步在 layer 层是否走偶数（左）子树路由
+		/// Whether step step routes through the even (left) subtree at layer layer
 		bool route_even(size_t step, size_t layer) const;
-		/// 第 step 步在 layer 层的路由判定（奇偶分发）
+		/// Routing decision of step step at layer layer (odd/even dispatch)
 		bool route(size_t step, size_t layer) const;
-		/// 第 step 步的内存拷贝位，无操作返回 -1
+		/// Memory copy bit of step step; returns -1 if there is no operation
 		int memory_copy(size_t step) const;
-		/// 第 time_step 步的节点内部交换目标，无操作返回 -1
+		/// Internal swap target of a node at step time_step; returns -1 if there is no operation
 		int internal_swap(size_t time_step) const;
-		/// 第 time_step 步内部交换对应的输出时间片，无则返回 -1
+		/// Output time slice of the internal swap at step time_step; returns -1 if none
 		int internal_swap_out(size_t time_step) const;
 
-		/// 生成第 step 个时间片的操作组（不含噪声）
+		/// Generates the operation pack of time slice step (noise excluded)
 		OperationPack generate_step(size_t step) const;
-		/// 第 time_step 步可纠缠的最大层数（噪声插入范围依据）
+		/// Maximum number of layers that can be entangled at step time_step (basis for the noise insertion range)
 		size_t layer_entangle_max(size_t time_step) const;
 
-		/// 判断地址 addr 是否落在坏分支区间内
+		/// Checks whether address addr falls within the bad branch interval
 		bool is_bad_branch(size_t addr) const;
 
-		/// qubit 架构：由坏比特 bad_qubit 推导坏分支地址区间 [lo, hi]
+		/// qubit architecture: derives the bad branch address range [lo, hi] from faulty qubit bad_qubit
 		std::pair<size_t, size_t> get_bad_range_qubit(size_t bad_qubit) const;
-		/// qutrit 架构：由坏比特 bad_qubit 推导坏分支地址区间 [lo, hi]
+		/// qutrit architecture: derives the bad branch address range [lo, hi] from faulty qubit bad_qubit
 		std::pair<size_t, size_t> get_bad_range_qutrit(size_t bad_qubit) const;
 
-		/// @brief 填充坏分支区间集合 cr。
-		/// @param qubit 出错的比特 / 节点
-		/// @param arch_type 架构常量（arch_qubit / arch_qutrit）
+		/// @brief Fills the bad branch interval set cr.
+		/// @param qubit The faulty qubit / node
+		/// @param arch_type Architecture constant (arch_qubit / arch_qutrit)
 		void fill_bad_range(size_t qubit, int arch_type);
-		/// @brief 向 pack 追加一个时间片后的噪声操作。
-		/// @param pack 目标操作组
-		/// @param max_entangle_layer 该时间片可纠缠的最大层数
-		/// @param noises 噪声模型
-		/// @param arch_type 架构常量
+		/// @brief Appends the noise operations following one time slice to pack.
+		/// @param pack Target operation pack
+		/// @param max_entangle_layer Maximum number of layers that can be entangled in that time slice
+		/// @param noises Noise model
+		/// @param arch_type Architecture constant
 		void noise_one_step(OperationPack& pack, size_t max_entangle_layer,
 			const std::map<OperationType, double>& noises, int arch_type);
 
-		/// @brief 生成一个时间片的噪声操作（不插入任何 OperationPack）。
-		/// @param max_entangle_layer 可纠缠的最大层数
-		/// @param noises 噪声模型
-		/// @param arch_type 架构常量
+		/// @brief Generates the noise operations of one time slice (without inserting them into any OperationPack).
+		/// @param max_entangle_layer Maximum number of layers that can be entangled
+		/// @param noises Noise model
+		/// @param arch_type Architecture constant
 		void noise_one_step(size_t max_entangle_layer,
 			const std::map<OperationType, double>& noises, int arch_type);
 
-		/// 生成无噪调度并缓存到 time_slices_noise_free
+		/// Generates the noise-free schedule and caches it in time_slices_noise_free
 		void init_noise_free();
-		/// 仅追加噪声区间（不生成含噪操作序列）
+		/// Appends noise intervals only (does not generate the noisy operation sequence)
 		void append_noise_range_only(const std::map<OperationType, double>& noises, int arch_type);
-		/// 在缓存的无噪调度上插入噪声，返回含噪调度
+		/// Inserts noise into the cached noise-free schedule and returns the noisy schedule
 		TimeSlices append_noise(const std::map<OperationType, double>& noises, int arch_type);
 		/**
-		 * @brief 生成完整含噪调度。
-		 * @param noises 噪声模型（可为空，即无噪调度）
-		 * @param arch_type 架构常量（arch_qubit / arch_qutrit）
-		 * @return 含噪的 TimeSlices 调度
+		 * @brief Generates the complete noisy schedule.
+		 * @param noises Noise model (may be empty, i.e. a noise-free schedule)
+		 * @param arch_type Architecture constant (arch_qubit / arch_qutrit)
+		 * @return The noisy TimeSlices schedule
 		 */
 		TimeSlices generate(const std::map<OperationType, double>& noises, int arch_type);
 
-		/// qubit 架构：第 step 步地址 addr 的阻尼乘子指数实现
+		/// qubit architecture: implementation of the damping multiplier exponent for address addr at step step
 		ptrdiff_t _get_multiplier_impl_qubit(
 			size_t step, size_t addr) const;
 
-		/// qutrit 架构：按 branchid 计算阻尼乘子指数实现
+		/// qutrit architecture: implementation computing the damping multiplier exponent from branchid
 		ptrdiff_t _get_multiplier_impl_qutrit(
 			size_t step, size_t branch_id, const memory_t& mem) const;
 
-		/// qutrit 架构：按 (addr, data) 计算阻尼乘子指数实现
+		/// qutrit architecture: implementation computing the damping multiplier exponent from (addr, data)
 		ptrdiff_t _get_multiplier_impl_qutrit(
 			size_t step, size_t addr, size_t data, const memory_t& mem) const;
 
 		/**
-		 * @brief qubit 架构：为好分支计算 Damping 相对乘子。
+		 * @brief qubit architecture: computes the relative Damping multiplier for good branches.
 		 *
-		 * 以第一条好分支为基准，按各好分支地址的阻尼指数差设置
-		 * branch.relative_multiplier = (1-gamma)^(指数差)。
-		 * @param gamma Damping 衰减率
-		 * @param step 时间片
-		 * @param branches 分支集合
-		 * @param first_good_branch 基准好分支下标
-		 * @param good_branch_ids 其余好分支下标
+		 * Using the first good branch as the reference, sets
+		 * branch.relative_multiplier = (1-gamma)^(exponent difference) according to each good branch's address damping exponent difference.
+		 * @param gamma Damping decay rate
+		 * @param step Time slice
+		 * @param branches Branch collection
+		 * @param first_good_branch Index of the reference good branch
+		 * @param good_branch_ids Indices of the remaining good branches
 		 */
 		template<typename BranchType>
 		inline void get_multiplier_qubit(
@@ -335,16 +335,16 @@ namespace qram_simulator {
 		}
 
 		/**
-		 * @brief qutrit 架构：为好分支计算 Damping 相对乘子。
+		 * @brief qutrit architecture: computes the relative Damping multiplier for good branches.
 		 *
-		 * 语义同 get_multiplier_qubit，阻尼乘子按 branchid 与数据树
-		 * 内容推导。
-		 * @param gamma Damping 衰减率
-		 * @param step 时间片
-		 * @param branches 分支集合
-		 * @param first_good_branch 基准好分支下标
-		 * @param good_branch_ids 其余好分支下标
-		 * @param memory 数据树
+		 * Semantics identical to get_multiplier_qubit, with the damping multiplier derived
+		 * from branchid and the contents of the data tree.
+		 * @param gamma Damping decay rate
+		 * @param step Time slice
+		 * @param branches Branch collection
+		 * @param first_good_branch Index of the reference good branch
+		 * @param good_branch_ids Indices of the remaining good branches
+		 * @param memory Data tree
 		 */
 		template<typename BranchType>
 		void get_multiplier_qutrit(
@@ -374,7 +374,7 @@ namespace qram_simulator {
 			}
 		}
 
-		/// 打印全部时间片的调度详情到 stdout（fmt 输出）
+		/// Prints the schedule details of all time slices to stdout (fmt output)
 		inline void print() const
 		{
 			for (size_t step = 1; step < full_step(); ++step)
@@ -386,40 +386,40 @@ namespace qram_simulator {
 
 	};
 
-	/// 返回第 pos 个位置在第 layer 层的左右路由序列（左右子树走向）
+	/// Returns the left/right routing sequence of the pos-th position at layer layer (left/right subtree choices)
 	std::vector<bool> calc_pos(int pos, int layer);
-	/// 返回第 layer 层的全部节点编号
+	/// Returns all node indices at layer layer
 	std::vector<size_t> get_nodes_in_layer(int layer);
-	/// 返回第 pos 个位置在第 layer 层的二进制路由串
+	/// Returns the binary routing string of the pos-th position at layer layer
 	std::string pos2str(int pos, int layer);
-	/// 返回操作类型的缩写名
+	/// Returns the abbreviated name of an operation type
 	std::string type2str(OperationType type);
 
-	/// bool 转 "1"/"0"
+	/// Converts a bool to "1"/"0"
 	constexpr const char* bool2char(bool x)
 	{
 		return x ? "1" : "0";
 	}
 
-	/// bool 转 "True"/"False"
+	/// Converts a bool to "True"/"False"
 	constexpr const char* bool2str(bool x)
 	{
 		return x ? "True" : "False";
 	}
 
-	/// bool 转 0/1
+	/// Converts a bool to 0/1
 	constexpr int bool2int(bool x)
 	{
 		return x ? 1 : 0;
 	}
 
-	/// bool 转 Pauli 基符号 "+"/"-"
+	/// Converts a bool to the Pauli basis symbol "+"/"-"
 	constexpr const char* bool2char_pmbasis(bool x)
 	{
 		return x ? "+" : "-";
 	}
 
-	/// qutrit 地址能级转字符：W→'W'，L→'L'，R→'R'，其余→'?'
+	/// Converts a qutrit address level to a character: W→'W', L→'L', R→'R', otherwise→'?'
 	constexpr char addr2str(int addr)
 	{
 		if (addr == W) { return 'W'; }
@@ -428,7 +428,7 @@ namespace qram_simulator {
 		else { return '?'; }
 	}
 
-	/// 架构常量转名称："qutrit" / "qubit" / "unknown_arch"
+	/// Converts an architecture constant to a name: "qutrit" / "qubit" / "unknown_arch"
 	constexpr const char* arch2str(int arch)
 	{
 		if (arch == arch_qutrit) return "qutrit";
@@ -436,7 +436,7 @@ namespace qram_simulator {
 		return "unknown_arch";
 	}
 
-	/// 噪声模型转可读串，如 "[BitFlip=0.01,Damping=0.001]"
+	/// Converts a noise model to a readable string, e.g. "[BitFlip=0.01,Damping=0.001]"
 	inline std::string noise2str(const noise_t& noises)
 	{
 		std::string ret = "[";

@@ -17,9 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 自包含步骤：runner 无法稳定访问 github.com（TLS 握手超时），
-      # 因此不用 actions/checkout 与 actions/setup-python，
-      # 改为直接从本 Gitea 实例克隆 + 使用系统工具链。
+      # Self-contained steps: the runner cannot reliably reach github.com
+      # (TLS handshake timeouts), so actions/checkout and
+      # actions/setup-python are avoided in favor of cloning directly from
+      # this Gitea instance + using the system toolchain.
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -44,8 +45,9 @@ jobs:
       - name: Run C++ tests
         run: ctest --test-dir build/ci --output-on-failure --parallel 2
 
-  # SparQSim 以 add_subdirectory(submodule) 方式消费本仓库；
-  # 该 job 验证消费模式的开关组合可配置、核心库可编译。
+  # SparQSim consumes this repository via add_subdirectory(submodule);
+  # this job verifies that the consumer-mode option combination is
+  # configurable and the core libraries compile.
   consumer-mode:
     name: Consumer mode (embedded build)
     runs-on: ubuntu-latest

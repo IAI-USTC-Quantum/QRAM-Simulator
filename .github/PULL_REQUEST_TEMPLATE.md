@@ -1,71 +1,71 @@
-## PR 类型
+## PR Type
 
-<!-- 在相关选项前的 [ ] 中填入 x -->
+<!-- Put an x in the [ ] in front of the applicable option -->
 
-- [ ] Bug 修复 (non-breaking change which fixes an issue)
-- [ ] 新功能 (non-breaking change which adds functionality)
-- [ ] 破坏性变更 (breaking change which would cause existing functionality to not work as expected)
-- [ ] 文档更新
-- [ ] 代码重构
-- [ ] 性能优化
-- [ ] 测试相关
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (breaking change which would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Code refactoring
+- [ ] Performance improvement
+- [ ] Test related
 
-## 变更描述
+## Change Description
 
-<!-- 描述这个 PR 做了什么，为什么做这些变更 -->
+<!-- Describe what this PR does and why these changes were made -->
 
-### 主要变更
+### Main Changes
 
-1. [描述变更 1]
-2. [描述变更 2]
-3. [描述变更 3]
+1. [Describe change 1]
+2. [Describe change 2]
+3. [Describe change 3]
 
-### 技术细节
+### Technical Details
 
-<!-- 如果是复杂变更，提供技术实现细节 -->
+<!-- For complex changes, provide technical implementation details -->
 
-## 测试情况
+## Testing
 
-<!-- 描述你如何测试这些变更 -->
+<!-- Describe how you tested these changes -->
 
-- [ ] 单元测试通过
-- [ ] 集成测试通过
-- [ ] 手动测试通过
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing passes
 
-### 测试环境
+### Test Environment
 
-- 操作系统: [例如 Ubuntu 22.04]
-- 编译器: [例如 GCC 11.4]
-- CMake 版本: [例如 3.25.1]
+- Operating system: [e.g., Ubuntu 22.04]
+- Compiler: [e.g., GCC 11.4]
+- CMake version: [e.g., 3.25.1]
 
-### 性能影响
+### Performance Impact
 
-<!-- 如果适用，描述性能变化 -->
+<!-- If applicable, describe the performance changes -->
 
-- [ ] 性能提升
-- [ ] 性能下降
-- [ ] 无显著影响
+- [ ] Performance improved
+- [ ] Performance degraded
+- [ ] No significant impact
 
-## 关联 Issue
+## Related Issues
 
-<!-- 使用关键字自动关闭相关 Issue: Fixes #123, Closes #456, Resolves #789 -->
+<!-- Use keywords to automatically close related issues: Fixes #123, Closes #456, Resolves #789 -->
 
 Fixes #
 
-## 检查清单
+## Checklist
 
-- [ ] 代码遵循项目编码规范
-- [ ] 所有测试通过
-- [ ] 新增代码有适当测试覆盖
-- [ ] 文档已更新（如需要）
-- [ ] Commit message 清晰有意义
-- [ ] 没有引入编译警告
-- [ ] 向后兼容（如为 bugfix 或新功能）
+- [ ] Code follows the project coding conventions
+- [ ] All tests pass
+- [ ] New code has appropriate test coverage
+- [ ] Documentation has been updated (if needed)
+- [ ] Commit messages are clear and meaningful
+- [ ] No new compiler warnings introduced
+- [ ] Backward compatible (for bug fixes or new features)
 
-## 截图/日志
+## Screenshots/Logs
 
-<!-- 如果适用，添加截图或日志来演示变更 -->
+<!-- If applicable, add screenshots or logs to demonstrate the changes -->
 
-## 其他信息
+## Additional Information
 
-<!-- 任何其他相关信息 -->
+<!-- Any other relevant information -->

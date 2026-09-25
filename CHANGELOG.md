@@ -9,121 +9,177 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Circuit-level QRAM baseline in the Python package** (`qram_simulator.baseline`,
+  extra `pip install "qram-simulator[baseline]"`): a gate-level re-implementation
+  of the qubit-architecture QRAM loading circuit on the UnifiedQuantum (uniqc)
+  QuTiP density-matrix backend — 1-2 tree layers (density-matrix budget), noise
+  channels only on the routing tree, schedule taken from the C++ `TimeStep`
+  through the binding (single source of truth). Ships a packaged semi-quantitative
+  comparison experiment (`python -m qram_simulator.baseline.compare`): noise-free
+  bridge at machine precision, and over the full noise sweep F_cls ≥ 0.9988 /
+  TVD ≤ 0.026 with `⟨ψ_ideal|ρ|ψ_ideal⟩` = `E|⟨ψ_ideal|ψ_traj⟩|²` within Monte
+  Carlo error (see `bindings/python/qram_simulator/baseline/results.md`).
+
+### Changed
+- **`QRAMCircuitQubit` binding surface for scripted experiments**: new
+  `set_input_zerobus()` (uniform address superposition with bus = 0, the
+  discriminating input), `get_output_distribution()` (marginal `addr:bus`
+  distribution of the current run) and `get_fidelity_conventions()` (the three
+  no-post-selection fidelity statistics — `overlap_fid` / `fid_nopost` /
+  `fid_incoh`); `TimeStep.layer_entangle_max(step)` and `OperationPack.operations`
+  are now exposed so Python can read the exact schedule.
+
 ## [0.2.1] - 2026-09-25
 
 ### Fixed
-- **与 `pysparq` 包共装兼容**：`QRAMCircuitQutrit` 绑定改用
-  `py::module_local()`——C++ 类型 `qram_qutrit::QRAMCircuit` 同时被
-  pysparq 的富绑定注册（Python 名 `QRAMCircuit_qutrit`），pybind11
-  按 C++ typeid 全局注册导致同一进程导入两个包时报
-  `generic_type: type "QRAMCircuit_qutrit" is already registered`。
-  局部化后两包可共存（双向导入顺序均验证），类型实例仅在本模块内
-  使用，无跨模块流动。
+- **Co-installation compatibility with the `pysparq` package**: the
+  `QRAMCircuitQutrit` binding now uses `py::module_local()` — the C++ type
+  `qram_qutrit::QRAMCircuit` is also registered by pysparq's rich bindings
+  (under the Python name `QRAMCircuit_qutrit`), and pybind11's global
+  registration keyed on the C++ typeid made importing both packages in one
+  process raise
+  `generic_type: type "QRAMCircuit_qutrit" is already registered`. With the
+  localized type the two packages coexist (verified for both import orders);
+  type instances are used only within their own module and never flow across
+  modules.
 
 ## [0.2.0] - 2026-09-25
 
 ### Added
-- **pybind11 绑定层回归本仓库**：`bindings/python/`（`core_binding.cpp` +
-  `qram_simulator/__init__.py` + pytest 套件）导出核心工作类——
-  `QRAMCircuitQubit` / `QRAMCircuitQutrit` / `QRAMFullAmp` / `TimeStep`
-  （含 `TimeSlices` / `OperationPack` / `Operation` 轻量视图）、
-  `OperationType` 枚举、`ARCH_QUBIT` / `ARCH_QUTRIT` 常量与全局随机种子
-  控制（`set_seed` / `get_seed`），供外部 Python 库与脚本化实验直接驱动
-  完整的"构造 → 设噪声 → 运行 → 保真度"工作流
-- **根 `pyproject.toml`**：scikit-build-core + pybind11 + setuptools-scm
-  打包 `qram-simulator`（cp310–313，manylinux x86_64 + win_amd64），
-  `__version__` 运行时从 dist-info 读取（规避 scikit-build-core 按
-  .gitignore 过滤 wheel 文件的坑）
-- **`.github/workflows/pypi-publish.yml`**：tag `v*` / GitHub Release 触发
-  → cibuildwheel 多平台 wheel + sdist（含自包含校验）→ PyPI trusted
-  publishing（OIDC）；`python-bindings.yml` 守护 CI（wheel 构建安装 +
-  pytest，ubuntu/windows × py3.10/3.12）
-- **Sphinx 文档站点**（`docs/sphinx/`）：单一站点 = MyST 指南（安装/
-  快速上手/架构重写）+ breathe 吸入 Doxygen C++ API + pybind11-stubgen →
-  autoapi 的 Python API + 论文文档迁移；`docs.yml` 重写为该流水线，
-  gh-pages 全量替换为 Sphinx 站点（Doxyfile 开启 `GENERATE_XML`）
-- **全仓中文 Doxygen 注释**：`QRAM/include/` 五个头文件与
-  `Common/include/` 全部公有头（QRAMCircuit ×2、TimeStep、State/Branch
-  系列、QRAMFullAmp、矩阵、随机引擎、日志等）补齐 `/** @brief @param
-  @return */` 注释，注释与 Doxygen/breathe/Sphinx 链路打通
-- **`LICENSE`**：补齐 Apache-2.0 全文（pyproject 与 README 此前已声明该许可，
-  GitHub 许可检测由此生效）；CONTRIBUTING 克隆示例统一为 GitHub 地址
+- **pybind11 bindings layer returns to this repository**: `bindings/python/`
+  (`core_binding.cpp` + `qram_simulator/__init__.py` + pytest suite) exports
+  the core working classes — `QRAMCircuitQubit` / `QRAMCircuitQutrit` /
+  `QRAMFullAmp` / `TimeStep` (with `TimeSlices` / `OperationPack` /
+  `Operation` lightweight views), the `OperationType` enum, the `ARCH_QUBIT` /
+  `ARCH_QUTRIT` constants, and global random-seed control (`set_seed` /
+  `get_seed`), so external Python libraries and scripted experiments can drive
+  the full "construct → set noise → run → fidelity" workflow directly
+- **Root `pyproject.toml`**: scikit-build-core + pybind11 + setuptools-scm
+  packaging for `qram-simulator` (cp310–313, manylinux x86_64 + win_amd64);
+  `__version__` is read from dist-info at runtime (working around
+  scikit-build-core filtering wheel files per .gitignore)
+- **`.github/workflows/pypi-publish.yml`**: triggered by `v*` tags / GitHub
+  Releases → cibuildwheel multi-platform wheels + sdist (with self-containment
+  checks) → PyPI trusted publishing (OIDC); `python-bindings.yml` guard CI
+  (wheel build + install + pytest, ubuntu/windows × py3.10/3.12)
+- **Sphinx documentation site** (`docs/sphinx/`): a single site = MyST guides
+  (installation / quick start / architecture rewrite) + breathe ingesting the
+  Doxygen C++ API + pybind11-stubgen → autoapi for the Python API + paper
+  documentation migration; `docs.yml` rewritten for this pipeline, and
+  gh-pages fully replaced by the Sphinx site (Doxyfile enables
+  `GENERATE_XML`)
+- **Chinese Doxygen comments across the repository**: the five headers under
+  `QRAM/include/` and all public headers under `Common/include/` (QRAMCircuit
+  ×2, TimeStep, the State/Branch families, QRAMFullAmp, matrices, random
+  engine, logging, etc.) now carry complete `/** @brief @param @return */`
+  comments, wired through the Doxygen/breathe/Sphinx pipeline
+- **`LICENSE`**: the full Apache-2.0 text added (pyproject and README had
+  already declared this license, so GitHub license detection now takes
+  effect); CONTRIBUTING clone examples unified to the GitHub address
 
 ### Changed
-- **第二轮分仓:SparQ 框架整体迁出,本仓库收敛为纯 C++ QRAM 基座**。
-  `SparQ/`、`SparQ_Algorithm/`、`bindings/python/`（薄绑定）、`examples/`、
-  算法系实验（QDA/Grover/StatePreparation/QCNN/QFT/CKS/Shor/GHZ/
-  ErrorFiltration/GPUTime）与依赖 SparQ 算子的 QRAMFidelity(v1)/QRAM_Qubit
-  全部迁至 SparQSim 仓库;CommonTest 按归属拆分（算法块随完整版留在
-  SparQSim,本仓库保留 Common 与纯 QRAM 部分）。依赖方向固化为
-  **SparQSim → QRAM-Simulator**;本仓库不再包含任何 SparQ 代码与 Python 组件,
-  `qram-simulator` 包改由 SparQSim 仓库构建发布
-  （注:该决定后被本次 Unreleased 的绑定层回归条目取代——`qram-simulator`
-  改由本仓库独立构建发布）
-- 伞形 `SparQ` CMake 目标随 SparQ_Algorithm 迁出（现定义于 SparQSim 根
-  CMakeLists）;本仓库导出目标收敛为 `SparQ_Common` + `SparQ_QRAMSimulator`
-  （平铺头文件 BUILD_INTERFACE 随目标暴露,供 SparQSim 组合）,
-  `SparQ_Common` 补 PUBLIC 链接 fmt
-- 构建开关收敛为 `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS`
-  （`QRAM_BUILD_PYTHON_BINDINGS` 与 `BUILD_EXAMPLES` 移除）;
-  consumer-mode CI 改 `--target SparQ_QRAMSimulator`
-- **第一轮拆分**:本仓库（QRAM-Simulator monorepo）拆分为两个独立仓库,
-  本仓库名保留 QRAM-Simulator,转为纯 C++ 核心仓库独立发版;
-  PySparQ/pysparq 全功能 Python 框架迁移至 **SparQSim** 仓库,以 git
-  submodule(相对 URL `../QRAM-Simulator.git`)引用并编译本仓库核心。
-  本条目之前的 PySparQ 相关历史条目见 SparQSim 仓库 CHANGELOG 及本文件
-  git 历史(路径已随拆分移除,`git log --follow` 可追溯)
-- 根 CMakeLists 新增 `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS` /
-  `QRAM_BUILD_PYTHON_BINDINGS` 开关,供 SparQSim 以 add_subdirectory
-  方式消费(测试/实验默认 ON,绑定默认 OFF)
+- **Second repository split: the SparQ framework moved out entirely and this
+  repository converged to a pure C++ QRAM base**.
+  `SparQ/`, `SparQ_Algorithm/`, `bindings/python/` (thin bindings),
+  `examples/`, the algorithm experiments
+  (QDA/Grover/StatePreparation/QCNN/QFT/CKS/Shor/GHZ/ErrorFiltration/GPUTime),
+  and the SparQ-operator-dependent QRAMFidelity(v1)/QRAM_Qubit all moved to
+  the SparQSim repository; CommonTest was split by ownership (the algorithm
+  blocks stay with the full version in SparQSim; this repository keeps the
+  Common and pure-QRAM parts). The dependency direction is fixed as
+  **SparQSim → QRAM-Simulator**; this repository no longer contains any SparQ
+  code or Python components, and the `qram-simulator` package was instead
+  built and published from the SparQSim repository
+  (note: that decision was later superseded by the bindings-layer return
+  entry under Unreleased in this release — `qram-simulator` is now built and
+  published independently from this repository)
+- The umbrella `SparQ` CMake target moved out together with SparQ_Algorithm
+  (now defined in the SparQSim root CMakeLists); this repository's exported
+  targets converged to `SparQ_Common` + `SparQ_QRAMSimulator` (flattened
+  headers exposed via the targets' BUILD_INTERFACE for SparQSim to compose),
+  and `SparQ_Common` gained a PUBLIC link to fmt
+- Build switches converged to `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS`
+  (`QRAM_BUILD_PYTHON_BINDINGS` and `BUILD_EXAMPLES` removed); consumer-mode
+  CI switched to `--target SparQ_QRAMSimulator`
+- **First split**: this repository (the QRAM-Simulator monorepo) was split
+  into two independent repositories; this repository keeps the QRAM-Simulator
+  name and became a pure C++ core repository released independently; the
+  PySparQ/pysparq full-featured Python framework moved to the **SparQSim**
+  repository, which references and compiles this repository's core via a git
+  submodule (relative URL `../QRAM-Simulator.git`). For PySparQ-related
+  history before this entry, see the SparQSim repository's CHANGELOG and this
+  file's git history (paths were removed by the split; `git log --follow` can
+  trace them)
+- Root CMakeLists gained the `QRAM_BUILD_TESTS` / `QRAM_BUILD_EXPERIMENTS` /
+  `QRAM_BUILD_PYTHON_BINDINGS` switches for SparQSim to consume via
+  add_subdirectory (tests/experiments default ON, bindings default OFF)
 
 ### Removed
-- `PySparQ/`、旧 `pyproject.toml`、`.cibuildwheel-hooks/`、`docs/sphinx/`、
-  Python 示例与各 workflow 中的 Python 作业(全部迁往 SparQSim)
+- `PySparQ/`, the old `pyproject.toml`, `.cibuildwheel-hooks/`, `docs/sphinx/`,
+  Python examples, and the Python jobs in the workflows (all moved to
+  SparQSim)
 
 ### Added
-- **qram_simulator 薄 Python 绑定**(`bindings/python/`):刻意最小化的
-  核心原语 API——System/SparseState 寄存器管理、Init/Hadamard/X、
-  Add 算术族、QFT、MeasureZ/Reset/Probability、PartialTrace、
-  QRAMCircuit_qutrit/QRAMLoad、StatePrint;含 pytest 冒烟测试
-- 根 `pyproject.toml`(qram-simulator 包):scikit-build-core + setuptools-scm,
-  wheel 构建经 cmake.define 关闭 tests/experiments,sdist 保持自包含
-- **宽度与截断约定**(`docs/operators.md` 新章,权威契约):LSB 对齐;读扩展由
-  名字槽位承载(`_UInt_` 零扩展 / `_SInt_` 符号扩展 / `AnyInt` 按寄存器声明
-  类型),release 构建同样成立;结果 `mod 2^out_width` XOR 写入,输出宽度可与
-  输入任意不同;域外全量化(除零→商 0);flag 谓词在全精度域求值;宽度
-  1..64 全支持;唯一行为变更是 `Add_AnyInt_AnyInt_InPlace` 的 AnyInt 槽语义
-- **16 个新算术算子**(CPU+CUDA+PySparQ 绑定,整数核+flag 谓词族,服务
-  pyqecclang QFVM 算术自动编译的去 compile_operator 化):
-  `Sub_UInt_UInt`、`Neg_UInt`、`Abs_SInt`、`Mul_UInt_UInt`、`Div_UInt_UInt`、
-  `Sqrt_UInt`、`Select_Bool_UInt_UInt`、`And/Or/Xor_UInt_UInt`、
-  `Less_SInt_SInt`、`Carry_UInt_UInt`、`Overflow_SInt_SInt`、
-  `MulOverflow_UInt_UInt`、`IsZero_UInt`、`Negative_SInt`
-- **Common/include/basic.h**:`width_mask` / `isqrt_u64`(HOST_DEVICE,
-  整数位对算法,CPU/CPU-CUDA 位一致)
-- **PySparQ/pysparq/conformance.py**:`two_complement_decode` / `sign_extend`
-  / `WIDTH_BOUNDARIES` / 声明式 `width_matrix_case`(宽度组合 × 独立模型 ×
-  非零输出起点碰撞 × 双序 dagger × 叠加线性 × 控制矩阵一站式 runner);
-  **PySparQ/test/test_width_conventions.py**:16 新算子 + 存量 Add/Assign/
-  Compare 的宽度边界矩阵(含 63/64 位边界)
-- **SparQ/test/quantum_arithmetic.cpp**:16 新算子混合宽度真值表 + 参数化
-  宽度扫描 + Add_AnyInt 新语义专项;**test/GPUTest/ArithmeticTest**:CUDA
-  修复项的一致性用例(新)
-- **docs/naming_conventions.md**:槽位语义承载规则与谓词算子族命名规则增补
+- **qram_simulator thin Python bindings** (`bindings/python/`): a
+  deliberately minimal core-primitive API — System/SparseState register
+  management, Init/Hadamard/X, the Add arithmetic family, QFT,
+  MeasureZ/Reset/Probability, PartialTrace, QRAMCircuit_qutrit/QRAMLoad,
+  StatePrint; with pytest smoke tests
+- Root `pyproject.toml` (qram-simulator package): scikit-build-core +
+  setuptools-scm; wheel builds disable tests/experiments via cmake.define,
+  and the sdist stays self-contained
+- **Width and truncation conventions** (new chapter in `docs/operators.md`,
+  the authoritative contract): LSB alignment; read extension carried by the
+  name slots (`_UInt_` zero-extends / `_SInt_` sign-extends / `AnyInt`
+  follows the register's declared type), which also holds in release builds;
+  results written XOR with `mod 2^out_width`, and the output width may differ
+  arbitrarily from the input; out-of-domain inputs get total semantics
+  (division by zero → quotient 0); flag predicates evaluated over the
+  full-precision domain; widths 1..64 all supported; the only behavior change
+  is the AnyInt slot semantics of `Add_AnyInt_AnyInt_InPlace`
+- **16 new arithmetic operators** (CPU+CUDA+PySparQ bindings, integer cores +
+  the flag-predicate family, serving the de-`compile_operator`-ization of
+  pyqecclang QFVM arithmetic auto-compilation): `Sub_UInt_UInt`, `Neg_UInt`,
+  `Abs_SInt`, `Mul_UInt_UInt`, `Div_UInt_UInt`, `Sqrt_UInt`,
+  `Select_Bool_UInt_UInt`, `And/Or/Xor_UInt_UInt`, `Less_SInt_SInt`,
+  `Carry_UInt_UInt`, `Overflow_SInt_SInt`, `MulOverflow_UInt_UInt`,
+  `IsZero_UInt`, `Negative_SInt`
+- **Common/include/basic.h**: `width_mask` / `isqrt_u64` (HOST_DEVICE,
+  bit-exact integer algorithms, bit-identical across CPU and CPU-CUDA)
+- **PySparQ/pysparq/conformance.py**: `two_complement_decode` / `sign_extend`
+  / `WIDTH_BOUNDARIES` / the declarative `width_matrix_case` (width
+  combinations × independent models × nonzero-output-start collisions ×
+  both-order dagger × superposition linearity × control matrix, all in one
+  runner); **PySparQ/test/test_width_conventions.py**: width-boundary matrix
+  for the 16 new operators plus the existing Add/Assign/Compare (including
+  the 63/64-bit boundary)
+- **SparQ/test/quantum_arithmetic.cpp**: mixed-width truth tables for the 16
+  new operators + parameterized width scans + a dedicated section for the new
+  Add_AnyInt semantics; **test/GPUTest/ArithmeticTest**: consistency cases
+  for the CUDA fixes (new)
+- **docs/naming_conventions.md**: additions covering the slot-carried
+  semantics rules and the predicate-operator-family naming rules
 
 ### Changed
-- **CUDA 可逆性/UB 修复**:`Add_UInt_UInt` 无条件路径由覆盖写改为 XOR+宽度
-  掩码(此前对非零输出寄存器不可逆);`Add_UInt_UInt_InPlace`/`Add_Mult`/
-  `Assign` CUDA 路径补宽度掩码(消除 CPU/GPU 不等宽行为分歧);全部
-  `%=(1<<w)`/`1<<w` 于 w=64 的 UB 改为 `width_mask`;`cu_as_uint64/double/
-  bool/int64` 与 `CuConditionSatisfied` 的 `1ULL<<64` UB 修复(64 位寄存器
-  CUDA 读取此前掩码为 0)
-- **`Add_AnyInt_AnyInt_InPlace` 语义迁移(唯一行为变更)**:AnyInt 槽按寄存器
-  声明类型扩展(SInt 操作数此前按无符号位模式读);宽度/类型改执行期读取;
-  补 `lhs==rhs` 别名拒绝(always-on)。等宽非负使用不受影响
-- **`CustomArithmetic`**:输出 XOR 补宽度掩码(此前裸写可越宽)
-- **`consumer_runtime_inventory.json`**:accepted 清单增补 16 个新算子
-  (xor_into);契约测试增补 Sub/Div/Select 独立模型用例
+- **CUDA reversibility/UB fixes**: the unconditional `Add_UInt_UInt` path
+  changed from overwriting to XOR + width mask (previously non-reversible on
+  non-zero output registers); the `Add_UInt_UInt_InPlace`/`Add_Mult`/`Assign`
+  CUDA paths gained width masks (eliminating the CPU/GPU behavioral
+  divergence for unequal widths); all `%=(1<<w)`/`1<<w` UB at w=64 replaced
+  with `width_mask`; `1ULL<<64` UB in `cu_as_uint64/double/bool/int64` and
+  `CuConditionSatisfied` fixed (64-bit-register CUDA reads were previously
+  masked to 0)
+- **`Add_AnyInt_AnyInt_InPlace` semantics migration (the only behavior
+  change)**: AnyInt slots now extend according to the register's declared
+  type (SInt operands were previously read as unsigned bit patterns);
+  width/type now read at execution time; added an always-on `lhs==rhs`
+  aliasing rejection. Equal-width non-negative usage is unaffected
+- **`CustomArithmetic`**: the output XOR gained a width mask (the previous
+  bare write could exceed the width)
+- **`consumer_runtime_inventory.json`**: the accepted list gained the 16 new
+  operators (xor_into); contract tests gained independent-model cases for
+  Sub/Div/Select
 - **docs/naming_conventions.md** (naming-refactor task): authoritative operator
   naming ruleset — symbol layers, the `Family_Slots_Variants` grammar with closed type-tag /
   modifier / variant vocabularies, slot and `_Bool` semantics, the `_InPlace`
@@ -298,139 +354,139 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### 核心模拟器
-- **稀疏态量子模拟器核心（SparQ）**
-  - 基于稀疏向量表示的量子态存储
-  - 高效的门操作执行引擎
-  - 支持任意数量的量子比特
-  - 内置归一化验证和状态检查
+#### Core simulator
+- **Sparse-state quantum simulator core (SparQ)**
+  - Quantum state storage based on sparse vector representation
+  - Efficient gate-operation execution engine
+  - Support for any number of qubits
+  - Built-in normalization validation and state checks
 
-#### QRAM 实现
-- **Qutrit-based QRAM 电路**
-  - 层次化的树形结构表示
-  - 支持可配置的地址线和数据线位数
-  - 时步逻辑生成量子操作序列
-  - 分支概率追踪和采样
-  
-- **Qubit-based QRAM 电路**
-  - 硬件兼容的实现方式
-  - 与 qutrit 版本共享相同 API
+#### QRAM implementation
+- **Qutrit-based QRAM circuits**
+  - Hierarchical tree-structured representation
+  - Configurable address-line and data-line widths
+  - Time-step logic generating quantum operation sequences
+  - Branch probability tracking and sampling
 
-- **CUDA GPU 加速支持**
-  - GPU 内存管理（`thrust::device_vector`）
-  - 并行门操作内核
-  - 异步执行支持
-  - CPU-GPU 混合执行策略
+- **Qubit-based QRAM circuits**
+  - Hardware-compatible implementation
+  - Shares the same API as the qutrit version
 
-#### 基础量子门
-- **单比特门**：H（Hadamard）、X、Y、Z、S、T
-- **旋转门**：RX、RY、RZ、通用旋转门
-- **多比特门**：CNOT、Toffoli、多控制门
-- **条件门**：条件旋转、条件交换
-- **相位门**：S、T、相位旋转、并行相位操作
+- **CUDA GPU acceleration support**
+  - GPU memory management (`thrust::device_vector`)
+  - Parallel gate-operation kernels
+  - Asynchronous execution support
+  - CPU-GPU hybrid execution strategy
 
-#### 高级量子算法
-- **量子傅里叶变换（QFT）**
-- **Grover 搜索算法**
-- **量子算术运算**
-  - 量子加法器
-  - 量子乘法器
-  - 量子比较器
-- **块编码（Block Encoding）**
-- **态制备（State Preparation）**
-- **量子随机漫步**
-- **哈密顿量模拟**
+#### Basic quantum gates
+- **Single-qubit gates**: H (Hadamard), X, Y, Z, S, T
+- **Rotation gates**: RX, RY, RZ, general rotation gates
+- **Multi-qubit gates**: CNOT, Toffoli, multi-controlled gates
+- **Conditional gates**: conditional rotation, conditional swap
+- **Phase gates**: S, T, phase rotation, parallel phase operations
 
-#### 噪声模型
-- **去极化噪声（Depolarizing）**
-- **振幅阻尼噪声（Amplitude Damping）**
-- **噪声参数可配置**
-- **噪声影响分析工具**
+#### Advanced quantum algorithms
+- **Quantum Fourier transform (QFT)**
+- **Grover's search algorithm**
+- **Quantum arithmetic**
+  - Quantum adders
+  - Quantum multipliers
+  - Quantum comparators
+- **Block encoding**
+- **State preparation**
+- **Quantum random walk**
+- **Hamiltonian simulation**
 
-#### Python 绑定（PySparQ）
-- **完整的 Python API**
-  - 所有核心类暴露到 Python
-  - 类型提示支持（`_core.pyi`）
-- **Pybind11 封装**
-  - 高效的 C++-Python 互操作
-  - 自动内存管理
-- **pip 安装支持**
-  - `pyproject.toml` 配置
-  - 预编译 wheel 分发
+#### Noise models
+- **Depolarizing noise**
+- **Amplitude damping noise**
+- **Configurable noise parameters**
+- **Noise impact analysis tools**
 
-#### 实验代码
-- **QRAM 保真度测试**
-  - `QRAMFidelityTest.cpp`：主模拟 + 性能分析
-  - `QRAMSimulatorTest.cpp`：完整 vs 普通模拟器对比
-- **误差过滤实验**
-  - `testMultiEFQRAM.cpp`：多误差过滤 QRAM
-- **算法验证**
-  - QFT、Grover、Shor 算法
-  - 量子卷积神经网络（QCNN）
-  - 量子微分算法（QDA）
-  - GHZ 态制备
+#### Python bindings (PySparQ)
+- **Complete Python API**
+  - All core classes exposed to Python
+  - Type hint support (`_core.pyi`)
+- **Pybind11 wrappers**
+  - Efficient C++-Python interoperability
+  - Automatic memory management
+- **pip installation support**
+  - `pyproject.toml` configuration
+  - Pre-compiled wheel distribution
 
-#### 基础设施
-- **CMake 构建系统**
-  - 跨平台支持（Linux、Windows、macOS）
-  - 自动依赖检测
-  - CUDA 可选编译
-- **Eigen 集成**
-  - 头文件形式嵌入（ThirdParty/eigen-3.4.0）
-  - 稀疏/稠密矩阵运算支持
-- **日志系统**
-  - 分级日志（DEBUG、INFO、WARN、ERROR）
-  - 性能计时支持
-- **单元测试框架**
-  - 核心模块测试覆盖
-  - CI/CD 集成（GitHub Actions）
+#### Experimental code
+- **QRAM fidelity tests**
+  - `QRAMFidelityTest.cpp`: main simulation + performance profiling
+  - `QRAMSimulatorTest.cpp`: full vs. plain simulator comparison
+- **Error filtration experiments**
+  - `testMultiEFQRAM.cpp`: multi-error-filtration QRAM
+- **Algorithm validation**
+  - QFT, Grover, Shor algorithms
+  - Quantum convolutional neural networks (QCNN)
+  - Quantum differentiation algorithm (QDA)
+  - GHZ state preparation
+
+#### Infrastructure
+- **CMake build system**
+  - Cross-platform support (Linux, Windows, macOS)
+  - Automatic dependency detection
+  - Optional CUDA compilation
+- **Eigen integration**
+  - Embedded in header-only form (ThirdParty/eigen-3.4.0)
+  - Sparse/dense matrix operation support
+- **Logging system**
+  - Leveled logging (DEBUG, INFO, WARN, ERROR)
+  - Performance timing support
+- **Unit test framework**
+  - Core module test coverage
+  - CI/CD integration (GitHub Actions)
 
 ### Changed
-- 无（初始版本）
+- None (initial release)
 
 ### Deprecated
-- 无
+- None
 
 ### Removed
-- 无
+- None
 
 ### Fixed
-- 无（初始版本）
+- None (initial release)
 
 ### Security
-- 无
+- None
 
 ---
 
-## 版本历史概览
+## Version history overview
 
-| 版本 | 日期 | 主要更新 |
+| Version | Date | Key updates |
 |------|------|----------|
 | 0.1.1 | 2026-05-01 | CKS/QDA Python primitive alignment, native C++ bindings, integration tests activated |
-| 0.1.0 | 2025-04-15 | 首次发布，包含完整的 QRAM 模拟器、稀疏态模拟核心、Python 绑定和实验代码 |
+| 0.1.0 | 2025-04-15 | First release with the complete QRAM simulator, sparse-state simulation core, Python bindings, and experimental code |
 
 ---
 
-## 未来计划
+## Future plans
 
-### [1.1.0] - 计划
+### [1.1.0] - Planned
 
-#### 预期新增功能
-- [ ] 更多噪声模型（相位阻尼、比特翻转等）
-- [ ] 可视化工具（量子态演化图）
-- [ ] 性能优化（向量化、更高效的稀疏操作）
-- [ ] 更多算法实现（VQE、QAOA）
-- [ ] 交互式 Jupyter Notebook 教程
+#### Expected new features
+- [ ] More noise models (phase damping, bit flip, etc.)
+- [ ] Visualization tools (quantum state evolution diagrams)
+- [ ] Performance optimizations (vectorization, more efficient sparse operations)
+- [ ] More algorithm implementations (VQE, QAOA)
+- [ ] Interactive Jupyter Notebook tutorials
 
-#### 预期改进
-- [ ] Python API 文档完善
-- [ ] 更多使用示例
-- [ ] 性能基准测试套件
+#### Expected improvements
+- [ ] Complete Python API documentation
+- [ ] More usage examples
+- [ ] Performance benchmark suite
 
 ---
 
-## 参考
+## References
 
 - [Keep a Changelog](https://keepachangelog.com/)
 - [Semantic Versioning](https://semver.org/)
-- 项目文档：[README.md](README.md) | [ARCHITECTURE.md](docs/architecture.md)
+- Project documentation: [README.md](README.md) | [ARCHITECTURE.md](docs/architecture.md)

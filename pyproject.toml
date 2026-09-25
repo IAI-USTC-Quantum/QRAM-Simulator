@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "qram-simulator"
 dynamic = ["version"]
-description = "QRAM 电路模拟核心：qubit/qutrit 两种架构的噪声稀疏分支仿真（pybind11 薄绑定）"
+description = "QRAM circuit simulation core: noisy sparse branch-based simulation for qubit/qutrit architectures (thin pybind11 bindings)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
@@ -23,26 +23,32 @@ Documentation = "https://iai-ustc-quantum.github.io/QRAM-Simulator/"
 
 [project.optional-dependencies]
 dev = ["pybind11-stubgen", "pytest"]
+# circuit-level baseline simulator (qram_simulator.baseline) and its packaged
+# comparison experiment: the uniqc (UnifiedQuantum) QuTiP density-matrix backend
+baseline = ["numpy", "unified-quantum", "qutip", "qutip-qip"]
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.18"
 cmake.build-type = "Release"
 wheel.platlib = true
-# wheel.packages 需与 wheel.platlib 同时启用：把 bindings/python/qram_simulator
-# 的纯 Python 源码与 CMake install 前缀里的编译扩展 (_core) 一并打进 wheel
+# wheel.packages must be enabled together with wheel.platlib: packs both the
+# pure-Python sources of bindings/python/qram_simulator and the compiled
+# extension (_core) from the CMake install prefix into the wheel
 wheel.packages = { qram_simulator = "bindings/python/qram_simulator" }
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 
 [tool.scikit-build.cmake.define]
-# wheel 构建不需要 C++ 测试/实验目标；vendored googletest 也一并跳过
+# Wheel builds don't need the C++ test/experiment targets; the vendored
+# googletest is skipped as well
 QRAM_BUILD_TESTS = false
 QRAM_BUILD_EXPERIMENTS = false
 QRAM_BUILD_PYTHON_BINDINGS = true
 
 [tool.scikit-build.sdist]
-# sdist 保持自包含（eigen/fmt/argparse 随包发布，构建期不联网），
-# 但剔除测试与文档冗余；Python 测试在 bindings/python/test（保留）
+# Keep the sdist self-contained (eigen/fmt/argparse ship with the package,
+# no network access needed at build time) while trimming test and docs
+# redundancy; Python tests live in bindings/python/test (kept)
 exclude = [
     "/Experiments",
     "/test",
@@ -57,20 +63,22 @@ exclude = [
     "/CMakeSettings.json",
 ]
 
-# __version__ 运行时从 dist-info 读取（见 bindings/python/qram_simulator/__init__.py），
-# 不落盘 _version.py：scikit-build-core 会按 .gitignore 过滤 wheel 内文件，
-# 曾静默丢弃 setuptools-scm 写入的版本文件（pyqsparse<=0.1.1 踩过的坑）
+# __version__ is read from dist-info at runtime (see
+# bindings/python/qram_simulator/__init__.py) instead of writing _version.py
+# to disk: scikit-build-core filters wheel contents by .gitignore and once
+# silently dropped the version file written by setuptools-scm
+# (a pitfall hit by pyqsparse<=0.1.1)
 [tool.setuptools-scm]
 fallback_version = "0.0.0"
 
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-# 暂不支持 32 位系统（size_t != uint64_t）；macOS 支持暂缓
+# 32-bit systems unsupported for now (size_t != uint64_t); macOS support deferred
 skip = ["*-musllinux_*", "*-win32", "*-macos*"]
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64"]
-before-all = "yum install -y libgomp" # OpenMP 运行时
+before-all = "yum install -y libgomp" # OpenMP runtime
 
 [tool.cibuildwheel.windows]
 archs = ["AMD64"]

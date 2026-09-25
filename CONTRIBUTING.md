@@ -1,165 +1,168 @@
-# 贡献指南
+# Contributing Guide
 
-首先，感谢你考虑为 QRAM-Simulator 项目做出贡献！🎉
+First off, thank you for considering contributing to the QRAM-Simulator project! 🎉
 
-本指南将帮助你了解如何参与项目开发，包括提交 Issue、设置开发环境、遵循编码规范以及提交 Pull Request。
+This guide helps you understand how to get involved in developing the project, including filing issues, setting up the development environment, following the coding conventions, and submitting pull requests.
 
-## 目录
+## Table of Contents
 
-- [如何提交 Issue](#如何提交-issue)
-- [开发环境设置](#开发环境设置)
-- [编码规范](#编码规范)
-- [Pull Request 流程](#pull-request-流程)
+- [Filing Issues](#filing-issues)
+- [Development Environment Setup](#development-environment-setup)
+- [Coding Conventions](#coding-conventions)
+- [Pull Request Workflow](#pull-request-workflow)
 
-## 如何提交 Issue
+## Filing Issues
 
-### Bug 报告
+### Bug Reports
 
-如果你发现了 bug，请使用 [Bug 报告模板](.github/ISSUE_TEMPLATE/bug_report.md) 创建 Issue，并尽可能提供以下信息：
+If you find a bug, please create an issue using the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) and provide as much of the following information as possible:
 
-- 问题的清晰描述
-- 复现步骤
-- 期望行为 vs 实际行为
-- 环境信息（操作系统、编译器、CMake 版本等）
-- 错误日志或截图
+- A clear description of the problem
+- Steps to reproduce
+- Expected behavior vs. actual behavior
+- Environment information (operating system, compiler, CMake version, etc.)
+- Error logs or screenshots
 
-### 功能请求
+### Feature Requests
 
-如果你有新功能的想法，请使用 [功能请求模板](.github/ISSUE_TEMPLATE/feature_request.md) 创建 Issue，包括：
+If you have an idea for a new feature, please create an issue using the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md), including:
 
-- 功能描述
-- 使用场景
-- 期望的 API/接口设计
-- 替代方案（如果有）
+- A description of the feature
+- Use cases
+- Desired API/interface design
+- Alternative solutions (if any)
 
-## 开发环境设置
+## Development Environment Setup
 
-### 前置要求
+### Prerequisites
 
 - **CMake**: >= 3.18
-- **C++ 编译器**: 支持 C++17 标准
-- **Git**: 任何最新版本
+- **C++ compiler**: with C++17 support
+- **Git**: any recent version
 
-### 可选依赖
+### Optional Dependencies
 
-- **CUDA Toolkit**: 如需 GPU 支持
-- **TBB (Intel Threading Building Blocks)**: 用于并行计算优化
-- **OpenMP**: 通常已包含在现代编译器中
+- **CUDA Toolkit**: if you need GPU support
+- **TBB (Intel Threading Building Blocks)**: for parallel computing optimizations
+- **OpenMP**: usually included in modern compilers
 
-### 构建步骤
+### Build Steps
 
-1. **克隆仓库**
+1. **Clone the repository**
    ```bash
    git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
    cd QRAM-Simulator
    ```
 
-2. **创建构建目录**
+2. **Create a build directory**
    ```bash
    mkdir build && cd build
    ```
 
-3. **配置项目**
+3. **Configure the project**
    ```bash
    cmake ..
    ```
    
-   如需指定特定选项：
+   To specify particular options:
    ```bash
    cmake .. -DCMAKE_BUILD_TYPE=Release -DCACHED_REGISTER_SIZE=32
    ```
-   `CACHED_REGISTER_SIZE` 在 CPU 构建中只控制每个基态最初预留的寄存器
-   槽位数；`std::vector` 会在需要时继续增长。它仅在 CUDA 构建中仍是固定
-   容量。
+   `CACHED_REGISTER_SIZE` only controls the number of register slots initially
+   reserved per basis state in CPU builds; the underlying `std::vector` keeps
+   growing as needed. It remains a fixed capacity only in CUDA builds.
 
-4. **编译**
+4. **Build**
    ```bash
    cmake --build . -j$(nproc)
    ```
 
-5. **运行测试**
+5. **Run the tests**
    ```bash
    ./bin/run_tests
    ```
 
-### Python 绑定开发
+### Python Bindings Development
 
-本仓库为纯 C++ 基座，不含 Python 绑定。`pysparq` 与 `qram_simulator` 两个包的
-开发均在 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim) 进行
-（其以 submodule 引用本仓库）。
+This repository is a pure C++ base and contains no Python bindings. The
+`pysparq` and `qram_simulator` packages are both developed in the
+[SparQSim repository](https://github.com/IAI-USTC-Quantum/SparQSim)
+(which references this repository as a submodule).
 
-## 编码规范
+## Coding Conventions
 
-### 基本规范
+### Basic Rules
 
-- **C++ 标准**: C++17
-- **缩进**: 4 个空格（不使用 Tab）
-- **文件编码**: UTF-8
+- **C++ standard**: C++17
+- **Indentation**: 4 spaces (no tabs)
+- **File encoding**: UTF-8
 
-### 命名约定
+### Naming Conventions
 
-| 类型 | 命名风格 | 示例 |
+| Type | Naming style | Example |
 |------|---------|------|
-| 命名空间 | 小写 + 下划线 | `qram_simulator` |
-| 类名 | 大驼峰 (PascalCase) | `QRAMLoad`, `SparseState` |
-| 函数名 | 小写 + 下划线 (snake_case) | `noise_free_impl`, `make_mask` |
-| 成员变量 | 小驼峰 + 下划线后缀 | `register_addr_`, `state_vector_` |
-| 局部变量 | 小驼峰 | `tempValue`, `index` |
-| 宏/常量 | 大写 + 下划线 | `MAX_QUBITS`, `CACHE_SIZE` |
-| 模板参数 | 大驼峰 | `typename InputIt` |
+| Namespaces | lowercase + underscores | `qram_simulator` |
+| Class names | PascalCase | `QRAMLoad`, `SparseState` |
+| Function names | snake_case | `noise_free_impl`, `make_mask` |
+| Member variables | camelCase + underscore suffix | `register_addr_`, `state_vector_` |
+| Local variables | camelCase | `tempValue`, `index` |
+| Macros/constants | uppercase + underscores | `MAX_QUBITS`, `CACHE_SIZE` |
+| Template parameters | PascalCase | `typename InputIt` |
 
-量子算子的命名（类型槽位、变体后缀、逆操作表示等）遵循
-[docs/naming_conventions.md](docs/naming_conventions.md)，新增算子前请先阅读。
+Quantum operator naming (type slots, variant suffixes, inverse-operation
+notation, etc.) follows
+[docs/naming_conventions.md](docs/naming_conventions.md); please read it
+before adding new operators.
 
-### 头文件规范
+### Header File Rules
 
-- 使用 `#pragma once` 作为头文件保护
-- 包含顺序：系统头文件 → 第三方库 → 项目内部头文件
+- Use `#pragma once` as the include guard
+- Include order: system headers → third-party libraries → project headers
 
 ```cpp
 #pragma once
 
-// 系统头文件
+// System headers
 #include <vector>
 #include <memory>
 
-// 第三方库
+// Third-party libraries
 #include <eigen/Dense>
 
-// 项目内部头文件
+// Project headers
 #include "QRAM/QRAM.h"
 ```
 
-### 代码格式
+### Code Formatting
 
-项目使用 `.clang-format` 进行代码格式化。在提交代码前，请确保：
+The project uses `.clang-format` for code formatting. Before committing code, make sure:
 
 ```bash
-# 格式化所有源文件
+# Format all source files
 find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | xargs clang-format -i
 ```
 
-### 注释规范
+### Comment Conventions
 
-- 使用 `//` 进行单行注释
-- 使用 `/* */` 进行多行注释
-- 函数和类应使用 Doxygen 风格注释
+- Use `//` for single-line comments
+- Use `/* */` for multi-line comments
+- Functions and classes should use Doxygen-style comments
 
 ```cpp
 /**
- * @brief 执行 QRAM 加载操作
- * @param address 地址寄存器状态
- * @param data 数据寄存器状态
- * @return 加载后的量子态
+ * @brief Perform a QRAM loading operation
+ * @param address address register state
+ * @param data data register state
+ * @return the quantum state after loading
  */
 QState qramLoad(const QState& address, const QState& data);
 ```
 
-## Pull Request 流程
+## Pull Request Workflow
 
-### 1. 克隆仓库
+### 1. Clone the repository
 
-### 2. 创建功能分支
+### 2. Create a feature branch
 
 ```bash
 git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
@@ -167,73 +170,73 @@ cd QRAM-Simulator
 git checkout -b feature/your-feature-name
 ```
 
-分支命名建议：
-- `feature/` - 新功能
-- `bugfix/` - Bug 修复
-- `docs/` - 文档更新
-- `refactor/` - 代码重构
+Suggested branch naming:
+- `feature/` - new features
+- `bugfix/` - bug fixes
+- `docs/` - documentation updates
+- `refactor/` - code refactoring
 
-### 3. 提交更改
+### 3. Commit your changes
 
-编写清晰的 commit message：
+Write a clear commit message:
 
 ```bash
 git add .
-git commit -m "feat: 添加稀疏态模拟器的 GPU 加速支持
+git commit -m "feat: add GPU acceleration support for the sparse state simulator
 
-- 实现 CUDA 内核用于并行振幅计算
-- 添加内存池管理减少分配开销
-- 性能提升约 3x 在 V100 上测试"
+- Implement CUDA kernels for parallel amplitude computation
+- Add memory pool management to reduce allocation overhead
+- ~3x performance improvement measured on V100"
 ```
 
-Commit message 格式：
-- `feat:` 新功能
-- `fix:` Bug 修复
-- `docs:` 文档更新
-- `style:` 代码格式调整（不影响功能）
-- `refactor:` 代码重构
-- `perf:` 性能优化
-- `test:` 测试相关
-- `chore:` 构建/工具相关
+Commit message format:
+- `feat:` new feature
+- `fix:` bug fix
+- `docs:` documentation update
+- `style:` code formatting changes (no functional impact)
+- `refactor:` code refactoring
+- `perf:` performance optimization
+- `test:` test related
+- `chore:` build/tooling related
 
-### 4. 推送到 Fork
+### 4. Push to your fork
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
-### 5. 创建 Pull Request
+### 5. Create a pull request
 
-1. 访问你的 Fork 仓库
-2. 点击 "Compare & pull request"
-3. 填写 PR 描述，使用提供的 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md)
-4. 关联相关 Issue（如有）：`Fixes #123`
-5. 提交 PR
+1. Visit your forked repository
+2. Click "Compare & pull request"
+3. Fill in the PR description using the provided [PR template](.github/PULL_REQUEST_TEMPLATE.md)
+4. Link related issues (if any): `Fixes #123`
+5. Submit the PR
 
-### 6. 等待 CI 通过和审阅
+### 6. Wait for CI to pass and for review
 
-- 确保所有 CI 检查通过
-- 等待维护者审阅
-- 根据反馈进行修改
-- 保持 PR 与主分支同步：`git pull upstream main`
+- Make sure all CI checks pass
+- Wait for maintainer review
+- Make changes based on feedback
+- Keep your PR in sync with the main branch: `git pull upstream main`
 
-### PR 审阅清单
+### PR review checklist
 
-在提交 PR 前，请确认：
+Before submitting a PR, please confirm:
 
-- [ ] 代码符合项目编码规范
-- [ ] 所有测试通过
-- [ ] 新增功能有相应测试覆盖
-- [ ] 文档已更新（如需要）
-- [ ] Commit message 清晰有意义
-- [ ] PR 描述完整，关联相关 Issue
+- [ ] Code follows the project coding conventions
+- [ ] All tests pass
+- [ ] New features have corresponding test coverage
+- [ ] Documentation has been updated (if needed)
+- [ ] Commit messages are clear and meaningful
+- [ ] The PR description is complete and links related issues
 
-## 获取帮助
+## Getting Help
 
-如果你有任何问题，可以通过以下方式获取帮助：
+If you have any questions, you can get help in the following ways:
 
-- 在 Issue 中提问
-- 查看现有文档和代码
-- 参考项目 [README.md](README.md)
+- Ask in an issue
+- Browse the existing documentation and code
+- Refer to the project [README.md](README.md)
 
-再次感谢你的贡献！🙏
+Thanks again for your contribution! 🙏

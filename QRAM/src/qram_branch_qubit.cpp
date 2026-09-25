@@ -229,11 +229,14 @@ namespace qram_simulator
 
 		void SystemState::run_bitphaseflip(size_t qubit_id)
 		{
-			/* Y flip（与 qutrit 架构奇数位语义一致）：先翻转，翻转后为 1 时加 -1 相位，
-			   即 |0>->-|1>、|1>->|0>（ZX = iY，酉）。
-			   此前实现为 |1>->-|0>、|0>->|0>（秩 1 非酉，等价 -K1 衰减算子），
-			   会使 Depolarizing 轨迹丢失相干与权重，并触发 sample_output 的
-			   零范数 Bad-result 崩溃。 */
+			/* Y flip (matching the odd-position semantics of the qutrit
+			   architecture): flip first, then apply a -1 phase when the
+			   flipped value is 1, i.e. |0>->-|1>, |1>->|0> (ZX = iY,
+			   unitary). The previous implementation was |1>->-|0>,
+			   |0>->|0> (rank-1 non-unitary, equivalent to the -K1 decay
+			   operator), which made Depolarizing trajectories lose
+			   coherence and weight and triggered the zero-norm Bad-result
+			   crash in sample_output. */
 			state.flip(qubit_id);
 			if (state.state_of(qubit_id) == OneState)
 				amplitude *= -1;

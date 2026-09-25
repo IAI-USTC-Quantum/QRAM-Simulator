@@ -1,56 +1,56 @@
-# verify_noisy_simulation — QRAM-Simulator ↔ 电路级噪声模拟 对拍（CI 用例）
+# verify_noisy_simulation — QRAM-Simulator ↔ circuit-level noise simulation cross-check (CI case)
 
-`Experiments/verify_noisy_simulation.cpp`（ctest 用例 `verify_noisy_simulation`，随
-CI 全量回归自动运行，约 3 秒）：把本工作区建立的「符号稀疏树轨迹引擎 ↔ 电路级噪声
-模拟」对拍固化进仓库，用一组确定性实验持续保证两种架构噪声模拟的正确性。
+`Experiments/verify_noisy_simulation.cpp` (ctest case `verify_noisy_simulation`, run automatically with the
+full CI regression suite, about 3 seconds): bakes the "symbolic sparse-tree trajectory engine ↔ circuit-level
+noise simulation" cross-check established in this workspace into the repository, using a set of deterministic experiments to continuously guarantee the correctness of noise simulation in both architectures.
 
-## 结构
+## Structure
 
-- **内置独立模拟器**（与符号树引擎零共享代码）：态矢量引擎 + 稀疏密度矩阵引擎；
-  门/信道统一为「局域矩阵 + 控制极性集」原语（支持任意 1q/2q/3q 局域矩阵与 Kraus 族，
-  无需门分解）。
-- **编码**：qutrit 节点 3 qubit（W=00/L=01/R=10/死态 11 + data）；qubit 节点 2 qubit
-  （addr + data；相位 kickback 版 FetchData + CopyIn/CopyOut 的真实 Hadamard）。
-- **参考侧**：同进程直接运行 `qram_qutrit::QRAMCircuit` / `qram_qubit::QRAMCircuit`
-  （`run_full` 全分支轨迹）；Damp_Full 的第二次抽样由复刻执行拦截（逐 RNG draw 对齐）。
+- **Built-in standalone simulator** (zero code shared with the symbolic tree engine): a state-vector engine + a sparse density-matrix engine;
+  gates/channels are unified as "local matrix + control-polarity set" primitives (arbitrary 1q/2q/3q local matrices and Kraus families supported,
+  no gate decomposition needed).
+- **Encoding**: a qutrit node is 3 qubits (W=00/L=01/R=10/dead state 11 + data); a qubit node is 2 qubits
+  (addr + data; phase-kickback FetchData + real Hadamards in CopyIn/CopyOut).
+- **Reference side**: `qram_qutrit::QRAMCircuit` / `qram_qubit::QRAMCircuit` run directly in-process
+  (`run_full` full-branch trajectories); Damp_Full's second sampling is intercepted by a replica execution (aligned RNG draw by draw).
 
-## 实验阶梯（14 组，55 项断言）
+## Experiment Ladder (14 groups, 55 assertions)
 
-| # | 实验 | 断言 |
+| # | Experiment | Assertions |
 | --- | --- | --- |
-| S0 | qutrit/qubit 无噪声桥（addr=2 全 memory） | 输出分布逐位相等（<1e-9） |
-| S1 | depol p∈{0.02,0.3}、damp γ=0.05 逐随机 case（各 6 case × 两架构） | 含跳变 outcome 的次归一化分布逐位相等（<1e-16 级） |
-| S2 | depol/damp/mixed 信道级 faithful 镜像（300 轨迹参考） | F_cls(归一)>0.99~0.995、TVD<0.05、\|trace−survival\|<0.01~0.02、\|F_quantum−avg_overlap_fid\|<0.05 |
+| S0 | qutrit/qubit noise-free bridge (addr=2, all memories) | output distributions bitwise equal (<1e-9) |
+| S1 | depol p∈{0.02,0.3}, damp γ=0.05 per random case (6 cases each × both architectures) | sub-normalized distributions including jump outcomes bitwise equal (<1e-16 level) |
+| S2 | depol/damp/mixed channel-level faithful mirror (300-trajectory reference) | F_cls(normalized)>0.99~0.995, TVD<0.05, \|trace−survival\|<0.01~0.02, \|F_quantum−avg_overlap_fid\|<0.05 |
 
-全部固定 seed（确定性）；失败返回非零退出码。`VNS_TRACE`/`VNS_TRACE2`/`VNS_DEBUG`
-环境变量可打开逐步激发/分布调试探针。
+All use fixed seeds (deterministic); failure returns a non-zero exit code. The `VNS_TRACE`/`VNS_TRACE2`/`VNS_DEBUG`
+environment variables enable step-wise excitation/distribution debug probes.
 
-## 开发过程中该对拍抓到并修复的实现差异（对拍价值的直接证明）
+## Implementation differences this cross-check caught and fixed during development (direct proof of the cross-check's value)
 
-1. 密度引擎初版的控制语义错误（控制不满足侧误用矩阵对角元而非恒等）——S2 零噪声自检
-   立即暴露（trace=0）。
-2. qutrit `SwapInternal{ℓ≥1}` 翻译把两个 child 都发射了受控 internal_swap——未被路由
-   选中的 ground `(W,0)` 被错误激发成 `(L,0)`；对 (addr,bus) 边缘分布不可见（S0 蒙混），
-   但被 Damp_Common 过度衰减（S1 阻尼范数差 ~10%）并在高噪声 depol 下进入边缘分布。
-3. qutrit (a1,a0) 局域矩阵的 bit 序错位（L↔R 互换）——相位类算子在分布上不可见，
-   置换类/跳变在 p=0.3 / 阻尼下暴露。
-4. qubit `CopyOut` 的 Hadamard 双重发射（交换前后各一次）——`|±>` 在 node0.d 与 bus
-   间复制出额外激发，边缘分布仍正确，但阻尼 S1/S2 的 trace↔survival 差 0.06；
-   修复后差 0.001。
+1. The density engine's first version had wrong control semantics (the control-not-satisfied side wrongly used the matrix's diagonal elements instead of the identity) — immediately exposed by the S2 zero-noise
+   self-check (trace=0).
+2. The qutrit `SwapInternal{ℓ≥1}` translation emitted a controlled internal_swap for both children — the ground `(W,0)` not selected by routing
+   was wrongly excited into `(L,0)`; invisible in the (addr,bus) marginal distribution (slipped past S0),
+   but over-damped by Damp_Common (S1 damping norm difference ~10%) and entering the marginal distribution under high-noise depol.
+3. A bit-order misalignment in the qutrit (a1,a0) local matrices (L↔R swapped) — invisible in distributions for phase-type operators,
+   exposed for permutation-type/jump operators at p=0.3 / under damping.
+4. The qubit `CopyOut` Hadamard was emitted twice (once before and once after the swap) — `|±>` copied extra excitations between node0.d and the
+   bus; the marginal distribution stayed correct, but the damping S1/S2 trace↔survival difference was 0.06;
+   0.001 after the fix.
 
-另：库侧 `qram_qubit::SystemState::run_bitphaseflip` 已按设计意图修复为 Y flip
-（|0>→−|1>、|1>→|0>，与 qutrit 架构奇数位语义一致）；旧实现为秩 1 非酉算子，
-是 qubit 架构高噪声下 `sample_output` 零范数崩溃的根因（详见仓库实验 README）。
-两架构的 `set_noise_models` 增加概率范围校验（∈[0,1]，Damping 要求 γ<1），
-从输入侧排除唯一残余的零范数路径。
+Additionally: the library-side `qram_qubit::SystemState::run_bitphaseflip` has been fixed to a Y flip per the design intent
+(|0>→−|1>, |1>→|0>, consistent with the qutrit architecture's odd-position semantics); the old implementation was a rank-1 non-unitary operator
+and was the root cause of the qubit architecture's `sample_output` zero-norm crashes under high noise (see the repository's experiment README).
+Both architectures' `set_noise_models` gained probability-range validation (∈[0,1], Damping requires γ<1),
+excluding at the input side the only remaining zero-norm path.
 
-这些与交互式管线（`Experiments/QRAM/ChannelCorrespondence/`，uniqc/QuTiP 后端）的
-发现互相印证：**边缘分布匹配不足以保证树态正确，必须有阻尼/相干口径的验证维度。**
+These findings corroborate those of the interactive pipeline (`Experiments/QRAM/ChannelCorrespondence/`, uniqc/QuTiP backend):
+**marginal-distribution matching is not enough to guarantee a correct tree state; a damping/coherence-convention verification dimension is required.**
 
-## 运行
+## Running
 
 ```bash
 cmake --build build --target verify_noisy_simulation
-./build/bin/verify_noisy_simulation          # 或
+./build/bin/verify_noisy_simulation          # or
 ctest --test-dir build -R verify_noisy
 ```

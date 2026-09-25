@@ -24,7 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Gitea 也会扫描 .github/workflows,但其 runner 访问不了 github.com → 仅 GitHub 上游执行
+  # Gitea also scans .github/workflows, but its runners cannot reach github.com -> run on the GitHub upstream only
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -148,6 +148,7 @@ jobs:
         PROJECT_ROOT: ${{ github.workspace }}
       run: ctest --output-on-failure -C ${{ matrix.build_type }} -j4
 
-    # Python 绑定层（qram-simulator PyPI 包）的守护构建与发布流水线
-    # 见 python-bindings.yml 与 pypi-publish.yml；pysparq 全功能绑定
-    # 见 SparQSim 仓库。
+    # Guard builds and the publishing pipeline of the Python binding layer
+    # (qram-simulator PyPI package) live in python-bindings.yml and
+    # pypi-publish.yml; the full-featured pysparq bindings are in the
+    # SparQSim repository.

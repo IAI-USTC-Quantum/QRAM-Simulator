@@ -1,69 +1,69 @@
 ---
-name: Bug 报告
-about: 创建报告以帮助我们改进项目
+name: Bug Report
+about: Create a report to help us improve the project
 title: '[Bug] '
 labels: bug
 assignees: ''
 ---
 
-## 问题描述
+## Problem Description
 
-<!-- 清晰简洁地描述你遇到的问题 -->
+<!-- Describe clearly and concisely the problem you ran into -->
 
-## 复现步骤
+## Steps to Reproduce
 
-<!-- 提供详细的步骤来复现该问题 -->
+<!-- Provide detailed steps to reproduce the problem -->
 
-1. 步骤 1: '...'
-2. 步骤 2: '...'
-3. 步骤 3: '...'
-4. 出现错误
+1. Step 1: '...'
+2. Step 2: '...'
+3. Step 3: '...'
+4. Error occurs
 
-## 期望行为 vs 实际行为
+## Expected Behavior vs. Actual Behavior
 
-<!-- 描述你期望发生什么，以及实际发生了什么 -->
+<!-- Describe what you expected to happen and what actually happened -->
 
-**期望:** [描述期望的行为]
+**Expected:** [describe the expected behavior]
 
-**实际:** [描述实际发生的行为]
+**Actual:** [describe what actually happened]
 
-## 环境信息
+## Environment Information
 
-<!-- 请提供以下信息 -->
+<!-- Please provide the following information -->
 
-- **操作系统**: [例如 Ubuntu 22.04, Windows 11, macOS 14]
-- **编译器**: [例如 GCC 11.4, Clang 15, MSVC 2022]
-- **CMake 版本**: [例如 3.25.1]
-- **项目版本/Commit**: [例如 main 分支最新, v1.2.3]
-- **CUDA 版本** (如适用): [例如 CUDA 12.1]
-- **Python 版本** (如适用): [例如 Python 3.10]
+- **Operating system**: [e.g., Ubuntu 22.04, Windows 11, macOS 14]
+- **Compiler**: [e.g., GCC 11.4, Clang 15, MSVC 2022]
+- **CMake version**: [e.g., 3.25.1]
+- **Project version/commit**: [e.g., latest main branch, v1.2.3]
+- **CUDA version** (if applicable): [e.g., CUDA 12.1]
+- **Python version** (if applicable): [e.g., Python 3.10]
 
-## 最小复现示例
+## Minimal Reproduction Example
 
-<!-- 如果可能，提供最小化的代码示例来复现问题 -->
+<!-- If possible, provide a minimal code example that reproduces the problem -->
 
 ```cpp
-// 在此处粘贴代码
+// Paste code here
 ```
 
-或者 Python 代码：
+Or Python code:
 
 ```python
-# 在此处粘贴代码
+# Paste code here
 ```
 
-## 错误日志
+## Error Logs
 
-<!-- 粘贴相关的错误日志或堆栈跟踪 -->
+<!-- Paste relevant error logs or stack traces -->
 
 ```
-在此处粘贴错误日志
+Paste error logs here
 ```
 
-## 截图
+## Screenshots
 
-<!-- 如果适用，添加截图来帮助解释问题 -->
+<!-- If applicable, add screenshots to help explain the problem -->
 
-## 其他信息
+## Additional Information
 
-<!-- 任何其他相关信息，如你是否已尝试修复 -->
+<!-- Any other relevant information, such as whether you have already attempted a fix -->

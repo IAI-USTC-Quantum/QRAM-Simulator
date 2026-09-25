@@ -1,20 +1,20 @@
 /*
  * QubitCorrespondenceExporter
  *
- * qubit-based QRAM（QRAM/include/qram_circuit_qubit.h，phase-kickback 版 FetchData
- * + 真实 Hadamard）与电路级模拟对应的 C++ 导出端，与 QutritCorrespondenceExporter
- * 同构：提取 TimeStep 调度（门级翻译 + 采样噪声算子含 Damp_Full 的第二次抽样结果），
- * 输出原生/复刻双参考轨迹与四个 fidelity 口径。
+ * C++ export side of the correspondence between qubit-based QRAM (QRAM/include/qram_circuit_qubit.h, phase-kickback FetchData
+ * + real Hadamards) and circuit-level simulation; isomorphic to QutritCorrespondenceExporter:
+ * extracts the TimeStep schedule (gate-level translation + sampled noise operators incl. Damp_Full's second-draw results),
+ * and outputs native/replica dual reference trajectories plus four fidelity conventions.
  *
- * qubit 架构语义要点（与 qutrit 的差异）：
- *   - 节点 v 占 2 个普通 qubit：位置 = v*2+lr（0 → addr，1 → data），基态 = 未激发；
- *   - FetchData 为相位翻转（叶 data×addr 选 cell 的 −1 相位），CopyIn{0}/CopyOut{末}
- *     处 run_hadamard 对 bus 全位做 H —— 净语义仍为 bus_out = bus_in ⊕ memory[a]；
- *   - run_bitphaseflip 为 |1>→−|0>（−K1 跳变，非酉）→ Depolarizing k=2 的轨迹次归一化；
- *   - Damp_Full 只有单一跳变信道（k=0）。
+ * Key semantic points of the qubit architecture (differences from qutrit):
+ *   - node v occupies 2 ordinary qubits: position = v*2+lr (0 → addr, 1 → data), ground = unexcited;
+ *   - FetchData is a phase flip (−1 phase on the leaf cell selected by data×addr), and run_hadamard at CopyIn{0}/CopyOut{last}
+ *     applies H to all bus bits — the net semantics remain bus_out = bus_in ⊕ memory[a];
+ *   - run_bitphaseflip is |1>→−|0> (−K1 jump, non-unitary) → trajectory sub-normalization of Depolarizing k=2;
+ *   - Damp_Full has a single jump channel (k=0).
  *
- * 编码：地址 addr_size 位（bit b ↔ qubit b）；bus data_size 位；节点 v：
- *   a = addr+data+2v，d = addr+data+2v+1。addr=2 → 9 个编码 qubit。
+ * Encoding: address addr_size bits (bit b ↔ qubit b); bus data_size bits; node v:
+ *   a = addr+data+2v, d = addr+data+2v+1. addr=2 → 9 encoded qubits.
  */
 
 #include <cmath>
@@ -86,9 +86,9 @@ string gate_u1(double theta, size_t t, const vector<pair<size_t, int>>& cs)
 		t, ctrls2str(cs), theta);
 }
 
-/* 逻辑算子 → 门序列。镜像 qram_qubit::QRAMCircuit::run_bad 的 dispatch。
- * SwapInternal 对基态节点是恒等 → 无条件发射；ControlSwap 对两层非零集之外的
- * 节点也为恒等 → 无条件发射双方向受控 SWAP。 */
+/* Logical operators → gate sequence. Mirrors the dispatch of qram_qubit::QRAMCircuit::run_bad.
+ * SwapInternal is the identity on ground-state nodes → emitted unconditionally; ControlSwap is also
+ * the identity on nodes outside the layer's nonempty set → unconditionally emit both-direction controlled SWAPs. */
 vector<string> translate_op(const Operation& op, const Encoding& enc, const memory_t& memory)
 {
 	vector<string> out;
@@ -190,7 +190,7 @@ string noise_type_name(OperationType t)
 	}
 }
 
-/* 设定输入：zerobus = 地址均匀叠加、bus=0（主配置）；uniform = 地址+bus 全均匀 */
+/* Set input: zerobus = uniform superposition of addresses with bus=0 (main configuration); uniform = fully uniform address+bus */
 void set_input(qram_qubit::QRAMCircuit& q, const string& mode)
 {
 	q.branch_groups.clear();
@@ -271,8 +271,8 @@ struct DampOutcome
 	int outcome;
 };
 
-/* 复刻 qram_qubit::QRAMCircuit::run_damp_full 的采样（prepare_all 路径：
- * first_good_branch_group == -1，multiplier 预处理跳过）。恰好一次 uniform01。 */
+/* Replicates qram_qubit::QRAMCircuit::run_damp_full's sampling (prepare_all path:
+ * first_good_branch_group == -1, multiplier preprocessing skipped). Exactly one uniform01. */
 int replica_damp_full(qram_qubit::QRAMCircuit& q, size_t qubit_id, size_t step,
 	std::vector<DampOutcome>* log)
 {
@@ -294,7 +294,7 @@ int replica_damp_full(qram_qubit::QRAMCircuit& q, size_t qubit_id, size_t step,
 	return outcome;
 }
 
-/* 复刻执行：逻辑/噪声算子走公有 dispatch，Damp_Full 走拦截采样并记日志 */
+/* Replica execution: logical/noise operators go through the public dispatch, Damp_Full goes through the intercepted sampling and is logged */
 void run_replica_trajectory(qram_qubit::QRAMCircuit& q, std::vector<DampOutcome>* damp_log)
 {
 	int step = 0;
@@ -534,7 +534,7 @@ int main(int argc, const char** argv)
 	Encoding enc{ addr_size, data_size };
 	std::filesystem::create_directories(outdir);
 
-	/* 1) 无噪声参考（Stage 0 基准） */
+	/* 1) Noise-free reference (Stage 0 baseline) */
 	map<string, double> noisefree_dist;
 	{
 		qram_qubit::QRAMCircuit q0(addr_size, data_size, memory_t(memory));
@@ -543,7 +543,7 @@ int main(int argc, const char** argv)
 		noisefree_dist = collect_output_distribution(q0);
 	}
 
-	/* 2) 原生轨迹：分布 + 四个 fidelity 口径（sample_and_get_fidelity 前计算） */
+	/* 2) Native trajectories: distributions + four fidelity conventions (computed before sample_and_get_fidelity) */
 	string schedule_str;
 	map<string, double> single_run_dist;
 	map<string, double> avg_dist;
@@ -604,8 +604,8 @@ int main(int argc, const char** argv)
 			}
 			catch (const std::exception&)
 			{
-				/* sample_output 在全体振幅相干抵消为零时抛 Bad result
-				   （qubit 架构 run_bitphaseflip 的簿记后果）——计为失败轨迹 */
+			/* sample_output throws Bad result when all amplitudes coherently cancel to zero
+			   (a bookkeeping consequence of the qubit architecture's run_bitphaseflip) — counted as a failed trajectory */
 				++native_sample_failures;
 			}
 		}
@@ -613,7 +613,7 @@ int main(int argc, const char** argv)
 			v /= (double)runs;
 	}
 
-	/* 3) 复刻轨迹：拦截 Damp_Full 第二次抽样 + 逐轨迹一致性校验 + 调度导出 */
+	/* 3) Replica trajectories: intercept the Damp_Full second draw + per-trajectory consistency check + schedule export */
 	map<string, double> model_single_run_dist;
 	map<string, double> model_avg_dist;
 	double model_fidelity_sum = 0.0;

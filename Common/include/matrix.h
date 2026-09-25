@@ -14,16 +14,18 @@
 
 namespace qram_simulator
 {	
-	template<typename Ty = complex_t> using EigenMat = Eigen::MatrixX<Ty>;  ///< Eigen 稠密矩阵别名
-	template<typename Ty = complex_t> using EigenVec = Eigen::VectorX<Ty>;  ///< Eigen 向量别名
+	template<typename Ty = complex_t> using EigenMat = Eigen::MatrixX<Ty>;  ///< Alias of the Eigen dense matrix type
+	template<typename Ty = complex_t> using EigenVec = Eigen::VectorX<Ty>;  ///< Alias of the Eigen vector type
 
 	/**
-	 * @brief 定点化稀疏矩阵（每行固定 nnz_col 个非零元）。
+	 * @brief Fixed-point sparse matrix (a fixed number nnz_col of nonzeros per row).
 	 *
-	 * 元素以 data_size 位定点整数存储（正数或补码），配合 sparsity
-	 * 存储列位置，用于量子算术中的定点线性求解；to_eigen 转换为
-	 * Eigen 稠密 double 表示后可做经典线性代数。构造时做取值范围
-	 * 校验，越界抛出异常。
+	 * Elements are stored as data_size-bit fixed-point integers (positive or
+	 * two's complement), with sparsity storing the column positions; used for
+	 * fixed-point linear solving in quantum arithmetic. After conversion via
+	 * to_eigen to an Eigen dense double representation, classical linear
+	 * algebra can be applied. Value ranges are checked at construction;
+	 * out-of-range values throw an exception.
 	 */
 	// SparseMatrix data storage
 	struct SparseMatrix
@@ -33,10 +35,10 @@ namespace qram_simulator
 		std::vector<size_t> sparsity;
 
 		/* data[n_row * nnz_col], sparsity[n_row * nnz_col] */
-		/// 拼接 data 与 sparsity 为单一向量（n_row * nnz_col 布局）
+		/// Concatenate data and sparsity into a single vector (n_row * nnz_col layout)
 		std::vector<size_t> get_data() const;
 
-		/// 返回 sparsity 的字节偏移（get_data 拼接布局用）
+		/// Return the byte offset of sparsity (for the concatenated layout of get_data)
 		size_t get_sparsity_offset() const;
 
 		// metadata
@@ -113,12 +115,12 @@ namespace qram_simulator
 			}
 		}
 
-		/// 估计条件数 kappa（定点求解迭代步数推导用）
+		/// Estimate the condition number kappa (for deriving the iteration count of fixed-point solving)
 		double get_kappa() const;
-		/// 由精度 eps 估计零阶 Bessel 项 j0
+		/// Estimate the zeroth-order Bessel term j0 from the accuracy eps
 		double get_j0(double eps) const;
 
-		/// 转换为 Eigen 稀疏矩阵（定点值按比例还原为 double）
+		/// Convert to an Eigen sparse matrix (fixed-point values restored to double by scaling)
 		Eigen::SparseMatrix<double> to_eigen() const
 		{
 			Eigen::SparseMatrix<double> ret(n_row, n_row);
@@ -159,11 +161,12 @@ namespace qram_simulator
 	template<typename Ty> struct DenseVector;
 
 	/**
-	 * @brief 稠密方阵（行主序一维存储）。
+	 * @brief Dense square matrix (row-major one-dimensional storage).
 	 *
-	 * 提供 Eigen 互转（to_eigen / from_eigen）、酉性 / 厄米性校验
-	 * （is_unitary / is_Hermitian）、dagger（共轭转置）与逐元素
-	 * allclose 比较，是量子算子验证流程的基础容器。
+	 * Provides Eigen conversion (to_eigen / from_eigen), unitarity /
+	 * Hermiticity checks (is_unitary / is_Hermitian), dagger (conjugate
+	 * transpose), and element-wise allclose comparison; a base container
+	 * for the quantum operator verification workflow.
 	 */
 	template<typename Ty>
 	struct DenseMatrix {
@@ -295,7 +298,7 @@ namespace qram_simulator
 		}
 
 #if defined(_MSC_VER)
-#pragma warning(disable: 4244) // 从“Ty2”转换到“const std::complex<double>::_Ty”，可能丢失数据
+#pragma warning(disable: 4244) // conversion from 'Ty2' to 'const std::complex<double>::_Ty', possible loss of data
 #endif
 		template<typename Ty2>
 		DenseMatrix<Ty> operator/(Ty2 m) {
@@ -372,7 +375,7 @@ namespace qram_simulator
 			return true;
 		}
 
-		/// 厄米性校验（容差 tol）
+		/// Hermiticity check (tolerance tol)
 		bool is_Hermitian(double tol = epsilon) const
 		{
 			for (size_t i = 0; i < size; ++i)
@@ -386,7 +389,7 @@ namespace qram_simulator
 			return true;
 		}
 
-		/// 转换为 Eigen 稠密矩阵
+		/// Convert to an Eigen dense matrix
 		Eigen::MatrixX<Ty> to_eigen() const
 		{
 			Eigen::MatrixX<Ty> m(size, size);
@@ -400,7 +403,7 @@ namespace qram_simulator
 			return m;
 		}
 
-		/// 从 Eigen 稠密矩阵构造
+		/// Construct from an Eigen dense matrix
 		static DenseMatrix<Ty> from_eigen(const Eigen::MatrixX<Ty>& mat)
 		{
 			if (mat.rows() != mat.cols())
@@ -415,7 +418,7 @@ namespace qram_simulator
 			return ret;
 		}
 
-		/// 逐元素近似相等比较（容差 tol）
+		/// Element-wise approximate equality comparison (tolerance tol)
 		bool allclose(const DenseMatrix<Ty>& other, double tol = epsilon) const
 		{
 			// Check if sizes are equal
@@ -464,7 +467,7 @@ namespace qram_simulator
 			return true;
 		}
 
-		/// 酉性校验：AA† 与 A†A 均为单位阵（容差 tol）
+		/// Unitarity check: both AA^dagger and A^dagger*A are identity matrices (tolerance tol)
 		bool is_unitary(double tol = epsilon) const
 		{
 			return (dagger() * *this).is_identity(tol)
@@ -493,7 +496,7 @@ namespace qram_simulator
 			return ret;
 		}
 
-		/// 共轭转置（dagger）
+		/// Conjugate transpose (dagger)
 		DenseMatrix<Ty> dagger() const {
 			DenseMatrix<Ty> ret(size);
 			for (size_t i = 0; i < size; ++i) {
@@ -533,14 +536,15 @@ namespace qram_simulator
 		~DenseMatrix() {}
 	};
 
-	/// 复矩阵共轭转置（自由函数形式）
+	/// Conjugate transpose of a complex matrix (free-function form)
 	DenseMatrix<complex_t> dagger(const DenseMatrix<complex_t>& mat);
 
 	/**
-	 * @brief 稠密向量（一维存储）。
+	 * @brief Dense vector (one-dimensional storage).
 	 *
-	 * 提供 Eigen 互转、逐元素 allclose 与线性方程求解所需的
-	 * 基础运算，与 DenseMatrix 配套使用。
+	 * Provides Eigen conversion, element-wise allclose, and the basic
+	 * operations needed for linear equation solving; used together with
+	 * DenseMatrix.
 	 */
 	template<typename Ty>
 	struct DenseVector {
@@ -707,7 +711,7 @@ namespace qram_simulator
 			return sgns;
 		}
 
-		/// 转换为 Eigen 向量
+		/// Convert to an Eigen vector
 		EigenVec<Ty> to_eigen() const
 		{
 			Eigen::VectorX<Ty> m(size);
@@ -718,7 +722,7 @@ namespace qram_simulator
 			return m;
 		}
 
-		/// 从 Eigen 向量构造
+		/// Construct from an Eigen vector
 		static DenseVector<Ty> from_eigen(const EigenVec<Ty>& vec)
 		{
 			DenseVector<Ty> ret(vec.size());
@@ -746,7 +750,7 @@ namespace qram_simulator
 			return ret;
 		}
 
-		/// 逐元素近似相等比较（容差 tol）
+		/// Element-wise approximate equality comparison (tolerance tol)
 		bool allclose(const DenseVector<Ty>& other, double tol = epsilon) const
 		{
 			// Check if sizes are equal
@@ -882,7 +886,7 @@ namespace qram_simulator
 	}
 
 	template<typename Ty>
-	/// 自实现的定点线性方程求解器 Ax = b（HHL 类算法验证用）
+	/// Self-implemented fixed-point linear equation solver Ax = b (for verifying HHL-style algorithms)
 	DenseVector<Ty> my_linear_solver(DenseMatrix<Ty> A, DenseVector<Ty> b) {
 		profiler _("my_linear_solver");
 		if (A.size != b.size) 
@@ -919,7 +923,7 @@ namespace qram_simulator
 	}
 
 	template<typename Ty>
-	/// Eigen 后端的线性方程求解器（稠密矩阵版本，作为基准）
+	/// Eigen-backed linear equation solver (dense matrix version, used as the benchmark)
 	DenseVector<Ty> eigen_linear_solver(const DenseMatrix<Ty> &A, const DenseVector<Ty> &b) {
 		/* convert it to eigen mat */
 		EigenMat<Ty> A_eig = A.to_eigen();
@@ -938,7 +942,7 @@ namespace qram_simulator
 	}
 
 	template<typename Ty>
-	/// Eigen 后端的线性方程求解器（稀疏矩阵版本）
+	/// Eigen-backed linear equation solver (sparse matrix version)
 	DenseVector<Ty> eigen_linear_solver(const SparseMatrix& A, const DenseVector<Ty>& b) {
 		/* convert it to eigen mat */
 		Eigen::SparseMatrix<double> A_eig = A.to_eigen();

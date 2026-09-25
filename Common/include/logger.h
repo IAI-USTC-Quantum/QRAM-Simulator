@@ -5,31 +5,31 @@
 
 namespace qram_simulator {
 
-	/// 时间单位换算常量（以纳秒为 1）
+	/// Time unit conversion constants (nanosecond taken as 1)
 	constexpr double nanosec = 1;
-	constexpr double microsec = nanosec / 1e3;  ///< 微秒
-	constexpr double millisec = microsec / 1e3; ///< 毫秒
-	constexpr double sec = millisec / 1e3;      ///< 秒
-	constexpr double minute = sec / 60;         ///< 分
-	constexpr double hour = minute / 60;        ///< 时
-	constexpr double day = hour / 24;           ///< 天
+	constexpr double microsec = nanosec / 1e3;  ///< Microsecond
+	constexpr double millisec = microsec / 1e3; ///< Millisecond
+	constexpr double sec = millisec / 1e3;      ///< Second
+	constexpr double minute = sec / 60;         ///< Minute
+	constexpr double hour = minute / 60;        ///< Hour
+	constexpr double day = hour / 24;           ///< Day
 
-	/// 当前日期时间的字符串（完整格式）
+	/// String of the current date and time (full format)
 	std::string _datetime();
 
-	/// 当前日期时间的字符串（简明格式，用于文件名）
+	/// String of the current date and time (compact format, for file names)
 	std::string _datetime_simple();
 
 	/**
-	 * @brief 简单计时器：构造时记录起点，get 返回经过时间。
+	 * @brief Simple timer: records the start point on construction; get returns the elapsed time.
 	 */
 	struct timer {
-		/// 计时起点（steady_clock）
+		/// Timing start point (steady_clock)
 		std::chrono::time_point<std::chrono::steady_clock> startpoint;
 		timer() {
 			startpoint = std::chrono::steady_clock::now();
 		}
-		/// 距起点的经过时间（按 unit 换算，默认单位为纳秒）
+		/// Elapsed time since the start point (converted by unit; default unit is nanoseconds)
 		inline double get(double unit) const {
 			std::chrono::nanoseconds m = std::chrono::steady_clock::now() - startpoint;
 			return std::chrono::duration_cast<std::chrono::nanoseconds>(m).count() * unit;
@@ -37,10 +37,11 @@ namespace qram_simulator {
 	};
 
 	/**
-	 * @brief 文件日志单例。
+	 * @brief File log singleton.
 	 *
-	 * 首次 instance() 时自动创建带时间戳的日志文件（log-*.txt），
-	 * 提供 info / error 两级写入、栈式计时器与 flush。
+	 * On the first instance() call a timestamped log file (log-*.txt) is
+	 * created automatically; provides info / error level writing, a stack
+	 * of timers, and flush.
 	 */
 	struct Logger {
 		std::ofstream out;
@@ -48,7 +49,7 @@ namespace qram_simulator {
 		std::vector<timer> timers;
 		Logger() { }
 
-		/// 取 Logger 单例（首次调用自动新建日志文件并开启写入）
+		/// Get the Logger singleton (the first call automatically creates the log file and enables writing)
 	static Logger& instance()
 		{
 			static Logger static_logger;
@@ -63,7 +64,7 @@ namespace qram_simulator {
 			return static_logger;
 		}
 
-	/// 生成 "前缀 + 时间戳 + 后缀" 形式的自动文件名
+	/// Generate an automatic file name of the form "prefix + timestamp + postfix"
 	inline static std::string autofilename(std::string prefix, std::string postfix) {
 			return prefix + _datetime_simple() + postfix;
 		}
@@ -100,11 +101,11 @@ namespace qram_simulator {
 		inline Logger& datetime() {
 			return info(_datetime());
 		}
-	/// 压入一个新计时器
+	/// Push a new timer
 	inline void timer_start() {
 		timers.push_back(timer());
 	}
-	/// 弹出栈顶计时器并返回经过时间（unit 换算，默认秒）
+	/// Pop the top timer and return the elapsed time (converted by unit; defaults to seconds)
 	inline double timer_end(double unit = sec) {
 			if (timers.size() == 0) {
 				return 0.0;
@@ -118,18 +119,18 @@ namespace qram_simulator {
 		}
 	};
 
-	/// 写一条 INFO 日志
+	/// Write an INFO log entry
 	inline void log_info(std::string msg) {
 		Logger::instance().info(msg);
 	}
 
-	/// 写一条 ERROR 日志
+	/// Write an ERROR log entry
 	inline void log_error(std::string msg) {
 		Logger::instance().error(msg);
 	}
 
 	/**
-	 * @brief 单个函数的性能档案：调用计数与累计耗时（栈式计时）。
+	 * @brief Performance profile of a single function: call count and accumulated time (stack-based timing).
 	 */
 	struct profile {
 		size_t ncalls = 0;
@@ -163,11 +164,11 @@ namespace qram_simulator {
 	}
 
 	/**
-	 * @brief RAII 函数剖面器：构造计时进入、析构退出，按函数名聚合。
+	 * @brief RAII function profiler: starts timing on construction, stops on destruction, aggregated by function name.
 	 *
-	 * 配合 FunctionProfiler 宏使用（在函数入口声明
-	 * `volatile profiler _profilehelper_(__FUNCTION__);`），
-	 * print_profiler 输出各函数的调用次数与累计耗时。
+	 * Used together with the FunctionProfiler macro (declare at function
+	 * entry `volatile profiler _profilehelper_(__FUNCTION__);`);
+	 * print_profiler outputs the call count and accumulated time of each function.
 	 */
 	struct profiler {
 		static std::map<std::string, profile*> profiles;
@@ -270,12 +271,12 @@ namespace qram_simulator {
 		static std::string get_all_profiles_v2();
 	};
 
-/// 在函数入口声明 RAII 剖面器（配合 profiler::print_profiler 输出）
+/// Declare an RAII profiler at function entry (output via profiler::print_profiler)
 #define FunctionProfiler volatile profiler _profilehelper_(__FUNCTION__)
 
 	extern Logger logger;
 
-	/// 格式化后同时打印到 stdout 并写入日志
+	/// Print to stdout and write to the log after formatting
 	template <typename... Ty>
 	void print_and_log(std::string fmt_str, Ty&&...args) {
 		std::string str = format(fmt_str, std::forward<Ty>(args)...);
@@ -285,20 +286,20 @@ namespace qram_simulator {
 	}
 
 	/**
-	 * @brief 在线统计量：边记录边累计均值 / 方差 / 标准差。
+	 * @brief Online statistics: accumulates mean / variance / standard deviation while recording.
 	 *
-	 * @tparam Ty 记录值类型（须可转 double）
+	 * @tparam Ty Type of the recorded values (must be convertible to double)
 	 */
 	template<typename Ty>
 	struct Statistic
 	{
-		/// 原始记录
+		/// Raw records
 		std::vector<Ty> records;
-		/// 累计和
+		/// Accumulated sum
 		double sum = 0;
-		/// 累计平方和
+		/// Accumulated sum of squares
 		double sum_sqr = 0;
-		/// 记录条数
+		/// Number of records
 		size_t shots = 0;
 
 		inline Ty simple_record(Ty r) {
@@ -338,15 +339,16 @@ namespace qram_simulator {
 		}
 	};
 
-	using StatisticDouble = Statistic<double>;  ///< double 统计别名
-	using StatisticInt = Statistic<int>;        ///< int 统计别名
-	using StatisticSize = Statistic<size_t>;    ///< size_t 统计别名
+	using StatisticDouble = Statistic<double>;  ///< Alias of statistics over double
+	using StatisticInt = Statistic<int>;        ///< Alias of statistics over int
+	using StatisticSize = Statistic<size_t>;    ///< Alias of statistics over size_t
 
 	/**
-	 * @brief 实验结果输出器：按 Python 类模板生成 .py 结果文件。
+	 * @brief Experiment result outputter: generates a .py result file from a Python class template.
 	 *
-	 * 以模板字符串填充实验名 / 变量 / 结果 / 时间 / 剖面信息，
-	 * 输出可直接被 Python 侧导入分析的 Experiment-*.py 文件。
+	 * Fills the template string with the experiment name / variables /
+	 * results / time / profiler info, and outputs an Experiment-*.py file
+	 * that can be imported directly on the Python side for analysis.
 	 */
 	struct Outputter
 	{

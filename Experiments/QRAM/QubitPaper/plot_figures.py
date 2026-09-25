@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""从 QubitPaperScan 输出的 CSV 重生成论文图 fig_fidelity.pdf / fig_perf.pdf。
+"""Regenerate the paper figures fig_fidelity.pdf / fig_perf.pdf from the CSVs
+output by QubitPaperScan.
 
-用法：
+Usage:
     python3 plot_figures.py <results_dir> <out_dir>
 
-输入：
-    fidelity_scan.csv  —— fidelity 模式输出（fig 3）
-    perf_scan.csv      —— perf 模式输出（fig 4）
+Inputs:
+    fidelity_scan.csv  -- fidelity-mode output (fig 3)
+    perf_scan.csv      -- perf-mode output (fig 4)
 
-风格：PRA（APS）单栏 3.4 in / 双栏 7.0 in，正文字号 8 pt，出图后按原尺寸
-插入 LaTeX（\\columnwidth / \\textwidth），图中文字即为最终印刷字号。
+Style: PRA (APS) single-column 3.4 in / two-column 7.0 in, 8 pt body font;
+figures are inserted into LaTeX (\\columnwidth / \\textwidth) at their original
+size, so the text in the figure is the final printed font size.
 """
 
 import csv
@@ -23,7 +25,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# APS/PRA 常规：无标题，(a)/(b) 角标在轴内；Helvetica 类无衬线小字号
+# APS/PRA convention: no title, (a)/(b) corner tags inside the axes; Helvetica-like sans-serif small font
 matplotlib.rcParams.update({
     "font.size": 8,
     "axes.labelsize": 8,
@@ -69,14 +71,26 @@ def load_csv(path):
     return rows
 
 
-def aggregate_mean(rows, key_fields, value_field):
-    """按 key_fields 分组求 value_field 的均值"""
-    acc = defaultdict(lambda: [0.0, 0])
+def aggregate(rows, key_fields, value_field):
+    """Group by key_fields; return {key: (mean, sample std over the runs)}"""
+    acc = defaultdict(list)
     for r in rows:
-        key = tuple(r[f] for f in key_fields)
-        acc[key][0] += r[value_field]
-        acc[key][1] += 1
-    return {k: s / c for k, (s, c) in acc.items()}
+        acc[tuple(r[f] for f in key_fields)].append(r[value_field])
+    out = {}
+    for k, v in acc.items():
+        mean = sum(v) / len(v)
+        std = (sum((x - mean) ** 2 for x in v) / (len(v) - 1)) ** 0.5 \
+            if len(v) > 1 else 0.0
+        out[k] = (mean, std)
+    return out
+
+
+ERRBAR = dict(capsize=1.4, elinewidth=0.55, capthick=0.55, markeredgewidth=0.6)
+
+
+def log_yerr(means, stds):
+    """Error bars for a log axis: clamp the lower bar so it never goes <= 0."""
+    return [[min(s, 0.9 * m) for m, s in zip(means, stds)], list(stds)]
 
 
 def style_axis(ax):
@@ -92,15 +106,17 @@ def panel_tag(ax, tag, x=0.03, y=0.95):
 
 def plot_fidelity(rows, out_dir):
     qubit = [r for r in rows if r["arch"] == "qubit" and r["version"] == "full"]
-    fid = aggregate_mean(qubit, ["eps", "n"], "fid")
+    fid = aggregate(qubit, ["eps", "n"], "fid")
 
     fig, ax = plt.subplots(figsize=(3.4, 2.5))
 
     for eps in (1e-5, 1e-4, 1e-3):
         ns = sorted(n for (e, n) in fid if e == eps)
-        ax.plot(ns, [fid[(eps, n)] for n in ns], "-o", color=COLORS[eps],
-                label=r"$10^{-%d}$" % round(-math.log10(eps)))
-    ax.set_xlabel("address size $n$")
+        means = [fid[(eps, n)][0] for n in ns]
+        stds = [fid[(eps, n)][1] for n in ns]
+        ax.errorbar(ns, means, yerr=stds, fmt="-o", color=COLORS[eps],
+                    label=r"$10^{-%d}$" % round(-math.log10(eps)), **ERRBAR)
+    ax.set_xlabel("Address size $n$")
     ax.set_ylabel("Fidelity")
     ax.set_ylim(0.0, 1.02)
     ax.set_xlim(2.6, 10.4)
@@ -114,8 +130,8 @@ def plot_fidelity(rows, out_dir):
 
 
 def plot_perf(rows, out_dir):
-    per = aggregate_mean(rows, ["eps", "n", "version"], "time_ms")
-    branches = aggregate_mean(rows, ["eps", "n", "version"], "branches")
+    per = aggregate(rows, ["eps", "n", "version"], "time_ms")
+    branches = aggregate(rows, ["eps", "n", "version"], "branches")
 
     ns = sorted({n for (_, n, _) in per})
     fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(7.0, 2.55))
@@ -124,20 +140,24 @@ def plot_perf(rows, out_dir):
         color = COLORS[eps]
         marker = MARKERS[eps]
         label = r"$10^{-%d}$" % round(-math.log10(eps)) if eps > 0 else "0"
-        ls_full = "-." if eps == 0.0 else "-"
-        for ax, data, ylab in ((ax_a, per, "time per query (ms)"),
-                               (ax_b, branches, "explicitly simulated branches")):
-            ax.plot(ns, [data[(eps, n, "full")] for n in ns], ls_full, marker=marker,
-                    color=color, label=label)
-            ax.plot(ns, [data[(eps, n, "normal")] for n in ns], ":", marker=marker,
-                    color=color, markerfacecolor="none")
+        for ax, data, ylab in ((ax_a, per, "Time per query (ms)"),
+                               (ax_b, branches, "Explicitly simulated branches")):
+            full_m = [data[(eps, n, "full")][0] for n in ns]
+            full_s = [data[(eps, n, "full")][1] for n in ns]
+            norm_m = [data[(eps, n, "normal")][0] for n in ns]
+            norm_s = [data[(eps, n, "normal")][1] for n in ns]
+            ax.errorbar(ns, full_m, yerr=log_yerr(full_m, full_s), fmt="-",
+                        marker=marker, color=color, label=label, **ERRBAR)
+            ax.errorbar(ns, norm_m, yerr=log_yerr(norm_m, norm_s), fmt=":",
+                        marker=marker, color=color, markerfacecolor="none",
+                        **ERRBAR)
     ax_a.set_yscale("log")
-    ax_a.set_xlabel("address size $n$")
-    ax_a.set_ylabel("time per query (ms)")
+    ax_a.set_xlabel("Address size $n$")
+    ax_a.set_ylabel("Time per query (ms)")
     panel_tag(ax_a, "(a)")
     ax_b.set_yscale("log")
-    ax_b.set_xlabel("address size $n$")
-    ax_b.set_ylabel("explicitly simulated branches")
+    ax_b.set_xlabel("Address size $n$")
+    ax_b.set_ylabel("Explicitly simulated branches")
     panel_tag(ax_b, "(b)")
     for ax in (ax_a, ax_b):
         ax.set_xticks(ns)
@@ -145,7 +165,7 @@ def plot_perf(rows, out_dir):
 
     handles, labels = ax_a.get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=5,
-               title="solid: full   dotted: pruned;   $\\varepsilon=\\gamma$:",
+               title="Solid: full   dotted: pruned;   $\\varepsilon=\\gamma$:",
                bbox_to_anchor=(0.5, -0.01))
     fig.tight_layout(rect=(0, 0.16, 1, 1), pad=0.3)
     fig.savefig(out_dir / "fig_perf.pdf")

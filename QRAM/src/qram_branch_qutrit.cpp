@@ -258,8 +258,11 @@ namespace qram_simulator
 		{
 			size_t nodeid = qubit_id / 2;
 			auto iter = iterof(nodeid);
-			/* absent 节点物理上是基态 (W,0)：data 位取 0，addr-qutrit 取 W。
-			   此前统一返回 0(==L)，使相位类噪声算子对基态节点误加 ω 相位。 */
+			/* An absent node is physically the ground state (W, 0): the data
+			   bit reads 0 and the addr-qutrit reads W. The previous code
+			   returned 0 (== L) uniformly, which made phase-type noise
+			   operators spuriously add an omega phase to ground-state
+			   nodes. */
 			if (iter == iterend()) return (qubit_id & 1) ? 0 : W;
 			if (qubit_id & 1)
 				return iter->second.data;

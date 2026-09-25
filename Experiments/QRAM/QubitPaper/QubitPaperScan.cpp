@@ -1,16 +1,17 @@
-/* qubit-encoded QRAM 论文实验驱动：重跑 fig_fidelity / fig_perf / tab:equiv 的原始数据。
+/* qubit-encoded QRAM paper experiment driver: regenerates the raw data for fig_fidelity / fig_perf / tab:equiv.
  *
- * 协议与 QRAMFidelityV2/QRAMSimulatorTest.cpp 的 test_qubit_compare 一致：
- *   - memory 与 500 分支均匀叠加输入由 base seed 决定（每条轨迹相同）；
- *   - 每条轨迹 set_seed(base+it) 后 reseed() 得到 runseed，控制该轨迹的噪声采样；
- *   - full 与 pruned（normal）在同一 runseed 下对拍。
- * 噪声约定：eps = gamma，即 Depolarizing 与 Damping 同时置为同一数值。
+ * Protocol identical to QRAMFidelityV2/QRAMSimulatorTest.cpp's test_qubit_compare:
+ *   - memory and the 500-branch uniform-superposition input are fixed by the base seed (same for every trajectory);
+ *   - each trajectory derives runseed via set_seed(base+it) then reseed(), driving that trajectory's noise sampling;
+ *   - full vs pruned (normal) are cross-checked under the same runseed.
+ * Noise convention: eps = gamma, i.e. Depolarizing and Damping are both set to the same value.
+ * Exception: perf (fig 4) uses full-address-coverage, bus=0 data-loading task input (deterministic branch count d=2^n).
  *
- * 用法：
- *   QubitPaperScan fidelity [outdir]   # fig 3：qubit 3 档噪声 × n=3..10 × 200 轨迹
- *                                      #        + qutrit 1e-5（fig 3b 对比线）
- *   QubitPaperScan perf [outdir]       # fig 4：qubit n=4..12 × {0,1e-5,1e-4,1e-3} × 10 轨迹
- *   QubitPaperScan equiv [outdir]      # tab:equiv：4 个工作点 × 3 个显式种子
+ * Usage:
+ *   QubitPaperScan fidelity [outdir]   # fig 3: qubit 3 noise levels × n=3..10 × 200 trajectories
+ *                                      #        + qutrit 1e-5 (fig 3b comparison line)
+ *   QubitPaperScan perf [outdir]       # fig 4: qubit n=4..12 × {0,1e-5,1e-4,1e-3} × 10 trajectories
+ *   QubitPaperScan equiv [outdir]      # tab:equiv: 4 working points × 3 explicit seeds
  */
 
 #include <algorithm>
@@ -37,8 +38,34 @@ constexpr size_t k_data_bits = 3;
 constexpr size_t k_branches = 500;
 constexpr seed_t k_base_seed = 123456789;
 
-/* tab:equiv 的显式种子（沿用论文原表） */
+/* Explicit seeds for tab:equiv (carried over from the paper's original table) */
 constexpr seed_t k_equiv_seeds[] = {880000, 880007, 880014};
+
+/* Full address coverage + zero-bus input: data-loading task convention (one branch per address, bus=0, uniform weights).
+ * Under this convention the full-mode branch count is exactly 2^n, and at ε=0 pruned mode evolves exactly 1 reference branch,
+ * so fig_perf panel b carries no input-sampling fluctuations. */
+void set_full_coverage_zero_bus(qram_qubit::QRAMCircuit& qram, size_t n, size_t k)
+{
+	auto& groups = qram.get_branch_groups();
+	groups.clear();
+	for (size_t addr = 0; addr < pow2(n); ++addr) {
+		groups.emplace_back(addr);
+		auto& g = groups.back();
+		g.branches_input.emplace_back(addr, k, static_cast<bus_t>(0));
+		g.branch_probs.push_back(1.0 / pow2(n));
+		g.state_probs.push_back(1.0 / pow2(n));
+	}
+}
+
+void set_full_coverage_zero_bus(qram_qutrit::QRAMCircuit& qram, size_t n, size_t k)
+{
+	qram.get_branches().clear();
+	qram.get_branch_probs().clear();
+	for (size_t addr = 0; addr < pow2(n); ++addr) {
+		qram.get_branches().emplace_back(addr << k, k);
+		qram.get_branch_probs().push_back(1.0 / pow2(n));
+	}
+}
 
 std::map<OperationType, double> make_noise(double eps)
 {
@@ -52,21 +79,24 @@ std::map<OperationType, double> make_noise(double eps)
 
 template <typename QRAM_type>
 QRAM_type configure_qram(size_t addr_sz, size_t data_sz, const std::map<OperationType, double>& noise,
-	seed_t base_seed, size_t input_sz)
+	seed_t base_seed, size_t input_sz, bool zero_bus_full_coverage = false)
 {
 	random_engine::get_instance().set_seed(base_seed);
 
 	QRAM_type qram(addr_sz, data_sz);
 	qram.set_memory_random();
 	qram.set_noise_models(noise);
-	qram.set_input_uniform(input_sz);
+	if (zero_bus_full_coverage)
+		set_full_coverage_zero_bus(qram, addr_sz, data_sz);
+	else
+		qram.set_input_uniform(input_sz);
 
 	return qram;
 }
 
-/* run 结束后（采样前）显式存储的 branch sub-state 总数。
- * 只统计 valid_branch_group_view（实际被演化的分支：bad + 参考 good），
- * pruned 模式下 good 分支的输入态未被演化，不应计入。 */
+/* Total branch sub-states explicitly stored after the run (before sampling).
+ * Counts only valid_branch_group_view (branches actually evolved: bad + reference good);
+ * in pruned mode the good branches' input states are not evolved and must not be counted. */
 size_t count_explicit_states(const qram_qubit::QRAMCircuit& qram)
 {
 	size_t count = 0;
@@ -76,7 +106,7 @@ size_t count_explicit_states(const qram_qubit::QRAMCircuit& qram)
 	return count;
 }
 
-/* 实际被显式演化的分支数（bad + 参考 good）；full 模式下等于全部输入分支。 */
+/* Number of branches explicitly evolved (bad + reference good); equals all input branches in full mode. */
 size_t count_explicit_branches(const qram_qubit::QRAMCircuit& qram)
 {
 	size_t count = 0;
@@ -100,10 +130,12 @@ struct QubitTrajectoryResult
 };
 
 QubitTrajectoryResult run_qubit_once(size_t addr_sz, const std::map<OperationType, double>& noise,
-	seed_t base_seed, size_t input_sz, seed_t run_seed, std::string version)
+	seed_t base_seed, size_t input_sz, seed_t run_seed, std::string version,
+	bool zero_bus_full_coverage = false)
 {
 	QubitTrajectoryResult result;
-	auto qram = configure_qram<qram_qubit::QRAMCircuit>(addr_sz, k_data_bits, noise, base_seed, input_sz);
+	auto qram = configure_qram<qram_qubit::QRAMCircuit>(addr_sz, k_data_bits, noise, base_seed,
+		input_sz, zero_bus_full_coverage);
 
 	random_engine::get_instance().set_seed(run_seed);
 	auto t0 = std::chrono::steady_clock::now();
@@ -166,7 +198,7 @@ void run_fidelity(const std::filesystem::path& outdir)
 	constexpr size_t trials = 200;
 	const std::vector<double> eps_list = {1e-5, 1e-4, 1e-3};
 
-	/* qubit：3 档噪声 × n=3..10（fig 3a；1e-5 行同时供 fig 3b 使用） */
+	/* qubit: 3 noise levels × n=3..10 (fig 3a; the 1e-5 rows also feed fig 3b) */
 	for (double eps : eps_list) {
 		auto noise = make_noise(eps);
 		for (size_t n = 3; n <= 10; ++n) {
@@ -185,7 +217,7 @@ void run_fidelity(const std::filesystem::path& outdir)
 		}
 	}
 
-	/* qutrit：1e-5，full 模式（fig 3b 对比线） */
+	/* qutrit: 1e-5, full mode (fig 3b comparison line) */
 	{
 		auto noise = make_noise(1e-5);
 		for (size_t n = 3; n <= 10; ++n) {
@@ -207,17 +239,19 @@ void run_perf(const std::filesystem::path& outdir)
 	auto csv = open_csv(outdir, "perf_scan.csv");
 	csv << "arch,eps,n,traj,runseed,version,fid,time_run_ms,time_sample_ms,states,branches\n";
 
-	constexpr size_t trials = 10;
+	constexpr size_t trials = 50;
 	const std::vector<double> eps_list = {0.0, 1e-5, 1e-4, 1e-3};
 	const std::vector<size_t> n_list = {4, 6, 8, 10, 12};
 
+	/* Input convention: full address coverage, bus=0 (data-loading task). The branch count is exactly d=2^n;
+	 * at ε=0 pruned evolves only 1 reference branch, so panel b has no input-sampling fluctuations. */
 	for (double eps : eps_list) {
 		auto noise = make_noise(eps);
 		for (size_t n : n_list) {
 			for (size_t traj = 0; traj < trials; ++traj) {
 				seed_t run_seed = derive_run_seed(traj);
 				for (std::string version : {qram_qubit::QRAMCircuit::FULL_VER, qram_qubit::QRAMCircuit::NORMAL_VER}) {
-					auto r = run_qubit_once(n, noise, k_base_seed, k_branches, run_seed, version);
+					auto r = run_qubit_once(n, noise, k_base_seed, pow2(n), run_seed, version, true);
 					csv << std::setprecision(12) << "qubit," << eps << ',' << n << ',' << traj << ','
 						<< run_seed << ',' << version << ',' << r.fid << ',' << r.time_run_ms << ','
 						<< r.time_sample_ms << ',' << r.states << ',' << r.branches << '\n';
@@ -254,8 +288,8 @@ void run_equiv(const std::filesystem::path& outdir)
 	}
 }
 
-/* 验证 ε=0 时 pruned 模式只保留 1 个 branch group（参考分支），
- * 并统计参考组的 sub-state 构成 */
+/* Verify that at ε=0 pruned mode keeps only 1 branch group (the reference branch),
+ * and tally the sub-state composition of the reference group */
 void run_check0(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "check0.csv");
@@ -281,8 +315,8 @@ void run_check0(const std::filesystem::path& outdir)
 	}
 }
 
-/* 机制分解：单通道（depol-only / damp-only）下 qubit vs qutrit 的保真度。
- * ε=1e-4（1e-5 下 damping 几乎无事件，看不见通道差异），n∈{8,10}，k∈{1,5} */
+/* Mechanism breakdown: qubit vs qutrit fidelity under single channels (depol-only / damp-only).
+ * ε=1e-4 (at 1e-5 damping has almost no events, so channel differences are invisible), n∈{8,10}, k∈{1,5} */
 void run_mech(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "mech_scan.csv");
@@ -324,8 +358,8 @@ void run_mech(const std::filesystem::path& outdir)
 	}
 }
 
-/* 深树单故障注入审计：在指定节点注入单个 X(BitFlip) 故障，测 full 模式
- * 实际损伤的地址集合，对比解析 bad range（论文包络）与 Hann 左端口链传播预期 */
+/* Deep-tree single-fault injection audit: inject a single X(BitFlip) fault at a given
+ * node, measure the address set actually damaged in full mode, and compare with the analytic bad range (paper envelope) and the Hann left-port-chain propagation expectation */
 void run_audit(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "audit.csv");
@@ -333,10 +367,10 @@ void run_audit(const std::filesystem::path& outdir)
 		"analytic_lo,analytic_hi,analytic_size\n";
 
 	constexpr size_t n = 10;
-	constexpr size_t input_sz = pow2(n + k_data_bits); /* 全地址覆盖 */
+	constexpr size_t input_sz = pow2(n + k_data_bits); /* full address coverage */
 
 	for (size_t depth : {4, 6, 8}) {
-		for (size_t side : {0, 1}) { /* 0=最左链, 1=最右链 */
+		for (size_t side : {0, 1}) { /* 0=leftmost chain, 1=rightmost chain */
 			size_t node = side == 0 ? pow2(depth) - 1 : pow2(depth + 1) - 2;
 			size_t pos = 2 * node; /* addr slot */
 
@@ -378,9 +412,9 @@ void run_audit(const std::filesystem::path& outdir)
 	}
 }
 
-/* k 扫描：验证 qubit/qutrit 保真度差距是否随数据位 k 增长。
- * Scan A：n=8 固定，k ∈ {1,2,3,5}，eps ∈ {1e-5, 1e-4}
- * Scan B：k ∈ {1,5}，n ∈ {4,6,10}，eps = 1e-4（n 标度斜率） */
+/* k scan: test whether the qubit/qutrit fidelity gap grows with data width k.
+ * Scan A: n=8 fixed, k ∈ {1,2,3,5}, eps ∈ {1e-5, 1e-4}
+ * Scan B: k ∈ {1,5}, n ∈ {4,6,10}, eps = 1e-4 (n-scaling slope) */
 void run_kscan(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "kscan.csv");
@@ -431,8 +465,8 @@ void run_kscan(const std::filesystem::path& outdir)
 	}
 }
 
-/* 加密 n 扫描：ε=3e-5 中等强度（避免 1e-4 饱和与 1e-5 尾部噪声），
- * n=4..10 逐点，k∈{1,5}，300 轨迹 —— 用于渐近斜率拟合 */
+/* Densified n scan: ε=3e-5 intermediate strength (avoiding 1e-4 saturation and 1e-5 tail noise),
+ * n=4..10 point by point, k∈{1,5}, 300 trajectories — for asymptotic slope fitting */
 void run_nscan(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "nscan.csv");
@@ -472,32 +506,8 @@ void run_nscan(const std::filesystem::path& outdir)
 	}
 }
 
-/* 全地址覆盖 + 零总线输入：数据加载任务约定（每个地址一个分支，bus=0，均匀权重） */
-void set_full_coverage_zero_bus(qram_qubit::QRAMCircuit& qram, size_t n, size_t k)
-{
-	auto& groups = qram.get_branch_groups();
-	groups.clear();
-	for (size_t addr = 0; addr < pow2(n); ++addr) {
-		groups.emplace_back(addr);
-		auto& g = groups.back();
-		g.branches_input.emplace_back(addr, k, static_cast<bus_t>(0));
-		g.branch_probs.push_back(1.0 / pow2(n));
-		g.state_probs.push_back(1.0 / pow2(n));
-	}
-}
-
-void set_full_coverage_zero_bus(qram_qutrit::QRAMCircuit& qram, size_t n, size_t k)
-{
-	qram.get_branches().clear();
-	qram.get_branch_probs().clear();
-	for (size_t addr = 0; addr < pow2(n); ++addr) {
-		qram.get_branches().emplace_back(addr << k, k);
-		qram.get_branch_probs().push_back(1.0 / pow2(n));
-	}
-}
-
-/* 等比特数架构对比：A=(n,d) 并行 vs B=(n+log2 d,1) 扩址，
- * 数据加载任务（全地址覆盖、零总线），d=1 时两者全同作为自洽检查 */
+/* Equal-qubit-count architecture comparison: A=(n,d) parallel vs B=(n+log2 d,1) address-widened,
+ * data-loading task (full coverage, zero bus); at d=1 the two are identical, serving as a self-consistency check */
 void run_archscan(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "archscan.csv");
@@ -554,7 +564,7 @@ void run_archscan(const std::filesystem::path& outdir)
 	}
 }
 
-/* 架构对比的通道分解：d=4, n=8, eps=1e-4, A 与 B 各跑 depol-only / damp-only */
+/* Channel breakdown of the architecture comparison: d=4, n=8, eps=1e-4, A and B each run depol-only / damp-only */
 void run_archmech(const std::filesystem::path& outdir)
 {
 	auto csv = open_csv(outdir, "archmech.csv");
