@@ -1,16 +1,23 @@
 {# Language switcher: maps the current page to its counterpart in the other
-   language tree. Both trees share identical document names, so switching is
-   a plain ../zh/ <-> ../en/ path rewrite relative to the current page.
+   language tree. Both trees are built by SEPARATE sphinx-build runs (zh/ and
+   en/) and merged one level below the site root, so the other tree is not a
+   document of the current build — pathto() cannot reach it. Emit the link by
+   hand instead: depth of the page below the site root is len(pagename
+   segments) + 1, giving (pagename.count('/') + 1) `../` hops from the page's
+   own directory. Relative paths keep working under the GitHub Pages project
+   subpath and in local file:// previews.
    NOTE: the Jinja context exposes the BCP-47 form of the language setting
    ("zh-CN"), not the conf.py spelling ("zh_CN") — accept all spellings. #}
+{%- set up = '../' * (pagename.count('/') + 1) %}
+{%- set suffix = file_suffix|default('.html') %}
 <div class="sidebar-langswitch">
   <span class="sidebar-langswitch-label">Language:</span>
   {%- if language in ("zh_CN", "zh-CN", "zh") %}
   <strong>中文</strong>
   <span class="sidebar-langswitch-sep">·</span>
-  <a href="../en/{{ pagename }}{{ file_suffix|default('.html') }}">English</a>
+  <a href="{{ up }}en/{{ pagename }}{{ suffix }}">English</a>
   {%- else %}
-  <a href="../zh/{{ pagename }}{{ file_suffix|default('.html') }}">中文</a>
+  <a href="{{ up }}zh/{{ pagename }}{{ suffix }}">中文</a>
   <span class="sidebar-langswitch-sep">·</span>
   <strong>English</strong>
   {%- endif %}
