@@ -54,6 +54,12 @@ jobs:
         with:
           cmake-version: '3.26.x'
 
+      # scikit-build-core 用 Ninja generator，需要 cl 在 PATH 中
+      #（裸 windows runner 的 pwsh 不带 MSVC 环境，否则报
+      # CMAKE_CXX_COMPILER not set, after EnableLanguage）
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+
       - name: Install libgomp (Linux OpenMP runtime)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgomp1
