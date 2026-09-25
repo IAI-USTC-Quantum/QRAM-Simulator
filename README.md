@@ -2,7 +2,7 @@
   <img src="banner.png" alt="QRAM-Simulator Banner" width="100%">
 </p>
 
-English | [简体中文](README.zh-CN.md)
+English | [简体中文](README_zh-cn.md)
 
 # QRAM-Simulator
 

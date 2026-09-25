@@ -1,6 +1,6 @@
 # QRAM-Simulator Documentation
 
-English | [简体中文](README.zh-CN.md)
+English | [简体中文](README_zh-cn.md)
 
 This directory holds the sources of the **Sphinx site** (published on
 [GitHub Pages](https://iai-ustc-quantum.github.io/QRAM-Simulator/)). The site
@@ -36,7 +36,7 @@ docs/
 │       │   ├── api/           # C++ API (cpp.rst, breathe) + Python API (autoapi)
 │       │   └── paper/         # paper reproduction & theory docs
 │       └── zh/                # Chinese tree (same layout as en/)
-└── README.md                  # this file (English; see README.zh-CN.md)
+└── README.md                  # this file (English; see README_zh-cn.md)
 ```
 
 (`Doxyfile` sits in the repository root and outputs to `docs/api/` — the
