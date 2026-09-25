@@ -1,22 +1,36 @@
 name: Documentation
 
-# Build docs only on documentation changes
+# Sphinx 站点（单一站点）：
+#   1. doxygen 生成 XML（C++ API，经 breathe 吸入 Sphinx）
+#   2. pip install . 编译 pybind11 扩展 → pybind11-stubgen 生成 .pyi
+#      （Python API，经 sphinx-autoapi 构建）
+#   3. sphinx-build 产出完整站点并部署 gh-pages（main push 时全量替换）
 on:
   push:
     branches: [ "main", "develop" ]
     paths:
       - '**.md'
+      - '**.rst'
       - 'LICENSE'
       - 'docs/**'
       - 'Doxyfile'
+      - 'bindings/**'
+      - 'pyproject.toml'
+      - 'Common/**'
+      - 'QRAM/**'
       - '.pre-commit-config.yaml'
   pull_request:
     branches: [ "main", "develop" ]
     paths:
       - '**.md'
+      - '**.rst'
       - 'LICENSE'
       - 'docs/**'
       - 'Doxyfile'
+      - 'bindings/**'
+      - 'pyproject.toml'
+      - 'Common/**'
+      - 'QRAM/**'
       - '.pre-commit-config.yaml'
 
 concurrency:
@@ -32,43 +46,46 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.26.x'
 
     - name: Install Documentation Dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y doxygen graphviz
+        sudo apt-get update && sudo apt-get install -y doxygen graphviz libgomp1
 
-    - name: Generate Doxygen Documentation
+    - name: Generate Doxygen XML (C++ API for breathe)
       run: doxygen Doxyfile
+
+    - name: Build Python extension and type stubs (Python API for autoapi)
+      run: |
+        python -m pip install -v . pybind11-stubgen -r docs/sphinx/requirements.txt
+        python -m pybind11_stubgen qram_simulator -o docs/sphinx/source/api_stubs
+
+    - name: Build Sphinx site
+      run: sphinx-build docs/sphinx/source docs/sphinx/build/html
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: |
-          docs/api/html/
+          docs/sphinx/build/html/
         retention-days: 30
-
-    - name: Prepare Pages directory
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        mkdir -p pages-deploy
-
-        # Landing page
-        cp docs/index.html pages-deploy/index.html
-
-        # Doxygen docs (C++ API)
-        mkdir -p pages-deploy/api
-        cp -r docs/api/html/* pages-deploy/api/
-
-        # Other docs
-        cp docs/architecture.md pages-deploy/
-        cp docs/operators.md pages-deploy/
-        cp docs/README.md pages-deploy/
 
     - name: Deploy to GitHub Pages
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: pages-deploy/
+        publish_dir: docs/sphinx/build/html/
         publish_branch: gh-pages
+        # 单一 Sphinx 站点：全量替换 gh-pages 上的旧落地页/Doxygen 站点
+        force_orphan: true
