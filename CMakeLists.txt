@@ -38,18 +38,36 @@ endif()
 
 add_compile_definitions(FMT_UNICODE=0)
 
-if(QRAM_ENABLE_CUDA)
-    message(STATUS "CUDA support is temporarily disabled for the CondRot primitive refactor")
+# CUDA 检测：作为子目录嵌入（如 SparQSim）时尊重父级已定义的 CUDA_FOUND；
+# 独立构建时由 QRAM_ENABLE_CUDA 决定。构建侧已接通 CUDA 13（CCCL 3），
+# 生产 CondRot 原语的 GPU 内核仍待后续补充（期间走 CPU 回退路径）。
+if(NOT DEFINED CUDA_FOUND)
+    if(QRAM_ENABLE_CUDA)
+        include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CUDA.cmake)
+        sparq_prepare_cuda_env()
+        include(CheckLanguage)
+        check_language(CUDA)
+        if(CMAKE_CUDA_COMPILER)
+            enable_language(CUDA)
+            set(CUDA_FOUND TRUE)
+            message(STATUS "CUDA enabled: ${CMAKE_CUDA_COMPILER}")
+        else()
+            message(FATAL_ERROR "QRAM_ENABLE_CUDA=ON but no CUDA compiler (nvcc) found")
+        endif()
+    else()
+        set(CUDA_FOUND FALSE)
+        message(STATUS "CUDA support disabled (QRAM_ENABLE_CUDA=OFF) - building CPU-only")
+    endif()
 endif()
-set(CUDA_FOUND FALSE)
-message(STATUS "CUDA support disabled - building CPU-only")
 
 option(CMAKE_BUILD_TYPE "Release")
 
 message(STATUS "PROJECT_BINARY_DIR = ${PROJECT_BINARY_DIR}")
 message(STATUS "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 
-find_package(OpenMP REQUIRED)
+# OpenMP 仅用于 CPU 并行；限定 C/CXX 组件，避免启用 CUDA 语言后
+# find_package 去找不存在的 OpenMP_CUDA 而失败。
+find_package(OpenMP REQUIRED COMPONENTS C CXX)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")

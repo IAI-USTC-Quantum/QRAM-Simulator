@@ -53,7 +53,7 @@ cmake --build build --parallel
 | `QRAM_BUILD_TESTS` | ON | 构建 C++ 测试目标（`test/`） |
 | `QRAM_BUILD_EXPERIMENTS` | ON | 构建论文实验程序（`Experiments/`） |
 | `QRAM_BUILD_PYTHON_BINDINGS` | OFF | 构建 pybind11 绑定（`bindings/python/`，需 pybind11） |
-| `QRAM_ENABLE_CUDA` | OFF | 当前强制禁用（CondRot 重构期间 CPU-only） |
+| `QRAM_ENABLE_CUDA` | OFF | 构建 CUDA GPU 后端（需 CUDA 工具链；生产 CondRot 原语的 GPU 内核待补，期间走 CPU 回退） |
 
 运行 CI 回归对拍：
 

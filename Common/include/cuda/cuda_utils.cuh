@@ -9,6 +9,7 @@
 
 #if defined(__CUDACC__) && defined(USE_CUDA)
 #include <cuda_runtime.h>
+#include <cuda/std/complex>
 #include <thrust/binary_search.h>
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
@@ -40,37 +41,24 @@ namespace qram_simulator {
 	void throw_cuda_runtime_error(std::string_view errinfo);
 	void run_cuda_kernel();
 
+	/// 将设备向量内容拷贝回宿主向量（宿主侧自动 resize 到设备长度）
 	template <typename T>
 	void thrust_device_to_std(std::vector<T>& hv, const thrust::device_vector<T>& dv) {
 		hv.resize(dv.size());
-
-		//thrust::host_vector<T> tmp = dv;
-		//for (size_t i = 0; i < tmp.size(); ++i) {
-		//	hv[i] = tmp[i];
-		//}
-
 		thrust::copy(dv.begin(), dv.end(), hv.begin());
 	}
 
+	/// 将宿主向量内容上传到设备向量（assign 复用既有设备缓冲，避免反复分配显存）
 	template <typename T>
 	void std_to_thrust_device(thrust::device_vector<T>& dv, const std::vector<T>& hv) {
-		thrust::device_vector<T> tmp(hv.begin(), hv.end());
-		thrust::swap(dv, tmp);
+		dv.assign(hv.begin(), hv.end());
 	}
 
-	//__device__ __host__
-	//constexpr complex_t conj_dev(const complex_t& z)
-	//{
-	//	return complex_t(z.real(), -z.imag());
-	//}
-
-	using cu_complex_t = thrust::complex<double>;
-
-	HOST_DEVICE inline cu_complex_t operator+=(cu_complex_t& a, const cu_complex_t& b) {
-		a.real(a.real() + b.real());
-		a.imag(a.imag() + b.imag());
-		return a;
-	}
+	/// 设备侧复数类型：cuda::std::complex 与 std::complex 布局兼容、可隐式互转，
+	/// 全部运算符均可在 __host__ __device__ 代码中调用（libcu++）。
+	/// 注：thrust::complex 在 CCCL 2.7/3.3 中仍是独立实现（非本类型别名），
+	/// 与本类型布局兼容、值级可互转。
+	using cu_complex_t = cuda::std::complex<double>;
 
 	__device__ inline bool cuda_bit_parity(unsigned int v) {
 		// 使用 CUDA 的 __popc 函数计算位数，然后检查奇偶性

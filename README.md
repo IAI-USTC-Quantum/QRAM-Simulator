@@ -45,7 +45,7 @@ git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 mkdir build && cd build
 
-# 配置（CPU 版本；GPU/CUDA 后端当前暂缓，CMake 会构建 CPU-only 版本）
+# 配置（CPU 版本；GPU/CUDA 后端加 -DQRAM_ENABLE_CUDA=ON 开启，默认 OFF）
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
 make -j$(nproc)

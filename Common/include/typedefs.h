@@ -66,15 +66,19 @@ namespace qram_simulator{
 	/**
 	 * @brief 2×2 酉矩阵（行主序四元素）。
 	 *
-	 * 为保证 CPU 与 CUDA 按位一致而采用自定义结构（避免 std::array
-	 * 在 device 上的差异），提供迭代器、下标访问与 dagger（共轭转置）。
+	 * 自定义包装的目的：为承载 std::complex 数据的固定尺寸矩阵提供
+	 * __host__ __device__ 可用的构造与访问接口（std::complex 的成员
+	 * 函数不能直接在 device 代码中调用），并保持 CPU 与 CUDA 共享
+	 * 同一内存布局。提供迭代器、下标访问与 dagger（共轭转置）。
+	 * 数值一致性口径：整数路径按位一致；浮点路径以容差比较。
 	 */
 	struct u22_t
 	{
 		using data_type = std::array<std::complex<double>, 4>;
 		data_type m_data;
 
-		HOST_DEVICE u22_t() noexcept : m_data{ 0 } {}
+		/// 零初始化构造（全零矩阵）
+		HOST_DEVICE u22_t() noexcept : m_data{} {}
 
 		/// @brief 以四个元素（行主序 a,b,c,d）构造。
 		HOST_DEVICE	u22_t(std::complex<double> a, std::complex<double> b,
@@ -89,25 +93,11 @@ namespace qram_simulator{
 		HOST_DEVICE	u22_t(std::array<std::complex<double>, 4>&& arr) noexcept
 			: m_data(arr) {}
 
-		/// 拷贝构造
-		HOST_DEVICE	u22_t(const u22_t& other) noexcept
-			: m_data(other.m_data) {}
-
-		/// 移动构造
-		HOST_DEVICE	u22_t(u22_t&& other) noexcept
-			: m_data(other.m_data) {}
-
-		/// 拷贝赋值
-		HOST_DEVICE	u22_t& operator=(const u22_t& other) noexcept {
-			m_data = other.m_data;
-			return *this;
-		}
-
-		/// 移动赋值
-		HOST_DEVICE	u22_t& operator=(u22_t&& other) noexcept {
-			m_data = other.m_data;
-			return *this;
-		}
+		/// 拷贝/移动构造与赋值（与手写版本语义一致）
+		HOST_DEVICE	u22_t(const u22_t&) noexcept = default;
+		HOST_DEVICE	u22_t(u22_t&&) noexcept = default;
+		HOST_DEVICE	u22_t& operator=(const u22_t&) noexcept = default;
+		HOST_DEVICE	u22_t& operator=(u22_t&&) noexcept = default;
 
 		/// 起始迭代器
 		HOST_DEVICE	data_type::iterator begin() noexcept {
