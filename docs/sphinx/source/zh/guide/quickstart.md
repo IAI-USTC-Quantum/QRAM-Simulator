@@ -141,5 +141,5 @@ cmake --build build --parallel
 ## 下一步
 
 - [架构文档](architecture.md)：模块划分、数据流与剪枝机制
-- {doc}`C++ API 参考 <../api/cpp>`：全部核心类的中文 Doxygen 文档
+- {doc}`C++ API 参考 <../api/cpp>`：全部核心类的 Doxygen 文档
 - [论文复现指南](../paper/reproduction.md)：arXiv:2503.13832 图件复现

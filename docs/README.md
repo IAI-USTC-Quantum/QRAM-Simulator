@@ -1,55 +1,70 @@
-# QRAM-Simulator 文档
+# QRAM-Simulator Documentation
 
-本目录是 **Sphinx 站点**的源（发布于
-[GitHub Pages](https://iai-ustc-quantum.github.io/QRAM-Simulator/)），
-单一站点同时承载：
+English | [简体中文](README.zh-CN.md)
 
-- **使用指南**（安装 / 快速上手 / 架构 / 算子约束 / 命名规范）——Markdown（MyST）
-- **C++ API 参考**——由 Doxygen 头文件中文注释经 **breathe** 吸入 Sphinx
-- **Python API 参考**——由 pybind11 编译模块经 **pybind11-stubgen** 生成 `.pyi`
-  桩后由 **sphinx-autoapi** 构建
-- **论文与实验**——论文-代码对照与复现指南
+This directory holds the sources of the **Sphinx site** (published on
+[GitHub Pages](https://iai-ustc-quantum.github.io/QRAM-Simulator/)). The site
+is **bilingual (English by default, Chinese available)** and carries:
 
-Python 绑定（`qram-simulator` PyPI 包）源码位于本仓库 `bindings/python/`；
-pysparq 富绑定位于 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)。
+- **User guide** (installation / quickstart / architecture / operator
+  constraints / naming conventions) — Markdown (MyST)
+- **C++ API reference** — Doxygen header comments ingested into Sphinx via
+  **breathe**
+- **Python API reference** — `.pyi` stubs generated from the compiled
+  pybind11 module by **pybind11-stubgen**, built by **sphinx-autoapi**
+- **Papers & experiments** — paper-to-code walkthroughs and reproduction
+  guides
 
-## 目录结构
+The Python bindings (`qram-simulator` PyPI package) live in
+`bindings/python/` of this repository; the rich `pysparq` bindings live in
+the [SparQSim repository](https://github.com/IAI-USTC-Quantum/SparQSim).
+
+## Directory layout
 
 ```
 docs/
 ├── sphinx/
-│   ├── Makefile            # make html
-│   ├── requirements.txt    # Sphinx 构建依赖
+│   ├── Makefile               # make html (builds both trees)
+│   ├── requirements.txt       # Sphinx build dependencies
 │   └── source/
-│       ├── index.rst       # 站点首页与导航
-│       ├── guide/          # 安装/快速上手/架构/算子/命名规范
-│       ├── api/            # C++ API（cpp.rst，breathe）+ Python API（autoapi）
-│       └── paper/          # 论文复现与理论文档
-└── README.md               # 本文件
+│       ├── _conf_base.py      # shared Sphinx config (theme, breathe, autoapi)
+│       ├── _shared/           # shared static files + templates (language switcher)
+│       ├── api_stubs/         # CI-injected .pyi stubs (gitignored)
+│       ├── en/                # English tree (default language)
+│       │   ├── conf.py, index.rst
+│       │   ├── guide/         # install/quickstart/architecture/operators/naming
+│       │   ├── api/           # C++ API (cpp.rst, breathe) + Python API (autoapi)
+│       │   └── paper/         # paper reproduction & theory docs
+│       └── zh/                # Chinese tree (same layout as en/)
+└── README.md                  # this file (English; see README.zh-CN.md)
 ```
 
-（`Doxyfile` 位于仓库根目录，输出 `docs/api/`——HTML 供直接浏览，
-XML 供 breathe 使用；两者均已 gitignore。）
+(`Doxyfile` sits in the repository root and outputs to `docs/api/` — the
+HTML is for direct browsing, the XML feeds breathe; both are gitignored.)
 
-## 本地构建
+## Local build
 
 ```bash
-# 1. Doxygen XML（breathe 输入；需系统安装 doxygen）
+# 1. Doxygen XML (breathe input; requires doxygen on the system)
 doxygen Doxyfile
 
-# 2. Python 扩展与类型桩（autoapi 输入；仅 Python API 章节需要）
+# 2. Python extension and type stubs (autoapi input; only needed for the
+#    Python API chapter)
 pip install . pybind11-stubgen -r docs/sphinx/requirements.txt
 pybind11_stubgen qram_simulator -o docs/sphinx/source/api_stubs
 
-# 3. Sphinx 站点
-sphinx-build docs/sphinx/source docs/sphinx/build/html
-# 或：cd docs/sphinx && make html
+# 3. Sphinx site (both language trees)
+sphinx-build docs/sphinx/source/en docs/sphinx/build/html/en
+sphinx-build docs/sphinx/source/zh docs/sphinx/build/html/zh
+# or: cd docs/sphinx && make html
 ```
 
-> 缺第 1 步时 C++ API 章节构建失败；缺第 2 步时自动跳过 Python API
-> 章节（`conf.py` 检测 `api_stubs/` 是否存在）。
+> Without step 1 the C++ API chapter fails to build; without step 2 the
+> Python API chapter is skipped automatically (`_conf_base.py` detects
+> whether `api_stubs/` exists).
 
-## CI（docs.yml）
+## CI (docs.yml)
 
-push/PR 触发 → doxygen → pip install . + stubgen → sphinx-build →
-上传 artifact；main 分支 push 时部署 gh-pages（单一 Sphinx 站点全量替换）。
+push/PR trigger -> doxygen -> pip install . + stubgen -> sphinx-build (zh +
+en) -> artifact upload; on push to main the site is deployed to gh-pages
+(full replacement; the root URL redirects to the English tree).

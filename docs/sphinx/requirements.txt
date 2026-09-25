@@ -1,4 +1,4 @@
-# Sphinx 文档构建依赖（docs.yml CI 与本地 make html 均使用）
+# Sphinx documentation build dependencies (used by docs.yml CI and local make html)
 sphinx>=7.0
 furo
 myst-parser

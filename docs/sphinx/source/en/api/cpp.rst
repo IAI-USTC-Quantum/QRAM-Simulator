@@ -1,30 +1,31 @@
-C++ API 参考
-============
+C++ API Reference
+=================
 
-本章由 `Doxygen <https://www.doxygen.nl>`_ + `Breathe
-<https://breathe.readthedocs.io>`_ 从源码头文件的中文注释自动生成，
-按核心工作类组织。完整头文件（含自由函数与工具）见仓库
-``QRAM/include/`` 与 ``Common/include/``。
+This chapter is generated automatically from the comments in the source
+header files by `Doxygen <https://www.doxygen.nl>`_ + `Breathe
+<https://breathe.readthedocs.io>`_, organized by core working class. The complete
+headers (including free functions and utilities) live in the repository under
+``QRAM/include/`` and ``Common/include/``.
 
-QRAM 模块
----------
+QRAM Module
+-----------
 
-电路（qubit 架构）
-~~~~~~~~~~~~~~~~~~
+Circuits (qubit architecture)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::qram_qubit::QRAMCircuit
    :project: QRAM-Simulator
    :members:
 
-电路（qutrit 架构）
-~~~~~~~~~~~~~~~~~~~
+Circuits (qutrit architecture)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::qram_qutrit::QRAMCircuit
    :project: QRAM-Simulator
    :members:
 
-时序与噪声调度
-~~~~~~~~~~~~~~
+Timing and noise scheduling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::TimeStep
    :project: QRAM-Simulator
@@ -46,8 +47,8 @@ QRAM 模块
    :project: QRAM-Simulator
    :members:
 
-分支结构（qubit 架构）
-~~~~~~~~~~~~~~~~~~~~~~
+Branch structures (qubit architecture)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::qram_qubit::BranchGroup
    :project: QRAM-Simulator
@@ -65,8 +66,8 @@ QRAM 模块
    :project: QRAM-Simulator
    :members:
 
-分支结构（qutrit 架构）
-~~~~~~~~~~~~~~~~~~~~~~~
+Branch structures (qutrit architecture)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::qram_qutrit::Branch
    :project: QRAM-Simulator
@@ -84,25 +85,25 @@ QRAM 模块
    :project: QRAM-Simulator
    :members:
 
-Common 模块
------------
+Common Module
+-------------
 
-全振幅桥接
-~~~~~~~~~~
+Full-amplitude bridge
+~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenclass:: qram_simulator::QRAMFullAmp
    :project: QRAM-Simulator
    :members:
 
-全振幅电路原语
-~~~~~~~~~~~~~~
+Full-amplitude circuit primitives
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::quantum_simulator::MeasureResult
    :project: QRAM-Simulator
    :members:
 
-矩阵
-~~~~
+Matrices
+~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::SparseMatrix
    :project: QRAM-Simulator
@@ -116,15 +117,15 @@ Common 模块
    :project: QRAM-Simulator
    :members:
 
-随机引擎
-~~~~~~~~
+Random engine
+~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::random_engine
    :project: QRAM-Simulator
    :members:
 
-日志与剖析
-~~~~~~~~~~
+Logging and profiling
+~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: qram_simulator::Logger
    :project: QRAM-Simulator
@@ -142,8 +143,8 @@ Common 模块
    :project: QRAM-Simulator
    :members:
 
-迭代工具
-~~~~~~~~
+Iteration utilities
+~~~~~~~~~~~~~~~~~~~
 
 .. doxygenclass:: qram_simulator::range
    :project: QRAM-Simulator

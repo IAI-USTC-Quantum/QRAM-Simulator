@@ -1,0 +1,15 @@
+{# Language switcher: maps the current page to its counterpart in the other
+   language tree. Both trees share identical document names, so switching is
+   a plain ../zh/ <-> ../en/ path rewrite relative to the current page. #}
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  {%- if language == "zh_CN" %}
+  <strong>中文</strong>
+  <span class="sidebar-langswitch-sep">·</span>
+  <a href="../en/{{ pagename }}{{ file_suffix|default('.html') }}">English</a>
+  {%- else %}
+  <a href="../zh/{{ pagename }}{{ file_suffix|default('.html') }}">中文</a>
+  <span class="sidebar-langswitch-sep">·</span>
+  <strong>English</strong>
+  {%- endif %}
+</div>

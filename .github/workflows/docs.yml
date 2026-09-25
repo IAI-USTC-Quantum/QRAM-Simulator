@@ -1,10 +1,12 @@
 name: Documentation
 
-# Sphinx 站点（单一站点）：
-#   1. doxygen 生成 XML（C++ API，经 breathe 吸入 Sphinx）
-#   2. pip install . 编译 pybind11 扩展 → pybind11-stubgen 生成 .pyi
-#      （Python API，经 sphinx-autoapi 构建）
-#   3. sphinx-build 产出完整站点并部署 gh-pages（main push 时全量替换）
+# Sphinx site (bilingual zh/en trees under one site):
+#   1. doxygen generates XML (C++ API, ingested by Sphinx via breathe)
+#   2. pip install . compiles the pybind11 extension -> pybind11-stubgen
+#      generates .pyi stubs (Python API, built via sphinx-autoapi)
+#   3. sphinx-build builds BOTH language trees (html/zh + html/en) plus a
+#      root redirect page (English by default) and deploys to gh-pages
+#      (full replacement on push to main)
 on:
   push:
     branches: [ "main", "develop" ]
@@ -40,7 +42,8 @@ concurrency:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    # Gitea 也会扫描 .github/workflows,但其 runner 访问不了 github.com → 仅 GitHub 上游执行
+    # Gitea also scans .github/workflows, but its runners cannot reach
+    # github.com -> run on the GitHub upstream only
     if: github.repository_owner == 'IAI-USTC-Quantum'
     permissions:
       contents: write
@@ -69,8 +72,14 @@ jobs:
         python -m pip install -v . pybind11-stubgen -r docs/sphinx/requirements.txt
         python -m pybind11_stubgen qram_simulator -o docs/sphinx/source/api_stubs
 
-    - name: Build Sphinx site
-      run: sphinx-build docs/sphinx/source docs/sphinx/build/html
+    - name: Build Sphinx site (zh + en trees)
+      run: |
+        sphinx-build docs/sphinx/source/zh docs/sphinx/build/html/zh
+        sphinx-build docs/sphinx/source/en docs/sphinx/build/html/en
+
+    - name: Generate root landing page (redirect, English by default)
+      run: |
+        printf '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>QRAM-Simulator Documentation</title>\n<meta http-equiv="refresh" content="0; url=en/index.html">\n<link rel="canonical" href="en/index.html">\n</head>\n<body>\n<p>Redirecting to the <a href="en/index.html">English documentation</a>. <a href="zh/index.html">中文文档</a></p>\n</body>\n</html>\n' > docs/sphinx/build/html/index.html
 
     - name: Upload documentation artifact
       uses: actions/upload-artifact@v4
@@ -87,5 +96,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/sphinx/build/html/
         publish_branch: gh-pages
-        # 单一 Sphinx 站点：全量替换 gh-pages 上的旧落地页/Doxygen 站点
+        # Bilingual Sphinx site: fully replaces the old landing page /
+        # Doxygen site previously hosted on gh-pages
         force_orphan: true
