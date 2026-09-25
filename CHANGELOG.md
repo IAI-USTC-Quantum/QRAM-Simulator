@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-25
+
+### Fixed
+- **与 `pysparq` 包共装兼容**：`QRAMCircuitQutrit` 绑定改用
+  `py::module_local()`——C++ 类型 `qram_qutrit::QRAMCircuit` 同时被
+  pysparq 的富绑定注册（Python 名 `QRAMCircuit_qutrit`），pybind11
+  按 C++ typeid 全局注册导致同一进程导入两个包时报
+  `generic_type: type "QRAMCircuit_qutrit" is already registered`。
+  局部化后两包可共存（双向导入顺序均验证），类型实例仅在本模块内
+  使用，无跨模块流动。
+
 ## [0.2.0] - 2026-09-25
 
 ### Added

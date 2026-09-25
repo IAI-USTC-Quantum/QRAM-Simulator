@@ -217,7 +217,11 @@ qubit 架构 QRAM 装载电路的分支化稀疏仿真器。
 	// ---- qutrit 架构 QRAMCircuit ----
 	{
 		using QC = qram_qutrit::QRAMCircuit;
-		py::class_<QC>(m, "QRAMCircuitQutrit", R"doc(
+		// module_local：该 C++ 类型同时被 pysparq 包的富绑定注册（Python 名
+		// QRAMCircuit_qutrit）；pybind11 按 C++ typeid 全局注册，两模块同注
+		// 册时后导入者报 "already registered"。局部化后两包可共存；本类型
+		// 实例仅在 qram_simulator 模块内使用，无跨模块流动。
+		py::class_<QC>(m, "QRAMCircuitQutrit", py::module_local(), R"doc(
 qutrit 架构 QRAM 装载电路的分支化稀疏仿真器。
 
 每个树节点为 (addr ∈ {W, L, R}, data) 的三能级系统，以
