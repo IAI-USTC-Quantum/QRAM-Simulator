@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.png" alt="QRAM-Simulator Banner" width="100%">
+  <img src="banner.svg" alt="QRAM-Simulator Banner" width="100%">
 </p>
 
 English | [简体中文](README_zh-cn.md)

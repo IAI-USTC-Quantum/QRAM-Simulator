@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2433" height="1221" viewBox="0 0 2433 1221">
+  <title>QRAM-Simulator — Sparse state and QRAM simulator</title>
+  <!-- QRAM-Simulator version of the project banner (shared design with SparQSim/banner.svg) -->
+
+  <!-- top panel -->
+  <rect x="0" y="0" width="2433" height="585" fill="#FEFDFA"/>
+
+  <!-- blue band -->
+  <rect x="0" y="585" width="2433" height="636" fill="#0472F7"/>
+
+  <!-- wordmark -->
+  <text x="332" y="384" font-family="'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif"
+        font-size="250" font-weight="600" fill="#0067F0"
+        textLength="1768" lengthAdjust="spacingAndGlyphs">QRAM-Simulator</text>
+
+  <!-- isometric cube mark -->
+  <g fill="#FFFFFF">
+    <!-- roof tile -->
+    <path d="M267,766 L177,834 L357,834 Z"/>
+    <!-- left pillar (slashed by a blue diagonal below) -->
+    <path d="M177,838 L183,838 L262,917 L262,1042 L177,959 Z"/>
+    <!-- right pillar -->
+    <path d="M357,838 L351,838 L272,917 L272,1042 L357,959 Z"/>
+    <!-- lower-left wedge under the slash -->
+    <path d="M177,995 L254,1072 L177,1142 Z"/>
+    <!-- bottom tip -->
+    <path d="M177,1146 L357,1146 L267,1210 Z"/>
+    <!-- right column: triangle over square -->
+    <path d="M361,823 L523,823 L523,985 Z"/>
+    <rect x="359" y="988" width="164" height="160"/>
+  </g>
+  <!-- light-blue accent triangle -->
+  <path d="M267,1068 L177,1141 L357,1141 Z" fill="#66ADFB"/>
+
+  <!-- tagline -->
+  <g font-family="'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif"
+     font-size="124" font-weight="400" fill="#FFFFFF">
+    <text x="758" y="967" textLength="885" lengthAdjust="spacingAndGlyphs">Sparse state and</text>
+    <text x="758" y="1104" textLength="853" lengthAdjust="spacingAndGlyphs">QRAM simulator</text>
+  </g>
+
+  <!-- rounded rail motif, bleeding off the right edge -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="6">
+    <rect x="1946" y="838"  width="2490" height="60" rx="30"/>
+    <rect x="1946" y="956"  width="2490" height="60" rx="30"/>
+    <rect x="1946" y="1074" width="2490" height="60" rx="30"/>
+  </g>
+</svg>
