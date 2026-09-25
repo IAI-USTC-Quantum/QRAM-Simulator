@@ -93,11 +93,13 @@ namespace qram_simulator{
 		HOST_DEVICE	u22_t(std::array<std::complex<double>, 4>&& arr) noexcept
 			: m_data(arr) {}
 
-		/// 拷贝/移动构造与赋值（与手写版本语义一致）
-		HOST_DEVICE	u22_t(const u22_t&) noexcept = default;
-		HOST_DEVICE	u22_t(u22_t&&) noexcept = default;
-		HOST_DEVICE	u22_t& operator=(const u22_t&) noexcept = default;
-		HOST_DEVICE	u22_t& operator=(u22_t&&) noexcept = default;
+		/// 拷贝/移动构造与赋值：defaulted 平凡成员（nvcc 会忽略 defaulted
+		/// 函数上的 __host__ __device__ 标注并告警，故不标注；平凡特殊
+		/// 成员在 device 代码中天然可用）
+		u22_t(const u22_t&) noexcept = default;
+		u22_t(u22_t&&) noexcept = default;
+		u22_t& operator=(const u22_t&) noexcept = default;
+		u22_t& operator=(u22_t&&) noexcept = default;
 
 		/// 起始迭代器
 		HOST_DEVICE	data_type::iterator begin() noexcept {

@@ -41,6 +41,17 @@ function(sparq_setup_cuda_target target)
         CUDA_RESOLVE_DEVICE_SYMBOLS ON
     )
 
+    # VS 生成器：把工具包根目录以 Globals 属性写入 vcxproj（其求值先于
+    # CUDA <ver>.props 的目录探测），使 build/IDE/CI 都无需环境变量。
+    if(CMAKE_GENERATOR MATCHES "Visual Studio" AND CMAKE_CUDA_COMPILER)
+        get_filename_component(_sparq_cuda_root "${CMAKE_CUDA_COMPILER}" DIRECTORY) # .../bin
+        get_filename_component(_sparq_cuda_root "${_sparq_cuda_root}" DIRECTORY)
+        if(EXISTS "${_sparq_cuda_root}/include/cuda_runtime.h")
+            set_target_properties(${target} PROPERTIES
+                VS_GLOBAL_CudaToolkitDir "${_sparq_cuda_root}")
+        endif()
+    endif()
+
     # 目标架构：默认继承 CMAKE_CUDA_ARCHITECTURES（父级或命令行设置）；
     # 完全未设置时回退 native（要求配置机有 GPU）。
     get_target_property(_sparq_arch ${target} CUDA_ARCHITECTURES)
@@ -64,8 +75,10 @@ function(sparq_setup_cuda_target target)
     target_compile_options(${target} PRIVATE "$<$<COMPILE_LANGUAGE:CUDA>:${_sparq_cuda_flags}>")
 
     # USE_CUDA 改变 System 等数据结构的内存布局（std::vector ↔ std::array），
-    # 消费方编译时必须看到一致的开关，故为 PUBLIC。
-    target_compile_definitions(${target} PUBLIC USE_CUDA=1 EIGEN_NO_CUDA)
+    # 消费方编译时必须看到一致的开关，故为 PUBLIC。FMT_UNICODE=0 与核心仓库
+    # 的全局定义一致——fmt 的 Unicode 路径要求 _UTF8 宏（cl 的 /utf-8 产物），
+    # nvcc 前端解析 fmt 头文件时没有该宏，会触发 static_assert 与字符越界错误。
+    target_compile_definitions(${target} PUBLIC USE_CUDA=1 EIGEN_NO_CUDA FMT_UNICODE=0)
 
     target_link_libraries(${target} PRIVATE cudart cudadevrt)
 endfunction()
