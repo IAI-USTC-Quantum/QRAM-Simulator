@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **pybind11 绑定层回归本仓库**：`bindings/python/`（`core_binding.cpp` +
+  `qram_simulator/__init__.py` + pytest 套件）导出核心工作类——
+  `QRAMCircuitQubit` / `QRAMCircuitQutrit` / `QRAMFullAmp` / `TimeStep`
+  （含 `TimeSlices` / `OperationPack` / `Operation` 轻量视图）、
+  `OperationType` 枚举、`ARCH_QUBIT` / `ARCH_QUTRIT` 常量与全局随机种子
+  控制（`set_seed` / `get_seed`），供外部 Python 库与脚本化实验直接驱动
+  完整的"构造 → 设噪声 → 运行 → 保真度"工作流
+- **根 `pyproject.toml`**：scikit-build-core + pybind11 + setuptools-scm
+  打包 `qram-simulator`（cp310–313，manylinux x86_64 + win_amd64），
+  `__version__` 运行时从 dist-info 读取（规避 scikit-build-core 按
+  .gitignore 过滤 wheel 文件的坑）
+- **`.github/workflows/pypi-publish.yml`**：tag `v*` / GitHub Release 触发
+  → cibuildwheel 多平台 wheel + sdist（含自包含校验）→ PyPI trusted
+  publishing（OIDC）；`python-bindings.yml` 守护 CI（wheel 构建安装 +
+  pytest，ubuntu/windows × py3.10/3.12）
+- **Sphinx 文档站点**（`docs/sphinx/`）：单一站点 = MyST 指南（安装/
+  快速上手/架构重写）+ breathe 吸入 Doxygen C++ API + pybind11-stubgen →
+  autoapi 的 Python API + 论文文档迁移；`docs.yml` 重写为该流水线，
+  gh-pages 全量替换为 Sphinx 站点（Doxyfile 开启 `GENERATE_XML`）
+- **全仓中文 Doxygen 注释**：`QRAM/include/` 五个头文件与
+  `Common/include/` 全部公有头（QRAMCircuit ×2、TimeStep、State/Branch
+  系列、QRAMFullAmp、矩阵、随机引擎、日志等）补齐 `/** @brief @param
+  @return */` 注释，注释与 Doxygen/breathe/Sphinx 链路打通
+- **`LICENSE`**：补齐 Apache-2.0 全文（pyproject 与 README 此前已声明该许可，
+  GitHub 许可检测由此生效）；CONTRIBUTING 克隆示例统一为 GitHub 地址
+
 ### Changed
 - **第二轮分仓:SparQ 框架整体迁出,本仓库收敛为纯 C++ QRAM 基座**。
   `SparQ/`、`SparQ_Algorithm/`、`bindings/python/`（薄绑定）、`examples/`、
@@ -18,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   SparQSim,本仓库保留 Common 与纯 QRAM 部分）。依赖方向固化为
   **SparQSim → QRAM-Simulator**;本仓库不再包含任何 SparQ 代码与 Python 组件,
   `qram-simulator` 包改由 SparQSim 仓库构建发布
+  （注:该决定后被本次 Unreleased 的绑定层回归条目取代——`qram-simulator`
+  改由本仓库独立构建发布）
 - 伞形 `SparQ` CMake 目标随 SparQ_Algorithm 迁出（现定义于 SparQSim 根
   CMakeLists）;本仓库导出目标收敛为 `SparQ_Common` + `SparQ_QRAMSimulator`
   （平铺头文件 BUILD_INTERFACE 随目标暴露,供 SparQSim 组合）,

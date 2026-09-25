@@ -50,7 +50,7 @@
 
 1. **克隆仓库**
    ```bash
-   git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
+   git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
    cd QRAM-Simulator
    ```
 
@@ -157,12 +157,12 @@ QState qramLoad(const QState& address, const QState& data);
 
 ## Pull Request 流程
 
-### 1. 克隆 Gitea 仓库
+### 1. 克隆仓库
 
 ### 2. 创建功能分支
 
 ```bash
-git clone git@git.chenzhaoyun.com:agony/QRAM-Simulator.git
+git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 git checkout -b feature/your-feature-name
 ```
