@@ -21,6 +21,7 @@ on:
       - 'Common/**'
       - 'QRAM/**'
       - '.pre-commit-config.yaml'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches: [ "main", "develop" ]
     paths:
@@ -34,6 +35,8 @@ on:
       - 'Common/**'
       - 'QRAM/**'
       - '.pre-commit-config.yaml'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
 
 concurrency:
   group: docs-${{ github.ref }}
