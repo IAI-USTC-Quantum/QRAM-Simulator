@@ -23,6 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 # this project via add_subdirectory, e.g. SparQSim, turn QRAM_BUILD_TESTS OFF)
 option(QRAM_BUILD_TESTS "Build C++ test targets (test/)" ON)
 option(QRAM_BUILD_EXPERIMENTS "Build QRAM experiment programs (Experiments/)" ON)
+option(QRAM_BUILD_PYTHON_BINDINGS "Build pybind11 Python bindings (bindings/python/)" OFF)
 if(QRAM_BUILD_TESTS)
     enable_testing()
 endif()
@@ -103,6 +104,16 @@ target_include_directories(SparQ_Common INTERFACE
 
 add_subdirectory(ThirdParty EXCLUDE_FROM_ALL)
 
+# Python 绑定（pybind11）：默认 OFF，嵌入消费方（SparQSim 的
+# add_subdirectory）与纯 C++ CI 不受影响。开启时 pybind11 由
+# scikit-build-core 的构建隔离环境（pip）或系统安装提供。
+# 注意：pybind11 的 imported target 是目录作用域，find_package 必须
+# 在本目录内完成，不能依赖上层消费者代为查找。
+if(QRAM_BUILD_PYTHON_BINDINGS)
+    find_package(pybind11 CONFIG REQUIRED)
+    add_subdirectory(bindings/python)
+endif()
+
 if(QRAM_BUILD_TESTS)
     add_subdirectory(test)
 endif()
@@ -113,6 +124,12 @@ endif()
 
 # --- Install rules ---
 # (GNUInstallDirs is included above, before the INTERFACE includes)
+#
+# C++ 开发包安装规则（静态库 + 平铺头文件 + CMake package config）。
+# wheel 构建（QRAM_BUILD_PYTHON_BINDINGS=ON，scikit-build-core 把安装前缀
+# 指向 wheel 的 platlib）时跳过，避免把 include/、lib/ 灌进 site-packages；
+# 此时仅有 bindings/python 里 _core 扩展的 install 规则生效。
+if(NOT QRAM_BUILD_PYTHON_BINDINGS)
 
 set(INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/QRAMSimulator")
 
@@ -146,3 +163,5 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/QRAMSimulatorConfig.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
 )
+
+endif() # NOT QRAM_BUILD_PYTHON_BINDINGS（跳过 C++ 开发包安装）

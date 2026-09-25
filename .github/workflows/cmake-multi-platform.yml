@@ -148,5 +148,6 @@ jobs:
         PROJECT_ROOT: ${{ github.workspace }}
       run: ctest --output-on-failure -C ${{ matrix.build_type }} -j4
 
-    # Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）的构建、
-    # 测试与发布均见 SparQSim 仓库；本仓库为纯 C++ 核心。
+    # Python 绑定层（qram-simulator PyPI 包）的守护构建与发布流水线
+    # 见 python-bindings.yml 与 pypi-publish.yml；pysparq 全功能绑定
+    # 见 SparQSim 仓库。

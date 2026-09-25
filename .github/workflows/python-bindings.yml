@@ -1,0 +1,65 @@
+name: Python Bindings
+
+# pybind11 绑定层的守护 CI：wheel 构建安装 + pytest 冒烟。
+# 发布（tag → PyPI trusted publishing）见 pypi-publish.yml。
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'bindings/**'
+      - 'pyproject.toml'
+      - 'CMakeLists.txt'
+      - 'Common/**'
+      - 'QRAM/**'
+      - 'ThirdParty/**'
+      - '.github/workflows/python-bindings.yml'
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'bindings/**'
+      - 'pyproject.toml'
+      - 'CMakeLists.txt'
+      - 'Common/**'
+      - 'QRAM/**'
+      - 'ThirdParty/**'
+      - '.github/workflows/python-bindings.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: python-bindings-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: wheel + pytest (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    # Gitea 也会扫描 .github/workflows，但其 runner 访问不了 github.com
+    # → 仅 GitHub 上游执行
+    if: github.repository_owner == 'IAI-USTC-Quantum'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+        python: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.26.x'
+
+      - name: Install libgomp (Linux OpenMP runtime)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgomp1
+
+      - name: Build and install wheel
+        run: python -m pip install -v . pytest
+
+      - name: Run binding tests
+        run: python -m pytest bindings/python/test -v

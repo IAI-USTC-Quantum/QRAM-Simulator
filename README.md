@@ -11,17 +11,18 @@
 [![CI](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/actions/workflows/cmake-multi-platform.yml)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-4D6AE4)](https://iai-ustc-quantum.github.io/QRAM-Simulator/)
 
-> **QRAM 电路模拟核心（纯 C++ 基座仓）**：Qutrit/Qubit 两种 QRAM 架构、噪声模型与 QRAM 论文实验
+> **QRAM 电路模拟核心（C++ 基座仓）**：Qutrit/Qubit 两种 QRAM 架构、噪声模型、QRAM 论文实验与 pybind11 Python 绑定
 
 ## 仓库分工
 
-本仓库是纯 C++ 基座，不含任何 Python 组件；SparQ 框架（稀疏态模拟器、算法库、
-Python 绑定、算法类实验）全部位于 SparQSim 仓库：
+本仓库是 C++ 基座：QRAM 电路核心 + 论文实验 + **pybind11 薄绑定**（`qram-simulator`
+PyPI 包）；SparQ 框架（稀疏态模拟器、算法库、pysparq 富绑定、算法类实验）位于
+SparQSim 仓库：
 
 | 仓库 | 内容 | PyPI 包 |
 |------|------|---------|
-| **QRAM-Simulator**（本仓库） | C++ QRAM 电路核心（Common + QRAM）+ QRAM 论文实验 | 无（纯 C++） |
-| [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) | SparQ 框架（稀疏态模拟器、算法库、pysparq 与 qram_simulator 绑定、算法类实验） | `pysparq`、`qram-simulator` |
+| **QRAM-Simulator**（本仓库） | C++ QRAM 电路核心（Common + QRAM）+ QRAM 论文实验 + pybind11 薄绑定 | `qram-simulator` |
+| [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) | SparQ 框架（稀疏态模拟器、算法库、pysparq 富绑定、算法类实验） | `pysparq` |
 
 依赖方向：**SparQSim → QRAM-Simulator**。SparQSim 以 git submodule
 （相对 URL `../QRAM-Simulator.git`）方式引用本仓库并编译 C++ 核心；两个仓库各自
@@ -82,6 +83,33 @@ qram.run_normal();
 // 4. 采样保真度
 double fidelity = qram.sample_and_get_fidelity();
 ```
+
+## Python 快速开始
+
+```bash
+pip install qram-simulator
+```
+
+绑定层（`bindings/python/`，pybind11）导出核心工作类：`QRAMCircuitQubit` /
+`QRAMCircuitQutrit`（两套架构电路）、`QRAMFullAmp`（全振幅桥接）、`TimeStep`
+（时序与噪声调度）、`OperationType` 与全局随机种子控制，供外部库直接驱动
+完整的"构造 → 设噪声 → 运行 → 保真度"工作流：
+
+```python
+from qram_simulator import QRAMCircuitQubit, OperationType, set_seed
+
+set_seed(42)
+qram = QRAMCircuitQubit(4, 2)
+qram.set_memory_random()
+qram.set_noise_models({OperationType.Depolarizing: 1e-3,
+                       OperationType.Damping: 1e-4})
+qram.set_input_uniform(100)
+qram.run_normal()
+print(qram.sample_and_get_fidelity())
+```
+
+本地开发：`pip install -v .`（CMake ≥ 3.18 + C++17 + OpenMP），
+测试：`pytest bindings/python/test`。
 
 ### 作为 CMake 子项目消费（SparQSim 的方式）
 
@@ -157,10 +185,11 @@ Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）见
 QRAM-Simulator/
 ├── QRAM/               # QRAM 电路实现（Qutrit/Qubit-based）
 ├── Common/             # 公共组件（矩阵、随机引擎、state manipulator 等）
+├── bindings/python/    # pybind11 薄绑定（qram-simulator PyPI 包）
 ├── Experiments/        # QRAM 论文实验（QRAMFidelityV2、QubitPaper、ChannelCorrespondence 等）
 ├── test/               # C++ 测试（Common/QRAM 归属部分）
 ├── ThirdParty/         # vendored 依赖（Eigen、fmt、googletest、argparse）
-└── docs/               # 文档（Doxygen、论文复现）
+└── docs/               # Sphinx 文档（breathe 吸入 Doxygen C++ API + autoapi Python API）
 ```
 
 ## 发版流程
@@ -168,8 +197,10 @@ QRAM-Simulator/
 1. 在 Gitea（开发主仓）合并变更到 main；
 2. 同步到 GitHub 上游 `IAI-USTC-Quantum/QRAM-Simulator`；
 3. 更新 `CHANGELOG.md`，打 tag（`vX.Y.Z`，注意历史上已有 v0.1.x，新系列从 v0.2.0 起）；
-4. push tag 或创建 GitHub Release（本仓库为纯 C++ 源码仓，不发布 PyPI 包；
-   `pysparq` / `qram-simulator` 的 wheel 由 SparQSim 仓库发布）。
+4. push tag 或创建 GitHub Release → `pypi-publish.yml` 自动构建
+   cp310–cp313 的 manylinux / win_amd64 wheel 与 sdist，经 PyPI
+   trusted publishing 发布 `qram-simulator` 包；`pysparq` 仍由
+   SparQSim 仓库发布。
 
 ## About Us
 
@@ -184,7 +215,7 @@ IAI-USTC Quantum 是合肥综合性国家科学中心人工智能研究院（Ins
 
 ## 相关项目
 
-- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - SparQ 框架与 Python 生态（pysparq、qram_simulator）
+- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - SparQ 框架与 Python 生态（pysparq）
 - [UnifiedQuantum](https://github.com/IAI-USTC-Quantum/UnifiedQuantum) - 统一量子计算框架
 
 ## 许可证

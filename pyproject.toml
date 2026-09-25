@@ -1,0 +1,76 @@
+[build-system]
+requires = [
+    "scikit-build-core>=0.10",
+    "pybind11>=2.13",
+    "setuptools-scm>=8",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "qram-simulator"
+dynamic = ["version"]
+description = "QRAM 电路模拟核心：qubit/qutrit 两种架构的噪声稀疏分支仿真（pybind11 薄绑定）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Agony", email = "chenzhaoyun@iai.ustc.edu.cn" }]
+
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/IAI-USTC-Quantum/QRAM-Simulator"
+Documentation = "https://iai-ustc-quantum.github.io/QRAM-Simulator/"
+
+[project.optional-dependencies]
+dev = ["pybind11-stubgen", "pytest"]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.18"
+cmake.build-type = "Release"
+wheel.platlib = true
+# wheel.packages 需与 wheel.platlib 同时启用：把 bindings/python/qram_simulator
+# 的纯 Python 源码与 CMake install 前缀里的编译扩展 (_core) 一并打进 wheel
+wheel.packages = { qram_simulator = "bindings/python/qram_simulator" }
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+
+[tool.scikit-build.cmake.define]
+# wheel 构建不需要 C++ 测试/实验目标；vendored googletest 也一并跳过
+QRAM_BUILD_TESTS = false
+QRAM_BUILD_EXPERIMENTS = false
+QRAM_BUILD_PYTHON_BINDINGS = true
+
+[tool.scikit-build.sdist]
+# sdist 保持自包含（eigen/fmt/argparse 随包发布，构建期不联网），
+# 但剔除测试与文档冗余；Python 测试在 bindings/python/test（保留）
+exclude = [
+    "/Experiments",
+    "/test",
+    "/docs",
+    "/ThirdParty/googletest",
+    "/.gitea",
+    "/.github",
+    "/.pre-commit-config.yaml",
+    "/.clang-format",
+    "/.gitattributes",
+    "/Doxyfile",
+    "/CMakeSettings.json",
+]
+
+# __version__ 运行时从 dist-info 读取（见 bindings/python/qram_simulator/__init__.py），
+# 不落盘 _version.py：scikit-build-core 会按 .gitignore 过滤 wheel 内文件，
+# 曾静默丢弃 setuptools-scm 写入的版本文件（pyqsparse<=0.1.1 踩过的坑）
+[tool.setuptools-scm]
+fallback_version = "0.0.0"
+
+[tool.cibuildwheel]
+build-frontend = "build[uv]"
+# 暂不支持 32 位系统（size_t != uint64_t）；macOS 支持暂缓
+skip = ["*-musllinux_*", "*-win32", "*-macos*"]
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]
+before-all = "yum install -y libgomp" # OpenMP 运行时
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]

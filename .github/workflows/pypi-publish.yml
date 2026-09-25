@@ -1,0 +1,113 @@
+name: Publish Python Package
+
+# tag（v*）或 GitHub Release 触发 → cibuildwheel 出多平台 wheel + sdist
+# → PyPI trusted publishing（OIDC，无 token；PyPI 端需预配置 environment
+# "pypi" 的 trusted publisher：owner=IAI-USTC-Quantum,
+# repo=QRAM-Simulator, workflow=pypi-publish.yml）。
+on:
+  push:
+    tags: ['v*']
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: pypi-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_wheels:
+    name: Build wheels (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    # Gitea 也会扫描 .github/workflows，但其 runner 访问不了 github.com
+    # → 仅 GitHub 上游执行
+    if: github.repository_owner == 'IAI-USTC-Quantum'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # setuptools-scm 需要 git 历史推导版本号
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.26.x'
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Build wheels (cibuildwheel)
+        uses: pypa/cibuildwheel@v2.22
+        env:
+          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          # 暂不支持 musllinux / 32 位 / macOS（详见 pyproject.toml [tool.cibuildwheel]）
+          CIBW_SKIP: "*-musllinux_* *-win32 *-macos*"
+          # OpenMP 运行时（manylinux 容器默认缺失）
+          CIBW_BEFORE_ALL_LINUX: "yum install -y libgomp"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'IAI-USTC-Quantum'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade pip build setuptools-scm
+          python -m build --sdist
+
+      - name: 自包含校验（sdist 须携带全部构建所需源码）
+        run: |
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "QRAM/include/qram_circuit_qubit.h"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "Common/include/basic.h"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "ThirdParty/eigen-3.4.0/Eigen/Eigen"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "ThirdParty/fmt/src/format.cc"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "bindings/python/core_binding.cpp"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    # workflow_dispatch 手动触发只构建不发布
+    if: >-
+      github.repository_owner == 'IAI-USTC-Quantum' &&
+      (github.event_name == 'push' || github.event_name == 'release')
+    environment:
+      name: pypi
+      url: https://pypi.org/project/qram-simulator/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI (trusted publishing)
+        uses: pypa/gh-action-pypi-publish@release/v1
