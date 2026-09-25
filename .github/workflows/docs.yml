@@ -69,7 +69,10 @@ jobs:
 
     - name: Build Python extension and type stubs (Python API for autoapi)
       run: |
-        python -m pip install -v . pybind11-stubgen -r docs/sphinx/requirements.txt
+        # numpy: stubgen imports the package tree and the optional baseline
+        # subpackage (uniqc/qutip cross-check) needs it at import time;
+        # uniqc itself stays optional and is not installed here.
+        python -m pip install -v . pybind11-stubgen numpy -r docs/sphinx/requirements.txt
         python -m pybind11_stubgen qram_simulator -o docs/sphinx/source/api_stubs
 
     - name: Build Sphinx site (zh + en trees)
