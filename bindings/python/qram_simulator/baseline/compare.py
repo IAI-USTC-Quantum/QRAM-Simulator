@@ -50,7 +50,9 @@ from .metrics import classical_fidelity, dist_total, mean_of_dists, normalize, t
 DEFAULT_SWEEP: List[Dict[str, float]] = (
     [{"depol": p} for p in (0.005, 0.02, 0.05, 0.1, 0.3)]
     + [{"damp": g} for g in (0.001, 0.01, 0.05, 0.2)]
-    + [{"depol": 0.02, "damp": 0.02}]
+    + [{"depol": p, "damp": g}
+       for p, g in ((0.005, 0.005), (0.02, 0.02), (0.05, 0.02),
+                    (0.02, 0.05), (0.05, 0.05), (0.1, 0.05))]
 )
 
 
