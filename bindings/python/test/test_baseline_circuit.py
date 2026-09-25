@@ -3,14 +3,18 @@
 # comparison experiment.  Skipped automatically when the optional uniqc
 # (UnifiedQuantum) + qutip stack is not installed.
 
-import numpy as np
 import pytest
 
 import qram_simulator as qs
 
-qs.baseline  # lazy import guard (fails here, not deep inside, if broken)
-
+# Skip before touching qs.baseline (its __init__ eagerly imports
+# circuit_qram, which needs numpy) and before importing numpy directly:
+# CI runs on bare `pip install . pytest` environments.
 pytest.importorskip("uniqc.simulator.qutip_sim_impl")
+
+import numpy as np
+
+qs.baseline  # lazy import guard (fails here, not deep inside, if broken)
 
 from qram_simulator.baseline import CircuitQRAMQubit, classical_fidelity, tvd
 from qram_simulator.baseline.compare import run_circuit_side, run_qram_side
