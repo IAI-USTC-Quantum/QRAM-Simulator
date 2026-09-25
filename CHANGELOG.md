@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-25
+
 ### Added
 - **pybind11 绑定层回归本仓库**：`bindings/python/`（`core_binding.cpp` +
   `qram_simulator/__init__.py` + pytest 套件）导出核心工作类——
