@@ -109,6 +109,7 @@ namespace qram_simulator {
 			good_branch_group_ids.clear();
 			first_good_branch_group = -1;
 			valid_branch_group_view.clear();
+			fired_jump_count = 0;
 			std::for_each(branch_groups.begin(), branch_groups.end(),
 				[](BranchGroup& branchgroup) { branchgroup.reset(); }
 			);
@@ -428,6 +429,7 @@ namespace qram_simulator {
 
 				for (size_t i = 0; i < good_branch_group_ids.size(); ++i) {
 					size_t id = good_branch_group_ids[i];
+					if (branch_groups[id].annihilated) continue;
 					double g_input = 0;
 					for (double bp : branch_groups[id].branch_probs) g_input += bp;
 					for (auto k = 0; k < damp_op_num; ++k) {
@@ -461,6 +463,32 @@ namespace qram_simulator {
 							}
 						);
 					}
+					/* No mid-run action is taken on the un-evolved good
+					   groups. Their predictable trajectories share the
+					   reference branch's component-wise tree configuration
+					   (XOR mirror; docs/sphinx/source/en/paper/
+					   qubit_qram_pruning.md, Theorem 3), so the fired K1
+					   projection acts on them exactly as on the reference:
+					   a good branch excited at the fired node decays in
+					   lockstep with the reference (the mirror amplitudes
+					   already carry that), and an idle one is annihilated
+					   together with it. Every mid-run nominal estimate
+					   (ref_unit_norm * relative_multiplier * g_input here
+					   and in get_normalization_factor_with_damping) tracks
+					   the reference's surviving norm on its own, so the
+					   `annihilated` skips at those sites are defensive only
+					   (nothing sets the flag before materialization).
+					   KNOWN TRAP (do not reintroduce): a blanket "kill every
+					   good group on fire" mid-run marker was tried and is
+					   WRONG -- it breaks trajectories in which the reference
+					   survives the fire while some good groups are excited
+					   at the fired node (perf_scan eps=1e-3 seeds
+					   7744644691974779904 at n=10/12, 1183008555922881536,
+					   3227135189013113856, 3287329390135220224,
+					   4366419402265368576 at n=12; deviations up to 6.6e-1).
+					   Reference survival alone decides everything at
+					   materialization; see materialize_good_branches. */
+					++fired_jump_count;
 					break;
 				}
 				r -= prob_damp[k];
@@ -581,6 +609,7 @@ namespace qram_simulator {
 				for (size_t i = 0; i < good_branch_group_ids.size(); ++i)
 				{
 					const auto& g = branch_groups[good_branch_group_ids[i]];
+					if (g.annihilated) continue;
 					double g_input = 0;
 					for (double bp : g.branch_probs) g_input += bp;
 					new_prob += ref_unit_norm * g.relative_multiplier * g_input;
@@ -627,21 +656,50 @@ namespace qram_simulator {
 			if (first_good_branch_group < 0) return;
 
 			auto& ref = branch_groups[first_good_branch_group];
+
+			/* any reference branch carries the full 2^k data-bus
+			   structure; pick the first with a surviving state */
+			Branch* ref_branch = nullptr;
+			for (auto& rb : ref.branches)
+				if (rb.system_states_sz > 0) { ref_branch = &rb; break; }
+
+			if (ref_branch == nullptr)
+			{
+				/* The reference good branch was fully annihilated (a fired
+				   K1 jump whose node was |0> along the whole reference
+				   trajectory). Every other good branch shares the
+				   reference's component-wise tree configuration, so the
+				   same projection annihilated it too; the full mode leaves
+				   all of them at exactly zero weight. Flag them dead so
+				   the un-materialized nominal paths contribute nothing.
+				   (After reference death the mid-run estimates vanish on
+				   their own: ref.get_prob() == 0 makes ref_unit_norm == 0,
+				   so no mid-run gating is required.)
+				   FIX STATUS: this early-return is the load-bearing piece
+				   of the pruned-vs-full exactness repair. At the time of
+				   writing it is compile-verified only -- run the
+				   QubitPaperExactness ctest battery, then the perf_scan
+				   re-check (1000/1000 pairs at |dF| <= 1e-9), before
+				   trusting it. ASSUMPTION: reference death is total and
+				   shared, i.e. no good branch survives a fire that killed
+				   the reference. A battery failure showing nonzero
+				   full-mode weight on unmarked addresses is the symptom of
+				   that assumption failing. */
+				for (size_t id : good_branch_group_ids)
+					branch_groups[id].mark_annihilated();
+				return;
+			}
+
 			for (size_t idx = 0; idx < good_branch_group_ids.size(); ++idx)
 			{
 				size_t id = good_branch_group_ids[idx];
 				auto& group = branch_groups[id];
+				if (group.annihilated) continue;
 				double amp_factor = std::sqrt(group.relative_multiplier);
 
 				for (size_t b = 0; b < group.branches.size(); ++b)
 				{
 					auto& br = group.branches[b];
-					/* any reference branch carries the full 2^k data-bus
-					structure; pick the first with a surviving state */
-					Branch* ref_branch = nullptr;
-					for (auto& rb : ref.branches)
-						if (rb.system_states_sz > 0) { ref_branch = &rb; break; }
-					if (ref_branch == nullptr) continue;
 
 					size_t delta = (ref_branch->bus_input ^ memory[ref.address])
 						^ (br.bus_input ^ memory[group.address]);

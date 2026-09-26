@@ -333,6 +333,20 @@ namespace qram_simulator {
 			prob/fidelity paths apply */
 			/// Set once the reference good branch's system states have been materialized (XOR mirror), after which the generic probability/fidelity paths apply
 			bool predicted = false;
+			/* Set at materialization when the reference good branch was fully
+			   annihilated by fired damping (K1) jumps: every good branch
+			   shares the reference's component-wise tree configuration, so
+			   the same projection annihilated it too, and the full mode
+			   leaves it at exactly zero weight. An annihilated group carries
+			   zero weight in every consumer (prob, fidelity, sampling,
+			   norm). In the current design nothing sets this flag before
+			   materialization, so the mid-run `annihilated` skips at the
+			   nominal-estimate sites (run_damp_full,
+			   get_normalization_factor_with_damping) are defensive only.
+			   OPEN RISK: whether reference-death detection alone covers all
+			   fired-jump trajectories has not yet been confirmed by the
+			   QubitPaperExactness battery -- see HANDOFF-pruned-full-exactness.md. */
+			bool annihilated = false;
 
 			/// @brief Constructs an empty group at address addr.
 			BranchGroup(size_t addr) : address(addr)
@@ -344,6 +358,8 @@ namespace qram_simulator {
 			void set_good(BranchGroup* good_ref_);
 			/// Clears all branch states (branch skeleton kept)
 			void set_empty_state();
+			/// Marks the group as annihilated by a fired damping jump (zero weight everywhere) and clears all branch states
+			void mark_annihilated();
 
 			/// Fidelity amplitude against the data tree (modulus not squared)
 			complex_t get_fidelity(const memory_t& memory) const;

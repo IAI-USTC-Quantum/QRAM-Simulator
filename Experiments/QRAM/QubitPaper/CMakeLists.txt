@@ -5,3 +5,10 @@ target_link_libraries(${PROJECT_NAME} SparQ_QRAMSimulator SparQ_Common)
 
 add_executable(${PROJECT_NAME}Verify QubitPaperVerify.cpp)
 target_link_libraries(${PROJECT_NAME}Verify SparQ_QRAMSimulator SparQ_Common)
+
+add_executable(${PROJECT_NAME}Hunt QubitPaperExceptionHunt.cpp)
+target_link_libraries(${PROJECT_NAME}Hunt SparQ_QRAMSimulator SparQ_Common)
+
+add_executable(${PROJECT_NAME}ExactTest QubitPaperExactTest.cpp)
+target_link_libraries(${PROJECT_NAME}ExactTest SparQ_QRAMSimulator SparQ_Common)
+add_test(NAME QubitPaperExactness COMMAND ${PROJECT_NAME}ExactTest)

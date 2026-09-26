@@ -500,6 +500,7 @@ namespace qram_simulator
 			branches = branches_input;
 			is_good = false;
 			predicted = false;
+			annihilated = false;
 			relative_multiplier = 1.0;
 		}
 
@@ -514,8 +515,17 @@ namespace qram_simulator
 			branches.clear();
 		}
 
+		void BranchGroup::mark_annihilated()
+		{
+			annihilated = true;
+			for (auto& branch : branches) {
+				branch.remove_all_state();
+			}
+		}
+
 		complex_t BranchGroup::get_fidelity(const memory_t& memory) const
 		{
+			if (annihilated) return 0.;
 			if (is_good && !predicted) return good_ref->get_fidelity(memory);
 
 			complex_t ret = 0;
@@ -543,8 +553,11 @@ namespace qram_simulator
 
 		double BranchGroup::get_prob() const
 		{
+			/* an annihilated good group carries zero weight even though it
+			   was never materialized */
+			if (annihilated) return 0.;
 			/* before materialization a good group only carries its input
-			weight; afterwards the generic state sum is exact */
+			   weight; afterwards the generic state sum is exact */
 			if (is_good && !predicted)
 			{
 				double ret = 0;
