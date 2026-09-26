@@ -9,8 +9,10 @@
  * two input conventions and must fire at least 50 jumps. Fixed operation
  * histories additionally verify reference death, survival and circuit reuse.
  * --channels covers five noise channels, three bus widths and nonuniform input.
- * Stochastic fixtures pin MSVC-specific jump outcomes only on that library;
- * fixed-history fixtures enforce projection coverage on every platform.
+ * Historical seeds remain stress inputs; candidate-domain and joint-sampler
+ * changes intentionally change their old jump outcomes. Fixed-history fixtures
+ * enforce projection coverage on every platform. Compare actual joint Kraus
+ * labels, not only the number of fired jumps.
  *
  * --case n eps seed [uniform] replays one case. --battery-shard i count and
  * --perf-shard i count partition independent trajectories across processes.
@@ -326,7 +328,13 @@ bool run_case(const Case& c, size_t& pruned_fires)
 		dw = std::max(dw, std::abs(wf[a] - wp[a]));
 	double df = std::abs(f_full - f_pruned);
 	bool fires_agree = qf.fired_jump_count == qp.fired_jump_count;
-	const bool history_agrees = qf.operations.to_string() == qp.operations.to_string();
+    bool outcomes_agree = qf.damping_history.size() == qp.damping_history.size();
+    if (outcomes_agree) for (size_t i = 0; i < qf.damping_history.size(); ++i) {
+        const auto& f = qf.damping_history[i];
+        const auto& p = qp.damping_history[i];
+        outcomes_agree &= f.step == p.step && f.candidates == p.candidates && f.jumps == p.jumps;
+    }
+    const bool history_agrees = qf.operations.to_string() == qp.operations.to_string() && outcomes_agree;
 	const bool normalized = std::abs(std::accumulate(wp.begin(), wp.end(), 0.0) - 1)
 		<= k_weight_tol;
 
@@ -362,16 +370,9 @@ bool run_case(const Case& c, size_t& pruned_fires)
 	check(normalized, "normalized output weight", tag);
 	if (c.eps > 0.0)
 		check(fires_agree, "fired-jump counts agree", tag);
-	/* std::binomial_distribution/uniform_int_distribution are not specified
-	 * bit-for-bit across standard libraries. The pinned stochastic fixtures use
-	 * MSVC outcomes; replay the seeds everywhere, but only assert their particular
-	 * firing outcome on that library. Portable forced-history cases below
-	 * independently exercise both reference-death and reference-survival. */
-#ifdef _MSVC_STL_VERSION
-	const bool require_fire = c.require_fire;
-#else
-	const bool require_fire = false;
-#endif
+    // Historical individual-seed jump expectations belong to the retired
+    // sampler. Coverage is enforced by fixed histories and the total-jump floor.
+    const bool require_fire = false;
 	if (require_fire && pruned_fires == 0)
 		check(false, "expected at least one fired jump", tag);
 

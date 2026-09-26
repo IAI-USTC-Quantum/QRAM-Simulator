@@ -584,9 +584,11 @@ def apply_qubit_noise_op_be(be, o: dict, enc: dict):
 
 
 def replay_trajectory_qubit(sched: dict, order: str):
-    """Stage 1 (qubit): operator-by-operator replay. Depolarizing k=2
-    (bitphaseflip) is realized as the single Kraus M (physical coherent
-    semantics); Damp operators follow the qutrit structure (all 1q)."""
+    """Replay fixed joint Kraus labels; preserve the original coherent state.
+
+    New exports normalize at each damping-layer boundary. Old exports retain
+    their historical raw-norm convention for reproducibility.
+    """
     enc = sched["encoding"]
     be = init_backend(sched)
     for st in sched["steps"]:
@@ -596,16 +598,22 @@ def replay_trajectory_qubit(sched: dict, order: str):
                         theta=o.get("theta"))
             else:
                 apply_qubit_noise_op_be(be, o, enc)
+                if o["type"] == "Damp_Common" and sched.get("normalize_damping_layers"):
+                    trace = float(np.real(be.density_matrix.tr()))
+                    if trace <= 0:
+                        raise ValueError("zero-norm joint damping outcome")
+                    be.density_matrix = be.density_matrix / trace
     rho = np.array(be.density_matrix.full())
     return rho, marginal_from_rho(rho, sched, order)
 
 
 def run_stage2_qubit(sched: dict, order: str, mode: str):
-    """Stage 2 (qubit). mode ∈ {depol_textbook, depol_faithful, full, nojump, faithful}:
-    depol_*  = active positions [0, 2(2^L-1)) with marginal probability p; textbook = TP Pauli depolarizing;
-               faithful = {I, X, Z, M} mixture (M is non-TP -> the trajectory ensemble is physically sub-normalized);
-    damping* = applied to every qubit of the whole tree at Damp_Common occurrences; full = textbook AD (TP),
-               nojump = K0 only, faithful = ρ-dependent jump mixture (active nodes only)."""
+    """Independent qubit circuit channel; `full` is standard whole-tree AD.
+
+    `faithful` retains the retired state-dependent mirror only for old exports;
+    it is not a fixed physical amplitude-damping channel. Pauli noise is the
+    active-front {I, X, Z, ZX} mixture with total error probability p.
+    """
     enc = sched["encoding"]
     noise_cfg = sched["noise"]
     be = init_backend(sched)
@@ -845,6 +853,10 @@ def main():
         sys.exit(1)
     has_damp = bool(sched_noise_types & {"Damp_Full", "Damp_Common"})
     arch = sched.get("arch", "qutrit")
+    if (arch == "qubit" and sched.get("damping_semantics") == "joint_auxiliary_whole_tree_v1"
+            and sched.get("input", {}).get("mode") != "zerobus"):
+        raise ValueError("Coherent circuit comparison requires the one-bus-column-per-address zerobus input; "
+                         "the engine's multi-column probability bookkeeping is a different input convention")
     order = detect_index_bit_order()
     print(f"uniqc statevector index convention: qubit0={'LSB' if order == 'lsb' else 'MSB'}")
 
@@ -932,8 +944,10 @@ def main():
             psi_ideal = np.asarray(Simulator(backend_type="statevector").simulate_statevector(
                 build_circuit(sched, "skip").originir))
             s_qram = ref.get("survival", sum(ref["avg_dist"].values()))
-            modes = (["full", "nojump", "faithful"] if has_damp
-                     else ["depol_textbook", "depol_faithful"])
+            joint = sched.get("damping_semantics") == "joint_auxiliary_whole_tree_v1"
+            modes = (["full"] if joint else
+                     (["full", "nojump", "faithful"] if has_damp
+                      else ["depol_textbook", "depol_faithful"]))
             rows = {}
             for mode in modes:
                 rho, dist = run_stage2_qubit(sched, order, mode)
@@ -957,22 +971,22 @@ def main():
                       f"trace(ρ)={trace:.6f}  QRAM survival={s_qram:.6f}  "
                       f"F_quantum={row['F_quantum_vs_ideal']:.6f}")
             fid_row = {
-                "F_quantum_faithful": rows.get("faithful", rows.get("depol_faithful", {}))
+                "F_quantum_reference": (rows.get("full", {}) if joint else rows.get("faithful", rows.get("depol_faithful", {})))
                     .get("F_quantum_vs_ideal"),
                 "qram_avg_overlap_fid": ref.get("avg_overlap_fid"),
                 "qram_avg_fid_nopost": ref.get("avg_fid_nopost"),
                 "qram_avg_fid_incoh": ref.get("avg_fid_incoh"),
                 "qram_avg_fidelity": ref.get("avg_fidelity"),
-                "trace_faithful": rows.get("faithful", rows.get("depol_faithful", {}))
+                "trace_reference": (rows.get("full", {}) if joint else rows.get("faithful", rows.get("depol_faithful", {})))
                     .get("trace_rho"),
                 "trace_nojump": rows.get("nojump", {}).get("trace_rho"),
                 "qram_survival": s_qram,
             }
             summary["stage2"] = rows
             summary["fidelity_metrics"] = fid_row
-            print(f"  -- F_quantum(faithful) = {fid_row['F_quantum_faithful']}   "
+            print(f"  -- F_quantum(reference) = {fid_row['F_quantum_reference']}   "
                   f"QRAM avg_overlap_fid = {fid_row['qram_avg_overlap_fid']}   "
-                  f"trace(faithful) = {fid_row['trace_faithful']}   "
+                  f"trace(reference) = {fid_row['trace_reference']}   "
                   f"QRAM survival = {fid_row['qram_survival']}")
         elif has_damp:
             print("\n== Stage 2-d: channel-level damping simulation (full = textbook 3-level AD channel; nojump = K0 only) ==")

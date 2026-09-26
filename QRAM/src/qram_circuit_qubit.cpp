@@ -110,6 +110,7 @@ namespace qram_simulator {
 			first_good_branch_group = -1;
 			valid_branch_group_view.clear();
 			fired_jump_count = 0;
+            damping_history.clear();
 			std::for_each(branch_groups.begin(), branch_groups.end(),
 				[](BranchGroup& branchgroup) { branchgroup.reset(); }
 			);
@@ -398,85 +399,146 @@ namespace qram_simulator {
 			}
 		}
 
-		void QRAMCircuit::run_damp_full(size_t qubit_id, size_t step, double gamma) {
+        QRAMCircuit::DampingMaskWeights QRAMCircuit::damping_mask_weights(
+            const std::vector<size_t>& candidates, size_t step, double gamma) {
+            // Draw only the auxiliary configuration's restriction to C. Keeping
+            // a canonical map avoids dependence on sparse-state iteration order
+            // and keeps pruned/full roulette intervals aligned for the same seed.
+            auto sorted_candidates = candidates;
+            std::sort(sorted_candidates.begin(), sorted_candidates.end());
+            if ((!sorted_candidates.empty() && sorted_candidates.back() >= get_qubit_num()) ||
+                std::adjacent_find(sorted_candidates.begin(), sorted_candidates.end()) != sorted_candidates.end())
+                throw std::runtime_error("invalid or duplicate damping candidate");
+            DampingMaskWeights weights;
+            if (first_good_branch_group >= 0) {
+                time_step.get_multiplier_qubit(gamma, step, branch_groups,
+                    first_good_branch_group, good_branch_group_ids);
+            }
+            auto accumulate = [&](BranchGroup& group, double group_scale) {
+                for (size_t b = 0; b < group.branches.size(); ++b) {
+                    auto& branch = group.branches[b];
+                    branch.try_merge(); // interference within one coherent column
+                    for (auto it = branch.iterbeg(); it != branch.iterend(); ++it) {
+                        std::vector<size_t> mask;
+                        // Visit sparse excitations, not all M tree positions or
+                        // even every candidate when C is large.
+                        for (size_t q : it->state.nz_elements)
+                            if (std::binary_search(sorted_candidates.begin(), sorted_candidates.end(), q))
+                                mask.push_back(q);
+                        weights[mask] += group_scale * group.branch_probs[b] * std::norm(it->amplitude);
+                    }
+                }
+            };
+            // A good group is predictable on the entire candidate mask, not
+            // merely each one-site marginal: no candidate's bad-address range
+            // contains it. Its tree restriction is represented by the reference;
+            // address-dependent no-jump attenuation changes its scalar weight.
+            // Full/pruned tests exercise this stronger joint-mask invariant.
+            for (auto group : valid_branch_group_view) accumulate(*group, 1.0);
+            if (first_good_branch_group >= 0) {
+                auto& ref = branch_groups[first_good_branch_group];
+                double ref_input = std::accumulate(ref.branch_probs.begin(), ref.branch_probs.end(), 0.0);
+                double predicted_scale = 0.0;
+                for (size_t id : good_branch_group_ids) {
+                    const auto& group = branch_groups[id];
+                    if (!group.annihilated)
+                        predicted_scale += group.relative_multiplier
+                            * std::accumulate(group.branch_probs.begin(), group.branch_probs.end(), 0.0)
+                            / ref_input;
+                }
+                if (predicted_scale > 0.0) accumulate(ref, predicted_scale);
+            }
+            return weights;
+        }
 
-			// Include predicted groups through the reference's surviving population
-			// and each group's input weight and address attenuation.
-			std::vector<double> prob_damp;
-			int damp_op_num = 1;
-			if constexpr (Branch::qunit_type == arch_qubit)
-			{
-				damp_op_num = 1;
-			}
-			else if constexpr (Branch::qunit_type == arch_qutrit)
-			{
-				damp_op_num = 2;
-			}
-			else {
-				throw_invalid_input();
-			}
-			prob_damp.resize(damp_op_num);
-			if (first_good_branch_group >= 0)
-			{
-				time_step.get_multiplier_qubit(gamma, step, branch_groups,
-					first_good_branch_group, good_branch_group_ids);
+        void QRAMCircuit::apply_damping_outcome(const std::vector<size_t>& jumps, double gamma) {
+            if (!(gamma >= 0.0 && gamma < 1.0))
+                throw std::runtime_error("joint damping requires 0 <= gamma < 1");
+            if (!std::is_sorted(jumps.begin(), jumps.end()) ||
+                std::adjacent_find(jumps.begin(), jumps.end()) != jumps.end() ||
+                (!jumps.empty() && jumps.back() >= get_qubit_num()))
+                throw std::runtime_error("joint damping jumps must be sorted, unique, in-range positions");
+            const double attenuation = std::sqrt(1.0 - gamma);
+            for (auto group : valid_branch_group_view) {
+                for (auto& branch : group->branches) {
+                    size_t write = 0;
+                    for (size_t i = 0; i < branch.system_states_sz; ++i) {
+                        auto& state = branch.system_states[i];
+                        if (!std::includes(state.state.nz_elements.begin(), state.state.nz_elements.end(),
+                                           jumps.begin(), jumps.end())) continue;
+                        for (size_t q : jumps) state.state.nz_elements.erase(q);
+                        // K0 is identity at a reset site. One sparse excitation
+                        // count applies every remaining K0 without a tree scan.
+                        state.amplitude *= std::pow(attenuation, state.state.nz_elements.size());
+                        if (write != i) branch.system_states[write] = std::move(state);
+                        ++write;
+                    }
+                    branch.system_states_sz = write;
+                }
+            }
+        }
 
-				auto&& ref_prob_full = branch_groups[first_good_branch_group].get_prob_damp(qubit_id);
-				const auto& refg = branch_groups[first_good_branch_group];
-				double ref_input = 0;
-				for (double bp : refg.branch_probs) ref_input += bp;
+        void QRAMCircuit::run_damping_layer(const std::vector<size_t>& input_candidates,
+                                            size_t step, double gamma) {
+            auto candidates = input_candidates;
+            std::sort(candidates.begin(), candidates.end());
+            if (std::adjacent_find(candidates.begin(), candidates.end()) != candidates.end())
+                throw std::runtime_error("duplicate damping candidate in one layer");
+            std::vector<size_t> jumps;
+            if (!candidates.empty()) {
+                auto weights = damping_mask_weights(candidates, step, gamma);
+                double total = 0;
+                for (const auto& entry : weights) total += entry.second;
+                if (!(total > 0) || !std::isfinite(total))
+                    throw std::runtime_error("joint damping: empty or nonfinite represented state");
+                double r = random_engine::get_instance().uniform01() * total;
+                for (const auto& [mask, weight] : weights) {
+                    if (weight <= 0) continue;
+                    jumps = mask;
+                    if (r < weight) break;
+                    r -= weight;
+                }
+            }
+            // The auxiliary sample selects a Kraus label only. Never replace
+            // the coherent input by its sampled computational-basis component.
+            apply_damping_outcome(jumps, gamma);
+            fired_jump_count += jumps.size();
+            damping_history.push_back({step, candidates, jumps});
+            // Keep a normalized conditional trajectory (not a survival weight).
+            // At this boundary step+1 counts the K0 just applied. One shared
+            // rescale also scales every implicit group represented by the ref.
+            if (first_good_branch_group >= 0)
+                time_step.get_multiplier_qubit(gamma, step + 1, branch_groups,
+                    first_good_branch_group, good_branch_group_ids);
+            double norm = get_normalization_factor_with_damping();
+            if (!(norm > 0) || !std::isfinite(norm))
+                throw std::runtime_error("joint damping produced an impossible zero-norm outcome");
+            const double scale = 1.0 / std::sqrt(norm);
+            for (auto group : valid_branch_group_view)
+                for (auto& branch : group->branches)
+                    for (auto it = branch.iterbeg(); it != branch.iterend(); ++it)
+                        it->amplitude *= scale;
+        }
 
-				for (size_t i = 0; i < good_branch_group_ids.size(); ++i) {
-					size_t id = good_branch_group_ids[i];
-					if (branch_groups[id].annihilated) continue;
-					double g_input = 0;
-					for (double bp : branch_groups[id].branch_probs) g_input += bp;
-					for (auto k = 0; k < damp_op_num; ++k) {
-						prob_damp[k] += (ref_prob_full[k] / ref_input)
-							* branch_groups[id].relative_multiplier
-							* g_input;
-					}
-				}
-			}
-			/* first: decide whether this qubit is non-zero*/
-			for (auto branch_ptr : valid_branch_group_view)
-			{
-				auto&& prob = branch_ptr->get_prob_damp(qubit_id);
-				for (auto k = 0; k < damp_op_num; ++k) {
-					prob_damp[k] += prob[k];
-				}
-			}
-			double global_coef = get_normalization_factor_with_damping();
-			// Consume exactly one draw per damping spot in both execution modes.
-			double r = random_engine::get_instance().uniform01() * global_coef;
-			for (size_t k = 0; k < prob_damp.size(); ++k)
-			{
-				if (r < prob_damp[k])
-				{
-					for (auto branch_group_ptr : valid_branch_group_view)
-					{
-						std::for_each(
-							branch_group_ptr->branches.begin(),
-							branch_group_ptr->branches.end(),
-							[qubit_id, k](Branch& branch) {
-								branch.run_damp_full(qubit_id, k);
-							}
-						);
-					}
-					/* Predicted groups inherit this projection through the reference.
-					   A surviving reference still represents surviving good components;
-					   a fired jump alone does not imply that those groups are empty.
-					   If the reference dies, its zero norm also zeros the mid-run
-					   population estimates. Materialization propagates that empty
-					   state to the predicted groups before output sampling. */
-					++fired_jump_count;
-					break;
-				}
-				r -= prob_damp[k];
-			}
-			// no need to run extra damp_common
-			// because always include a damp_common at every time step
-		}
+        void QRAMCircuit::run_damp_full(size_t qubit_id, size_t step, double gamma) {
+            // Compatibility primitive for a SINGLE supplied candidate. Production
+            // dispatch collects a whole layer before choosing any jump outcomes.
+            auto weights = damping_mask_weights({qubit_id}, step, gamma);
+            double total = 0;
+            for (const auto& entry : weights) total += entry.second;
+            double r = random_engine::get_instance().uniform01() * total;
+            for (const auto& [mask, weight] : weights) {
+                if (r < weight) {
+                    if (!mask.empty()) {
+                        for (auto group : valid_branch_group_view)
+                            for (auto& branch : group->branches) branch.run_damp_full(qubit_id, 0);
+                        ++fired_jump_count;
+                    }
+                    break;
+                }
+                r -= weight;
+            }
+        }
 
 		void QRAMCircuit::run_damp_common(double gamma) {
 			for (auto branch_group_ptr : valid_branch_group_view)
@@ -778,7 +840,12 @@ namespace qram_simulator {
 			int step = 0;
 			for (OperationPack& ops : operations.time_slices) {
 				step++;
+                std::vector<size_t> damping_candidates;
+                double candidate_gamma = 0;
 				for (Operation& op : ops.operations) {
+                    if (!damping_candidates.empty() && op.type != OperationType::Damp_Full
+                        && op.type != OperationType::Damp_Common)
+                        throw std::runtime_error("joint damping candidates cannot straddle an intervening gate");
 					switch (op.type) {
 					case OperationType::ControlSwap:
 						run_cswap(op.targets[0]); break;
@@ -807,15 +874,23 @@ namespace qram_simulator {
 					case OperationType::Depolarizing:
 						run_depolarizing(op.targets[0], op.coefficients[0]); break;
 					case OperationType::Damp_Full:
-						run_damp_full(op.targets[0], step, op.coefficients[0]);
-						clear_zero_elements();
+						if (!damping_candidates.empty() && op.coefficients[0] != candidate_gamma)
+                            throw std::runtime_error("one damping layer requires a common gamma");
+                        damping_candidates.push_back(op.targets[0]);
+                        candidate_gamma = op.coefficients[0];
 						break;
 					case OperationType::Damp_Common:
-						run_damp_common(op.coefficients[0]); break;
+						if (!damping_candidates.empty() && op.coefficients[0] != candidate_gamma)
+                            throw std::runtime_error("damping candidate and K0 strengths differ");
+                        run_damping_layer(damping_candidates, step, op.coefficients[0]);
+                    damping_candidates.clear();
+                    break;
 					default:
 						throw std::runtime_error("Bad type.");
 					}
 				}
+                if (!damping_candidates.empty())
+                    run_damping_layer(damping_candidates, step, candidate_gamma);
 			}
 			clear_zero_elements();
 		}

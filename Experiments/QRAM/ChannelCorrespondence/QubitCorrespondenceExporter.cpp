@@ -3,14 +3,14 @@
  *
  * C++ export side of the correspondence between qubit-based QRAM (QRAM/include/qram_circuit_qubit.h, phase-kickback FetchData
  * + real Hadamards) and circuit-level simulation; isomorphic to QutritCorrespondenceExporter:
- * extracts the TimeStep schedule (gate-level translation + sampled noise operators incl. Damp_Full's second-draw results),
+ * extracts the TimeStep schedule (gate-level translation + recorded joint damping outcomes),
  * and outputs native/replica dual reference trajectories plus four fidelity conventions.
  *
  * Key semantic points of the qubit architecture (differences from qutrit):
  *   - node v occupies 2 ordinary qubits: position = v*2+lr (0 → addr, 1 → data), ground = unexcited;
  *   - FetchData is a phase flip (−1 phase on the leaf cell selected by data×addr), and run_hadamard at CopyIn{0}/CopyOut{last}
  *     applies H to all bus bits — the net semantics remain bus_out = bus_in ⊕ memory[a];
- *   - run_bitphaseflip is |1>→−|0> (−K1 jump, non-unitary) → trajectory sub-normalization of Depolarizing k=2;
+ *   - run_bitphaseflip is the unitary ZX (global phase relative to Pauli Y);
  *   - Damp_Full has a single jump channel (k=0).
  *
  * Encoding: address addr_size bits (bit b ↔ qubit b); bus data_size bits; node v:
@@ -179,6 +179,7 @@ string noise_type_name(OperationType t)
 {
 	switch (t)
 	{
+	case OperationType::Damping: return "Damping";
 	case OperationType::BitFlip: return "BitFlip";
 	case OperationType::PhaseFlip: return "PhaseFlip";
 	case OperationType::BitPhaseFlip: return "BitPhaseFlip";
@@ -271,67 +272,17 @@ struct DampOutcome
 	int outcome;
 };
 
-/* Replicates qram_qubit::QRAMCircuit::run_damp_full's sampling (prepare_all path:
- * first_good_branch_group == -1, multiplier preprocessing skipped). Exactly one uniform01. */
-int replica_damp_full(qram_qubit::QRAMCircuit& q, size_t qubit_id, size_t step,
-	std::vector<DampOutcome>* log)
-{
-	double prob_damp = 0;
-	for (auto branch_ptr : q.valid_branch_group_view)
-		prob_damp += branch_ptr->get_prob_damp(qubit_id)[0];
-	double global_coef = q.get_normalization_factor_with_damping();
-	double r = random_engine::get_instance().uniform01() * global_coef;
-	int outcome = -1;
-	if (r < prob_damp)
-	{
-		for (auto branch_group_ptr : q.valid_branch_group_view)
-			for (auto& branch : branch_group_ptr->branches)
-				branch.run_damp_full(qubit_id, 0);
-		outcome = 0;
-	}
-	if (log)
-		log->push_back({ step, qubit_id, outcome });
-	return outcome;
-}
-
-/* Replica execution: logical/noise operators go through the public dispatch, Damp_Full goes through the intercepted sampling and is logged */
+/* The layer sampler records its Kraus labels. Circuit replay applies the
+ * recorded labels to the ORIGINAL coherent state and normalizes at each
+ * Damp_Common boundary. No independent per-candidate second draw is valid. */
 void run_replica_trajectory(qram_qubit::QRAMCircuit& q, std::vector<DampOutcome>* damp_log)
 {
-	int step = 0;
-	for (const OperationPack& ops : q.get_operations().time_slices)
-	{
-		++step;
-		for (const Operation& op : ops.operations)
-		{
-			switch (op.type)
-			{
-			case OperationType::ControlSwap: q.run_cswap(op.targets[0]); break;
-			case OperationType::CopyIn:
-				if (op.targets[0] == 0) q.run_hadamard();
-				q.run_busin(op.targets[0]);
-				break;
-			case OperationType::CopyOut:
-				q.run_busout(op.targets[0]);
-				if (op.targets[0] == q.data_size - 1) q.run_hadamard();
-				break;
-			case OperationType::SwapInternal: q.run_swap(op.targets[0]); break;
-			case OperationType::FirstCopy: q.run_acopy(op.targets[0]); break;
-			case OperationType::FetchData: q.run_fetchdata(op.targets[0]); break;
-			case OperationType::BitFlip: q.run_bitflip(op.targets[0]); break;
-			case OperationType::PhaseFlip: q.run_phaseflip(op.targets[0], op.coefficients[0]); break;
-			case OperationType::BitPhaseFlip: q.run_bitphaseflip(op.targets[0]); break;
-			case OperationType::Depolarizing: q.run_depolarizing(op.targets[0], op.coefficients[0]); break;
-			case OperationType::Damp_Full:
-				replica_damp_full(q, op.targets[0], (size_t)step, damp_log);
-				q.clear_zero_elements();
-				break;
-			case OperationType::Damp_Common: q.run_damp_common(op.coefficients[0]); break;
-			default:
-				throw std::runtime_error("run_replica_trajectory(qubit): bad op");
-			}
-		}
-	}
-	q.clear_zero_elements();
+    q.run_bad();
+    if (!damp_log) return;
+    for (const auto& layer : q.damping_history)
+        for (size_t pos : layer.candidates)
+            damp_log->push_back({layer.step, pos,
+                std::binary_search(layer.jumps.begin(), layer.jumps.end(), pos) ? 0 : -1});
 }
 
 string export_schedule(const qram_qubit::QRAMCircuit& q, const Encoding& enc,
@@ -341,6 +292,8 @@ string export_schedule(const qram_qubit::QRAMCircuit& q, const Encoding& enc,
 	std::ostringstream out;
 	out << "{\n";
 	out << "  \"arch\": \"qubit\",\n";
+    out << "  \"damping_semantics\": \"joint_auxiliary_whole_tree_v1\",\n";
+    out << "  \"normalize_damping_layers\": true,\n";
 	out << fmt::format("  \"addr_size\": {},\n  \"data_size\": {},\n", enc.addr_size, enc.data_size);
 	out << fmt::format("  \"memory\": {},\n", memory2str(q.get_memory()));
 	out << fmt::format("  \"seed\": {},\n", seed);
@@ -613,7 +566,7 @@ int main(int argc, const char** argv)
 			v /= (double)runs;
 	}
 
-	/* 3) Replica trajectories: intercept the Damp_Full second draw + per-trajectory consistency check + schedule export */
+	/* 3) Replay recorded joint Kraus labels + per-trajectory consistency + schedule export. */
 	map<string, double> model_single_run_dist;
 	map<string, double> model_avg_dist;
 	double model_fidelity_sum = 0.0;

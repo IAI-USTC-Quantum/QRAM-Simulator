@@ -10,3 +10,7 @@ add_executable(${PROJECT_NAME}ExactTest QubitPaperExactTest.cpp)
 target_link_libraries(${PROJECT_NAME}ExactTest SparQ_QRAMSimulator SparQ_Common)
 add_test(NAME QubitPaperExactness COMMAND ${PROJECT_NAME}ExactTest)
 add_test(NAME QubitPaperExactnessChannels COMMAND ${PROJECT_NAME}ExactTest --channels)
+
+add_executable(${PROJECT_NAME}JointDampingTest JointDampingTest.cpp)
+target_link_libraries(${PROJECT_NAME}JointDampingTest SparQ_QRAMSimulator SparQ_Common)
+add_test(NAME QubitJointDampingChannel COMMAND ${PROJECT_NAME}JointDampingTest)

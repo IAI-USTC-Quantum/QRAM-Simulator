@@ -1,5 +1,7 @@
 # Paper Experiment Reproduction Guide
 
+**Damping update:** the qubit sampler now uses whole-tree joint Kraus sampling and normalized conditional trajectories. Historical nonzero-damping numbers and per-candidate sampling descriptions must be regenerated/replaced; see [joint damping](joint_damping.md).
+
 The current qubit-QRAM seed-by-seed verification workflow is documented in [Pruned/full exactness validation](exactness_validation.md), including complete-state checks and the 1000-pair performance grid.
 
 This document provides detailed experiment setups, parameter ranges, and run commands for reproducing the numerical results in the paper.

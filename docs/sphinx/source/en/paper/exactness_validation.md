@@ -51,7 +51,7 @@ input reused by the next query. `reset()` restores the trajectory state and
 clears the flag. During evolution, predicted population estimates already
 inherit the reference's surviving norm.
 
-Each `Damp_Full` operation consumes exactly one random draw in both modes.
+Each nonempty damping candidate layer consumes one joint auxiliary draw in both modes; an empty candidate layer consumes none. The actual joint jump sets must agree, as well as the candidate operation history. See [joint damping](joint_damping.md) for the physical-channel correction and changed seed mapping.
 The qubit materialization rule is separate from the qutrit reference-alias
 representation; the two representations should be verified independently.
 

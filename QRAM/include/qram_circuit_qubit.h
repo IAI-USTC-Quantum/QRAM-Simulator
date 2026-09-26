@@ -55,6 +55,14 @@ namespace qram_simulator {
 			double total_prob = 0;
 			/// Number of damping (K1) jumps fired during the last run (diagnostic: lets tests assert the fired-jump path was actually exercised)
 			size_t fired_jump_count = 0;
+
+            /// One joint environment outcome per damping layer, retained for circuit replay.
+            struct DampingOutcome {
+                size_t step;
+                std::vector<size_t> candidates;
+                std::vector<size_t> jumps;
+            };
+            std::vector<DampingOutcome> damping_history;
 			/// Final system state obtained from sampling
 			qram_state_t final_system_state;
 
@@ -217,7 +225,24 @@ namespace qram_simulator {
 			void run_busin(size_t digit);
 			/// Bus output of bit digit
 			void run_busout(size_t digit);
-			/// Full amplitude damping on the given qubit (noise; gamma is the decay rate)
+			/** Candidate-mask marginal of the complete represented state.
+             * Each key is C intersect X; weights include implicit good groups.
+             * An input-bus branch is an orthogonal input-column label in this
+             * API. Coherent superpositions must be combined inside a Branch;
+             * branch_probs alone does not encode interference between columns.
+             */
+            using DampingMaskWeights = std::map<std::vector<size_t>, double>;
+            DampingMaskWeights damping_mask_weights(const std::vector<size_t>& candidates,
+                                                    size_t step, double gamma);
+            /// Apply sorted, unique, in-range jump positions to every represented component; no sampling.
+            /// The common sqrt(gamma)^|J| factor is omitted (conditional-state gauge).
+            void apply_damping_outcome(const std::vector<size_t>& jumps, double gamma);
+            /// Resolve all candidates jointly, attenuate once, and normalize once.
+            /// Empty candidate sets need no auxiliary random draw.
+            void run_damping_layer(const std::vector<size_t>& candidates, size_t step, double gamma);
+            /// Legacy singleton-candidate primitive: projection only, no K0 layer.
+            /// Multiple candidates MUST be passed together to run_damping_layer.
+            /// This method is retained for source compatibility and fixed-outcome probes.
 			void run_damp_full(size_t qubit_id, size_t step, double gamma);
 			/// System-wide common amplitude damping (noise; multiplies the damping factor by the non-zero element count)
 			void run_damp_common(double gamma);

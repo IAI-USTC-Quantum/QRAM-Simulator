@@ -348,10 +348,17 @@ namespace qram_simulator {
 		const std::map<OperationType, double>& noises,
 		int arch_type)
 	{
+        OperationPack joint_damping_candidates;
 		static std::uniform_real_distribution<double> ud(0, 1);
 		for (auto&& [noise_type, noise_parameter] : noises)
 		{
-			size_t nqubits = 2 * (pow2(max_entangle_layer) - 1);
+			// Qubit damping is a whole-tree channel, matching Damp_Common.
+                // Sampling only the routing front while attenuating the whole
+                // tree drops K1 partners (even occupied root slots at early steps).
+                // Pauli noise and the legacy qutrit model keep their active front.
+                size_t noise_layers = (arch_type == arch_qubit && noise_type == OperationType::Damping)
+                    ? addr_size : max_entangle_layer;
+                size_t nqubits = 2 * (pow2(noise_layers) - 1);
 			if (nqubits == 0)
 				continue;
 			std::binomial_distribution<size_t> bd(nqubits, noise_parameter);
@@ -380,7 +387,10 @@ namespace qram_simulator {
 						pack.append(Operation(noise_type, { pos }, { ud(random_engine::get_engine())}));
 						break;
 					case OperationType::Damping:
-						pack.append(Operation(OperationType::Damp_Full, {pos}, {noise_parameter}));
+						if (arch_type == arch_qubit)
+                            joint_damping_candidates.append(Operation(OperationType::Damp_Full, {pos}, {noise_parameter}));
+                        else
+                            pack.append(Operation(OperationType::Damp_Full, {pos}, {noise_parameter}));
 						break;
 					default:
 						throw_bad_switch_case();
@@ -388,6 +398,11 @@ namespace qram_simulator {
 				}
 			}
 		}
+        // A layer is a contiguous instrument: ideal gates, sampled Pauli
+        // unitaries, then the joint AD candidates and their K0 boundary.
+        // Enum/map iteration puts Damping before Pauli; retain RNG generation
+        // order but move only its operation records after the Pauli operators.
+        pack.operations.splice(pack.operations.end(), joint_damping_candidates.operations);
 		auto it = noises.find(OperationType::Damping);
 		if (it != noises.end())
 		{
@@ -403,7 +418,13 @@ namespace qram_simulator {
 		static std::uniform_real_distribution<double> ud(0, 1);
 		for (auto&& [noise_type, noise_parameter] : noises)
 		{
-			size_t nqubits = 2 * (pow2(max_entangle_layer) - 1);
+			// Qubit damping is a whole-tree channel, matching Damp_Common.
+                // Sampling only the routing front while attenuating the whole
+                // tree drops K1 partners (even occupied root slots at early steps).
+                // Pauli noise and the legacy qutrit model keep their active front.
+                size_t noise_layers = (arch_type == arch_qubit && noise_type == OperationType::Damping)
+                    ? addr_size : max_entangle_layer;
+                size_t nqubits = 2 * (pow2(noise_layers) - 1);
 			if (nqubits == 0)
 				continue;
 			std::binomial_distribution<size_t> bd(nqubits, noise_parameter);

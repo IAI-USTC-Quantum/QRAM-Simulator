@@ -37,6 +37,7 @@ QRAM-Simulator 是面向 QRAM（量子随机存储器）装载电路的高性能
    paper/README
    paper/reproduction
    paper/exactness_validation
+   paper/joint_damping
    paper/qubit_qram_pruning
    paper/qubit_error_propagation
 

@@ -1,20 +1,11 @@
-/*
- * verify_noisy_simulation — QRAM-Simulator (symbolic sparse-tree trajectory engine) ↔ circuit-level noise simulation cross-check
- *
- * Deterministic experiments guarantee that QRAM noise simulation for the qutrit / qubit
- * architectures (TimeStep schedule + Depolarizing / Damping) agrees with an independent
- * circuit-level implementation: the self-contained simulator built into this file (zero code shared with the symbolic tree engine):
- *   - Statevector engine: noise-free bridge (S0) and per-random-case replay (S1, incl. single Kraus jumps);
- *   - Sparse density-matrix engine: channel-level simulation (S2, Kraus channel families).
- * Gates/channels are unified as "local matrix + control polarity set" primitives; no gate decomposition needed.
- *
- *   S0  Noise-free bridge: encoded-circuit output distribution vs QRAMCircuit noise-free run — bitwise equal (1e-9);
- *   S1  Per-random-case: after sampling completes (incl. the Damp_Full second-draw outcome,
- *       intercepted by the replica execution), replay with deterministic operators — per-case bitwise equal (1e-9, sub-normalized convention);
- *   S2  Channel-level faithful mirror (average effect of its sampling scheme): F_cls / TVD /
- *       trace↔survival / F_quantum↔avg_overlap_fid threshold assertions.
- *
- * Failures return a nonzero exit code, caught by ctest / CI.
+/* Independent encoded-circuit verification of QRAM trajectories.
+ * Qubit: standard whole-tree amplitude damping, with one normalized joint
+ * Kraus outcome per layer. Check noiseless gates, fixed-outcome replay, the
+ * full averaged density matrix, trace, output TVD and ideal-state fidelity.
+ * The schedule is shared with the engine; the matrix state/channel backend
+ * is independent. Qutrit "faithful" tests retain the historical sampler's
+ * behavior only and do not certify a physical amplitude-damping channel.
+ * See docs/sphinx/source/en/paper/joint_damping.md for scope and derivation.
  */
 
 #include <cmath>
@@ -614,6 +605,13 @@ vector<cplx> replay_statevector(const vector<StepPlan>& plan, const Encoding& en
 		for (auto& o : st.noises)
 			for (auto& [qs, M] : replay_noise(o, enc))
 				apply_local_state(psi, qs, M, {});
+        if (!enc.qutrit && std::any_of(st.noises.begin(), st.noises.end(),
+                [](const NoiseEntry& o) { return o.type == OperationType::Damp_Common; })) {
+            double norm2 = 0;
+            for (auto a : psi) norm2 += norm(a);
+            if (!(norm2 > 0)) throw std::runtime_error("zero norm in circuit replay");
+            for (auto& a : psi) a /= sqrt(norm2);
+        }
 		if (getenv("VNS_TRACE"))
 		{
 			double tot = 0;
@@ -794,73 +792,20 @@ map<string, double> dist_qubit(const qram_qubit::QRAMCircuit& q)
 	return dist;
 }
 
+// Replay consumes the production layer's recorded environment outcomes.
+// The matrix backend below independently applies those operators; it does not
+// reproduce the auxiliary sampler, so this is a fixed-history bridge test.
 void replica_run_qubit(qram_qubit::QRAMCircuit& q, int step0,
-	vector<NoiseEntry>* noise_log)
+    vector<NoiseEntry>* noise_log)
 {
-	int step = step0;
-	for (auto& ops : q.get_operations().time_slices)
-	{
-		++step;
-		for (auto& op : ops.operations)
-		{
-			switch (op.type)
-			{
-			case OperationType::ControlSwap: q.run_cswap(op.targets[0]); break;
-			case OperationType::CopyIn:
-				if (op.targets[0] == 0) q.run_hadamard();
-				q.run_busin(op.targets[0]);
-				break;
-			case OperationType::CopyOut:
-				q.run_busout(op.targets[0]);
-				if (op.targets[0] == q.data_size - 1) q.run_hadamard();
-				break;
-			case OperationType::SwapInternal: q.run_swap(op.targets[0]); break;
-			case OperationType::FirstCopy: q.run_acopy(op.targets[0]); break;
-			case OperationType::FetchData: q.run_fetchdata(op.targets[0]); break;
-			case OperationType::BitFlip: q.run_bitflip(op.targets[0]); break;
-			case OperationType::PhaseFlip: q.run_phaseflip(op.targets[0], op.coefficients[0]); break;
-			case OperationType::BitPhaseFlip: q.run_bitphaseflip(op.targets[0]); break;
-			case OperationType::Depolarizing: q.run_depolarizing(op.targets[0], op.coefficients[0]); break;
-			case OperationType::Damp_Full:
-			{
-				size_t qid = op.targets[0];
-				double prob0 = 0;
-				for (auto g : q.valid_branch_group_view)
-					prob0 += g->get_prob_damp(qid)[0];
-				double global = q.get_normalization_factor_with_damping();
-				double r = random_engine::get_instance().uniform01() * global;
-				int outcome = -1;
-				if (r < prob0)
-				{
-					outcome = 0;
-					for (auto g : q.valid_branch_group_view)
-						for (auto& br : g->branches)
-							br.run_damp_full(qid, 0);
-				}
-				if (noise_log)
-					noise_log->push_back({ OperationType::Damp_Full, qid,
-						op.coefficients[0], outcome, (size_t)step });
-				q.clear_zero_elements();
-				break;
-			}
-			case OperationType::Damp_Common: q.run_damp_common(op.coefficients[0]); break;
-			default: throw std::runtime_error("replica qubit: bad op");
-			}
-		}
-		if (getenv("VNS_TRACE2"))
-		{
-			double exc = 0, norm = 0;
-			for (auto& g : q.get_branch_groups())
-				for (size_t b = 0; b < g.branches.size(); ++b)
-					for (auto it = g.branches[b].iterbeg(); it != g.branches[b].iterend(); ++it)
-					{
-						exc += g.branch_probs[b] * abs_sqr(it->amplitude) * it->state.nz_elements.size();
-						norm += g.branch_probs[b] * abs_sqr(it->amplitude);
-					}
-			fmt::print("step {:2d} norm={:.4f} exc={:.3f}\n", step, norm, exc);
-		}
-	}
-	q.clear_zero_elements();
+    q.run_bad();
+    if (!noise_log) return;
+    for (const auto& layer : q.damping_history)
+        for (size_t pos : layer.candidates)
+            noise_log->push_back({OperationType::Damp_Full, pos,
+                q.noise_parameters.count(OperationType::Damping) ? q.noise_parameters.at(OperationType::Damping) : 0,
+                std::binary_search(layer.jumps.begin(), layer.jumps.end(), pos) ? 0 : -1,
+                layer.step + static_cast<size_t>(step0)});
 }
 
 double overlap_fid_qubit(const qram_qubit::QRAMCircuit& q, const memory_t& memory)
@@ -902,7 +847,8 @@ struct Experiment
 struct References
 {
 	map<string, double> noisefree, avg;
-	double survival = 1.0, overlap_fid = 1.0;
+	double survival = 1.0, overlap_fid = 0.0;
+    RhoMap avg_rho;
 	vector<map<string, double>> case_dist;
 	vector<vector<StepPlan>> case_plan;
 	vector<cplx> psi_ideal;
@@ -996,6 +942,21 @@ References build_references(const Experiment& E, const memory_t& memory)
 			auto d = dist_qubit(q);
 			for (auto& [k, v] : d) R.avg[k] += v;
 			R.overlap_fid += overlap_fid_qubit(q, memory);
+            // Reconstruct the coherent address+bus+tree state for the supported
+            // one-input-bus-column-per-address loading experiment.
+            map<size_t, cplx> psi;
+            for (const auto& group : q.branch_groups)
+                for (size_t b = 0; b < group.branches.size(); ++b)
+                    for (auto it = group.branches[b].iterbeg(); it != group.branches[b].iterend(); ++it) {
+                        size_t index = group.address | (it->data_bus << q.addr_size);
+                        for (size_t pos : it->state.nz_elements)
+                            index |= size_t(1) << (q.addr_size + q.data_size + pos);
+                        psi[index] += sqrt(group.branch_probs[b]) * it->amplitude;
+                    }
+            for (const auto& [i, ai] : psi)
+                for (const auto& [j, aj] : psi)
+                    R.avg_rho[(uint64_t(i) << enc.num_qubits()) | j] += ai * conj(aj);
+
 			try { q.sample_and_get_fidelity(); }
 			catch (const std::exception&) {}
 		}
@@ -1028,6 +989,7 @@ References build_references(const Experiment& E, const memory_t& memory)
 			catch (const std::exception&) {}
 		}
 	}
+    for (auto& [key, value] : R.avg_rho) value /= static_cast<double>(E.runs);
 	return R;
 }
 
@@ -1225,7 +1187,10 @@ void run_experiment(const Experiment& E)
 			fmt::print("    [debug] S2 gates-only: trace={:.6f} max|ΔP|vs noisefree={:.2e}\n",
 				rho_trace(rho0, n), max_diff(d0, R.noisefree));
 		}
-		string mode = E.damping > 0 ? "faithful" : "faithful";
+		// Qubit validation uses the standard linear, trace-preserving Kraus
+        // channel. The qutrit legacy mirror is retained as an implementation
+        // regression only; it is NOT a physical amplitude-damping certificate.
+        string mode = E.qutrit ? "faithful" : "full";
 		auto [rho, d] = run_stage2(R.case_plan[0], enc, n, mode, E.depol, E.damping);
 		double tr = rho_trace(rho, n);
 		double sr = R.survival;
@@ -1241,13 +1206,30 @@ void run_experiment(const Experiment& E)
 			? [&]{ map<string, double> m; for (auto& [k, v] : d) m[k] = v / tr; return m; }()
 			: d);
 		double fq = overlap_fid(R.psi_ideal, rho, n);
-		check(f_cls > E.f_min, "S2 faithful F_cls (normalized)", fmt::format("{:.4f}", f_cls));
-		check(t < E.tvd_max, "S2 faithful TVD", fmt::format("{:.4f}", t));
-		check(fabs(tr - sr) < E.trace_gap, "S2 trace↔survival",
+		check(f_cls > E.f_min, E.qutrit ? "S2 legacy-mirror F_cls" : "S2 standard F_cls", fmt::format("{:.4f}", f_cls));
+		check(t < E.tvd_max, E.qutrit ? "S2 legacy-mirror TVD" : "S2 standard TVD", fmt::format("{:.4f}", t));
+		check(fabs(tr - sr) < E.trace_gap, E.qutrit ? "S2 legacy trace↔raw norm" : "S2 trace↔normalized ensemble",
 			fmt::format("trace={:.4f} survival={:.4f}", tr, sr));
 		check(fabs(fq - R.overlap_fid) < E.fid_gap, "S2 F_quantum↔avg_overlap_fid",
 			fmt::format("{:.4f} vs {:.4f}", fq, R.overlap_fid));
-		(void)f;
+        if (!E.qutrit) {
+            check(fabs(tr - 1) < 1e-10 && fabs(sr - 1) < 1e-10,
+                "S2 standard channel trace=1", fmt::format("rho={:.12f} trajectories={:.12f}", tr, sr));
+            double purity = 0, error2 = 0;
+            RhoMap difference = rho;
+            for (const auto& [key, value] : R.avg_rho) {
+                purity += norm(value);
+                difference[key] -= value;
+            }
+            for (const auto& [key, value] : difference) error2 += norm(value);
+            // Every trajectory is a normalized pure state. Its full-density
+            // sample mean has estimated squared Frobenius standard error
+            // (1 - purity(mean))/(runs - 1). Includes ALL coherences and tree.
+            double se = sqrt(max(0.0, 1-purity) / static_cast<double>(E.runs-1));
+            check(sqrt(error2) < 5*se + 1e-10, "S2 complete density matrix",
+                fmt::format("Frobenius={:.5g} estimated_RMS_SE={:.5g}", sqrt(error2), se));
+        }
+        (void)f;
 	}
 }
 
@@ -1274,12 +1256,16 @@ int main()
 	run_experiment({ "qubit / depol p=0.02 / S1", false, 0.02, 0, 20260921, 8, 6, 2 });
 	run_experiment({ "qubit / depol p=0.3 / S1", false, 0.3, 0, 777, 8, 6, 2 });
 	run_experiment({ "qubit / damp γ=0.05 / S1", false, 0, 0.05, 20260921, 8, 6, 2 });
-	run_experiment({ "qubit / depol p=0.02 / S2", false, 0.02, 0, 20260921, 300, 1, 4,
+    run_experiment({ "qubit / mixed p=gamma=0.2 / S1", false, 0.2, 0.2, 777, 8, 6, 2 });
+	run_experiment({ "qubit / depol p=0.02 / S2", false, 0.02, 0, 20260921, 2000, 1, 4,
 		0.995, 0.05, 0.01, 0.05 });
-	run_experiment({ "qubit / damp γ=0.05 / S2", false, 0, 0.05, 20260921, 300, 1, 4,
+	run_experiment({ "qubit / damp γ=0.05 / S2", false, 0, 0.05, 20260921, 2000, 1, 4,
 		0.99, 0.05, 0.01, 0.05 });
-	run_experiment({ "qubit / mixed p=γ=0.02 / S2", false, 0.02, 0.02, 20260921, 300, 1, 4,
+	run_experiment({ "qubit / mixed p=γ=0.02 / S2", false, 0.02, 0.02, 20260921, 2000, 1, 4,
 		0.995, 0.05, 0.01, 0.05 });
+
+    run_experiment({ "qubit / damp gamma=0.2 / standard channel", false, 0, 0.2,
+        777, 2000, 1, 4, 0.99, 0.05, 0.01, 0.05 });
 
 	fmt::print("\n{} assertion(s) failed\n", g_failures);
 	return g_failures ? 1 : 0;

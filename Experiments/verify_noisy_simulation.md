@@ -1,5 +1,7 @@
 # verify_noisy_simulation — QRAM-Simulator ↔ circuit-level noise simulation cross-check (CI case)
 
+**Qubit damping update:** the current qubit test uses the standard trace-preserving Kraus channel, whole-tree damping candidates and normalized joint trajectories. Historical faithful-mirror numbers below document the retired convention, not physical-channel correctness. See [the joint-damping algorithm and validation](../docs/sphinx/source/en/paper/joint_damping.md). The qutrit faithful mirror remains a legacy implementation regression.
+
 `Experiments/verify_noisy_simulation.cpp` (ctest case `verify_noisy_simulation`, run automatically with the
 full CI regression suite, about 3 seconds): bakes the "symbolic sparse-tree trajectory engine ↔ circuit-level
 noise simulation" cross-check established in this workspace into the repository, using a set of deterministic experiments to continuously guarantee the correctness of noise simulation in both architectures.

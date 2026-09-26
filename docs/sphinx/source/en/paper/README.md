@@ -1,5 +1,7 @@
 # Paper Reproduction Documentation
 
+[Exact joint damping: algorithm, legacy defects and channel validation](joint_damping.md).
+
 For the qubit-QRAM complete-state equivalence protocol, test coverage and commands, see [Pruned/full exactness validation](exactness_validation.md).
 
 This directory contains paper-related documentation and reproduction guides.

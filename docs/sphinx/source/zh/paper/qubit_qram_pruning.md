@@ -1,5 +1,7 @@
 # 面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论
 
+**阻尼更新：** qubit 引擎现采用整树联合 Kraus 抽样及归一化条件轨迹。历史非零阻尼数值和逐候选独立抽样描述需要重跑/替换，详见[联合阻尼抽样](joint_damping.md)。
+
 > 理论设计文档（预实现）。对应主文献：Yun-Jie Wang 等，*Efficient Simulation of Quantum Random Access Memory*（arXiv:2503.13832，Phys. Rev. Applied **25**, 044069）。本文解决该工作遗留的一个缺口：**qubit 编码（standard）bucket-brigade QRAM 在振幅阻尼噪声下的分支预测与剪枝**。
 
 ## 摘要

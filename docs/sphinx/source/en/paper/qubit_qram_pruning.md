@@ -1,5 +1,7 @@
 # Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory
 
+**Damping update:** the qubit sampler now uses whole-tree joint Kraus sampling and normalized conditional trajectories. Historical nonzero-damping numbers and per-candidate sampling descriptions must be regenerated/replaced; see [joint damping](joint_damping.md).
+
 > Theoretical design document (pre-implementation). Companion to the main publication: Yun-Jie Wang et al., *Efficient Simulation of Quantum Random Access Memory* (arXiv:2503.13832, Phys. Rev. Applied **25**, 044069). This document closes a gap left open by that work: **branch prediction and pruning for the qubit-encoded (standard) bucket-brigade QRAM under amplitude damping noise**.
 
 ## Abstract
