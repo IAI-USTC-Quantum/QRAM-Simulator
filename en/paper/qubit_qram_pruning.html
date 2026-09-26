@@ -1,0 +1,779 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="The Qubit-QRAM Error Propagation Mechanism: A Theoretical Walkthrough with Single-Error Injection Verification" href="qubit_error_propagation.html"><link rel="prev" title="Exact joint sampling of qubit amplitude damping" href="joint_damping.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory - QRAM-Simulator Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator Documentation</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <a href="../../zh/paper/qubit_qram_pruning.html">中文</a>
+  <span class="sidebar-langswitch-sep">·</span>
+  <strong>English</strong>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/architecture.html">QRAM-Simulator Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/operators.html">Quantum Arithmetic Operator Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/naming_conventions.html">SparQ Operator Naming Conventions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API Reference</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Papers and Experiments</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">Paper Reproduction Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reproduction.html">Paper Experiment Reproduction Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exactness_validation.html">Pruned/full exactness validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="joint_damping.html">Exact joint sampling of qubit amplitude damping</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_error_propagation.html">The Qubit-QRAM Error Propagation Mechanism: A Theoretical Walkthrough with Single-Error Injection Verification</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/paper/qubit_qram_pruning.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/paper/qubit_qram_pruning.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="branch-pruning-and-fast-simulation-for-the-qubit-architecture-qram-the-hk0h-predictability-theory">
+<h1>Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory<a class="headerlink" href="#branch-pruning-and-fast-simulation-for-the-qubit-architecture-qram-the-hk0h-predictability-theory" title="Link to this heading">¶</a></h1>
+<p><strong>Damping update:</strong> the qubit sampler now uses whole-tree joint Kraus sampling and normalized conditional trajectories. Historical nonzero-damping numbers and per-candidate sampling descriptions must be regenerated/replaced; see <a class="reference internal" href="joint_damping.html"><span class="std std-doc">joint damping</span></a>.</p>
+<blockquote>
+<div><p>Theoretical design document (pre-implementation). Companion to the main publication: Yun-Jie Wang et al., <em>Efficient Simulation of Quantum Random Access Memory</em> (arXiv:2503.13832, Phys. Rev. Applied <strong>25</strong>, 044069). This document closes a gap left open by that work: <strong>branch prediction and pruning for the qubit-encoded (standard) bucket-brigade QRAM under amplitude damping noise</strong>.</p>
+</div></blockquote>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">¶</a></h2>
+<p>The sparse-state QRAM simulator (this repository) achieves fast noisy simulation of the qutrit-encoded bucket-brigade QRAM: the noise history is pre-sampled into a “branch tree”; good branches, whose routing paths pass through no noise site, are not actually evolved — their final-state amplitudes are predicted directly by analytic formulas — and only the bad branches, whose good/bad classification is predetermined by the subtree-containment criterion, need explicit evolution. The trick is simple in the qutrit scheme because the data bus travels in the computational basis, on which the no-jump Kraus operator <span class="math notranslate nohighlight">\(K_0\)</span> is diagonal, so the entire damping effect on a good branch reduces to a countable scalar decay factor. In the qubit encoding, however, the data bits must traverse the whole tree in the <span class="math notranslate nohighlight">\(\{|+\rangle,|-\rangle\}\)</span> basis (the CZ phase-encoding fetch protocol requires a Hadamard first), <span class="math notranslate nohighlight">\(K_0=\mathrm{diag}(1,a)\)</span> is non-diagonal in the X basis, and the scalar prediction fails. This document proves that this <span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> structure is still <strong>predictable in closed form</strong>: the state acted on by the second H gate is exactly of the form <span class="math notranslate nohighlight">\((|0\rangle+(-1)^{b\oplus m}a^d|1\rangle)/\sqrt{2}\)</span>, giving output amplitudes <span class="math notranslate nohighlight">\((1\pm a^d)/2\)</span>; <span class="math notranslate nohighlight">\(k\)</span> data bits yield <span class="math notranslate nohighlight">\(2^k\)</span> closed-form components that depend only on the Hamming weight of the error pattern. Building on this, we give a complete pruning algorithm for the qubit QRAM that preserves the same complexity scaling as the qutrit scheme, <span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span>, and we clarify its error structure: the first-order effect on a good branch is mere norm loss (naturally absorbed into the Monte Carlo trajectory weights), the true within-branch error is second-order coherent leakage, and all first-order errors are concentrated on the explicitly evolved bad branches.</p>
+</section>
+<hr class="docutils" />
+<section id="introduction">
+<h2>1. Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>A quantum random access memory (QRAM) reads out data at superposed addresses with query depth <span class="math notranslate nohighlight">\(\mathcal{O}(\log N)\)</span>, making it a core component of algorithms such as quantum database search, quantum state preparation, and quantum machine learning; the price is a binary routing tree requiring <span class="math notranslate nohighlight">\(\mathcal{O}(N)\)</span> physical qubits. The sparse-state simulator of Wang et al. [1] enables efficient classical simulation of QRAM based on two observations: (i) the bucket-brigade circuit consists entirely of non-branching reversible gates, so the tree-configuration evolution of each input basis component is deterministic and unique; (ii) the noisy evolution can be expanded over Monte Carlo trajectories, where each noise site affects only those branches whose routing path passes through it (subtree containment), while the final states of all other good branches can be predicted analytically instead of being evolved. The simulation complexity drops from the exponential cost of the full density matrix to <span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span> (<span class="math notranslate nohighlight">\(d\)</span> is the number of input superposition branches, <span class="math notranslate nohighlight">\(p\)</span> the per-qubit noise rate, and <span class="math notranslate nohighlight">\(n\)</span> the number of address bits).</p>
+<p>That work and its implementation take the <strong>qutrit encoding</strong> as the flagship scheme: routing nodes use the three levels <span class="math notranslate nohighlight">\(\{|W\rangle,|L\rangle,|R\rangle\}\)</span>, the idle state <span class="math notranslate nohighlight">\(|W\rangle\)</span> is a fixed point of the damping channel’s no-jump operator <span class="math notranslate nohighlight">\(K_0\)</span>, and data transfer happens in the computational basis. For the physically more common <strong>qubit encoding</strong> (two two-level bits per routing node, address bit <span class="math notranslate nohighlight">\(|0\rangle\equiv L\)</span> and <span class="math notranslate nohighlight">\(|1\rangle\equiv R\)</span>, with no idle state), fast-simulation support has remained incomplete: the repository’s qubit good-branch multiplier implements only the scalar counting of the address-routing part (<code class="docutils literal notranslate"><span class="pre">TimeStep::_get_multiplier_impl_qubit</span></code>, with the wiring code commented out; see <code class="docutils literal notranslate"><span class="pre">QRAM/include/qram_branch_qubit.h:213-225</span></code>), while the data-bus part — the subject of this document — lacked a theoretical formula.</p>
+<p>The essential difference between the qubit and qutrit schemes lies in how data is fetched [2]: the qutrit scheme uses a classically controlled CNOT to flip the data bit in the computational basis, whereas the qubit scheme uses <strong>CZ phase encoding</strong> — the classical memory bit acts as the control and applies <span class="math notranslate nohighlight">\(Z\)</span> to the data bit passing through its leaf. To make “an active node’s <span class="math notranslate nohighlight">\(|0\rangle\)</span>” distinguishable from “an inactive node”, a Hadamard must be applied before the data bus enters the tree, rotating <span class="math notranslate nohighlight">\(\{|0\rangle,|1\rangle\}\)</span> into the <span class="math notranslate nohighlight">\(\{|+\rangle,|-\rangle\}\)</span> basis, and once the fetched data returns, another H rotates back to the original basis. Each data bit therefore shuttles through the entire tree as an X-basis superposition between the two H gates, continuously subject to the <span class="math notranslate nohighlight">\(K_0\)</span> action of amplitude damping — this is the <strong><span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> structure</strong> analyzed in this document.</p>
+<p>Contributions of this document:</p>
+<ol class="arabic simple">
+<li><p>Prove that the <span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> structure of a qubit-QRAM good branch has a closed-form solution (Lemma 1), and give the <span class="math notranslate nohighlight">\(2^k\)</span>-component Hamming-weight formula for <span class="math notranslate nohighlight">\(k\)</span> data bits (Theorem 2);</p></li>
+<li><p>Give the complete final-state prediction theorem for good branches (Theorem 3), extending the v2 proposition of Wang et al. that “all reliable branches share the same final state” [1, Eq. (6)] to the qubit encoding;</p></li>
+<li><p>Analyze the error structure: the deviation of a good branch’s output from the ideal output splits into first-order norm loss and second-order coherent leakage, of which the former is not an error but the probability weight of the jump trajectories;</p></li>
+<li><p>Present the complete pruning-based fast simulation algorithm with a complexity analysis, and list the gaps in the current implementation against this repository.</p></li>
+</ol>
+</section>
+<section id="background-and-notation">
+<h2>2. Background and Notation<a class="headerlink" href="#background-and-notation" title="Link to this heading">¶</a></h2>
+<section id="the-n-k-qram-and-the-time-slice-schedule">
+<h3>2.1 The <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM and the Time-Slice Schedule<a class="headerlink" href="#the-n-k-qram-and-the-time-slice-schedule" title="Link to this heading">¶</a></h3>
+<p>An <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM implements the transformation
+$<span class="math notranslate nohighlight">\(
+\sum_{i,j}\alpha_{i,j}|i\rangle_A|j\rangle_D\;\longrightarrow\;\sum_{i,j}\alpha_{i,j}|i\rangle_A|j\oplus d_i\rangle_D,
+\)</span><span class="math notranslate nohighlight">\(
+where \)</span>n<span class="math notranslate nohighlight">\( is the number of address bits (\)</span>N=2^n<span class="math notranslate nohighlight">\(), \)</span>k<span class="math notranslate nohighlight">\( the number of data bits, and \)</span>d_i\in{0,1}^k$ the classical memory content [1,2].</p>
+<p>A bucket-brigade query pipelines over a full binary tree of depth <span class="math notranslate nohighlight">\(n\)</span>: address bits are injected one by one at the root and drill down to establish the routing path; data-bus bits are swapped in one by one (CopyIn), travel down the path, return along the same path after interacting with the memory at the leaf, and are swapped out (CopyOut); finally all operations are executed in reverse order to uncompute. The simulator organizes the circuit into <span class="math notranslate nohighlight">\(T=6n+2k\)</span> time slices (<code class="docutils literal notranslate"><span class="pre">TimeStep::full_step</span></code>, <code class="docutils literal notranslate"><span class="pre">QRAM/src/time_step.cpp:118-121</span></code>), with the key scheduling points (<code class="docutils literal notranslate"><span class="pre">time_step.cpp:133-203</span></code>):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Event</p></th>
+<th class="head"><p>Time slice of data bit <span class="math notranslate nohighlight">\(i\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Address bit <span class="math notranslate nohighlight">\(t\)</span> injected (ACopy)</p></td>
+<td><p><span class="math notranslate nohighlight">\(2t+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>CopyIn<span class="math notranslate nohighlight">\(_i\)</span> (data bit <span class="math notranslate nohighlight">\(i\)</span> swapped into the root)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i)=2n+2i+1\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>FetchData<span class="math notranslate nohighlight">\(_i\)</span> (CZ fetch at the leaf)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{fetch}}(i)=3n+2i+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>CopyOut<span class="math notranslate nohighlight">\(_i\)</span> (data bit <span class="math notranslate nohighlight">\(i\)</span> swapped out)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)=4n+2i+1\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The schedule is mirror-symmetric about its midpoint: <span class="math notranslate nohighlight">\(\mathrm{out}(t)=T-t\)</span>. Note that <span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n\)</span> is independent of <span class="math notranslate nohighlight">\(i\)</span>, and that <span class="math notranslate nohighlight">\(\tau_{\mathrm{fetch}}(i)\)</span> is exactly the midpoint of the window. In the qubit architecture, the two Hadamards are attached just before CopyIn<span class="math notranslate nohighlight">\(_0\)</span> and just after CopyOut<span class="math notranslate nohighlight">\(_{k-1}\)</span> (<code class="docutils literal notranslate"><span class="pre">QRAM/include/qram_circuit_qubit.h:1039-1048</span></code>), acting on the entire data-bus register.</p>
+</section>
+<section id="noise-model-and-monte-carlo-trajectory-expansion">
+<h3>2.2 Noise Model and Monte Carlo Trajectory Expansion<a class="headerlink" href="#noise-model-and-monte-carlo-trajectory-expansion" title="Link to this heading">¶</a></h3>
+<p>After the gate operations of each time slice, noise is applied to every physical qubit inside the currently entangled subtree independently with the corresponding probability (<code class="docutils literal notranslate"><span class="pre">TimeStep::noise_one_step</span></code>, <code class="docutils literal notranslate"><span class="pre">time_step.cpp:341-385</span></code>):</p>
+<ul class="simple">
+<li><p><strong>Amplitude damping</strong> (strength <span class="math notranslate nohighlight">\(\gamma\)</span>): Kraus operators
+$<span class="math notranslate nohighlight">\(
+K_0=|0\rangle\langle0|+\sqrt{1-\gamma}\,|1\rangle\langle1|=\mathrm{diag}(1,a),\qquad K_1=\sqrt{\gamma}\,|0\rangle\langle1|,
+\)</span><span class="math notranslate nohighlight">\(
+where \)</span>a\equiv\sqrt{1-\gamma}<span class="math notranslate nohighlight">\( denotes the per-step decay factor. In the simulation this is split into two parts: \)</span>K_0<span class="math notranslate nohighlight">\( acts deterministically as the **default operator** (`Damp_Common`: at every step, each excitation amplitude currently in \)</span>|1\rangle<span class="math notranslate nohighlight">\( is multiplied by \)</span>a<span class="math notranslate nohighlight">\(, `qram_branch_qubit.h:84-87`); the jump operator \)</span>K_1$ is handled only at pre-sampled noise sites as a <strong>quasi-measurement</strong> (<code class="docutils literal notranslate"><span class="pre">Damp_Full</span></code>: compute the jump probability from the current unnormalized state, roll the dice, and on a hit project and reset the bit across all branches, <code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h:468-558</span></code>).</p></li>
+<li><p><strong>Depolarizing</strong> (strength <span class="math notranslate nohighlight">\(\varepsilon\)</span>): a random Pauli <span class="math notranslate nohighlight">\(X/Z/Y\)</span>, applied explicitly at the sampled noise sites.</p></li>
+</ul>
+<p>One trajectory = one pre-sampled noise history (the positions and kinds of the noise sites) + the everywhere-action of the default <span class="math notranslate nohighlight">\(K_0\)</span>. The state is always kept as an (unnormalized) sparse pure state, normalized only at quasi-measurements and at final-state sampling [1, SI §III]. Averaging over many trajectories restores the density-matrix-level observables.</p>
+</section>
+<section id="the-three-predictability-pillars-of-the-qutrit-scheme">
+<h3>2.3 The Three Predictability Pillars of the Qutrit Scheme<a class="headerlink" href="#the-three-predictability-pillars-of-the-qutrit-scheme" title="Link to this heading">¶</a></h3>
+<p>The pruning algorithm of Wang et al. rests on three pillars [1]:</p>
+<p><strong>(P1) Unique tree-configuration theorem.</strong> The circuit consists entirely of non-branching gates such as CSWAP/SWAP/CNOT/CZ (they only permute computational basis states and create no superpositions), so for every address <span class="math notranslate nohighlight">\(|i\rangle\)</span> there is a unique tree-configuration orbit <span class="math notranslate nohighlight">\(|\Psi_i(t)\rangle\)</span>; the noise-free evolution can be replayed classically without solving any equations.</p>
+<p><strong>(P2) Diagonality of the default operator.</strong> <span class="math notranslate nohighlight">\(K_0\)</span> is diagonal in the nodes’ computational basis, so along a no-jump trajectory a good branch’s basis-state orbit is exactly the noise-free orbit, and the entire damping effect is multiplication by a <strong>countable scalar decay factor</strong>: the amplitude factor <span class="math notranslate nohighlight">\(a^{c}\)</span>, where <span class="math notranslate nohighlight">\(c\)</span> is the branch’s “number of excitations × time steps” count, given analytically by the schedule table without any simulation. The relative weight between different good branches is <span class="math notranslate nohighlight">\(a^{\Delta c}\)</span> (implementation: <code class="docutils literal notranslate"><span class="pre">TimeStep::get_multiplier_qutrit</span></code>, <code class="docutils literal notranslate"><span class="pre">QRAM/include/time_step.h:209-234</span></code>).</p>
+<p><strong>(P3) Subtree-containment criterion.</strong> A fault at node <span class="math notranslate nohighlight">\((l,p)\)</span> affects only the address interval corresponding to its leaf subtree,
+$<span class="math notranslate nohighlight">\(
+i\in\big[2^{\,n-l}p,\;2^{\,n-l}(p+1)-1\big],
+\)</span><span class="math notranslate nohighlight">\(
+so, given the noise history, the good/bad branch sets can be determined analytically **before any evolution** (implementation: `get_bad_range_qutrit` + the interval union `ContinuousRange`, `time_step.cpp:267-339`). The expected bad-branch fraction is \)</span>\mathcal{O}(n^2p)$ [1, v1 Eq. (6)].</p>
+<p><strong>A caveat on the encoding dependence of (P3) (see the companion document <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code> for details).</strong> The true foundation of this criterion for qutrits is not that “the output damage is confined to the subtree” (that also holds for qubits), but that “<strong>the off-path components keep the same final tree configuration</strong>”: a qutrit’s fault residue is frozen in place at the faulty node by the <span class="math notranslate nohighlight">\(|W\rangle\)</span> guard (the <code class="docutils literal notranslate"><span class="pre">case</span> <span class="pre">W:</span> <span class="pre">do</span> <span class="pre">nothing</span></code> of <code class="docutils literal notranslate"><span class="pre">QRAMState::cswap</span></code>), all off-path components share one and the same configuration, and good-branch prediction is therefore valid. The qubit encoding lacks this guard, so the residues of X-type faults <strong>migrate and get pulled up</strong> along the “idle = points left” ancestor chain, diverging the configuration families over a wider range — the bad interval must instead use the left-child climb rule (§3, §5.1).</p>
+<p>In the qutrit scheme, data transfer happens in the computational basis and requires no H gates; the two H attachment points degenerate into pure merge operations (<code class="docutils literal notranslate"><span class="pre">run_hadamard</span></code> in <code class="docutils literal notranslate"><span class="pre">qram_branch_qutrit.cpp:547-573</span></code> only calls <code class="docutils literal notranslate"><span class="pre">try_merge</span></code>), so (P2) directly covers the data bus: good branches do not split, and the final state is <span class="math notranslate nohighlight">\(|i\rangle|j\oplus d_i\rangle|Q_0\rangle\)</span> times a scalar factor.</p>
+</section>
+</section>
+<section id="the-gaps-in-the-qubit-scheme">
+<h2>3. The Gaps in the Qubit Scheme<a class="headerlink" href="#the-gaps-in-the-qubit-scheme" title="Link to this heading">¶</a></h2>
+<p>In the qubit encoding, pillar (P1) holds verbatim (the non-branching gate set is independent of the level encoding). There are two gaps — the data-bus part of (P2), and the configuration identity of (P3):</p>
+<ul class="simple">
+<li><p><strong>(P3′) Configuration-family divergence (X-type faults)</strong>: the output damage (wrongbus) itself still satisfies ⊆ subtree(v) (verified by single-error injection), but an X flip leaves permanent residues in <strong>all</strong> superposition components (no one cleans idle nodes), and these residues migrate upward via the “idle = points left” ancestor pull: a residue at a left-child position climbs one level for every component whose parent is idle, while a residue at a right-child position is trapped inside its own subtree. The off-path components therefore split into different final-configuration families, and the envelope of the family divergence is <strong>bad = the left child takes subtree(parent(v)), the right child takes subtree(v)</strong> (i.e. the current <code class="docutils literal notranslate"><span class="pre">get_bad_range_qubit</span></code>; the root and the root’s children are special-cased). Damping jumps (K₁) create no off-path residues (an idle node has no excitation available to jump), so <strong>the pure damping channel can still use the pure subtree criterion</strong>. For the mechanism derivation and the exhaustive n=3 injection verification, see <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code>.</p></li>
+<li><p><strong>(P2) Address/routing part</strong>: routing bits in the state <span class="math notranslate nohighlight">\(|1\rangle\)</span> are likewise decayed step by step by <span class="math notranslate nohighlight">\(K_0\)</span>; the exposure window is given by the schedule table and is still a countable scalar (already implemented in the repository as <code class="docutils literal notranslate"><span class="pre">_get_multiplier_impl_qubit</span></code>, <code class="docutils literal notranslate"><span class="pre">time_step.cpp:462-475</span></code>). Nothing new is needed here.</p></li>
+<li><p><strong>(P2) Data-bus part</strong>: data bit <span class="math notranslate nohighlight">\(i\)</span> is swapped in at step <span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i)=2n+2i+1\)</span> and swapped out at step <span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)=4n+2i+1\)</span>, and in between it lives inside the tree in the form <span class="math notranslate nohighlight">\((|0\rangle\pm|1\rangle)/\sqrt{2}\)</span>. <span class="math notranslate nohighlight">\(K_0\)</span> is non-diagonal in the X basis:
+$<span class="math notranslate nohighlight">\(
+K_0|+\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle+a|1\rangle\big),\qquad K_0|-\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle-a|1\rangle\big).
+\)</span>$
+Different data components within a branch decay out of sync, and the two H gates no longer cancel each other — <strong>the output of the second H gate is no longer a definite computational basis state</strong>. This is exactly why the qutrit scalar-multiplier formula fails, and why a naive implementation must let the branch evolve for real (splitting at every H, counting step by step, and merging at the end).</p></li>
+</ul>
+</section>
+<section id="main-theoretical-results">
+<h2>4. Main Theoretical Results<a class="headerlink" href="#main-theoretical-results" title="Link to this heading">¶</a></h2>
+<section id="the-hk0h-lemma">
+<h3>4.1 The H–K₀–H Lemma<a class="headerlink" href="#the-hk0h-lemma" title="Link to this heading">¶</a></h3>
+<p><strong>Lemma 1 (single-bit closed form).</strong> Let <span class="math notranslate nohighlight">\(a=\sqrt{1-\gamma}\)</span>, <span class="math notranslate nohighlight">\(d\in\mathbb{N}\)</span>, <span class="math notranslate nohighlight">\(m\in\{0,1\}\)</span>, and define
+$<span class="math notranslate nohighlight">\(
+N_{m,d}\;=\;H\,\underbrace{Z^{m}\,\mathrm{diag}(1,a^{d})}_{\text{diagonal, and merges with }K_0\text{ powers}}\,H .
+\)</span><span class="math notranslate nohighlight">\(
+Then for any input bit \)</span>b\in{0,1}<span class="math notranslate nohighlight">\(, writing \)</span>b_{\mathrm{out}}=b\oplus m<span class="math notranslate nohighlight">\(:
+\)</span><span class="math notranslate nohighlight">\(
+N_{m,d}\,|b\rangle\;=\;\alpha_d\,|b_{\mathrm{out}}\rangle+\beta_d\,|\overline{b_{\mathrm{out}}}\rangle,\qquad
+\alpha_d=\frac{1+a^{d}}{2},\;\;\beta_d=\frac{1-a^{d}}{2}.
+\)</span>$</p>
+<p><strong>Proof.</strong> <span class="math notranslate nohighlight">\(H|b\rangle=\big(|0\rangle+(-1)^{b}|1\rangle\big)/\sqrt2\)</span>. Between the two H gates, the only actions on this bit are: (i) <span class="math notranslate nohighlight">\(d\)</span> applications of <span class="math notranslate nohighlight">\(K_0=\mathrm{diag}(1,a)\)</span> (routing SWAPs merely relocate the bit and never change its state; see below); (ii) the <span class="math notranslate nohighlight">\(Z^m\)</span> contributed by the CZ fetch at the leaf. Both are diagonal in the computational basis and commute with each other, so they merge into <span class="math notranslate nohighlight">\(Z^m\mathrm{diag}(1,a^d)=\mathrm{diag}\big(1,(-1)^m a^d\big)\)</span>. The resulting state is <span class="math notranslate nohighlight">\(\big(|0\rangle+(-1)^{b\oplus m}a^d|1\rangle\big)/\sqrt2\)</span> — <strong>this is the precise meaning of “when the second H gate acts, it is as if <span class="math notranslate nohighlight">\(|0\rangle+a^d|1\rangle\)</span> passes through one more H”</strong> (the sign is determined jointly by the input bit and the memory bit). Passing through <span class="math notranslate nohighlight">\(H\)</span> once more:
+$<span class="math notranslate nohighlight">\(
+\frac{1}{2}\Big[\big(1+(-1)^{b\oplus m}a^{d}\big)|0\rangle+\big(1-(-1)^{b\oplus m}a^{d}\big)|1\rangle\Big],
+\)</span><span class="math notranslate nohighlight">\(
+and collecting terms according to \)</span>b_{\mathrm{out}}=b\oplus m<span class="math notranslate nohighlight">\( gives the claim. \)</span>\square$</p>
+<p><strong>Remark 1 (norm-conservation consistency).</strong> <span class="math notranslate nohighlight">\(\alpha_d^2+\beta_d^2=\frac{1+a^{2d}}{2}\)</span> is exactly the direct evaluation of the <strong>no-jump probability</strong> <span class="math notranslate nohighlight">\(\frac12(\langle0|+\langle1|)K_0^{d\dagger}K_0^{d}(|0\rangle+|1\rangle)/1\)</span> of an X-basis state passing through <span class="math notranslate nohighlight">\(d\)</span> layers of the damping channel. The missing norm <span class="math notranslate nohighlight">\(\frac{1-a^{2d}}{2}\)</span> is precisely the probability weight carried by the jump (<span class="math notranslate nohighlight">\(K_1\)</span>) trajectories — evolved explicitly by the bad branches in this algorithm. Under the unnormalized framework, the two parts of the ledger balance exactly.</p>
+<p><strong>Remark 2 (the correct and the erroneous component).</strong> <span class="math notranslate nohighlight">\(\alpha_d\)</span> is the amplitude of a “correct fetch”, and <span class="math notranslate nohighlight">\(\beta_d\)</span> is the amplitude coherently leaked into the wrong value. When <span class="math notranslate nohighlight">\(a=1\)</span> (noise-free), <span class="math notranslate nohighlight">\(\beta_d=0\)</span> and the ideal QRAM output <span class="math notranslate nohighlight">\(H^2=I\)</span> is recovered.</p>
+</section>
+<section id="the-multi-bit-product-structure">
+<h3>4.2 The Multi-Bit Product Structure<a class="headerlink" href="#the-multi-bit-product-structure" title="Link to this heading">¶</a></h3>
+<p><strong>Theorem 2 (the <span class="math notranslate nohighlight">\(H\)</span>–<span class="math notranslate nohighlight">\(K_0\)</span>–<span class="math notranslate nohighlight">\(H\)</span> formula for <span class="math notranslate nohighlight">\(k\)</span> data bits).</strong> On a good branch <span class="math notranslate nohighlight">\((i,j)\)</span> (address <span class="math notranslate nohighlight">\(i\)</span>, bus input <span class="math notranslate nohighlight">\(j\in\{0,1\}^k\)</span>), suppose data bit <span class="math notranslate nohighlight">\(i\)</span> resides inside the tree for <span class="math notranslate nohighlight">\(d_i=\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n\)</span> damping layers, with memory bit <span class="math notranslate nohighlight">\(m_i=(d_i)_{\text{the }i\text{-th bit}}\)</span> (where the notations clash, context decides; below the memory content is written <span class="math notranslate nohighlight">\(d\)</span>, with its <span class="math notranslate nohighlight">\(t\)</span>-th bit <span class="math notranslate nohighlight">\(d^{(t)}\)</span>). Then the unnormalized state of the data register after the second H is
+$<span class="math notranslate nohighlight">\(
+\bigotimes_{t=0}^{k-1}N_{d^{(t)},\,2n}\,|j_t\rangle
+\;=\;\sum_{c\in\{0,1\}^k}A(c)\,|c\rangle,
+\)</span><span class="math notranslate nohighlight">\(
+where the amplitude of an output component \)</span>c<span class="math notranslate nohighlight">\( depends only on the **Hamming weight** \)</span>w=|e|<span class="math notranslate nohighlight">\( of the error pattern \)</span>e=c\oplus b_{\mathrm{out}}<span class="math notranslate nohighlight">\( (\)</span>b_{\mathrm{out}}=j\oplus d<span class="math notranslate nohighlight">\( being the ideal output):
+\)</span><span class="math notranslate nohighlight">\(
+\boxed{\;A(c)\;=\;\frac{1}{2^{k}}\,(1+a^{2n})^{\,k-w}\,(1-a^{2n})^{\,w}\;=\;\alpha_{2n}^{\,k-w}\,\beta_{2n}^{\,w}\;}
+\)</span>$</p>
+<p><strong>Proof.</strong> The routing of different data bits is guided by the same address path and pipelined through in different time slices, with no gate coupling between them; each bit’s fetch <span class="math notranslate nohighlight">\(Z^{d^{(t)}}\)</span> and its <span class="math notranslate nohighlight">\(K_0\)</span> exposure are independent. The total diagonal operator between the two H gates is therefore a bit-wise tensor product, and the total map is <span class="math notranslate nohighlight">\(\bigotimes_t N_{d^{(t)},d_t}\)</span>. By the schedule table, <span class="math notranslate nohighlight">\(d_t=\tau_{\mathrm{out}}(t)-\tau_{\mathrm{in}}(t)=(4n+2t+1)-(2n+2t+1)=2n\)</span> is the same for all bits (an endpoint-counting convention contributes at most a <span class="math notranslate nohighlight">\(\pm1\)</span> correction, identical for all bits, and it is self-calibrated by the reference branch; see §5.2). Applying Lemma 1 to each bit, <span class="math notranslate nohighlight">\(c_t=b_{\mathrm{out},t}\)</span> contributes <span class="math notranslate nohighlight">\(\alpha_{2n}\)</span> and <span class="math notranslate nohighlight">\(c_t=\overline{b_{\mathrm{out},t}}\)</span> contributes <span class="math notranslate nohighlight">\(\beta_{2n}\)</span>; collecting terms by the number of wrong bits <span class="math notranslate nohighlight">\(w\)</span> gives the claim. <span class="math notranslate nohighlight">\(\square\)</span></p>
+<p><strong>The contrast with the qutrit counter is worth emphasizing</strong>: in the qutrit version the data window depends on the input/output bit values (<span class="math notranslate nohighlight">\(b_{\mathrm{in}},b_{\mathrm{out}}\)</span> determine whether an excitation exists inside the tree on the outbound/return trip; see the data part of <code class="docutils literal notranslate"><span class="pre">_get_multiplier_impl_qutrit</span></code>, <code class="docutils literal notranslate"><span class="pre">time_step.cpp:510-534</span></code>), whereas in the qubit version the data bit <strong>always resides inside the tree in a half-excited state for the full window <span class="math notranslate nohighlight">\(2n\)</span></strong>, regardless of the bit value — X-basis transport makes the exposure window trivial, which actually simplifies the counting.</p>
+</section>
+<section id="the-scalar-factor-of-the-address-routing-part">
+<h3>4.3 The Scalar Factor of the Address-Routing Part<a class="headerlink" href="#the-scalar-factor-of-the-address-routing-part" title="Link to this heading">¶</a></h3>
+<p>The excitation exposure of routing bits belongs to pillar (P2), as in the qutrit case. When the <span class="math notranslate nohighlight">\(t\)</span>-th bit of address <span class="math notranslate nohighlight">\(i\)</span> is 1, the corresponding excitation is injected at step <span class="math notranslate nohighlight">\(2t+1\)</span> and withdrawn with the uncompute at step <span class="math notranslate nohighlight">\(\mathrm{out}(2t+1)=T-(2t+1)\)</span> (the qubit scheme has no idle state, so the path pointers live for the entire query). The full-trajectory exposure count is
+$<span class="math notranslate nohighlight">\(
+c_{\mathrm{addr}}(i)=\sum_{t:\,i_t=1}\big(T-2(2t+1)\big)=\sum_{t:\,i_t=1}(6n+2k-4t-2),
+\)</span><span class="math notranslate nohighlight">\(
+consistent with `_get_multiplier_impl_qubit` (`time_step.cpp:462-475`). The whole-branch amplitude acquires the scalar factor \)</span>a^{c_{\mathrm{addr}}(i)}<span class="math notranslate nohighlight">\(; the relative probability weight between different good branches is
+\)</span><span class="math notranslate nohighlight">\(
+\frac{p_i}{p_{i_{\mathrm{ref}}}}=(1-\gamma)^{\,c_{\mathrm{addr}}(i)-c_{\mathrm{addr}}(i_{\mathrm{ref}})}\;\equiv\;a^{2\Delta c},
+\)</span>$
+i.e. the <code class="docutils literal notranslate"><span class="pre">relative_multiplier</span></code> of <code class="docutils literal notranslate"><span class="pre">get_multiplier_qubit</span></code> (<code class="docutils literal notranslate"><span class="pre">time_step.h:186-207</span></code>).</p>
+<p>Note that the address exposure window in the qubit scheme is the <strong>whole query</strong> (of order <span class="math notranslate nohighlight">\(\sim T\)</span>), whereas the qutrit scheme activates address excitations in a propagating fashion, exposing each bit for only <span class="math notranslate nohighlight">\(\mathcal{O}(t)\)</span> steps (the <span class="math notranslate nohighlight">\([2t+1,3t+2]\)</span> segment and its mirror in <code class="docutils literal notranslate"><span class="pre">time_step.cpp:490-509</span></code>) — this is exactly the protocol-level origin of the qubit scheme’s infidelity scaling <span class="math notranslate nohighlight">\(\mathcal{O}((n+k)n^2\varepsilon)\)</span> being a factor <span class="math notranslate nohighlight">\(n\)</span> worse than the qutrit scheme’s <span class="math notranslate nohighlight">\(\mathcal{O}((n+k)n\varepsilon)\)</span> [2, §III]; it is unrelated to the simulation algorithm itself, but worth noting in the physical interpretation.</p>
+</section>
+<section id="the-good-branch-final-state-prediction-theorem">
+<h3>4.4 The Good-Branch Final-State Prediction Theorem<a class="headerlink" href="#the-good-branch-final-state-prediction-theorem" title="Link to this heading">¶</a></h3>
+<p><strong>Theorem 3 (closed-form prediction for good branches).</strong> Given a noise history, let the branch <span class="math notranslate nohighlight">\((i,j)\)</span> be a good branch (its routing path passes through no noise site). Then the final state of this branch’s no-jump trajectory is
+$<span class="math notranslate nohighlight">\(
+|\Psi_{i,j}^{\mathrm{good}}\rangle
+\;=\;a^{\,c_{\mathrm{addr}}(i)}\;|i\rangle_A\otimes\Big[\bigotimes_{t=0}^{k-1}N_{d^{(t)},2n}|j_t\rangle\Big]_D\otimes|\tilde Q_0\rangle_{\mathrm{tree}},
+\)</span><span class="math notranslate nohighlight">\(
+where \)</span>|\tilde Q_0\rangle_{\mathrm{tree}}$ is the (unnormalized) final tree state, <strong>identical for all good branches and for the reference branch</strong>.</p>
+<p><strong>Proof.</strong> By (P1), the reversible gates inside the tree merely relocate the unique basis-state orbit; by (P3) there are no noise sites on the path, so the only nontrivial action inside the tree is <span class="math notranslate nohighlight">\(K_0\)</span> at every step. Decompose <span class="math notranslate nohighlight">\(K_0^{\otimes}\)</span> bit by bit: the routing bits contribute the scalar <span class="math notranslate nohighlight">\(a^{c_{\mathrm{addr}}(i)}\)</span> counted as in §4.3; the data bits’ contribution is absorbed into the closed form of <span class="math notranslate nohighlight">\(N\)</span> as in §4.1–4.2 (each step spent inside the tree contributes one factor <span class="math notranslate nohighlight">\(a\)</span>, independent of the residing position, because <span class="math notranslate nohighlight">\(K_0\)</span> acts uniformly on every node’s bits). The final tree-state orbit coincides with the noise-free orbit, i.e. with the address-independent common final state (a definite configuration reached before the uncompute returns everything to all-zeros / all <span class="math notranslate nohighlight">\(W\)</span>), with only its norm corrected by the scalar. <span class="math notranslate nohighlight">\(\square\)</span></p>
+<p><strong>Relation to the proposition of Wang et al.</strong> [1, v2 Eq. (6)] asserts that all reliable branches share the final state <span class="math notranslate nohighlight">\(|i\rangle|d_i\rangle|Q_0\rangle\)</span>. Theorem 3 is its qubit generalization: the sharing still holds (<span class="math notranslate nohighlight">\(|\tilde Q_0\rangle\)</span> is address-independent), but the data register’s definite value <span class="math notranslate nohighlight">\(|j\oplus d_i\rangle\)</span> is replaced by a <strong>known two-component product state</strong> <span class="math notranslate nohighlight">\(\bigotimes_t(\alpha|b_{\mathrm{out},t}\rangle+\beta|\overline{b_{\mathrm{out},t}}\rangle)\)</span>. This is the entire difference between the two encodings at the prediction level.</p>
+</section>
+<section id="error-structure-norm-loss-and-coherent-leakage">
+<h3>4.5 Error Structure: Norm Loss and Coherent Leakage<a class="headerlink" href="#error-structure-norm-loss-and-coherent-leakage" title="Link to this heading">¶</a></h3>
+<p>The final state of Theorem 3 can be expanded in orders of <span class="math notranslate nohighlight">\(\gamma\)</span>. For a single bit (<span class="math notranslate nohighlight">\(d=2n\)</span> layers):</p>
+<ul class="simple">
+<li><p><strong>Correct amplitude</strong> <span class="math notranslate nohighlight">\(\alpha_{2n}=\frac{1+(1-\gamma)^n}{2}=1-\frac{n\gamma}{2}+\mathcal{O}(\gamma^2)\)</span>;</p></li>
+<li><p><strong>Leakage amplitude</strong> <span class="math notranslate nohighlight">\(\beta_{2n}=\frac{1-(1-\gamma)^n}{2}=\frac{n\gamma}{2}+\mathcal{O}(\gamma^2)\)</span>.</p></li>
+</ul>
+<p>Two notions must be distinguished:</p>
+<ol class="arabic simple">
+<li><p><strong>Norm loss (first order, not an error).</strong> The single-bit no-jump probability is <span class="math notranslate nohighlight">\(\alpha^2+\beta^2=\frac{1+a^{4n}}{2}=1-n\gamma+\mathcal{O}(\gamma^2)\)</span>. The lost <span class="math notranslate nohighlight">\(\approx n\gamma\)</span> is the probability weight of the jump trajectories, carried by the explicit evolution of the bad branches within the Monte Carlo framework. The shrinking unnormalized norm of a good branch is <strong>not an output error</strong>.</p></li>
+<li><p><strong>Coherent leakage (second order, a real error).</strong> After conditional normalization within a good branch, the error probability of a single data bit is
+$<span class="math notranslate nohighlight">\(
+\frac{\beta_{2n}^2}{\alpha_{2n}^2+\beta_{2n}^2}=\frac{n^2\gamma^2}{4}+\mathcal{O}(\gamma^3).
+\)</span>$</p></li>
+</ol>
+<p><strong>Conclusion: the output error of a good branch is second order in <span class="math notranslate nohighlight">\(\gamma\)</span>; all first-order errors are concentrated on the bad branches (the jump and depolarizing noise sites).</strong> This explains why “pruning + closed-form prediction” loses no first-order accuracy in the qubit encoding, and it is consistent with the channel-averaged result: the error probability of a single data bit after the full damping channel is <span class="math notranslate nohighlight">\(\frac{1-a^{2n}}{2}\approx\frac{n\gamma}{2}\)</span>, whose first-order term <span class="math notranslate nohighlight">\(=\)</span> jump probability <span class="math notranslate nohighlight">\(\times\frac12\)</span> (the output is random after a jump), while the second-order remainder is exactly the good branch’s coherent leakage.</p>
+<p>This property is good news for error-filtration-type applications [1, §IV; 4]: combined with the implicit postselection on jumps (a good-only trajectory is exactly the output under the “no jump” assumption), the residual error is <span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> per data bit.</p>
+</section>
+<section id="the-analytic-contribution-of-good-branches-to-jump-probability-sampling">
+<h3>4.6 The Analytic Contribution of Good Branches to Jump-Probability Sampling<a class="headerlink" href="#the-analytic-contribution-of-good-branches-to-jump-probability-sampling" title="Link to this heading">¶</a></h3>
+<p>The quasi-measurement probability at a <span class="math notranslate nohighlight">\(Damp\_Full\)</span> noise site must sum the occupation weight on the faulty bit over <strong>all</strong> branches (including the good branches that are not evolved). Two observations let the qubit scheme keep the analytic conversion:</p>
+<ol class="arabic simple">
+<li><p><strong>The data part is input-independent.</strong> Under X-basis transport, every residing data bit has average occupation probability exactly <span class="math notranslate nohighlight">\(1/2\)</span> at every position it passes, independent of the input <span class="math notranslate nohighlight">\(j\)</span> and the memory <span class="math notranslate nohighlight">\(d\)</span> (the <span class="math notranslate nohighlight">\(\pm\)</span> phases do not affect probabilities). Hence the data-part jump probability of the reference good branch holds <strong>exactly</strong> for all good branches, with no per-branch correction.</p></li>
+<li><p><strong>The address part is converted via the relative multiplier.</strong> Same as the qutrit version: <span class="math notranslate nohighlight">\(\mathrm{prob}_{\mathrm{damp}}^{(i)}=\mathrm{prob}_{\mathrm{damp}}^{(\mathrm{ref})}\times\mathrm{relative\_multiplier}_i\)</span> (implementation: <code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h:496-519</span></code>).</p></li>
+</ol>
+<p>Therefore, introducing the data-bus closed form of this document does not break the global consistency of the jump sampling.</p>
+</section>
+</section>
+<section id="the-algorithm">
+<h2>5. The Algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">¶</a></h2>
+<section id="pseudocode">
+<h3>5.1 Pseudocode<a class="headerlink" href="#pseudocode" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Algorithm 1: noisy fast simulation of the qubit-architecture (n,k)-QRAM (single trajectory)
+Input:  sparse input state Σ_j c_{i,j} |i⟩|j⟩; memory table d; noise rates (ε_dep, γ); a = √(1−γ)
+Output: the noisy output sparse state (unnormalized), or a final-state sample
+
+1  Noise-history pre-sampling: for t = 1..6n+2k, binomially sample the error count
+   according to the active-subtree size 2(2^{L(t)}−1), and sample positions uniformly;
+   merge every noise site into the union R of bad address intervals:
+   Damp_Full → the node's leaf subtree (damping jumps create no off-path residue);
+   the X/Y components of Depolarizing → the configuration-family divergence criterion
+   (get_bad_range_qubit: a left child takes subtree(parent(v)), a right child takes
+   subtree(v); the root / root's children are special-cased).
+2  Branch partition: address i ∈ R ⇒ bad branch; otherwise good branch, with the
+   first good branch recorded as the reference branch ref.
+3  Real evolution: execute time slice by time slice only for bad branches ∪ {ref}:
+   apply H before CopyIn_0 and H after CopyOut_{k−1} (a 2^k-way split within the
+   branch + try_merge merges); at the end of every step, Damp_Common (amplitude ×
+   a^{#excitations}); at Damp_Full sites, convert the probability per §4.6 and
+   sample the projection.
+4  Analytic prediction of good branches: for every good branch (i, j):
+   a) address factor: count c_addr(i) as in §4.3; relative weight r_i = a^{2[c_addr(i)−c_addr(ref)]};
+   b) data factor: b_out = j ⊕ d_i; for every error pattern c with w = 0..k,
+      A(c) = α^{k−|c⊕b_out|} β^{|c⊕b_out|}, α=(1+a^{2n})/2, β=(1−a^{2n})/2;
+   c) tree final state: copy the tree final state of ref.
+5  Output reconstruction: every good branch writes 2^k components |i⟩|c⟩ into the
+   output sparse state, with amplitude = c_{i,j} × √(r_i) × A(c) × (the ref tree
+   final-state amplitude);
+   bad branches are written from their evolution results; merge identical terms and
+   drop components with |amplitude|² &lt; ε.
+6  Final-state sampling (optional): roulette-wheel select the final state according
+   to the unnormalized weights, then normalize.
+</pre></div>
+</div>
+</section>
+<section id="correctness">
+<h3>5.2 Correctness<a class="headerlink" href="#correctness" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Steps 1–3 are identical to the qutrit version; their correctness follows from (P1), (P3), and the trajectory method [1].</p></li>
+<li><p>The correctness of step 4 is Theorem 3; the endpoint convention (<span class="math notranslate nohighlight">\(\pm1\)</span>) of the window count <span class="math notranslate nohighlight">\(d_t=2n\)</span> is identical for all good branches and self-calibrates against the step-by-step <code class="docutils literal notranslate"><span class="pre">Damp_Common</span></code> count in the reference branch’s real evolution — the relative weight <span class="math notranslate nohighlight">\(r_i\)</span> does not involve this convention, and the absolute factor <span class="math notranslate nohighlight">\((1+a^{2n})/2\)</span> can be calibrated once and for all by comparing the <span class="math notranslate nohighlight">\(2^k\)</span> components against the reference branch.</p></li>
+<li><p>In step 5, the <span class="math notranslate nohighlight">\(2^k\)</span> expansion of a good branch is an exact identity (Theorem 2), not an approximation; compared with the qutrit version’s “multiply by <span class="math notranslate nohighlight">\(\sqrt{\mathrm{multiplier}}\)</span> + correct the bus output” (<code class="docutils literal notranslate"><span class="pre">SparQ/src/qram.cpp:100-170</span></code>, now in the SparQSim repository), it only adds an expansion loop that distributes weights according to <span class="math notranslate nohighlight">\(A(c)\)</span>.</p></li>
+</ul>
+</section>
+<section id="complexity">
+<h3>5.3 Complexity<a class="headerlink" href="#complexity" title="Link to this heading">¶</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(d\)</span> be the number of input branches and <span class="math notranslate nohighlight">\(B\)</span> the number of bad branches (with an expectation of order <span class="math notranslate nohighlight">\(\mathbb{E}[B]=\mathcal{O}(n^2p)\,d\)</span>; see [1, v1 Eq. (6)]):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item</p></th>
+<th class="head"><p>Qutrit version</p></th>
+<th class="head"><p>Qubit version (this document)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Number of actually evolved branches</p></td>
+<td><p><span class="math notranslate nohighlight">\(B+1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(B+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Prediction cost per good branch</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span> (scalar multiplier)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span> (counting) <span class="math notranslate nohighlight">\(+\,\mathcal{O}(k\,2^k)\)</span> (writing out the components)</p></td>
+</tr>
+<tr class="row-even"><td><p>Memory per good branch</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span> (the product state can be stored lazily)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total complexity</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(d\cdot 2^k+p\cdot\mathrm{poly}(n))\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <span class="math notranslate nohighlight">\(2^k\)</span> factor is the intrinsic output width of the qubit encoding (each data bit carries a two-component superposition), not an algorithmic inefficiency: the output data register of a noise-free qubit QRAM is a definite <span class="math notranslate nohighlight">\(k\)</span>-bit value in the first place, and once noise is present its support naturally widens to <span class="math notranslate nohighlight">\(2^k\)</span>. For larger <span class="math notranslate nohighlight">\(k\)</span>, the product structure allows lazy expansion (generate the components on demand at sampling/reconstruction time via the Hamming-weight formula, at an expected <span class="math notranslate nohighlight">\(\mathcal{O}(k)\)</span> per component), or truncation by <span class="math notranslate nohighlight">\(\beta/\alpha\)</span> to <span class="math notranslate nohighlight">\(w\le w_{\max}\)</span> (error <span class="math notranslate nohighlight">\(\mathcal{O}((n\gamma)^{w_{\max}+1})\)</span>). For the typical <span class="math notranslate nohighlight">\(k=1\sim3\)</span> in the experiments, this factor is negligible.</p>
+</section>
+</section>
+<section id="comparison-with-the-qutrit-scheme">
+<h2>6. Comparison with the Qutrit Scheme<a class="headerlink" href="#comparison-with-the-qutrit-scheme" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Aspect</p></th>
+<th class="head"><p>Qutrit scheme</p></th>
+<th class="head"><p>Qubit scheme (this document)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Idle state</p></td>
+<td><p><span class="math notranslate nohighlight">\(|W\rangle\)</span> is a fixed point of <span class="math notranslate nohighlight">\(K_0\)</span></p></td>
+<td><p>None; the routing <span class="math notranslate nohighlight">\(|1\rangle\)</span> is exposed for the whole run</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data fetch</p></td>
+<td><p>CNOT (computational-basis flip)</p></td>
+<td><p>CZ (phase encoding), requires a basis change by <span class="math notranslate nohighlight">\(H\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>The two H gates</p></td>
+<td><p>Degenerate (only try_merge)</p></td>
+<td><p>Real splitting/merging</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data-bit damping exposure</p></td>
+<td><p>Computational basis, the window depends on <span class="math notranslate nohighlight">\(b_{\mathrm{in}},b_{\mathrm{out}}\)</span></p></td>
+<td><p>X basis, fixed window <span class="math notranslate nohighlight">\(2n\)</span>, independent of the bit value</p></td>
+</tr>
+<tr class="row-even"><td><p>Good-branch data output</p></td>
+<td><p>The definite value <span class="math notranslate nohighlight">\(|j\oplus d_i\rangle\)</span></p></td>
+<td><p>The known product state <span class="math notranslate nohighlight">\(\bigotimes_t(\alpha|b_{\mathrm{out},t}\rangle+\beta|\overline{b_{\mathrm{out},t}}\rangle)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Error within a good branch</p></td>
+<td><p>0 (pure scalar decay)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> coherent leakage per bit</p></td>
+</tr>
+<tr class="row-even"><td><p>Address-excitation exposure</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(t)\)</span> steps/bit (propagating)</p></td>
+<td><p>The whole run, <span class="math notranslate nohighlight">\(\sim T\)</span> steps/bit (residing)</p></td>
+</tr>
+<tr class="row-odd"><td><p>X-type fault residue</p></td>
+<td><p>Frozen at the faulty node (W guard), off-path configurations identical</p></td>
+<td><p>Migrates along idle ancestors, families diverge up to subtree(parent)</p></td>
+</tr>
+<tr class="row-even"><td><p>Prediction formula</p></td>
+<td><p>The scalar <span class="math notranslate nohighlight">\(a^{\Delta c}\)</span></p></td>
+<td><p>The scalar <span class="math notranslate nohighlight">\(a^{\Delta c}\)</span> × the Hamming-weight formula</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bad-interval criterion</p></td>
+<td><p>Subtree containment (common to both channels)</p></td>
+<td><p>Damping: subtree containment; depolarizing X: left-child climb (§3)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="implementation-gaps-and-roadmap-in-this-repository">
+<h2>7. Implementation Gaps and Roadmap in This Repository<a class="headerlink" href="#implementation-gaps-and-roadmap-in-this-repository" title="Link to this heading">¶</a></h2>
+<p>Against the current code, landing this algorithm requires:</p>
+<ol class="arabic simple">
+<li><p>~~<strong>Wire up qubit noise sampling</strong>~~ (done): <code class="docutils literal notranslate"><span class="pre">fill_bad_range</span></code> now supports the qubit architecture (<code class="docutils literal notranslate"><span class="pre">time_step.cpp</span></code>), and <code class="docutils literal notranslate"><span class="pre">arch2str</span></code> gained the qubit branch.</p></li>
+<li><p>~~<strong>Full (unpruned) ground truth</strong>~~ (done): <code class="docutils literal notranslate"><span class="pre">qram_qubit::QRAMCircuit</span></code> gained <code class="docutils literal notranslate"><span class="pre">set_input_uniform</span></code>/<code class="docutils literal notranslate"><span class="pre">set_input_random</span></code>, <code class="docutils literal notranslate"><span class="pre">run_full()</span></code> (= evolve all branches), and <code class="docutils literal notranslate"><span class="pre">sample_and_get_fidelity()</span></code>; fixed the probability-conversion index of <code class="docutils literal notranslate"><span class="pre">BranchGroup::get_prob_damp</span></code>, the weight convention of <code class="docutils literal notranslate"><span class="pre">sample_output_*</span></code> (<code class="docutils literal notranslate"><span class="pre">branch_probs</span> <span class="pre">×</span> <span class="pre">|amp|²</span></code>), and the missing jump reset in <code class="docutils literal notranslate"><span class="pre">Branch::run_damp_full</span></code> (after the projection the bit must be set back to <span class="math notranslate nohighlight">\(|0\rangle\)</span>), and implemented <code class="docutils literal notranslate"><span class="pre">Branch::get_fidelity</span></code>. Experiment entry point: <code class="docutils literal notranslate"><span class="pre">Experiment_QRAM_FidelityV2</span> <span class="pre">--architecture</span> <span class="pre">qubit</span></code> (full-only).</p></li>
+<li><p>~~<strong>Data-bus closed-form prediction (the core gap)</strong>~~ (done): the good-branch final state is realized by <strong>XOR-mirror materialization</strong> — <code class="docutils literal notranslate"><span class="pre">data_bus</span> <span class="pre">^=</span> <span class="pre">(b_out^{ref}</span> <span class="pre">⊕</span> <span class="pre">b_out^{good})</span></code>, amplitude × √relative_multiplier — copying out the <span class="math notranslate nohighlight">\(2^k\)</span> components directly from the reference branch (<code class="docutils literal notranslate"><span class="pre">materialize_good_branches</span></code>, <code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h</span></code>). The mathematical basis is exactly Theorem 2 (the Hamming-weight formula + the <span class="math notranslate nohighlight">\(d_i=2n\)</span> input-independence); after materialization, none of the generic paths (probability/sampling/fidelity) need a good-branch special case.</p></li>
+<li><p>~~<strong>Good-branch wiring for the qubit version</strong>~~ (done): <code class="docutils literal notranslate"><span class="pre">sample_output</span></code> was rewritten as a walk over all groups after materialization (same order and same weights as full mode, guaranteeing identical collapses under the same seed); <code class="docutils literal notranslate"><span class="pre">normalization</span></code> covers all groups; fixed the <strong>double counting of input weights</strong> in the good-branch conversion (the grouped <code class="docutils literal notranslate"><span class="pre">get_prob()</span></code> already contains the group’s input weight, so one must divide out the reference group’s weight to get unit norm — the flat qutrit branches do not have this problem; it was introduced during the port).</p></li>
+<li><p><strong>The data part of the jump-probability conversion</strong>: the qubit <code class="docutils literal notranslate"><span class="pre">run_damp_full</span></code> (<code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h</span></code>) already contains the reference-branch conversion framework; just add the data part per §4.6 (input-independent, occupation always <span class="math notranslate nohighlight">\(1/2\)</span>).</p></li>
+<li><p>~~<strong>Validation</strong>~~ (done): under 1e-5 depol+damping, n=3…10, 50 seeds per point, <code class="docutils literal notranslate"><span class="pre">test_qubit_compare</span></code> (<code class="docutils literal notranslate"><span class="pre">--architecture</span> <span class="pre">qubit</span></code>) shows <strong>full/normal agreement in all cases (400/400)</strong>; 150 trials of strong-noise stress (1e-4~3e-4) also all pass; at n=12, pruning yields a 17× speedup (2565ms→150ms). Remaining: the good-only mode (the qubit counterpart of <code class="docutils literal notranslate"><span class="pre">QRAMLoadFast</span></code>).</p></li>
+<li><p>~~<strong>Bad-interval criterion confirmed</strong>~~ (done): the “left child climbs to the parent’s interval, right child takes its own subtree” logic of <code class="docutils literal notranslate"><span class="pre">get_bad_range_qubit</span></code> was verified by mechanism derivation and n=3 single-error injection to be <strong>the correct envelope of the configuration-family divergence</strong> (the node1 special case is also mechanically correct: the root is never idle); it had previously been mis-documented as a “suspected quirk”. For the derivation see <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code>. Two notes: the pure damping channel admits the tighter pure-subtree criterion; and whether “multi-level climbing along idle chains” on deeper trees with n≥4 escapes subtree(parent(v)) is unverified — an n=4/5 injection regression is recommended when implementing pruning.</p></li>
+</ol>
+</section>
+<section id="conclusion">
+<h2>8. Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>We have shown that the good branches of a qubit-encoded bucket-brigade QRAM under amplitude damping noise remain predictable in closed form: the <span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> structure acts on the <span class="math notranslate nohighlight">\(t\)</span>-th data bit as the known single-bit map <span class="math notranslate nohighlight">\(N|b\rangle=\alpha|b\oplus d^{(t)}\rangle+\beta|\overline{b\oplus d^{(t)}}\rangle\)</span>, where <span class="math notranslate nohighlight">\(d=2n\)</span> is the fixed exposure window, <span class="math notranslate nohighlight">\(\alpha=(1+a^{2n})/2\)</span>, and <span class="math notranslate nohighlight">\(\beta=(1-a^{2n})/2\)</span>; the <span class="math notranslate nohighlight">\(k\)</span>-bit output amplitudes depend only on the Hamming weight of the error pattern. Combined with the existing address scalar multiplier and subtree-containment pruning, noisy simulation of the qubit QRAM reaches the same complexity scaling as the qutrit version, with only <span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> coherent leakage as the error within a good branch. This provides the complete theoretical foundation for completing the qubit architecture’s noisy fast simulation in this simulator, and for supporting downstream studies such as error filtration.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Y.-J. Wang, T.-P. Sun, X.-N. Zhuang, X.-F. Xu, H.-Y. Liu, C. Xue, Y.-C. Wu, Z.-Y. Chen, G.-P. Guo, <em>Efficient Simulation of Quantum Random Access Memory</em> (v2: <em>Refined Criteria for QRAM Error Suppression via Efficient Large-Scale QRAM Simulator</em>), Phys. Rev. Applied <strong>25</strong>, 044069; arXiv:2503.13832.</p></li>
+<li><p>Z.-Y. Chen et al., the <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM parallel query protocol (the bucket-brigade query circuit in both the qubit and qutrit encodings), arXiv:2303.05207.</p></li>
+<li><p>C. T. Hann, G. Lee, S. M. Girvin, L. Jiang, <em>Resilience of quantum random access memory to generic noise</em>, PRX Quantum <strong>2</strong>, 020311 (2021).</p></li>
+<li><p>S. Lee et al., <em>Error filtration for quantum communication/quantum memory</em> (the error filtration scheme), Phys. Rev. Lett. <strong>131</strong>, 190601 (2023).</p></li>
+<li><p>V. Giovannetti, S. Lloyd, L. Maccone, <em>Quantum Random Access Memory</em>, Phys. Rev. Lett. <strong>100</strong>, 160501 (2008).</p></li>
+</ol>
+<hr class="docutils" />
+<section id="appendix-key-notation">
+<h3>Appendix: Key Notation<a class="headerlink" href="#appendix-key-notation" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Notation</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(n,k\)</span></p></td>
+<td><p>Number of address bits, number of data bits; <span class="math notranslate nohighlight">\(N=2^n\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(T=6n+2k\)</span></p></td>
+<td><p>Total number of time slices</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\gamma,\ a=\sqrt{1-\gamma}\)</span></p></td>
+<td><p>Per-layer damping strength, per-step decay factor</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_0,K_1\)</span></p></td>
+<td><p>No-jump / jump Kraus operators of amplitude damping</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i),\tau_{\mathrm{out}}(i)\)</span></p></td>
+<td><p>Time slices at which data bit <span class="math notranslate nohighlight">\(i\)</span> is swapped in/out; window <span class="math notranslate nohighlight">\(d_i=2n\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\alpha_d,\beta_d\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((1\pm a^d)/2\)</span>, the correct / leakage amplitudes</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(c_{\mathrm{addr}}(i)\)</span></p></td>
+<td><p>Routing-excitation exposure count of address <span class="math notranslate nohighlight">\(i\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(b_{\mathrm{out}}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(j\oplus d_i\)</span>, the ideal output data</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(w\)</span></p></td>
+<td><p>Hamming weight of the error pattern <span class="math notranslate nohighlight">\(c\oplus b_{\mathrm{out}}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="qubit_error_propagation.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">The Qubit-QRAM Error Propagation Mechanism: A Theoretical Walkthrough with Single-Error Injection Verification</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="joint_damping.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Exact joint sampling of qubit amplitude damping</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory</a><ul>
+<li><a class="reference internal" href="#abstract">Abstract</a></li>
+<li><a class="reference internal" href="#introduction">1. Introduction</a></li>
+<li><a class="reference internal" href="#background-and-notation">2. Background and Notation</a><ul>
+<li><a class="reference internal" href="#the-n-k-qram-and-the-time-slice-schedule">2.1 The <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM and the Time-Slice Schedule</a></li>
+<li><a class="reference internal" href="#noise-model-and-monte-carlo-trajectory-expansion">2.2 Noise Model and Monte Carlo Trajectory Expansion</a></li>
+<li><a class="reference internal" href="#the-three-predictability-pillars-of-the-qutrit-scheme">2.3 The Three Predictability Pillars of the Qutrit Scheme</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-gaps-in-the-qubit-scheme">3. The Gaps in the Qubit Scheme</a></li>
+<li><a class="reference internal" href="#main-theoretical-results">4. Main Theoretical Results</a><ul>
+<li><a class="reference internal" href="#the-hk0h-lemma">4.1 The H–K₀–H Lemma</a></li>
+<li><a class="reference internal" href="#the-multi-bit-product-structure">4.2 The Multi-Bit Product Structure</a></li>
+<li><a class="reference internal" href="#the-scalar-factor-of-the-address-routing-part">4.3 The Scalar Factor of the Address-Routing Part</a></li>
+<li><a class="reference internal" href="#the-good-branch-final-state-prediction-theorem">4.4 The Good-Branch Final-State Prediction Theorem</a></li>
+<li><a class="reference internal" href="#error-structure-norm-loss-and-coherent-leakage">4.5 Error Structure: Norm Loss and Coherent Leakage</a></li>
+<li><a class="reference internal" href="#the-analytic-contribution-of-good-branches-to-jump-probability-sampling">4.6 The Analytic Contribution of Good Branches to Jump-Probability Sampling</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-algorithm">5. The Algorithm</a><ul>
+<li><a class="reference internal" href="#pseudocode">5.1 Pseudocode</a></li>
+<li><a class="reference internal" href="#correctness">5.2 Correctness</a></li>
+<li><a class="reference internal" href="#complexity">5.3 Complexity</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comparison-with-the-qutrit-scheme">6. Comparison with the Qutrit Scheme</a></li>
+<li><a class="reference internal" href="#implementation-gaps-and-roadmap-in-this-repository">7. Implementation Gaps and Roadmap in This Repository</a></li>
+<li><a class="reference internal" href="#conclusion">8. Conclusion</a></li>
+<li><a class="reference internal" href="#references">References</a><ul>
+<li><a class="reference internal" href="#appendix-key-notation">Appendix: Key Notation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=95e61db4"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

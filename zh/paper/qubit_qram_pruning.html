@@ -1,0 +1,772 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="Qubit-QRAM 错误传播机制：理论走读与单错误注入验证" href="qubit_error_propagation.html"><link rel="prev" title="qubit 振幅阻尼的精确联合抽样" href="joint_damping.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论 - QRAM-Simulator 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator 文档</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator 文档</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <strong>中文</strong>
+  <span class="sidebar-langswitch-sep">·</span>
+  <a href="../../en/paper/qubit_qram_pruning.html">English</a>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">使用指南</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/installation.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart.html">快速上手</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/architecture.html">QRAM-Simulator 架构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/operators.html">量子算术算子约束说明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/naming_conventions.html">SparQ 算子命名规范</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API 参考</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API 参考</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">论文与实验</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">论文复现文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reproduction.html">论文实验复现指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exactness_validation.html">剪枝与全量演化的精确性验证</a></li>
+<li class="toctree-l1"><a class="reference internal" href="joint_damping.html">qubit 振幅阻尼的精确联合抽样</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_error_propagation.html">Qubit-QRAM 错误传播机制：理论走读与单错误注入验证</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/paper/qubit_qram_pruning.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/paper/qubit_qram_pruning.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="qubit-qram-hk0h">
+<h1>面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论<a class="headerlink" href="#qubit-qram-hk0h" title="链接到此标题。">¶</a></h1>
+<p><strong>阻尼更新：</strong> qubit 引擎现采用整树联合 Kraus 抽样及归一化条件轨迹。历史非零阻尼数值和逐候选独立抽样描述需要重跑/替换，详见<a class="reference internal" href="joint_damping.html"><span class="std std-doc">联合阻尼抽样</span></a>。</p>
+<blockquote>
+<div><p>理论设计文档（预实现）。对应主文献：Yun-Jie Wang 等，<em>Efficient Simulation of Quantum Random Access Memory</em>（arXiv:2503.13832，Phys. Rev. Applied <strong>25</strong>, 044069）。本文解决该工作遗留的一个缺口：<strong>qubit 编码（standard）bucket-brigade QRAM 在振幅阻尼噪声下的分支预测与剪枝</strong>。</p>
+</div></blockquote>
+<section id="id1">
+<h2>摘要<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
+<p>稀疏态 QRAM 模拟器（本仓库）对 qutrit 编码的 bucket-brigade QRAM 实现了含噪快速模拟：噪声历史被预先采样为一棵&quot;分支树&quot;，路由路径不经过任何噪声点的 good 分支不做真实演化，其末态振幅由解析公式直接预测；只有 good/bad 划分由子树包含判据预先确定的 bad 分支需要显式演化。该技巧在 qutrit 方案中之所以简单，是因为数据总线在计算基中传输，无跳变 Kraus 算子 <span class="math notranslate nohighlight">\(K_0\)</span> 在其上是对角的，good 分支的全部阻尼效应退化为一个可数的标量衰减因子。然而在 qubit 编码方案中，数据比特必须以 <span class="math notranslate nohighlight">\(\{|+\rangle,|-\rangle\}\)</span> 基穿过整棵树（CZ 相位取数协议要求先作用 Hadamard），<span class="math notranslate nohighlight">\(K_0=\mathrm{diag}(1,a)\)</span> 在 X 基下非对角，标量预测失效。本文证明：这一 <span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> 结构依然是<strong>闭式可预测</strong>的——第二个 H 门所作用的正是 <span class="math notranslate nohighlight">\((|0\rangle+(-1)^{b\oplus m}a^d|1\rangle)/\sqrt{2}\)</span> 形式的态，输出振幅为 <span class="math notranslate nohighlight">\((1\pm a^d)/2\)</span>；<span class="math notranslate nohighlight">\(k\)</span> 个数据比特给出 <span class="math notranslate nohighlight">\(2^k\)</span> 个只依赖错误图样 Hamming 权重的闭式分量。据此我们给出完整的 qubit-QRAM 剪枝算法，保持与 qutrit 方案相同的复杂度标度 <span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span>，并阐明其误差结构：good 分支的一阶效应仅为范数流失（被蒙特卡洛轨迹权重自然吸收），真正的分支内误差是二阶的相干泄漏，一阶错误全部集中于被显式演化的 bad 分支。</p>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h2>1. 引言<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<p>量子随机存取存储器（QRAM）以 <span class="math notranslate nohighlight">\(\mathcal{O}(\log N)\)</span> 的查询深度实现叠加寻址的数据读取，是量子数据库搜索、量子态制备、量子机器学习等算法的核心部件；其代价是需要 <span class="math notranslate nohighlight">\(\mathcal{O}(N)\)</span> 个物理量子比特的二叉路由树。Wang 等人 [1] 提出的稀疏态模拟器利用两个观察实现了 QRAM 的高效经典模拟：(i) bucket-brigade 电路全部由非分支（non-branching）可逆门构成，每个输入基态分量的树配置演化是确定的、唯一的；(ii) 含噪演化可按蒙特卡洛轨迹展开，每个噪声点只影响路由路径经过它的那些分支（子树包含），其余 good 分支的末态可以解析预测而不必演化。模拟复杂度从全密度矩阵的指数级降到 <span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span>（<span class="math notranslate nohighlight">\(d\)</span> 为输入叠加分支数，<span class="math notranslate nohighlight">\(p\)</span> 为单比特噪声率，<span class="math notranslate nohighlight">\(n\)</span> 为地址位数）。</p>
+<p>该工作及其代码实现以 <strong>qutrit 编码</strong>为主力方案：路由节点取三能级 <span class="math notranslate nohighlight">\(\{|W\rangle,|L\rangle,|R\rangle\}\)</span>，空闲态 <span class="math notranslate nohighlight">\(|W\rangle\)</span> 是阻尼信道无跳变算子 <span class="math notranslate nohighlight">\(K_0\)</span> 的不动点，数据传输在计算基中完成。对于物理上更常见的 <strong>qubit 编码</strong>（每个路由节点两个二能级比特，地址比特 <span class="math notranslate nohighlight">\(|0\rangle\equiv L\)</span>、<span class="math notranslate nohighlight">\(|1\rangle\equiv R\)</span>，无空闲态），快速模拟的支持一直不完整：仓库中 qubit 版好分支乘子只实现了地址路由部分的标量计数（<code class="docutils literal notranslate"><span class="pre">TimeStep::_get_multiplier_impl_qubit</span></code>，且接线代码处于注释停用状态，见 <code class="docutils literal notranslate"><span class="pre">QRAM/include/qram_branch_qubit.h:213-225</span></code>），而数据总线部分——正是本文主题——缺少理论公式。</p>
+<p>qubit 方案与 qutrit 方案的本质区别在于数据取数方式 [2]：qutrit 方案用经典控制的 CNOT 在计算基翻转数据比特；qubit 方案用 <strong>CZ 相位编码</strong>——经典存储位作为控制，对途经叶子的数据比特施加 <span class="math notranslate nohighlight">\(Z\)</span>。为了让&quot;激活节点的 <span class="math notranslate nohighlight">\(|0\rangle\)</span>&quot;与&quot;未激活节点&quot;可区分，数据总线进入树之前必须先作用 Hadamard，把 <span class="math notranslate nohighlight">\(\{|0\rangle,|1\rangle\}\)</span> 换到 <span class="math notranslate nohighlight">\(\{|+\rangle,|-\rangle\}\)</span> 基，取出数据返回后再作用一次 H 换回原基。于是每个数据比特在两次 H 之间以 X 基叠加态穿行整棵树，持续承受振幅阻尼的 <span class="math notranslate nohighlight">\(K_0\)</span> 作用——这就是本文分析的 <strong><span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> 结构</strong>。</p>
+<p>本文的贡献：</p>
+<ol class="arabic simple">
+<li><p>证明 qubit-QRAM good 分支的 <span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> 结构具有闭式解（引理 1），并给出 <span class="math notranslate nohighlight">\(k\)</span> 数据比特下的 <span class="math notranslate nohighlight">\(2^k\)</span> 分量 Hamming 权重公式（定理 2）；</p></li>
+<li><p>给出 good 分支末态的完整预测定理（定理 3），将 Wang 等人 v2 版论文中&quot;所有可靠分支共享同一末态&quot;的命题 [1, Eq. (6)] 推广到 qubit 编码；</p></li>
+<li><p>分析误差结构：good 分支输出相对理想输出的偏差分为一阶范数流失与二阶相干泄漏两部分，前者不是误差而是跳变轨迹的概率权重；</p></li>
+<li><p>给出完整的剪枝快速模拟算法与复杂度分析，并对照本仓库列出现有实现缺口。</p></li>
+</ol>
+</section>
+<section id="id3">
+<h2>2. 背景与记号<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<section id="n-k-qram">
+<h3>2.1 <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM 与时间片调度<a class="headerlink" href="#n-k-qram" title="链接到此标题。">¶</a></h3>
+<p><span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM 实现变换
+$<span class="math notranslate nohighlight">\(
+\sum_{i,j}\alpha_{i,j}|i\rangle_A|j\rangle_D\;\longrightarrow\;\sum_{i,j}\alpha_{i,j}|i\rangle_A|j\oplus d_i\rangle_D,
+\)</span><span class="math notranslate nohighlight">\(
+其中 \)</span>n<span class="math notranslate nohighlight">\( 为地址比特数（\)</span>N=2^n<span class="math notranslate nohighlight">\(），\)</span>k<span class="math notranslate nohighlight">\( 为数据比特数，\)</span>d_i\in{0,1}^k$ 为经典存储内容 [1,2]。</p>
+<p>bucket-brigade 查询在一棵深度 <span class="math notranslate nohighlight">\(n\)</span> 的全二叉树上流水执行：地址比特逐位注入根节点并下钻建立路由路径，数据总线比特逐个换入（CopyIn）、沿路径下行、在叶子与存储作用后原路返回、换出（CopyOut），最后全部操作逆序执行以解除纠缠（uncompute）。模拟器把电路组织为 <span class="math notranslate nohighlight">\(T=6n+2k\)</span> 个时间片（<code class="docutils literal notranslate"><span class="pre">TimeStep::full_step</span></code>，<code class="docutils literal notranslate"><span class="pre">QRAM/src/time_step.cpp:118-121</span></code>），关键调度点为（<code class="docutils literal notranslate"><span class="pre">time_step.cpp:133-203</span></code>）：</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>事件</p></th>
+<th class="head"><p>数据比特 <span class="math notranslate nohighlight">\(i\)</span> 的时间片</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>地址比特 <span class="math notranslate nohighlight">\(t\)</span> 注入（ACopy）</p></td>
+<td><p><span class="math notranslate nohighlight">\(2t+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>CopyIn<span class="math notranslate nohighlight">\(_i\)</span>（数据比特 <span class="math notranslate nohighlight">\(i\)</span> 换入根节点）</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i)=2n+2i+1\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>FetchData<span class="math notranslate nohighlight">\(_i\)</span>（叶子处 CZ 取数）</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{fetch}}(i)=3n+2i+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>CopyOut<span class="math notranslate nohighlight">\(_i\)</span>（数据比特 <span class="math notranslate nohighlight">\(i\)</span> 换出）</p></td>
+<td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)=4n+2i+1\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>调度关于中线镜像对称：<span class="math notranslate nohighlight">\(\mathrm{out}(t)=T-t\)</span>。注意 <span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n\)</span> 与 <span class="math notranslate nohighlight">\(i\)</span> 无关，且 <span class="math notranslate nohighlight">\(\tau_{\mathrm{fetch}}(i)\)</span> 恰为窗口中点。在 qubit 架构中，两片 Hadamard 分别挂接在 CopyIn<span class="math notranslate nohighlight">\(_0\)</span> 之前与 CopyOut<span class="math notranslate nohighlight">\(_{k-1}\)</span> 之后（<code class="docutils literal notranslate"><span class="pre">QRAM/include/qram_circuit_qubit.h:1039-1048</span></code>），作用于整个数据总线寄存器。</p>
+</section>
+<section id="id4">
+<h3>2.2 噪声模型与蒙特卡洛轨迹展开<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
+<p>每个时间片的门操作之后，对当前已纠缠子树内的每个物理比特独立地以概率施加噪声（<code class="docutils literal notranslate"><span class="pre">TimeStep::noise_one_step</span></code>，<code class="docutils literal notranslate"><span class="pre">time_step.cpp:341-385</span></code>）：</p>
+<ul class="simple">
+<li><p><strong>振幅阻尼</strong>（强度 <span class="math notranslate nohighlight">\(\gamma\)</span>）：Kraus 算子
+$<span class="math notranslate nohighlight">\(
+K_0=|0\rangle\langle0|+\sqrt{1-\gamma}\,|1\rangle\langle1|=\mathrm{diag}(1,a),\qquad K_1=\sqrt{\gamma}\,|0\rangle\langle1|,
+\)</span><span class="math notranslate nohighlight">\(
+记 \)</span>a\equiv\sqrt{1-\gamma}<span class="math notranslate nohighlight">\( 为单步衰减因子。模拟中拆为两部分：\)</span>K_0<span class="math notranslate nohighlight">\( 作为**默认算子**确定性作用（`Damp_Common`：每步将每个处于 \)</span>|1\rangle<span class="math notranslate nohighlight">\( 的激发振幅乘以 \)</span>a<span class="math notranslate nohighlight">\(，`qram_branch_qubit.h:84-87`）；跳变算子 \)</span>K_1$ 只在预先采样的噪声点处作为<strong>准测量</strong>处理（<code class="docutils literal notranslate"><span class="pre">Damp_Full</span></code>：按当前未归一化态计算跳变概率、掷点、命中则对所有分支投影复位，<code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h:468-558</span></code>）。</p></li>
+<li><p><strong>退极化</strong>（强度 <span class="math notranslate nohighlight">\(\varepsilon\)</span>）：随机 Pauli <span class="math notranslate nohighlight">\(X/Z/Y\)</span>，在采样到的噪声点处显式施加。</p></li>
+</ul>
+<p>一条轨迹 = 一份预先采样的噪声历史（噪声点位置、种类）+ 默认 <span class="math notranslate nohighlight">\(K_0\)</span> 的全程作用。状态始终保持为（未归一化的）稀疏纯态，只在准测量与末态采样处归一化 [1, SI §III]。多轨迹平均即还原密度矩阵层面的观测量。</p>
+</section>
+<section id="qutrit">
+<h3>2.3 qutrit 方案的三条可预测性支柱<a class="headerlink" href="#qutrit" title="链接到此标题。">¶</a></h3>
+<p>Wang 等人的剪枝算法建立在三条支柱上 [1]：</p>
+<p><strong>(P1) 唯一树配置定理。</strong> 电路线全由 CSWAP/SWAP/CNOT/CZ 等非分支门构成（只置换计算基态、不产生叠加），因此对每个地址 <span class="math notranslate nohighlight">\(|i\rangle\)</span> 存在唯一的树配置轨道 <span class="math notranslate nohighlight">\(|\Psi_i(t)\rangle\)</span>；无噪演化无需解方程即可经典推演。</p>
+<p><strong>(P2) 默认算子的对角性。</strong> <span class="math notranslate nohighlight">\(K_0\)</span> 在节点计算基下对角，故无跳变轨迹中 good 分支的基态轨道与无噪轨道完全相同，阻尼的全部效应是乘上一个<strong>可数的标量衰减因子</strong>：振幅因子 <span class="math notranslate nohighlight">\(a^{c}\)</span>，其中 <span class="math notranslate nohighlight">\(c\)</span> 为该分支的&quot;激发数 × 时间步&quot;计数，由调度表解析给出而无需模拟。不同 good 分支之间的相对权重为 <span class="math notranslate nohighlight">\(a^{\Delta c}\)</span>（实现：<code class="docutils literal notranslate"><span class="pre">TimeStep::get_multiplier_qutrit</span></code>，<code class="docutils literal notranslate"><span class="pre">QRAM/include/time_step.h:209-234</span></code>）。</p>
+<p><strong>(P3) 子树包含判据。</strong> 节点 <span class="math notranslate nohighlight">\((l,p)\)</span> 处的故障只影响其叶子子树对应的地址区间
+$<span class="math notranslate nohighlight">\(
+i\in\big[2^{\,n-l}p,\;2^{\,n-l}(p+1)-1\big],
+\)</span><span class="math notranslate nohighlight">\(
+故给定噪声历史后，good/bad 分支集合可**在演化之前**解析确定（实现：`get_bad_range_qutrit` + 区间并集 `ContinuousRange`，`time_step.cpp:267-339`）。期望 bad 分支比例为 \)</span>\mathcal{O}(n^2p)$ [1, v1 Eq. (6)]。</p>
+<p><strong>注意 (P3) 的编码依赖性（详见姊妹篇 <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code>）。</strong> 该判据对 qutrit 的真正依据不是&quot;输出损坏局限于子树&quot;（这一点对 qubit 也成立），而是&quot;<strong>路径外分量的末态树构型保持同一</strong>&quot;：qutrit 的故障残留被 <span class="math notranslate nohighlight">\(|W\rangle\)</span> 守卫（<code class="docutils literal notranslate"><span class="pre">QRAMState::cswap</span></code> 的 <code class="docutils literal notranslate"><span class="pre">case</span> <span class="pre">W:</span> <span class="pre">do</span> <span class="pre">nothing</span></code>）冻结在故障节点原地，所有路径外分量共享同一构型，可作 good 分支预测。qubit 编码没有这个守卫，X 型故障的残留会沿&quot;空闲=指向左&quot;的祖先链<strong>迁移上拉</strong>，使构型家族在更大范围内分歧——坏区间必须改用左孩子上溯规则（§3、§5.1）。</p>
+<p>qutrit 方案中数据传输在计算基完成、不需要 H 门，两片 H 的挂接点退化为纯合并操作（<code class="docutils literal notranslate"><span class="pre">qram_branch_qutrit.cpp:547-573</span></code> 的 <code class="docutils literal notranslate"><span class="pre">run_hadamard</span></code> 只做 <code class="docutils literal notranslate"><span class="pre">try_merge</span></code>），因此 (P2) 直接覆盖数据总线：good 分支不分裂，末态为 <span class="math notranslate nohighlight">\(|i\rangle|j\oplus d_i\rangle|Q_0\rangle\)</span> 乘标量因子。</p>
+</section>
+</section>
+<section id="qubit">
+<h2>3. qubit 方案的缺口<a class="headerlink" href="#qubit" title="链接到此标题。">¶</a></h2>
+<p>qubit 编码中支柱 (P1) 逐字成立（非分支门集与能级编码无关）。缺口有两处——(P2) 的数据总线部分，以及 (P3) 的构型同一性：</p>
+<ul class="simple">
+<li><p><strong>(P3′) 构型家族分歧（X 型故障）</strong>：输出损坏（wrongbus）本身仍 ⊆ subtree(v)（单错误注入实测），但 X 翻转在<strong>所有</strong>叠加分量留下永久残留（空闲节点无人清理），且残留会被&quot;空闲=指向左&quot;的祖先上拉迁移：左孩子位置的残留对父节点空闲的分量上溯一级，右孩子位置的残留被困于自身子树。路径外分量因此分裂为不同末态构型家族，家族分歧的包络为 <strong>bad = 左孩子取 subtree(parent(v))，右孩子取 subtree(v)</strong>（即现行 <code class="docutils literal notranslate"><span class="pre">get_bad_range_qubit</span></code>；根与根的孩子有特判）。阻尼跳变（K₁）不产生路径外残留（空闲无激发可跳），<strong>纯阻尼通道仍可用纯子树判据</strong>。机制推导与 n=3 全注入验证见 <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code>。</p></li>
+<li><p><strong>(P2) 地址/路由部分</strong>：路由比特处于 <span class="math notranslate nohighlight">\(|1\rangle\)</span> 时同样被 <span class="math notranslate nohighlight">\(K_0\)</span> 逐步衰减，暴露窗口由调度表给出，仍是可数标量（仓库已实现 <code class="docutils literal notranslate"><span class="pre">_get_multiplier_impl_qubit</span></code>，<code class="docutils literal notranslate"><span class="pre">time_step.cpp:462-475</span></code>）。这部分没有新困难。</p></li>
+<li><p><strong>(P2) 数据总线部分</strong>：数据比特 <span class="math notranslate nohighlight">\(i\)</span> 在第 <span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i)=2n+2i+1\)</span> 步换入、第 <span class="math notranslate nohighlight">\(\tau_{\mathrm{out}}(i)=4n+2i+1\)</span> 步换出，其间以 <span class="math notranslate nohighlight">\((|0\rangle\pm|1\rangle)/\sqrt{2}\)</span> 的形式存在于树内。<span class="math notranslate nohighlight">\(K_0\)</span> 在 X 基下非对角：
+$<span class="math notranslate nohighlight">\(
+K_0|+\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle+a|1\rangle\big),\qquad K_0|-\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle-a|1\rangle\big).
+\)</span>$
+分支内不同数据分量的衰减不同步，两片 H 不再相互抵消——<strong>第二个 H 门的输出不再是确定的计算基态</strong>。这正是 qutrit 版标量乘子公式失效、也是 naive 实现必须让分支真实演化（每次 H 分裂、逐步计数、末态合并）的原因。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>4. 主要理论结果<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<section id="hk0h">
+<h3>4.1 H–K₀–H 引理<a class="headerlink" href="#hk0h" title="链接到此标题。">¶</a></h3>
+<p><strong>引理 1（单比特闭式）。</strong> 设 <span class="math notranslate nohighlight">\(a=\sqrt{1-\gamma}\)</span>，<span class="math notranslate nohighlight">\(d\in\mathbb{N}\)</span>，<span class="math notranslate nohighlight">\(m\in\{0,1\}\)</span>，定义
+$<span class="math notranslate nohighlight">\(
+N_{m,d}\;=\;H\,\underbrace{Z^{m}\,\mathrm{diag}(1,a^{d})}_{\text{对角, 与 }K_0\text{ 幂次可合并}}\,H .
+\)</span><span class="math notranslate nohighlight">\(
+则对任意输入比特 \)</span>b\in{0,1}<span class="math notranslate nohighlight">\(，记 \)</span>b_{\mathrm{out}}=b\oplus m<span class="math notranslate nohighlight">\(：
+\)</span><span class="math notranslate nohighlight">\(
+N_{m,d}\,|b\rangle\;=\;\alpha_d\,|b_{\mathrm{out}}\rangle+\beta_d\,|\overline{b_{\mathrm{out}}}\rangle,\qquad
+\alpha_d=\frac{1+a^{d}}{2},\;\;\beta_d=\frac{1-a^{d}}{2}.
+\)</span>$</p>
+<p><strong>证明。</strong> <span class="math notranslate nohighlight">\(H|b\rangle=\big(|0\rangle+(-1)^{b}|1\rangle\big)/\sqrt2\)</span>。两片 H 之间，对该比特的作用只有：(i) <span class="math notranslate nohighlight">\(d\)</span> 次 <span class="math notranslate nohighlight">\(K_0=\mathrm{diag}(1,a)\)</span>（路由 SWAP 只重定位比特、不改变其状态，见下）；(ii) 叶子处 CZ 取数贡献的 <span class="math notranslate nohighlight">\(Z^m\)</span>。二者皆在计算基对角、互相对易，故合并为 <span class="math notranslate nohighlight">\(Z^m\mathrm{diag}(1,a^d)=\mathrm{diag}\big(1,(-1)^m a^d\big)\)</span>。作用后状态为 <span class="math notranslate nohighlight">\(\big(|0\rangle+(-1)^{b\oplus m}a^d|1\rangle\big)/\sqrt2\)</span>——<strong>这正是&quot;第二个 H 门作用上去的时候，相当于 <span class="math notranslate nohighlight">\(|0\rangle+a^d|1\rangle\)</span> 再过一次 H&quot;的精确含义</strong>（符号由输入比特与存储比特共同决定）。再过 <span class="math notranslate nohighlight">\(H\)</span>：
+$<span class="math notranslate nohighlight">\(
+\frac{1}{2}\Big[\big(1+(-1)^{b\oplus m}a^{d}\big)|0\rangle+\big(1-(-1)^{b\oplus m}a^{d}\big)|1\rangle\Big],
+\)</span><span class="math notranslate nohighlight">\(
+按 \)</span>b_{\mathrm{out}}=b\oplus m<span class="math notranslate nohighlight">\( 归并即得结论。\)</span>\square$</p>
+<p><strong>注 1（范数守恒的自洽性）。</strong> <span class="math notranslate nohighlight">\(\alpha_d^2+\beta_d^2=\frac{1+a^{2d}}{2}\)</span> 恰好等于 X 基态经受 <span class="math notranslate nohighlight">\(d\)</span> 层阻尼信道的<strong>无跳变概率</strong> <span class="math notranslate nohighlight">\(\frac12(\langle0|+\langle1|)K_0^{d\dagger}K_0^{d}(|0\rangle+|1\rangle)/1\)</span> 的直算结果。缺失的范数 <span class="math notranslate nohighlight">\(\frac{1-a^{2d}}{2}\)</span> 正是跳变（<span class="math notranslate nohighlight">\(K_1\)</span>）轨迹携带的概率权重——在本算法中由 bad 分支显式演化。未归一化框架下两部分的账严格对齐。</p>
+<p><strong>注 2（正确分量与错误分量）。</strong> <span class="math notranslate nohighlight">\(\alpha_d\)</span> 是&quot;取数正确&quot;的振幅，<span class="math notranslate nohighlight">\(\beta_d\)</span> 是相干泄漏到错误值的振幅。<span class="math notranslate nohighlight">\(a=1\)</span>（无噪）时 <span class="math notranslate nohighlight">\(\beta_d=0\)</span>，退化为理想 QRAM 输出 <span class="math notranslate nohighlight">\(H^2=I\)</span>。</p>
+</section>
+<section id="id6">
+<h3>4.2 多比特乘积结构<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h3>
+<p><strong>定理 2（<span class="math notranslate nohighlight">\(k\)</span> 数据比特的 <span class="math notranslate nohighlight">\(H\)</span>–<span class="math notranslate nohighlight">\(K_0\)</span>–<span class="math notranslate nohighlight">\(H\)</span> 公式）。</strong> 在 good 分支 <span class="math notranslate nohighlight">\((i,j)\)</span>（地址 <span class="math notranslate nohighlight">\(i\)</span>、总线输入 <span class="math notranslate nohighlight">\(j\in\{0,1\}^k\)</span>）上，设数据比特 <span class="math notranslate nohighlight">\(i\)</span> 在树内停留 <span class="math notranslate nohighlight">\(d_i=\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n\)</span> 个阻尼层，存储位 <span class="math notranslate nohighlight">\(m_i=(d_i)_{\text{第 }i\text{ 位}}\)</span>（记号冲突处以上下文为准，下文记存储内容为 <span class="math notranslate nohighlight">\(d\)</span>，其第 <span class="math notranslate nohighlight">\(t\)</span> 位为 <span class="math notranslate nohighlight">\(d^{(t)}\)</span>）。则数据寄存器在第二片 H 之后的未归一化状态为
+$<span class="math notranslate nohighlight">\(
+\bigotimes_{t=0}^{k-1}N_{d^{(t)},\,2n}\,|j_t\rangle
+\;=\;\sum_{c\in\{0,1\}^k}A(c)\,|c\rangle,
+\)</span><span class="math notranslate nohighlight">\(
+其中输出分量 \)</span>c<span class="math notranslate nohighlight">\( 的振幅只依赖于错误图样 \)</span>e=c\oplus b_{\mathrm{out}}<span class="math notranslate nohighlight">\(（\)</span>b_{\mathrm{out}}=j\oplus d<span class="math notranslate nohighlight">\( 为理想输出）的 **Hamming 权重** \)</span>w=|e|<span class="math notranslate nohighlight">\(：
+\)</span><span class="math notranslate nohighlight">\(
+\boxed{\;A(c)\;=\;\frac{1}{2^{k}}\,(1+a^{2n})^{\,k-w}\,(1-a^{2n})^{\,w}\;=\;\alpha_{2n}^{\,k-w}\,\beta_{2n}^{\,w}\;}
+\)</span>$</p>
+<p><strong>证明。</strong> 不同数据比特的路由由同一地址路径引导、在不同时间片流水通过，彼此之间无任何门耦合；每比特的取数 <span class="math notranslate nohighlight">\(Z^{d^{(t)}}\)</span> 与 <span class="math notranslate nohighlight">\(K_0\)</span> 暴露各自独立。故两片 H 之间的总对角算子是逐比特张量积，总映射为 <span class="math notranslate nohighlight">\(\bigotimes_t N_{d^{(t)},d_t}\)</span>。由调度表，<span class="math notranslate nohighlight">\(d_t=\tau_{\mathrm{out}}(t)-\tau_{\mathrm{in}}(t)=(4n+2t+1)-(2n+2t+1)=2n\)</span> 对所有比特相同（端点计数约定至多为 <span class="math notranslate nohighlight">\(\pm1\)</span> 的修正，且对全部比特一致，可被参考分支自校准，见 §5.2）。对每个比特应用引理 1，<span class="math notranslate nohighlight">\(c_t=b_{\mathrm{out},t}\)</span> 贡献 <span class="math notranslate nohighlight">\(\alpha_{2n}\)</span>、<span class="math notranslate nohighlight">\(c_t=\overline{b_{\mathrm{out},t}}\)</span> 贡献 <span class="math notranslate nohighlight">\(\beta_{2n}\)</span>，按错误位数 <span class="math notranslate nohighlight">\(w\)</span> 归并即得。<span class="math notranslate nohighlight">\(\square\)</span></p>
+<p><strong>与 qutrit 计数器的对照值得强调</strong>：qutrit 版数据窗口依赖输入/输出比特值（<span class="math notranslate nohighlight">\(b_{\mathrm{in}},b_{\mathrm{out}}\)</span> 决定激发在去程/回程是否存在于树内，见 <code class="docutils literal notranslate"><span class="pre">_get_multiplier_impl_qutrit</span></code> 的数据部分，<code class="docutils literal notranslate"><span class="pre">time_step.cpp:510-534</span></code>），而 qubit 版数据比特<strong>始终以半激发态在树内驻留完整窗口 <span class="math notranslate nohighlight">\(2n\)</span></strong>，与比特值无关——X 基传输使暴露窗口变得平凡，这反而简化了计数。</p>
+</section>
+<section id="id7">
+<h3>4.3 地址路由部分的标量因子<a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h3>
+<p>路由比特的激发暴露与 qutrit 情形同属支柱 (P2)。地址 <span class="math notranslate nohighlight">\(i\)</span> 的第 <span class="math notranslate nohighlight">\(t\)</span> 位为 1 时，对应激发在第 <span class="math notranslate nohighlight">\(2t+1\)</span> 步注入、第 <span class="math notranslate nohighlight">\(\mathrm{out}(2t+1)=T-(2t+1)\)</span> 步随 uncompute 撤出（qubit 方案无空闲态，路径指针在整个查询期间存活），全轨迹暴露计数为
+$<span class="math notranslate nohighlight">\(
+c_{\mathrm{addr}}(i)=\sum_{t:\,i_t=1}\big(T-2(2t+1)\big)=\sum_{t:\,i_t=1}(6n+2k-4t-2),
+\)</span><span class="math notranslate nohighlight">\(
+与 `_get_multiplier_impl_qubit`（`time_step.cpp:462-475`）一致。整分支振幅获得标量因子 \)</span>a^{c_{\mathrm{addr}}(i)}<span class="math notranslate nohighlight">\(；不同 good 分支之间的相对概率权重为
+\)</span><span class="math notranslate nohighlight">\(
+\frac{p_i}{p_{i_{\mathrm{ref}}}}=(1-\gamma)^{\,c_{\mathrm{addr}}(i)-c_{\mathrm{addr}}(i_{\mathrm{ref}})}\;\equiv\;a^{2\Delta c},
+\)</span>$
+即 <code class="docutils literal notranslate"><span class="pre">get_multiplier_qubit</span></code> 的 <code class="docutils literal notranslate"><span class="pre">relative_multiplier</span></code>（<code class="docutils literal notranslate"><span class="pre">time_step.h:186-207</span></code>）。</p>
+<p>注意 qubit 方案的地址暴露窗口是<strong>全查询程</strong>（<span class="math notranslate nohighlight">\(\sim T\)</span> 量级），而 qutrit 方案的地址激发采用传播式激活、每比特仅暴露 <span class="math notranslate nohighlight">\(\mathcal{O}(t)\)</span> 步（<code class="docutils literal notranslate"><span class="pre">time_step.cpp:490-509</span></code> 的 <span class="math notranslate nohighlight">\([2t+1,3t+2]\)</span> 及镜像段）——这正是协议层面 qubit 方案 infidelity 标度 <span class="math notranslate nohighlight">\(\mathcal{O}((n+k)n^2\varepsilon)\)</span> 比 qutrit 方案 <span class="math notranslate nohighlight">\(\mathcal{O}((n+k)n\varepsilon)\)</span> 差一个因子 <span class="math notranslate nohighlight">\(n\)</span> 的来源 [2, §III]，与本模拟算法无关但值得在物理解读中注明。</p>
+</section>
+<section id="good">
+<h3>4.4 Good 分支末态预测定理<a class="headerlink" href="#good" title="链接到此标题。">¶</a></h3>
+<p><strong>定理 3（good 分支闭式预测）。</strong> 设噪声历史给定，分支 <span class="math notranslate nohighlight">\((i,j)\)</span> 为 good 分支（其路由路径不经过任何噪声点）。则该分支的无跳变轨迹末态为
+$<span class="math notranslate nohighlight">\(
+|\Psi_{i,j}^{\mathrm{good}}\rangle
+\;=\;a^{\,c_{\mathrm{addr}}(i)}\;|i\rangle_A\otimes\Big[\bigotimes_{t=0}^{k-1}N_{d^{(t)},2n}|j_t\rangle\Big]_D\otimes|\tilde Q_0\rangle_{\mathrm{tree}},
+\)</span><span class="math notranslate nohighlight">\(
+其中 \)</span>|\tilde Q_0\rangle_{\mathrm{tree}}$ 为（未归一化的）树末态，<strong>与所有 good 分支及参考分支相同</strong>。</p>
+<p><strong>证明。</strong> 由 (P1)，树内可逆门的作用是对唯一基态轨道的重定位；由 (P3)，路径上无噪声点，故树内仅有的非平凡作用是每步的 <span class="math notranslate nohighlight">\(K_0\)</span>。把 <span class="math notranslate nohighlight">\(K_0^{\otimes}\)</span> 按比特分解：路由比特的贡献按 §4.3 计数为标量 <span class="math notranslate nohighlight">\(a^{c_{\mathrm{addr}}(i)}\)</span>；数据比特的贡献按 §4.1–4.2 归入 <span class="math notranslate nohighlight">\(N\)</span> 的闭式（驻留树内的每步贡献一个 <span class="math notranslate nohighlight">\(a\)</span>，与驻留位置无关，因为 <span class="math notranslate nohighlight">\(K_0\)</span> 对各节点比特均匀作用）。树末态轨道与无噪轨道一致、即与地址无关的公共末态（uncompute 后回到全零/全 <span class="math notranslate nohighlight">\(W\)</span> 之前的某一确定配置），仅范数被标量修正。<span class="math notranslate nohighlight">\(\square\)</span></p>
+<p><strong>与 Wang 等人命题的关系。</strong> [1, v2 Eq. (6)] 断言所有可靠分支共享末态 <span class="math notranslate nohighlight">\(|i\rangle|d_i\rangle|Q_0\rangle\)</span>。定理 3 是其 qubit 推广：共享性仍然成立（<span class="math notranslate nohighlight">\(|\tilde Q_0\rangle\)</span> 与地址无关），但数据寄存器从确定值 <span class="math notranslate nohighlight">\(|j\oplus d_i\rangle\)</span> 替换为<strong>已知的二分量积态</strong> <span class="math notranslate nohighlight">\(\bigotimes_t(\alpha|b_{\mathrm{out},t}\rangle+\beta|\overline{b_{\mathrm{out},t}}\rangle)\)</span>。这是两种编码在预测层面的全部差别。</p>
+</section>
+<section id="id8">
+<h3>4.5 误差结构：范数流失与相干泄漏<a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<p>定理 3 的末态可按 <span class="math notranslate nohighlight">\(\gamma\)</span> 的阶数分解。记单比特（<span class="math notranslate nohighlight">\(d=2n\)</span> 层）：</p>
+<ul class="simple">
+<li><p><strong>正确振幅</strong> <span class="math notranslate nohighlight">\(\alpha_{2n}=\frac{1+(1-\gamma)^n}{2}=1-\frac{n\gamma}{2}+\mathcal{O}(\gamma^2)\)</span>；</p></li>
+<li><p><strong>泄漏振幅</strong> <span class="math notranslate nohighlight">\(\beta_{2n}=\frac{1-(1-\gamma)^n}{2}=\frac{n\gamma}{2}+\mathcal{O}(\gamma^2)\)</span>。</p></li>
+</ul>
+<p>两个概念必须区分：</p>
+<ol class="arabic simple">
+<li><p><strong>范数流失（一阶，非误差）。</strong> 单比特无跳变概率 <span class="math notranslate nohighlight">\(\alpha^2+\beta^2=\frac{1+a^{4n}}{2}=1-n\gamma+\mathcal{O}(\gamma^2)\)</span>。丢失的 <span class="math notranslate nohighlight">\(\approx n\gamma\)</span> 是跳变轨迹的概率权重，由蒙特卡洛框架中 bad 分支的显式演化携带。good 分支的未归一化范数收缩<strong>不是输出错误</strong>。</p></li>
+<li><p><strong>相干泄漏（二阶，真误差）。</strong> 在 good 分支内部做条件归一化后，单数据比特的错误概率为
+$<span class="math notranslate nohighlight">\(
+\frac{\beta_{2n}^2}{\alpha_{2n}^2+\beta_{2n}^2}=\frac{n^2\gamma^2}{4}+\mathcal{O}(\gamma^3).
+\)</span>$</p></li>
+</ol>
+<p><strong>结论：good 分支的输出错误对 <span class="math notranslate nohighlight">\(\gamma\)</span> 是二阶的；全部一阶错误都集中在 bad 分支（跳变与退极化噪声点）上。</strong> 这解释了为什么&quot;剪枝 + 闭式预测&quot;在 qubit 编码下不损失一阶精度，也与信道平均结果自洽：单数据比特经完整阻尼信道后的错误概率为 <span class="math notranslate nohighlight">\(\frac{1-a^{2n}}{2}\approx\frac{n\gamma}{2}\)</span>，其中一阶项 <span class="math notranslate nohighlight">\(=\)</span> 跳变概率 <span class="math notranslate nohighlight">\(\times\frac12\)</span>（跳变后输出随机），二阶余项正是 good 分支的相干泄漏。</p>
+<p>该性质对 error filtration 类应用 [1, §IV；4] 是好消息：若结合对跳变的隐式后选（good-only 轨迹即&quot;无跳变&quot;假设下的输出），残余误差为 <span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> 每数据比特。</p>
+</section>
+<section id="id9">
+<h3>4.6 跳变概率采样中 good 分支的解析贡献<a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h3>
+<p><span class="math notranslate nohighlight">\(Damp\_Full\)</span> 噪声点处的准测量概率需汇总<strong>所有</strong>分支（含不演化的 good 分支）在出错比特上的占据权重。两点观察使 qubit 方案可以保持解析折算：</p>
+<ol class="arabic simple">
+<li><p><strong>数据部分输入无关。</strong> X 基传输下，每个驻留数据比特对任一途经位置的平均占据概率恒为 <span class="math notranslate nohighlight">\(1/2\)</span>，与输入 <span class="math notranslate nohighlight">\(j\)</span>、存储 <span class="math notranslate nohighlight">\(d\)</span> 无关（<span class="math notranslate nohighlight">\(\pm\)</span> 相位不影响概率）。故参考 good 分支的数据部分跳变概率对全体 good 分支<strong>精确成立</strong>，无需逐分支修正。</p></li>
+<li><p><strong>地址部分按相对乘子折算。</strong> 与 qutrit 版相同：<span class="math notranslate nohighlight">\(\mathrm{prob}_{\mathrm{damp}}^{(i)}=\mathrm{prob}_{\mathrm{damp}}^{(\mathrm{ref})}\times\mathrm{relative\_multiplier}_i\)</span>（实现位置：<code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h:496-519</span></code>）。</p></li>
+</ol>
+<p>因此引入本文的数据总线闭式后，跳变采样的全局一致性不被破坏。</p>
+</section>
+</section>
+<section id="id10">
+<h2>5. 算法<a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h2>
+<section id="id11">
+<h3>5.1 伪代码<a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>算法 1：qubit 架构 (n,k)-QRAM 含噪快速模拟（单条轨迹）
+输入：稀疏输入态 Σ_j c_{i,j} |i⟩|j⟩；存储表 d；噪声率 (ε_dep, γ)；a = √(1−γ)
+输出：含噪输出稀疏态（未归一化），或末态采样
+
+1  噪声历史预采样：对 t = 1..6n+2k，按活动子树规模 2(2^{L(t)}−1) 二项采样错误数、
+   均匀采样位置；每个噪声点合并进 bad 地址区间并集 R：
+   Damp_Full → 节点叶子子树（阻尼跳变不产生路径外残留）；
+   Depolarizing 的 X/Y 分量 → 构型家族分歧判据（get_bad_range_qubit：
+   左孩子取 subtree(parent(v))，右孩子取 subtree(v)，根/根孩子特判）。
+2  分支划分：地址 i ∈ R ⇒ bad 分支；否则 good 分支，首个 good 记为参考分支 ref。
+3  真实演化：仅对 bad 分支 ∪ {ref} 逐时间片执行：
+   CopyIn_0 前作用 H；CopyOut_{k−1} 后作用 H（分支内 2^k 分裂 + try_merge 合并）；
+   每步末 Damp_Common（振幅 × a^{#激发}）；Damp_Full 处按 §4.6 折算概率并采样投影。
+4  good 分支解析预测：对每个 good 分支 (i, j)：
+   a) 地址因子：c_addr(i) 按 §4.3 计数，相对权重 r_i = a^{2[c_addr(i)−c_addr(ref)]}；
+   b) 数据因子：b_out = j ⊕ d_i；对 w = 0..k 的所有错误图样 c，
+      A(c) = α^{k−|c⊕b_out|} β^{|c⊕b_out|}，α=(1+a^{2n})/2，β=(1−a^{2n})/2；
+   c) 树末态：复制 ref 的树末态。
+5  重构输出：每个 good 分支向输出稀疏态写入 2^k 个分量
+      |i⟩|c⟩，振幅 = c_{i,j} × √(r_i) × A(c) × (ref 树末态振幅)；
+   bad 分支按演化结果写入；合并同项、剔除 |振幅|²&lt;ε 分量。
+6  末态采样（可选）：按未归一化权重轮盘赌选定末态后归一化。
+</pre></div>
+</div>
+</section>
+<section id="id12">
+<h3>5.2 正确性<a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p>步骤 1–3 与 qutrit 版相同，正确性由 (P1)(P3) 与轨迹法给出 [1]。</p></li>
+<li><p>步骤 4 的正确性即定理 3；其中窗口计数 <span class="math notranslate nohighlight">\(d_t=2n\)</span> 的端点约定（<span class="math notranslate nohighlight">\(\pm1\)</span>）对全部 good 分支一致，且与参考分支真实演化中的逐步 <code class="docutils literal notranslate"><span class="pre">Damp_Common</span></code> 计数自校准——相对权重 <span class="math notranslate nohighlight">\(r_i\)</span> 不含该约定，绝对因子 <span class="math notranslate nohighlight">\((1+a^{2n})/2\)</span> 的标定可通过与参考分支的 <span class="math notranslate nohighlight">\(2^k\)</span> 分量比对一次性完成。</p></li>
+<li><p>步骤 5 中 good 分支的 <span class="math notranslate nohighlight">\(2^k\)</span> 展开是精确恒等式（定理 2），不是近似；与 qutrit 版&quot;乘 <span class="math notranslate nohighlight">\(\sqrt{\mathrm{multiplier}}\)</span> + 修正 bus 输出&quot;（<code class="docutils literal notranslate"><span class="pre">SparQ/src/qram.cpp:100-170</span></code>，现位于 SparQSim 仓库）相比，仅多了按 <span class="math notranslate nohighlight">\(A(c)\)</span> 分配的展开循环。</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>5.3 复杂度<a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
+<p>设输入分支数 <span class="math notranslate nohighlight">\(d\)</span>、bad 分支数 <span class="math notranslate nohighlight">\(B\)</span>（期望 <span class="math notranslate nohighlight">\(\mathbb{E}[B]=\mathcal{O}(n^2p)\,d\)</span> 量级，见 [1, v1 Eq. (6)]）：</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>项目</p></th>
+<th class="head"><p>qutrit 版</p></th>
+<th class="head"><p>本文 qubit 版</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>真实演化分支数</p></td>
+<td><p><span class="math notranslate nohighlight">\(B+1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(B+1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>每 good 分支预测成本</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span>（标量乘子）</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span>（计数）<span class="math notranslate nohighlight">\(+\,\mathcal{O}(k\,2^k)\)</span>（写出分量）</p></td>
+</tr>
+<tr class="row-even"><td><p>每 good 分支内存</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n+k)\)</span>（积态可惰性存储）</p></td>
+</tr>
+<tr class="row-odd"><td><p>总复杂度</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(d+p\cdot\mathrm{poly}(n))\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(d\cdot 2^k+p\cdot\mathrm{poly}(n))\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><span class="math notranslate nohighlight">\(2^k\)</span> 因子是 qubit 编码的内在输出宽度（每个数据比特携带一个二分量叠加），并非算法低效：无噪 qubit-QRAM 的输出数据寄存器本来就是 <span class="math notranslate nohighlight">\(k\)</span> 比特确定值，含噪后其支持集天然扩到 <span class="math notranslate nohighlight">\(2^k\)</span>。对 <span class="math notranslate nohighlight">\(k\)</span> 较大的场景，可利用积态结构惰性展开（仅在采样/重构时按 Hamming 权重公式逐分量生成，期望每分量 <span class="math notranslate nohighlight">\(\mathcal{O}(k)\)</span>），或按 <span class="math notranslate nohighlight">\(\beta/\alpha\)</span> 截断到 <span class="math notranslate nohighlight">\(w\le w_{\max}\)</span>（误差 <span class="math notranslate nohighlight">\(\mathcal{O}((n\gamma)^{w_{\max}+1})\)</span>）。实验中典型的 <span class="math notranslate nohighlight">\(k=1\sim3\)</span> 下该因子可忽略。</p>
+</section>
+</section>
+<section id="id14">
+<h2>6. 与 qutrit 方案的对照<a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>方面</p></th>
+<th class="head"><p>qutrit 方案</p></th>
+<th class="head"><p>qubit 方案（本文）</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>空闲态</p></td>
+<td><p><span class="math notranslate nohighlight">\(|W\rangle\)</span> 是 <span class="math notranslate nohighlight">\(K_0\)</span> 不动点</p></td>
+<td><p>无；路由 <span class="math notranslate nohighlight">\(|1\rangle\)</span> 全程暴露</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据取数</p></td>
+<td><p>CNOT（计算基翻转）</p></td>
+<td><p>CZ（相位编码），需 <span class="math notranslate nohighlight">\(H\)</span> 换基</p></td>
+</tr>
+<tr class="row-even"><td><p>两片 H</p></td>
+<td><p>退化（仅 try_merge）</p></td>
+<td><p>真实分裂/合并</p></td>
+</tr>
+<tr class="row-odd"><td><p>数据比特阻尼暴露</p></td>
+<td><p>计算基，窗口依赖 <span class="math notranslate nohighlight">\(b_{\mathrm{in}},b_{\mathrm{out}}\)</span></p></td>
+<td><p>X 基，固定窗口 <span class="math notranslate nohighlight">\(2n\)</span>，与比特值无关</p></td>
+</tr>
+<tr class="row-even"><td><p>good 分支数据输出</p></td>
+<td><p>确定值 <span class="math notranslate nohighlight">\(|j\oplus d_i\rangle\)</span></p></td>
+<td><p>已知积态 <span class="math notranslate nohighlight">\(\bigotimes_t(\alpha|b_{\mathrm{out},t}\rangle+\beta|\overline{b_{\mathrm{out},t}}\rangle)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>good 分支内误差</p></td>
+<td><p>0（纯标量衰减）</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> 相干泄漏/比特</p></td>
+</tr>
+<tr class="row-even"><td><p>地址激发暴露</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{O}(t)\)</span> 步/比特（传播式）</p></td>
+<td><p>全程 <span class="math notranslate nohighlight">\(\sim T\)</span> 步/比特（驻留式）</p></td>
+</tr>
+<tr class="row-odd"><td><p>X 型故障残留</p></td>
+<td><p>冻结在故障节点（W 守卫），路径外构型同一</p></td>
+<td><p>沿空闲祖先迁移，家族分歧至 subtree(parent)</p></td>
+</tr>
+<tr class="row-even"><td><p>预测公式</p></td>
+<td><p><span class="math notranslate nohighlight">\(a^{\Delta c}\)</span> 标量</p></td>
+<td><p><span class="math notranslate nohighlight">\(a^{\Delta c}\)</span> 标量 × Hamming 权重公式</p></td>
+</tr>
+<tr class="row-odd"><td><p>坏区间判据</p></td>
+<td><p>子树包含（两通道通用）</p></td>
+<td><p>阻尼：子树包含；退极化 X：左孩子上溯（§3）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id15">
+<h2>7. 本仓库的实现缺口与路线图<a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h2>
+<p>对照当前代码，落地本算法需要：</p>
+<ol class="arabic simple">
+<li><p>~~<strong>qubit 噪声采样接通</strong>~~（已完成）：<code class="docutils literal notranslate"><span class="pre">fill_bad_range</span></code> 已支持 qubit 架构（<code class="docutils literal notranslate"><span class="pre">time_step.cpp</span></code>），<code class="docutils literal notranslate"><span class="pre">arch2str</span></code> 补上 qubit 分支。</p></li>
+<li><p>~~<strong>Full（不剪枝）ground truth</strong>~~（已完成）：<code class="docutils literal notranslate"><span class="pre">qram_qubit::QRAMCircuit</span></code> 补齐 <code class="docutils literal notranslate"><span class="pre">set_input_uniform</span></code>/<code class="docutils literal notranslate"><span class="pre">set_input_random</span></code>、<code class="docutils literal notranslate"><span class="pre">run_full()</span></code>（= 全分支演化）、<code class="docutils literal notranslate"><span class="pre">sample_and_get_fidelity()</span></code>；修复了 <code class="docutils literal notranslate"><span class="pre">BranchGroup::get_prob_damp</span></code> 的概率折算索引、<code class="docutils literal notranslate"><span class="pre">sample_output_*</span></code> 的权重口径（<code class="docutils literal notranslate"><span class="pre">branch_probs</span> <span class="pre">×</span> <span class="pre">|amp|²</span></code>）、<code class="docutils literal notranslate"><span class="pre">Branch::run_damp_full</span></code> 缺失的跳变复位（投影后须把该比特置回 <span class="math notranslate nohighlight">\(|0\rangle\)</span>）、<code class="docutils literal notranslate"><span class="pre">Branch::get_fidelity</span></code> 的实现。实验入口：<code class="docutils literal notranslate"><span class="pre">Experiment_QRAM_FidelityV2</span> <span class="pre">--architecture</span> <span class="pre">qubit</span></code>（full-only）。</p></li>
+<li><p>~~<strong>数据总线闭式预测（核心缺口）</strong>~~（已完成）：good 分支末态以 <strong>XOR 镜像物化</strong>实现——<code class="docutils literal notranslate"><span class="pre">data_bus</span> <span class="pre">^=</span> <span class="pre">(b_out^{ref}</span> <span class="pre">⊕</span> <span class="pre">b_out^{good})</span></code>、振幅 × √relative_multiplier，直接从参考分支复制出 <span class="math notranslate nohighlight">\(2^k\)</span> 分量（<code class="docutils literal notranslate"><span class="pre">materialize_good_branches</span></code>，<code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h</span></code>）。数学依据即定理 2（Hamming 权重公式 + <span class="math notranslate nohighlight">\(d_i=2n\)</span> 输入无关性），物化后所有通用路径（概率/采样/保真度）无需 good 特判。</p></li>
+<li><p>~~<strong>qubit 版 good 分支接线</strong>~~（已完成）：<code class="docutils literal notranslate"><span class="pre">sample_output</span></code> 重写为物化后全组游走（与 full 模式同序同权重，保证同种子塌缩一致）；<code class="docutils literal notranslate"><span class="pre">normalization</span></code> 覆盖全部组；修复了 good 折算的<strong>输入权重双重计数</strong>（分组版 <code class="docutils literal notranslate"><span class="pre">get_prob()</span></code> 已含组输入权重，需除回参考组权重取单位范数——qutrit 扁平分支无此问题，移植时引入）。</p></li>
+<li><p><strong>跳变概率的数据部分折算</strong>：qubit 版 <code class="docutils literal notranslate"><span class="pre">run_damp_full</span></code>（<code class="docutils literal notranslate"><span class="pre">qram_circuit_qubit.h</span></code>）已包含参考分支折算框架，按 §4.6 补上数据部分（输入无关、恒 <span class="math notranslate nohighlight">\(1/2\)</span> 占据）即可。</p></li>
+<li><p>~~<strong>验证</strong>~~（已完成）：<code class="docutils literal notranslate"><span class="pre">test_qubit_compare</span></code>（<code class="docutils literal notranslate"><span class="pre">--architecture</span> <span class="pre">qubit</span></code>）在 1e-5 depol+damping、n=3…10、每点 50 种子下 <strong>full/normal 全部一致（400/400）</strong>；强噪声压力（1e-4~3e-4）150 试验亦全过；n=12 剪枝收益 17×（2565ms→150ms）。剩余：good-only 模式（<code class="docutils literal notranslate"><span class="pre">QRAMLoadFast</span></code> 的 qubit 对应物）。</p></li>
+<li><p>~~<strong>坏区间判据确认</strong>~~（已完成）：<code class="docutils literal notranslate"><span class="pre">get_bad_range_qubit</span></code> 的&quot;左孩子上溯父区间、右孩子取自身子树&quot;逻辑经机制推导与 n=3 单错误注入验证为<strong>构型家族分歧的正确包络</strong>（node1 特判亦机制正确：根从不空闲），此前被误记为&quot;疑似怪癖&quot;。推导见 <code class="docutils literal notranslate"><span class="pre">qubit_error_propagation.md</span></code>。注意两点：纯阻尼通道可用更紧的纯子树判据；n≥4 的深层树上&quot;沿空闲链多级爬升&quot;是否越出 subtree(parent(v)) 未验证，剪枝实现时建议做一次 n=4/5 注入回归。</p></li>
+</ol>
+</section>
+<section id="id16">
+<h2>8. 结论<a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h2>
+<p>我们证明了 qubit 编码 bucket-brigade QRAM 在振幅阻尼噪声下的 good 分支依然是闭式可预测的：<span class="math notranslate nohighlight">\(H\to K_0^d\to H\)</span> 结构对第 <span class="math notranslate nohighlight">\(t\)</span> 个数据比特的作用等价于已知单比特映射 <span class="math notranslate nohighlight">\(N|b\rangle=\alpha|b\oplus d^{(t)}\rangle+\beta|\overline{b\oplus d^{(t)}}\rangle\)</span>，其中 <span class="math notranslate nohighlight">\(d=2n\)</span> 为固定暴露窗口，<span class="math notranslate nohighlight">\(\alpha=(1+a^{2n})/2\)</span>，<span class="math notranslate nohighlight">\(\beta=(1-a^{2n})/2\)</span>；<span class="math notranslate nohighlight">\(k\)</span> 比特输出振幅只依赖错误图样的 Hamming 权重。结合既有的地址标量乘子与子树包含剪枝，qubit-QRAM 的含噪模拟达到与 qutrit 版相同的复杂度标度，且 good 分支内误差仅为 <span class="math notranslate nohighlight">\(\mathcal{O}(n^2\gamma^2)\)</span> 的相干泄漏。这为在本模拟器中补齐 qubit 架构的噪声快速模拟、并进而支撑 error filtration 等下游研究提供了完整的理论基础。</p>
+</section>
+<section id="id17">
+<h2>参考文献<a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Y.-J. Wang, T.-P. Sun, X.-N. Zhuang, X.-F. Xu, H.-Y. Liu, C. Xue, Y.-C. Wu, Z.-Y. Chen, G.-P. Guo, <em>Efficient Simulation of Quantum Random Access Memory</em>（v2: <em>Refined Criteria for QRAM Error Suppression via Efficient Large-Scale QRAM Simulator</em>）, Phys. Rev. Applied <strong>25</strong>, 044069; arXiv:2503.13832.</p></li>
+<li><p>Z.-Y. Chen 等，<span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM 并行查询协议（bucket-brigade 查询线路与 qubit/qutrit 两种编码）, arXiv:2303.05207.</p></li>
+<li><p>C. T. Hann, G. Lee, S. M. Girvin, L. Jiang, <em>Resilience of quantum random access memory to generic noise</em>, PRX Quantum <strong>2</strong>, 020311 (2021).</p></li>
+<li><p>S. Lee 等，<em>Error filtration for quantum communication/quantum memory</em>（error filtration 方案）, Phys. Rev. Lett. <strong>131</strong>, 190601 (2023).</p></li>
+<li><p>V. Giovannetti, S. Lloyd, L. Maccone, <em>Quantum Random Access Memory</em>, Phys. Rev. Lett. <strong>100</strong>, 160501 (2008).</p></li>
+</ol>
+<hr class="docutils" />
+<section id="id18">
+<h3>附：关键记号表<a class="headerlink" href="#id18" title="链接到此标题。">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>记号</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(n,k\)</span></p></td>
+<td><p>地址比特数、数据比特数；<span class="math notranslate nohighlight">\(N=2^n\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(T=6n+2k\)</span></p></td>
+<td><p>总时间片数</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\gamma,\ a=\sqrt{1-\gamma}\)</span></p></td>
+<td><p>单层阻尼强度、单步衰减因子</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_0,K_1\)</span></p></td>
+<td><p>振幅阻尼无跳变/跳变 Kraus 算子</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\tau_{\mathrm{in}}(i),\tau_{\mathrm{out}}(i)\)</span></p></td>
+<td><p>数据比特 <span class="math notranslate nohighlight">\(i\)</span> 换入/换出时间片，窗口 <span class="math notranslate nohighlight">\(d_i=2n\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\alpha_d,\beta_d\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((1\pm a^d)/2\)</span>，正确/泄漏振幅</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(c_{\mathrm{addr}}(i)\)</span></p></td>
+<td><p>地址 <span class="math notranslate nohighlight">\(i\)</span> 的路由激发暴露计数</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(b_{\mathrm{out}}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(j\oplus d_i\)</span>，理想输出数据</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(w\)</span></p></td>
+<td><p>错误图样 <span class="math notranslate nohighlight">\(c\oplus b_{\mathrm{out}}\)</span> 的 Hamming 权重</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="qubit_error_propagation.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Qubit-QRAM 错误传播机制：理论走读与单错误注入验证</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="joint_damping.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">qubit 振幅阻尼的精确联合抽样</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</a><ul>
+<li><a class="reference internal" href="#id1">摘要</a></li>
+<li><a class="reference internal" href="#id2">1. 引言</a></li>
+<li><a class="reference internal" href="#id3">2. 背景与记号</a><ul>
+<li><a class="reference internal" href="#n-k-qram">2.1 <span class="math notranslate nohighlight">\((n,k)\)</span>-QRAM 与时间片调度</a></li>
+<li><a class="reference internal" href="#id4">2.2 噪声模型与蒙特卡洛轨迹展开</a></li>
+<li><a class="reference internal" href="#qutrit">2.3 qutrit 方案的三条可预测性支柱</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#qubit">3. qubit 方案的缺口</a></li>
+<li><a class="reference internal" href="#id5">4. 主要理论结果</a><ul>
+<li><a class="reference internal" href="#hk0h">4.1 H–K₀–H 引理</a></li>
+<li><a class="reference internal" href="#id6">4.2 多比特乘积结构</a></li>
+<li><a class="reference internal" href="#id7">4.3 地址路由部分的标量因子</a></li>
+<li><a class="reference internal" href="#good">4.4 Good 分支末态预测定理</a></li>
+<li><a class="reference internal" href="#id8">4.5 误差结构：范数流失与相干泄漏</a></li>
+<li><a class="reference internal" href="#id9">4.6 跳变概率采样中 good 分支的解析贡献</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">5. 算法</a><ul>
+<li><a class="reference internal" href="#id11">5.1 伪代码</a></li>
+<li><a class="reference internal" href="#id12">5.2 正确性</a></li>
+<li><a class="reference internal" href="#id13">5.3 复杂度</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id14">6. 与 qutrit 方案的对照</a></li>
+<li><a class="reference internal" href="#id15">7. 本仓库的实现缺口与路线图</a></li>
+<li><a class="reference internal" href="#id16">8. 结论</a></li>
+<li><a class="reference internal" href="#id17">参考文献</a><ul>
+<li><a class="reference internal" href="#id18">附：关键记号表</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=470db953"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

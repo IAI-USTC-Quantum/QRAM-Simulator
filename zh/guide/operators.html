@@ -1,0 +1,927 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="SparQ 算子命名规范" href="naming_conventions.html"><link rel="prev" title="QRAM-Simulator 架构" href="architecture.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>量子算术算子约束说明 - QRAM-Simulator 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator 文档</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator 文档</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <strong>中文</strong>
+  <span class="sidebar-langswitch-sep">·</span>
+  <a href="../../en/guide/operators.html">English</a>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">使用指南</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">快速上手</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">QRAM-Simulator 架构</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">量子算术算子约束说明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="naming_conventions.html">SparQ 算子命名规范</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API 参考</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API 参考</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">论文与实验</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../paper/README.html">论文复现文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/reproduction.html">论文实验复现指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/exactness_validation.html">剪枝与全量演化的精确性验证</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/joint_damping.html">qubit 振幅阻尼的精确联合抽样</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/qubit_qram_pruning.html">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/qubit_error_propagation.html">Qubit-QRAM 错误传播机制：理论走读与单错误注入验证</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/operators.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/operators.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1>量子算术算子约束说明<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<p>本文档详细说明 QRAM-Simulator 中预实现的量子算术算子的约束条件、unitary 性质保证以及使用规范。</p>
+<section id="id2">
+<h2>目录<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#id3">概述</a></p></li>
+<li><p><a class="reference internal" href="#id5">宽度与截断约定</a></p></li>
+<li><p><a class="reference internal" href="#id6">算子分类</a></p></li>
+<li><p><a class="reference internal" href="#id7">算子详细说明</a></p></li>
+<li><p><a class="reference internal" href="#unitary">Unitary 性质保证机制</a></p></li>
+<li><p><a class="reference internal" href="#id9">类型安全与溢出行为</a></p></li>
+<li><p><a class="reference internal" href="#id12">使用建议</a></p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>概述<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<p>QRAM-Simulator 采用 “Register Level Programming” 范式，所有算子直接操作寄存器。每个算子都经过精心设计以保证 quantum unitary 性质。</p>
+<section id="id4">
+<h3>关键概念<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Out-of-place 操作</strong>: 结果存储在独立的输出寄存器中，通过 XOR 保证 unitary</p></li>
+<li><p><strong>In-place 操作</strong>: 结果直接修改输入寄存器，需要显式实现 dagger 方法保证可逆性</p></li>
+<li><p><strong>SelfAdjoint 算子</strong>: 满足 U† = U，应用两次等于恒等操作</p></li>
+</ol>
+</section>
+</section>
+<section id="id5">
+<h2>宽度与截断约定<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<p>本节是所有算术算子位宽行为的<strong>权威契约</strong>(2026-09 制定)。原则:<strong>语义由算子名承载,
+不依赖构建模式</strong>;寄存器声明类型的校验仅在 debug 构建额外执行。</p>
+<ol class="arabic simple">
+<li><p><strong>LSB 对齐</strong>:所有操作数与输出按最低有效位对齐,不存在隐式移位。</p></li>
+<li><p><strong>读扩展由名字槽位决定</strong>:<code class="docutils literal notranslate"><span class="pre">_UInt_</span></code> 槽把操作数零扩展到计算域;<code class="docutils literal notranslate"><span class="pre">_SInt_</span></code> 槽按
+二补码符号扩展;<code class="docutils literal notranslate"><span class="pre">_Bool_</span></code> 槽按单比特;<code class="docutils literal notranslate"><span class="pre">AnyInt</span></code> 槽按寄存器<strong>声明类型</strong>扩展
+(UInt→零扩展,SInt→符号扩展)。实现把扩展逻辑直接写死,release 构建同样正确。</p></li>
+<li><p><strong>计算域</strong>:中间量按全精度求值——乘法经 64 位高低半分解(等价 128 位精度),
+加/减/比较在无符号 64 位回绕域上等价成立,除法/开方商域 ≤ 64 位。</p></li>
+<li><p><strong>写入</strong>:结果取 <code class="docutils literal notranslate"><span class="pre">mod</span> <span class="pre">2^out_width</span></code> 后 <strong>XOR</strong> 进输出寄存器。输出宽度可与
+任意输入宽度不同;输入寄存器的值永不被 out-of-place 算子修改。</p></li>
+<li><p><strong>域外全量化</strong>:可逆性要求算子在全部基矢上是确定性函数,因此核心算子不抛
+定义域异常——<code class="docutils literal notranslate"><span class="pre">Div_UInt_UInt</span></code> 在除数为零时商取 0;<code class="docutils literal notranslate"><span class="pre">Sqrt_UInt</span></code> 只接受幅度
+(非负)输入。定义域/溢出信息一律由专用 flag 算子另行报告。</p></li>
+<li><p><strong>flag 谓词</strong>:flag 输出 XOR 进 1-bit Boolean 寄存器;谓词在<strong>全精度域</strong>上
+求值。以 <code class="docutils literal notranslate"><span class="pre">out</span></code> 为参数的 flag 算子(<code class="docutils literal notranslate"><span class="pre">Carry_UInt_UInt</span></code> 等)<strong>只取该寄存器的
+宽度、不读其值</strong>,因此对输出寄存器的初始内容没有前置假设。</p></li>
+<li><p><strong>宽度边界</strong>:1…64 全支持。所有 <code class="docutils literal notranslate"><span class="pre">pow2(w)</span></code>/<code class="docutils literal notranslate"><span class="pre">1&lt;&lt;w</span></code> 于 w=64 的未定义行为
+一律以 <code class="docutils literal notranslate"><span class="pre">width_mask</span></code>(64 特判)替代;算子读取宽度一律在执行期经
+<code class="docutils literal notranslate"><span class="pre">System::size_of</span></code>,不在构造期快照。</p></li>
+<li><p><strong>别名约束</strong>:输出(含 flag)与任一输入不得别名——always-on 检查(与
+debug/release 无关)。</p></li>
+<li><p><strong>约定例外</strong>:<code class="docutils literal notranslate"><span class="pre">GetMid_UInt_UInt</span></code> 与 <code class="docutils literal notranslate"><span class="pre">Swap_General_General</span></code> 维持等宽要求
+(中点溢出与原值交换的语义本质上依赖等宽),是本约定仅有的两个例外。</p></li>
+<li><p><strong>存量兼容</strong>:既有 Add 族(读零扩展 + 写 <code class="docutils literal notranslate"><span class="pre">mod</span> <span class="pre">2^dst</span></code>)与本约定一致。
+唯一的历史行为修正是 <code class="docutils literal notranslate"><span class="pre">Add_AnyInt_AnyInt_InPlace</span></code>:AnyInt 槽自本约定起按
+寄存器声明类型扩展(此前一律按无符号位模式读),并补上 <code class="docutils literal notranslate"><span class="pre">lhs</span> <span class="pre">==</span> <span class="pre">rhs</span></code> 的
+别名拒绝与执行期宽度读取。</p></li>
+</ol>
+</section>
+<section id="id6">
+<h2>算子分类<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<section id="out-of-place-selfadjointoperator">
+<h3>1. Out-of-place 算子 (SelfAdjointOperator)<a class="headerlink" href="#out-of-place-selfadjointoperator" title="链接到此标题。">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>算子</p></th>
+<th class="head"><p>操作</p></th>
+<th class="head"><p>输入类型</p></th>
+<th class="head"><p>输出类型</p></th>
+<th class="head"><p>约束</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt</span></code></p></td>
+<td><p>res ^= lhs + rhs</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>所有寄存器大小任意，结果截断</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Add_UInt_ConstUInt</span></code></p></td>
+<td><p>res ^= lhs + const</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>所有寄存器大小任意，结果截断</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt</span></code></p></td>
+<td><p>res ^= lhs * const</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>const 应为奇数以保证双射</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Assign</span></code></p></td>
+<td><p>reg2 ^= reg1</p></td>
+<td><p>任意</p></td>
+<td><p>与 reg1 相同</p></td>
+<td><p>宽度任意，reg2 按 mod 2^reg2_w 截断</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Compare_UInt_UInt</span></code></p></td>
+<td><p>输出比较标志</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>Boolean</p></td>
+<td><p>输出寄存器大小为 1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Less_UInt_UInt</span></code></p></td>
+<td><p>输出小于标志</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>Boolean</p></td>
+<td><p>输出寄存器大小为 1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GetMid_UInt_UInt</span></code></p></td>
+<td><p>mid ^= (l+r)/2</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>三个寄存器大小必须相同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FlipBools</span></code></p></td>
+<td><p>reg ^= ~reg</p></td>
+<td><p>UnsignedInteger/SignedInteger</p></td>
+<td><p>-</p></td>
+<td><p>按位取反所有位</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Swap_Bool_Bool</span></code></p></td>
+<td><p>交换单个比特</p></td>
+<td><p>任意</p></td>
+<td><p>任意</p></td>
+<td><p>位索引在有效范围内</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Swap_General_General</span></code></p></td>
+<td><p>交换整个寄存器</p></td>
+<td><p>任意</p></td>
+<td><p>任意</p></td>
+<td><p>两寄存器大小必须相同</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Div_Sqrt_Arccos_UInt_UInt</span></code></p></td>
+<td><p>res ^= arccos(√(l/r))</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>Rational</p></td>
+<td><p>lhs &lt; rhs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Sqrt_Div_Arccos_Int_UInt</span></code></p></td>
+<td><p>res ^= arccos(l/√r)</p></td>
+<td><p>SignedInteger, UnsignedInteger</p></td>
+<td><p>Rational</p></td>
+<td><p>|lhs| ≤ √rhs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GetRotateAngle_Int_Int</span></code></p></td>
+<td><p>res ^= atan2(r,l)/2π</p></td>
+<td><p>整数类型</p></td>
+<td><p>Rational</p></td>
+<td><p>结果在 [0,1) 范围内</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Sub_UInt_UInt</span></code></p></td>
+<td><p>res ^= lhs − rhs</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>宽度任意（约定通用行）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Neg_UInt</span></code></p></td>
+<td><p>res ^= 0 − reg</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>宽度任意</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Abs_SInt</span></code></p></td>
+<td><p>res ^= |sext(reg)|</p></td>
+<td><p>SignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>补码最小值回绕自身</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Mul_UInt_UInt</span></code></p></td>
+<td><p>res ^= lhs · rhs</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>宽度任意，结果 mod 2^res_w</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Div_UInt_UInt</span></code></p></td>
+<td><p>res ^= lhs // rhs</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p><strong>除零 → 商 0</strong>（域外全量化）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Sqrt_UInt</span></code></p></td>
+<td><p>res ^= isqrt(reg)</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>整数开方（floor）</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Select_Bool_UInt_UInt</span></code></p></td>
+<td><p>res ^= cond ? lhs : rhs</p></td>
+<td><p>Boolean, UInt×2</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>cond 宽度为 1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">And_UInt_UInt</span></code> / <code class="docutils literal notranslate"><span class="pre">Or_UInt_UInt</span></code> / <code class="docutils literal notranslate"><span class="pre">Xor_UInt_UInt</span></code></p></td>
+<td><p>按位与/或/异或</p></td>
+<td><p>UnsignedInteger×2</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>宽度任意</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Less_SInt_SInt</span></code></p></td>
+<td><p>flag ^= sext(lhs) &lt; sext(rhs)</p></td>
+<td><p>SignedInteger×2</p></td>
+<td><p>Boolean</p></td>
+<td><p>有符号比较</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Carry_UInt_UInt</span></code></p></td>
+<td><p>flag ^= lhs+rhs ≥ 2^res_w</p></td>
+<td><p>UnsignedInteger×2</p></td>
+<td><p>Boolean</p></td>
+<td><p>res 仅提供宽度，不读不写</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Overflow_SInt_SInt</span></code></p></td>
+<td><p>flag ^= 有符号加溢出</p></td>
+<td><p>SignedInteger×2</p></td>
+<td><p>Boolean</p></td>
+<td><p>res 仅提供宽度；内部按 res 宽度求值</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MulOverflow_UInt_UInt</span></code></p></td>
+<td><p>flag ^= lhs·rhs ≥ 2^res_w (全精度)</p></td>
+<td><p>UnsignedInteger×2</p></td>
+<td><p>Boolean</p></td>
+<td><p>res 仅提供宽度</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IsZero_UInt</span></code></p></td>
+<td><p>flag ^= reg == 0</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>Boolean</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Negative_SInt</span></code></p></td>
+<td><p>flag ^= sext(reg) &lt; 0</p></td>
+<td><p>SignedInteger</p></td>
+<td><p>Boolean</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CustomArithmetic</span></code></p></td>
+<td><p>res ^= func(inputs)</p></td>
+<td><p>任意</p></td>
+<td><p>任意</p></td>
+<td><p>func 必须是确定性函数</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="in-place-baseoperator">
+<h3>2. In-place 算子 (BaseOperator)<a class="headerlink" href="#in-place-baseoperator" title="链接到此标题。">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>算子</p></th>
+<th class="head"><p>操作</p></th>
+<th class="head"><p>输入类型</p></th>
+<th class="head"><p>Dagger 实现</p></th>
+<th class="head"><p>约束</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt_InPlace</span></code></p></td>
+<td><p>rhs += lhs</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>rhs += (2^N - lhs)</p></td>
+<td><p>宽度任意，lhs 零扩展，rhs 按 mod 2^rhs_w 回绕</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Add_Mult_UInt_ConstUInt_InPlace</span></code></p></td>
+<td><p>res += lhs * const (lhs不变)</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>res -= lhs * const</p></td>
+<td><p>lhs不变，仅res更新</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Add_ConstUInt_InPlace</span></code></p></td>
+<td><p>reg += const</p></td>
+<td><p>UnsignedInteger/SignedInteger</p></td>
+<td><p>reg += (2^N - const)</p></td>
+<td><p>模 2^N 回绕</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Mod_Mult_UInt_ConstUInt_InPlace</span></code></p></td>
+<td><p>y = y * a^(2^x) mod N</p></td>
+<td><p>UnsignedInteger</p></td>
+<td><p>y = y * a^(-2^x) mod N</p></td>
+<td><p>gcd(a, N) = 1，寄存器 ≥ ⌈log₂(N)⌉</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Add_AnyInt_AnyInt_InPlace</span></code></p></td>
+<td><p>lhs += rhs</p></td>
+<td><p>整数类型</p></td>
+<td><p>lhs -= rhs (mod 2^N)</p></td>
+<td><p>混合类型；rhs 按声明类型扩展（SInt 符号扩展）；lhs≠rhs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ShiftLeft_InPlace</span></code></p></td>
+<td><p>循环左移</p></td>
+<td><p>UnsignedInteger/SignedInteger</p></td>
+<td><p>循环右移相同位数</p></td>
+<td><p>移位量 ≤ 寄存器大小</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ShiftRight_InPlace</span></code></p></td>
+<td><p>循环右移</p></td>
+<td><p>UnsignedInteger/SignedInteger</p></td>
+<td><p>循环左移相同位数</p></td>
+<td><p>移位量 ≤ 寄存器大小</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="id7">
+<h2>算子详细说明<a class="headerlink" href="#id7" title="链接到此标题。">¶</a></h2>
+<section id="add-uint-uint">
+<h3>Add_UInt_UInt<a class="headerlink" href="#add-uint-uint" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">^=</span> <span class="pre">lhs</span> <span class="pre">+</span> <span class="pre">rhs</span></code> (out-of-place)</p>
+<p><strong>Unitary 保证</strong>: 通过 XOR 实现。<code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">⊕</span> <span class="pre">(lhs+rhs)</span> <span class="pre">⊕</span> <span class="pre">(lhs+rhs)</span> <span class="pre">=</span> <span class="pre">res</span></code></p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lhs</span></code>, <code class="docutils literal notranslate"><span class="pre">rhs</span></code>, <code class="docutils literal notranslate"><span class="pre">res</span></code> 必须是 UnsignedInteger 类型</p></li>
+<li><p>所有寄存器必须是激活状态</p></li>
+<li><p>加法结果按 <code class="docutils literal notranslate"><span class="pre">res</span></code> 寄存器大小截断</p></li>
+</ul>
+<p><strong>示例</strong>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">lhs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"lhs"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">rhs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"rhs"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"res"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">Init_Unsafe</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="n">Init_Unsafe</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+<span class="c1">// res = 0 ⊕ (3 + 5) = 8</span>
+<span class="n">Add_UInt_UInt</span><span class="p">(</span><span class="s">"lhs"</span><span class="p">,</span><span class="w"> </span><span class="s">"rhs"</span><span class="p">,</span><span class="w"> </span><span class="s">"res"</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="add-uint-uint-inplace">
+<h3>Add_UInt_UInt_InPlace<a class="headerlink" href="#add-uint-uint-inplace" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">rhs</span> <span class="pre">+=</span> <span class="pre">lhs</span></code> (mod 2^N) (in-place)</p>
+<p><strong>Unitary 保证</strong>: 通过模运算实现 dagger。<code class="docutils literal notranslate"><span class="pre">rhs</span> <span class="pre">=</span> <span class="pre">(rhs</span> <span class="pre">+</span> <span class="pre">(2^N</span> <span class="pre">-</span> <span class="pre">lhs))</span> <span class="pre">mod</span> <span class="pre">2^N</span></code> 恢复原值。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lhs</span></code>, <code class="docutils literal notranslate"><span class="pre">rhs</span></code> 必须是 UnsignedInteger 类型</p></li>
+<li><p>强烈建议两寄存器大小相同</p></li>
+<li><p>所有寄存器必须是激活状态</p></li>
+</ul>
+<p><strong>溢出行为</strong>: 结果按 <code class="docutils literal notranslate"><span class="pre">rhs</span></code> 寄存器大小模 2^N 回绕</p>
+<p><strong>示例</strong>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">lhs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"lhs"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">rhs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"rhs"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">Init_Unsafe</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span>
+<span class="n">Init_Unsafe</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="c1">// rhs = (3 + 7) % 16 = 10</span>
+<span class="n">Add_UInt_UInt_InPlace</span><span class="p">(</span><span class="s">"lhs"</span><span class="p">,</span><span class="w"> </span><span class="s">"rhs"</span><span class="p">);</span>
+<span class="c1">// dagger: rhs = (10 + 9) % 16 = 3 (恢复原值)</span>
+<span class="n">op</span><span class="p">.</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="shiftleft-inplace-shiftright-inplace">
+<h3>ShiftLeft_InPlace / ShiftRight_InPlace<a class="headerlink" href="#shiftleft-inplace-shiftright-inplace" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: 循环移位</p>
+<p><strong>Unitary 保证</strong>: 循环移位是双射，ShiftLeft_InPlace 和 ShiftRight_InPlace 互为 dagger。<code class="docutils literal notranslate"><span class="pre">ShiftLeft_InPlace::dag()</span></code> 调用 <code class="docutils literal notranslate"><span class="pre">ShiftRight_InPlace</span></code>，反之亦然。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p>寄存器必须是 UnsignedInteger 或 SignedInteger 类型</p></li>
+<li><p>移位量必须 ≤ 寄存器大小</p></li>
+<li><p>移位量等于大小时等于恒等操作</p></li>
+</ul>
+<p><strong>示例</strong>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="o">::</span><span class="n">add_register</span><span class="p">(</span><span class="s">"reg"</span><span class="p">,</span><span class="w"> </span><span class="n">UnsignedInteger</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">Init_Unsafe</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span><span class="w"> </span><span class="mb">0b1010</span><span class="p">);</span><span class="w">  </span><span class="c1">// 10</span>
+<span class="c1">// 循环左移1位: 0b0101 = 5</span>
+<span class="n">ShiftLeft_InPlace</span><span class="p">(</span><span class="s">"reg"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">// 循环右移1位回到原值</span>
+<span class="n">ShiftRight_InPlace</span><span class="p">(</span><span class="s">"reg"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">// 或者使用 .dag()：</span>
+<span class="n">ShiftLeft_InPlace</span><span class="p">(</span><span class="s">"reg"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">).</span><span class="n">dag</span><span class="p">(</span><span class="n">state</span><span class="p">);</span><span class="w">  </span><span class="c1">// 撤销</span>
+</pre></div>
+</div>
+</section>
+<section id="mult-uint-constuint">
+<h3>Mult_UInt_ConstUInt<a class="headerlink" href="#mult-uint-constuint" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">^=</span> <span class="pre">lhs</span> <span class="pre">*</span> <span class="pre">mult</span></code> (out-of-place)</p>
+<p><strong>Unitary 保证</strong>: 通过 XOR 实现。注意：只有当 <code class="docutils literal notranslate"><span class="pre">mult</span></code> 与 2^N 互质时，乘法才是双射。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lhs</span></code>, <code class="docutils literal notranslate"><span class="pre">res</span></code> 必须是 UnsignedInteger 类型</p></li>
+<li><p>为保证 unitary，<code class="docutils literal notranslate"><span class="pre">mult</span></code> 应为奇数（与 2^N 互质）</p></li>
+<li><p>乘法结果按 <code class="docutils literal notranslate"><span class="pre">res</span></code> 寄存器大小截断</p></li>
+</ul>
+<p><strong>警告</strong>: 如果 <code class="docutils literal notranslate"><span class="pre">mult</span></code> 为偶数，乘法不是双射，可能导致信息丢失。例如，乘以 2 会丢失最低位。</p>
+</section>
+<section id="assign">
+<h3>Assign<a class="headerlink" href="#assign" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">reg2</span> <span class="pre">^=</span> <span class="pre">reg1</span></code> (out-of-place)</p>
+<p><strong>Unitary 保证</strong>: 通过 XOR 实现，是自伴操作。</p>
+<p><strong>语义说明</strong>: 这不是经典意义上的赋值。如果 <code class="docutils literal notranslate"><span class="pre">reg2</span></code> 初始为 0，效果为复制；否则为 XOR 更新。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p>两个寄存器大小必须相同</p></li>
+<li><p>类型可以不同（位模式被复制）</p></li>
+</ul>
+</section>
+<section id="compare-uint-uint">
+<h3>Compare_UInt_UInt<a class="headerlink" href="#compare-uint-uint" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">|l&gt;|r&gt;|0&gt;|0&gt;</span> <span class="pre">→</span> <span class="pre">|l&gt;|r&gt;|l&lt;r?&gt;|l==r?&gt;</span></code></p>
+<p><strong>Unitary 保证</strong>: 通过 XOR 设置标志位，是自伴操作。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">left</span></code>, <code class="docutils literal notranslate"><span class="pre">right</span></code> 必须是 UnsignedInteger</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compare_less</span></code>, <code class="docutils literal notranslate"><span class="pre">compare_equal</span></code> 必须是 Boolean（大小为 1）</p></li>
+</ul>
+</section>
+<section id="customarithmetic">
+<h3>CustomArithmetic<a class="headerlink" href="#customarithmetic" title="链接到此标题。">¶</a></h3>
+<p><strong>操作</strong>: <code class="docutils literal notranslate"><span class="pre">outputs</span> <span class="pre">^=</span> <span class="pre">func(inputs)</span></code> (out-of-place)</p>
+<p><strong>Unitary 保证</strong>: 通过 XOR 实现，但用户必须确保 <code class="docutils literal notranslate"><span class="pre">func</span></code> 是确定性的。</p>
+<p><strong>约束条件</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">func</span></code> 必须是纯函数（相同输入总是产生相同输出）</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">func</span></code> 不应该有副作用</p></li>
+<li><p>用户负责确保 <code class="docutils literal notranslate"><span class="pre">func</span></code> 的正确性</p></li>
+</ul>
+</section>
+</section>
+<section id="unitary">
+<h2>Unitary 性质保证机制<a class="headerlink" href="#unitary" title="链接到此标题。">¶</a></h2>
+<section id="xor-out-of-place">
+<h3>1. XOR 机制 (Out-of-place)<a class="headerlink" href="#xor-out-of-place" title="链接到此标题。">¶</a></h3>
+<p>所有 out-of-place 算子使用 XOR 写入结果：</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">output</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">compute_result</span><span class="p">(</span><span class="n">input_values</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>因为 <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">⊕</span> <span class="pre">y</span> <span class="pre">⊕</span> <span class="pre">y</span> <span class="pre">=</span> <span class="pre">x</span></code>，应用两次操作会恢复原值，保证 U† = U。</p>
+</section>
+<section id="in-place">
+<h3>2. 模运算机制 (In-place)<a class="headerlink" href="#in-place" title="链接到此标题。">¶</a></h3>
+<p>In-place 算子使用模运算保证可逆性：</p>
+<p><strong>正向操作</strong>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">reg</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">1ULL</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Dagger 操作</strong>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">reg</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="mi">1ULL</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">value</span><span class="p">))</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="p">(</span><span class="mi">1ULL</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>因为 <code class="docutils literal notranslate"><span class="pre">(x</span> <span class="pre">+</span> <span class="pre">y)</span> <span class="pre">+</span> <span class="pre">(2^N</span> <span class="pre">-</span> <span class="pre">y)</span> <span class="pre">≡</span> <span class="pre">x</span> <span class="pre">(mod</span> <span class="pre">2^N)</span></code>，操作和 dagger 互相抵消。</p>
+</section>
+<section id="id8">
+<h3>3. 双射验证<a class="headerlink" href="#id8" title="链接到此标题。">¶</a></h3>
+<p>对于 out-of-place 算子，使用 <code class="docutils literal notranslate"><span class="pre">verify_outofplace_unitarity</span></code> 模板验证：</p>
+<ul class="simple">
+<li><p>对所有可能的输入，应用两次操作</p></li>
+<li><p>验证结果等于原始状态</p></li>
+</ul>
+<p>对于 in-place 算子，使用 <code class="docutils literal notranslate"><span class="pre">verify_inplace_unitarity</span></code> 模板验证：</p>
+<ul class="simple">
+<li><p>对所有可能的输入，应用操作然后应用 dagger</p></li>
+<li><p>验证结果等于原始状态</p></li>
+</ul>
+</section>
+</section>
+<section id="id9">
+<h2>类型安全与溢出行为<a class="headerlink" href="#id9" title="链接到此标题。">¶</a></h2>
+<section id="debug">
+<h3>Debug 模式检查<a class="headerlink" href="#debug" title="链接到此标题。">¶</a></h3>
+<p>在非 <code class="docutils literal notranslate"><span class="pre">QRAM_Release</span></code> 模式下，所有算子构造函数会检查：</p>
+<ul class="simple">
+<li><p>输入/输出寄存器类型是否符合要求</p></li>
+<li><p>寄存器大小是否匹配（对于需要匹配的操作）</p></li>
+<li><p>操作数是否在有效范围内</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>溢出行为<a class="headerlink" href="#id10" title="链接到此标题。">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>加法/减法</strong>: 模 2^N 回绕</p></li>
+<li><p><strong>乘法</strong>: 截断到输出寄存器大小</p></li>
+<li><p><strong>移位</strong>: 循环移位（溢出位循环到另一边）</p></li>
+</ol>
+</section>
+<section id="id11">
+<h3>类型转换<a class="headerlink" href="#id11" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p>UnsignedInteger: 直接使用原始值</p></li>
+<li><p>SignedInteger: 使用补码表示</p></li>
+<li><p>Rational: 编码为定点小数</p></li>
+<li><p>Boolean: 视为 1 位 UnsignedInteger</p></li>
+</ul>
+</section>
+</section>
+<section id="id12">
+<h2>使用建议<a class="headerlink" href="#id12" title="链接到此标题。">¶</a></h2>
+<section id="id13">
+<h3>1. 寄存器大小选择<a class="headerlink" href="#id13" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p>确保输出寄存器有足够位数存储结果</p></li>
+<li><p>对于 in-place 操作，强烈建议使用相同大小的寄存器</p></li>
+<li><p>考虑溢出行为对算法正确性的影响</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>2. Unitary 验证<a class="headerlink" href="#id14" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p>使用提供的测试模板验证自定义算子的 unitary 性</p></li>
+<li><p>对于关键操作，在算法中使用 <code class="docutils literal notranslate"><span class="pre">CheckNormalization</span></code> 验证状态归一化</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>3. 性能优化<a class="headerlink" href="#id15" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p>Debug 模式的类型检查有运行时开销，Release 模式自动移除</p></li>
+<li><p>Out-of-place 操作通常比 in-place 更容易优化</p></li>
+<li><p>考虑使用 <code class="docutils literal notranslate"><span class="pre">CustomArithmetic</span></code> 减少寄存器分配</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>4. 常见陷阱<a class="headerlink" href="#id16" title="链接到此标题。">¶</a></h3>
+<ul class="simple">
+<li><p><strong>乘法非双射</strong>: 偶数乘数会导致信息丢失</p></li>
+<li><p><strong>In-place 大小不匹配</strong>: 较小寄存器的值会被截断</p></li>
+<li><p><strong>XOR 语义</strong>: Out-of-place 算子的输出是 XOR 到目标寄存器，不是直接赋值</p></li>
+<li><p><strong>有符号溢出</strong>: C++ 有符号整数溢出是未定义行为，使用时需谨慎</p></li>
+</ul>
+</section>
+</section>
+<section id="id17">
+<h2>参考<a class="headerlink" href="#id17" title="链接到此标题。">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Reversible_computing">量子计算中的可逆计算</a></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Unitary_matrix">Unitary 矩阵</a></p></li>
+<li><p>项目论文: arXiv:2503.13832, arXiv:2503.15118</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="naming_conventions.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">SparQ 算子命名规范</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="architecture.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">QRAM-Simulator 架构</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">量子算术算子约束说明</a><ul>
+<li><a class="reference internal" href="#id2">目录</a></li>
+<li><a class="reference internal" href="#id3">概述</a><ul>
+<li><a class="reference internal" href="#id4">关键概念</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">宽度与截断约定</a></li>
+<li><a class="reference internal" href="#id6">算子分类</a><ul>
+<li><a class="reference internal" href="#out-of-place-selfadjointoperator">1. Out-of-place 算子 (SelfAdjointOperator)</a></li>
+<li><a class="reference internal" href="#in-place-baseoperator">2. In-place 算子 (BaseOperator)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">算子详细说明</a><ul>
+<li><a class="reference internal" href="#add-uint-uint">Add_UInt_UInt</a></li>
+<li><a class="reference internal" href="#add-uint-uint-inplace">Add_UInt_UInt_InPlace</a></li>
+<li><a class="reference internal" href="#shiftleft-inplace-shiftright-inplace">ShiftLeft_InPlace / ShiftRight_InPlace</a></li>
+<li><a class="reference internal" href="#mult-uint-constuint">Mult_UInt_ConstUInt</a></li>
+<li><a class="reference internal" href="#assign">Assign</a></li>
+<li><a class="reference internal" href="#compare-uint-uint">Compare_UInt_UInt</a></li>
+<li><a class="reference internal" href="#customarithmetic">CustomArithmetic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unitary">Unitary 性质保证机制</a><ul>
+<li><a class="reference internal" href="#xor-out-of-place">1. XOR 机制 (Out-of-place)</a></li>
+<li><a class="reference internal" href="#in-place">2. 模运算机制 (In-place)</a></li>
+<li><a class="reference internal" href="#id8">3. 双射验证</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9">类型安全与溢出行为</a><ul>
+<li><a class="reference internal" href="#debug">Debug 模式检查</a></li>
+<li><a class="reference internal" href="#id10">溢出行为</a></li>
+<li><a class="reference internal" href="#id11">类型转换</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">使用建议</a><ul>
+<li><a class="reference internal" href="#id13">1. 寄存器大小选择</a></li>
+<li><a class="reference internal" href="#id14">2. Unitary 验证</a></li>
+<li><a class="reference internal" href="#id15">3. 性能优化</a></li>
+<li><a class="reference internal" href="#id16">4. 常见陷阱</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id17">参考</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=470db953"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    </body>
+</html>

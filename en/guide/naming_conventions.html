@@ -1,0 +1,707 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="API Reference" href="../api/index.html"><link rel="prev" title="Quantum Arithmetic Operator Constraints" href="operators.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>SparQ Operator Naming Conventions - QRAM-Simulator Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator Documentation</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <a href="../../zh/guide/naming_conventions.html">中文</a>
+  <span class="sidebar-langswitch-sep">·</span>
+  <strong>English</strong>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">QRAM-Simulator Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operators.html">Quantum Arithmetic Operator Constraints</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">SparQ Operator Naming Conventions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API Reference</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Papers and Experiments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../paper/README.html">Paper Reproduction Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/reproduction.html">Paper Experiment Reproduction Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/exactness_validation.html">Pruned/full exactness validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/joint_damping.html">Exact joint sampling of qubit amplitude damping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/qubit_qram_pruning.html">Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paper/qubit_error_propagation.html">The Qubit-QRAM Error Propagation Mechanism: A Theoretical Walkthrough with Single-Error Injection Verification</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/guide/naming_conventions.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/guide/naming_conventions.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="sparq-operator-naming-conventions">
+<h1>SparQ Operator Naming Conventions<a class="headerlink" href="#sparq-operator-naming-conventions" title="Link to this heading">¶</a></h1>
+<p>This document defines the naming rules for quantum operators and related public symbols in QRAM-Simulator; it is the <strong>authoritative reference</strong> for naming new operators.
+Specification date: 2026-09-17. The companion audit cross-reference table is at the end of this document; the deprecation and alias mechanism is described in Section 10.</p>
+<p>Historical background: when this specification was first written down, the names of roughly 60 existing operator classes carried a large body of de facto rules that had never been documented, along with several misleading labels and format anomalies. The first batch of renames executed under this specification covered 19 items (see the audit table); all old names were retained as deprecated aliases.</p>
+<section id="scope-and-symbol-layers">
+<h2>1. Scope and Symbol Layers<a class="headerlink" href="#scope-and-symbol-layers" title="Link to this heading">¶</a></h2>
+<p>This specification is primarily about <strong>unitary operators</strong>; the remaining public symbols fall into layers governed by rules of different strength:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Layer</p></th>
+<th class="head"><p>Definition</p></th>
+<th class="head"><p>Rule Strength</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Idempotent-operator layer</p></td>
+<td><p>subclasses of <code class="docutils literal notranslate"><span class="pre">BaseOperator</span></code> / <code class="docutils literal notranslate"><span class="pre">SelfAdjointOperator</span></code></p></td>
+<td><p><strong>mandatory</strong> (all rules in Sections 2–9)</p></td>
+</tr>
+<tr class="row-odd"><td><p>State-management layer</p></td>
+<td><p>register-management callables: <code class="docutils literal notranslate"><span class="pre">AddRegister</span></code>, <code class="docutils literal notranslate"><span class="pre">RemoveRegister</span></code>, <code class="docutils literal notranslate"><span class="pre">SplitRegister</span></code>, <code class="docutils literal notranslate"><span class="pre">CombineRegister</span></code>, <code class="docutils literal notranslate"><span class="pre">MoveBackRegister</span></code>, <code class="docutils literal notranslate"><span class="pre">Push</span></code>, <code class="docutils literal notranslate"><span class="pre">Pop</span></code>, <code class="docutils literal notranslate"><span class="pre">StateLoad</span></code>, etc.</p></td>
+<td><p>capitalization rules only (Section 2)</p></td>
+</tr>
+<tr class="row-even"><td><p>Measurement and readout layer</p></td>
+<td><p>non-unitary / read-only: <code class="docutils literal notranslate"><span class="pre">MeasureZ</span></code>, <code class="docutils literal notranslate"><span class="pre">Reset</span></code>, <code class="docutils literal notranslate"><span class="pre">Probability</span></code>, <code class="docutils literal notranslate"><span class="pre">PartialTrace*</span></code></p></td>
+<td><p>capitalization rules only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Debug and verification layer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Check*</span></code>, <code class="docutils literal notranslate"><span class="pre">View*</span></code>, <code class="docutils literal notranslate"><span class="pre">StatePrint</span></code>, <code class="docutils literal notranslate"><span class="pre">ModuleInheritance_Test*</span></code>, <code class="docutils literal notranslate"><span class="pre">TestRemovable</span></code></p></td>
+<td><p>capitalization rules only; verb prefixes drawn from the closed set {Check, View, Print, Test, Init}</p></td>
+</tr>
+<tr class="row-even"><td><p>Comparison functor layer</p></td>
+<td><p>interference-bucketing <code class="docutils literal notranslate"><span class="pre">State{Hash,Equal,Less}Except*</span></code></p></td>
+<td><p>capitalization rules only; <code class="docutils literal notranslate"><span class="pre">Except</span></code> = “excluded from the comparison”</p></td>
+</tr>
+<tr class="row-odd"><td><p>Free-function layer</p></td>
+<td><p>non-operator utilities such as <code class="docutils literal notranslate"><span class="pre">split_systems</span></code>, <code class="docutils literal notranslate"><span class="pre">combine_systems</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_system</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_system</span></code>, <code class="docutils literal notranslate"><span class="pre">stateprep_unitary_build_schmidt</span></code></p></td>
+<td><p><strong>snake_case exemption</strong> (see Section 2)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The layered rules only constrain consistency within each layer; they do not force cross-layer uniformity.</p>
+</section>
+<section id="capitalization-rules">
+<h2>2. Capitalization Rules<a class="headerlink" href="#capitalization-rules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Operator and class names are always <strong>PascalCase</strong>; class names starting with a lowercase letter are forbidden (the historical violation <code class="docutils literal notranslate"><span class="pre">inverseQFT</span></code> was eliminated in the first rename batch and is now <code class="docutils literal notranslate"><span class="pre">InverseQFT</span></code>).</p></li>
+<li><p>Free functions (non-operator utilities) keep <strong>snake_case</strong> — a documented exemption: they are not operators, and the snake-case/Pascal-case contrast forms a natural category boundary. This also matches common C++ practice.</p></li>
+<li><p>Enum values (<code class="docutils literal notranslate"><span class="pre">UnsignedInteger</span></code>, <code class="docutils literal notranslate"><span class="pre">Detail</span></code>, <code class="docutils literal notranslate"><span class="pre">Prob</span></code>, etc.) and macros (<code class="docutils literal notranslate"><span class="pre">UPPER_CASE</span></code>) follow their own established conventions.</p></li>
+</ul>
+</section>
+<section id="operator-naming-grammar">
+<h2>3. Operator Naming Grammar<a class="headerlink" href="#operator-naming-grammar" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>OperatorName ::= Family [ "_" Slot { "_" Slot } ] [ Variant { Variant } ]
+
+Family       ::= PascalCase verb phrase or established physics noun
+               (Add, Swap, Compare, Hadamard, QFT, CondRot, Rot, …)
+
+Slot         ::= TypeTag | Modifier TypeTag
+TypeTag      ::= "UInt" | "Int" | "Bool" | "Rational" | "General"
+Modifier      ::= "Const" | "Any" | "Fixed"
+
+Variant      ::= "_InPlace" | "_Full" | "_Fast" | "_Partial"
+</pre></div>
+</div>
+<p>Constraints:</p>
+<ul class="simple">
+<li><p><strong>The TypeTag vocabulary is closed</strong> and must correspond one-to-one with <code class="docutils literal notranslate"><span class="pre">StateStorageType</span></code>
+(<code class="docutils literal notranslate"><span class="pre">get_type_str</span></code> in <code class="docutils literal notranslate"><span class="pre">Common/include/typedefs.h</span></code>: General/UInt/Int/Bool/Rat).
+<code class="docutils literal notranslate"><span class="pre">UInt</span></code> = unsigned integer, <code class="docutils literal notranslate"><span class="pre">Int</span></code> = signed integer (two’s complement), <code class="docutils literal notranslate"><span class="pre">Bool</span></code> = a single bit, <code class="docutils literal notranslate"><span class="pre">Rational</span></code> = fixed-point rational, <code class="docutils literal notranslate"><span class="pre">General</span></code> = a raw bit string with no numeric meaning attached.</p></li>
+<li><p><strong>The Modifier vocabulary is closed</strong>: <code class="docutils literal notranslate"><span class="pre">Const</span></code> (classical compile-time constant, e.g. <code class="docutils literal notranslate"><span class="pre">ConstUInt</span></code>),
+<code class="docutils literal notranslate"><span class="pre">Any</span></code> (type-polymorphic, e.g. <code class="docutils literal notranslate"><span class="pre">AnyInt</span></code> = signed or unsigned),
+<code class="docutils literal notranslate"><span class="pre">Fixed</span></code> (fixed-point encoding variant, e.g. <code class="docutils literal notranslate"><span class="pre">CondRot_Fixed_Bool</span></code>; not a <code class="docutils literal notranslate"><span class="pre">StateStorageType</span></code> member, purely an encoding modifier).</p></li>
+<li><p><strong>The Variant vocabulary is closed, always sits at the end of the name, and is PascalCase</strong>. New variants require this specification to be revised first.</p></li>
+<li><p>Type words are always separated by underscores; PascalCase suffixes without an underscore such as <code class="docutils literal notranslate"><span class="pre">PartialQubit</span></code> are forbidden
+(the historical violation was renamed to <code class="docutils literal notranslate"><span class="pre">Hadamard_Partial</span></code>).</p></li>
+</ul>
+<p><strong>Slot-carried semantics rule</strong> (added 2026-09; see “Width and Truncation Conventions” in <code class="docutils literal notranslate"><span class="pre">docs/operators.md</span></code>):
+slot types do not only constrain register declarations, they also <strong>decide the read-extension semantics</strong> — <code class="docutils literal notranslate"><span class="pre">_UInt_</span></code> zero-extends,
+<code class="docutils literal notranslate"><span class="pre">_SInt_</span></code> sign-extends, <code class="docutils literal notranslate"><span class="pre">AnyInt</span></code> extends according to the register’s declared type. The semantics are carried by the operator name and hold equally in release builds.</p>
+<p><strong>Predicate (flag) operator family</strong>: predicate operators whose output is a 1-bit Boolean flag follow the
+<code class="docutils literal notranslate"><span class="pre">Compare_UInt_UInt(l,</span> <span class="pre">r,</span> <span class="pre">less,</span> <span class="pre">equal)</span></code> precedent — the Family is a predicate verb (<code class="docutils literal notranslate"><span class="pre">Less</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">Carry</span></code>, <code class="docutils literal notranslate"><span class="pre">IsZero</span></code>, <code class="docutils literal notranslate"><span class="pre">Negative</span></code>) or a compound verb chain (<code class="docutils literal notranslate"><span class="pre">MulOverflow</span></code> =
+“multiplication overflow”); flag outputs are implicitly not listed as slots per Section 4, and neither
+are <code class="docutils literal notranslate"><span class="pre">out</span></code> parameters that only supply a width. Predicates are evaluated over the full-precision domain.</p>
+</section>
+<section id="slot-rules">
+<h2>4. Slot Rules<a class="headerlink" href="#slot-rules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Slots list the types of the <strong>input registers</strong> in <strong>constructor-argument order</strong>.</p></li>
+<li><p><strong>XOR output registers are implicitly not listed</strong>: <code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt(lhs,</span> <span class="pre">rhs,</span> <span class="pre">res)</span></code> takes three arguments but lists only two slots;
+the output register is implied by the XOR semantics. Likewise, the less/equal output flags of <code class="docutils literal notranslate"><span class="pre">Compare_UInt_UInt</span></code> are not listed.</p></li>
+<li><p><strong>Disambiguation principle</strong>: labels are required only when sibling operators of the same family differ in type or granularity.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Swap_Bool_Bool</span></code> (bit granularity) and <code class="docutils literal notranslate"><span class="pre">Swap_General_General</span></code> (register granularity) are disambiguated by their labels — legal.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Assign</span></code>, <code class="docutils literal notranslate"><span class="pre">FlipBools</span></code>, <code class="docutils literal notranslate"><span class="pre">CustomArithmetic</span></code> have no sibling ambiguity, so they are exempt from labels — legal.</p></li>
+</ul>
+</li>
+<li><p><strong>Labels must not lie</strong>: the TypeTag in a name must agree with the constructor’s type checks and the actual numeric interpretation.
+Historical violations were fixed in the first rename batch (audit table #13–16).</p></li>
+</ul>
+</section>
+<section id="the-semantics-of-bool">
+<h2>5. The Semantics of <code class="docutils literal notranslate"><span class="pre">_Bool</span></code><a class="headerlink" href="#the-semantics-of-bool" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">_Bool</span></code> has two controlled meanings depending on context:</p>
+<ol class="arabic simple">
+<li><p><strong>In gate families and single-bit operations</strong> = “a single-bit-granularity target”: <code class="docutils literal notranslate"><span class="pre">X_Bool(reg,</span> <span class="pre">digit)</span></code>, <code class="docutils literal notranslate"><span class="pre">Phase_Bool</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Rot_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Hadamard_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Swap_Bool_Bool</span></code>.</p></li>
+<li><p><strong>Output flags</strong>: the Boolean outputs of <code class="docutils literal notranslate"><span class="pre">Compare_UInt_UInt</span></code>, implicitly not listed per Section 4 and absent from the name.</p></li>
+</ol>
+<p>A third usage is forbidden (historically there was a period when “any 1-qubit register” and “a specific digit inside a register”
+were conflated without distinction; the criterion is whether the constructor accepts a <code class="docutils literal notranslate"><span class="pre">digit</span></code> parameter).</p>
+</section>
+<section id="the-inplace-contract">
+<h2>6. The <code class="docutils literal notranslate"><span class="pre">_InPlace</span></code> Contract<a class="headerlink" href="#the-inplace-contract" title="Link to this heading">¶</a></h2>
+<p>The suffix <code class="docutils literal notranslate"><span class="pre">_InPlace</span></code> ⟺ the operator <strong>modifies its input register</strong> and is not self-adjoint, so it must implement <code class="docutils literal notranslate"><span class="pre">dag()</span></code> explicitly
+(<code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">ShiftLeft_InPlace</span></code>).</p>
+<p>An arithmetic operator without the <code class="docutils literal notranslate"><span class="pre">_InPlace</span></code> suffix ⟺ <strong>XOR output</strong> (out-of-place): the result is XOR-ed into a separate output register,
+which makes it automatically unitary and self-adjoint (<code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt</span></code>, <code class="docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt</span></code>).</p>
+<p>This dichotomy is how the operator constraint table in <code class="docutils literal notranslate"><span class="pre">docs/operators.md</span></code> is expressed at the naming level; the two must be kept in sync.</p>
+</section>
+<section id="inversion-principles">
+<h2>7. Inversion Principles<a class="headerlink" href="#inversion-principles" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Dagger first</strong>: the inverse of a non-self-adjoint operator is always expressed via <code class="docutils literal notranslate"><span class="pre">dag()</span></code> in preference; no separate class is created for it.</p></li>
+<li><p>Legal exception 1: <strong>the <code class="docutils literal notranslate"><span class="pre">Inverse&lt;Family&gt;</span></code> prefix morpheme</strong> — a separate inverse class is allowed only when <code class="docutils literal notranslate"><span class="pre">dag()</span></code> is genuinely unavailable or prohibitively costly,
+named with the leading <code class="docutils literal notranslate"><span class="pre">Inverse</span></code> (<code class="docutils literal notranslate"><span class="pre">InverseQFT</span></code>).</p></li>
+<li><p>Legal exception 2: <strong>paired classes that are each other’s dagger</strong> — <code class="docutils literal notranslate"><span class="pre">ShiftLeft_InPlace</span></code> / <code class="docutils literal notranslate"><span class="pre">ShiftRight_InPlace</span></code>
+are each other’s inverse; this is the established pattern under circular-shift semantics, a documented exemption.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QFT</span></code> has provided <code class="docutils literal notranslate"><span class="pre">dag()</span></code> since the first rename batch (the implementation delegates to the inverse transform).</p></li>
+</ul>
+</section>
+<section id="gate-family-rules">
+<h2>8. Gate-Family Rules<a class="headerlink" href="#gate-family-rules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed single-qubit gates: <strong><code class="docutils literal notranslate"><span class="pre">&lt;Axis&gt;_Bool</span></code></strong>, without the <code class="docutils literal notranslate"><span class="pre">gate</span></code> infix — <code class="docutils literal notranslate"><span class="pre">X_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Y_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Z_Bool</span></code>,
+<code class="docutils literal notranslate"><span class="pre">S_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">T_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">RX_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">RY_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">RZ_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">SX_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">U2_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">U3_Bool</span></code>.
+(The historical <code class="docutils literal notranslate"><span class="pre">&lt;Axis&gt;gate_Bool</span></code> forms are all deprecated; see the alias table.)</p></li>
+<li><p>The parameterized carrier base classes <code class="docutils literal notranslate"><span class="pre">Phase_Bool</span></code> (phase e^{iλ}) and <code class="docutils literal notranslate"><span class="pre">Rot_Bool</span></code> (an arbitrary 2×2 unitary matrix) are not fixed gates
+and naturally carry no <code class="docutils literal notranslate"><span class="pre">gate</span></code> infix. Inheritance: Z/S/T ← <code class="docutils literal notranslate"><span class="pre">Phase_Bool</span></code>; RX/RY/SX/U2/U3 ← <code class="docutils literal notranslate"><span class="pre">Rot_Bool</span></code>.</p></li>
+<li><p>Gate-family constructors uniformly support both forms <code class="docutils literal notranslate"><span class="pre">(reg,</span> <span class="pre">digit,</span> <span class="pre">[params])</span></code> and <code class="docutils literal notranslate"><span class="pre">(reg,</span> <span class="pre">[params])</span></code> (digit defaults to 0).</p></li>
+</ul>
+</section>
+<section id="compound-verb-pipelines-rpn-reading">
+<h2>9. Compound Verb Pipelines (RPN Reading)<a class="headerlink" href="#compound-verb-pipelines-rpn-reading" title="Link to this heading">¶</a></h2>
+<p>The Family of a multi-operand composite operation is read from right to left, in the order of mathematical application:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Add_Mult_UInt_ConstUInt_InPlace</span></code> = <code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">+=</span> <span class="pre">lhs</span> <span class="pre">*</span> <span class="pre">const</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Div_Sqrt_Arccos_UInt_UInt</span></code> = <code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">^=</span> <span class="pre">arccos(√(lhs/rhs))</span> <span class="pre">/</span> <span class="pre">2π</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Sqrt_Div_Arccos_Int_UInt</span></code> = <code class="docutils literal notranslate"><span class="pre">res</span> <span class="pre">^=</span> <span class="pre">arccos(lhs/√rhs)</span> <span class="pre">/</span> <span class="pre">2π</span></code>.</p></li>
+</ul>
+<p>Every morpheme in the verb chain is an independent mathematical operator; the Slots that follow describe the <strong>raw inputs</strong> of the chain.</p>
+</section>
+<section id="deprecation-and-alias-mechanism">
+<h2>10. Deprecation and Alias Mechanism<a class="headerlink" href="#deprecation-and-alias-mechanism" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Python side</strong>: <code class="docutils literal notranslate"><span class="pre">pysparq/__init__.py</span></code> provides the old names via the PEP 562 module-level <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code>,
+emitting a <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> on access and resolving to the new name. The alias table corresponds one-to-one with the rename master table.</p></li>
+<li><p><strong>C++ side</strong>: the header file where a rename happened provides
+<code class="docutils literal notranslate"><span class="pre">[[deprecated(&quot;use</span> <span class="pre">NewName&quot;)]]</span> <span class="pre">using</span> <span class="pre">OldName</span> <span class="pre">=</span> <span class="pre">NewName;</span></code> inside the same namespace.</p></li>
+<li><p><strong>Removal policy</strong>: aliases are kept until the next major version.</p></li>
+<li><p>From the external-consumer perspective: old names that external dependencies rely on, as recorded in
+<code class="docutils literal notranslate"><span class="pre">PySparQ/consumer_runtime_inventory.json</span></code> in the SparQSim repository (e.g. <code class="docutils literal notranslate"><span class="pre">Xgate_Bool</span></code>), remain usable
+during the alias period; downstream projects should migrate to the new names within that period.</p></li>
+</ul>
+</section>
+<section id="audit-cross-reference-table">
+<h2>11. Audit Cross-Reference Table<a class="headerlink" href="#audit-cross-reference-table" title="Link to this heading">¶</a></h2>
+<p>Disposition meanings: <strong>renamed</strong> (executed in the first batch; the old name is a deprecated alias) / <strong>compliant</strong> (already conforms to the specification) /
+<strong>exempt</strong> (label-free under the layering or disambiguation principles) / <strong>legacy</strong> (a recorded deviation, not addressed for now).</p>
+<section id="first-batch-renames-19-items">
+<h3>11.1 First-Batch Renames (19 Items)<a class="headerlink" href="#first-batch-renames-19-items" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Old Name</p></th>
+<th class="head"><p>New Name</p></th>
+<th class="head"><p>Rationale</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Xgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">X_Bool</span></code></p></td>
+<td><p>gate family drops the <code class="docutils literal notranslate"><span class="pre">gate</span></code> infix (Section 8); externally depended upon, carried by the alias</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Ygate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Y_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Zgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Z_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Sgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">S_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Tgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">T_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RXgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RX_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RYgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RY_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RZgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RZ_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SXgate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SX_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-odd"><td><p>10</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">U2gate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">U2_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">U3gate_Bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">U3_Bool</span></code></p></td>
+<td><p>same as above</p></td>
+</tr>
+<tr class="row-odd"><td><p>12</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">inverseQFT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">InverseQFT</span></code></p></td>
+<td><p>the only lowercase-initial class name (Section 2); <code class="docutils literal notranslate"><span class="pre">QFT</span></code> also gained <code class="docutils literal notranslate"><span class="pre">dag()</span></code> (Section 7)</p></td>
+</tr>
+<tr class="row-even"><td><p>13</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GlobalPhase_Int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GlobalPhase</span></code></p></td>
+<td><p>lying label: the parameter is a complex constant, there is no integer register; global class exempt from labels (Section 4)</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AddAssign_AnyInt_AnyInt_InPlace</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Add_AnyInt_AnyInt_InPlace</span></code></p></td>
+<td><p>two syntaxes for one concept, unified into the <code class="docutils literal notranslate"><span class="pre">Add_</span></code> family (Sections 3, 9)</p></td>
+</tr>
+<tr class="row-even"><td><p>15</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Div_Sqrt_Arccos_Int_Int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Div_Sqrt_Arccos_UInt_UInt</span></code></p></td>
+<td><p>lying label: the constructor checks UInt, UInt</p></td>
+</tr>
+<tr class="row-odd"><td><p>16</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Sqrt_Div_Arccos_Int_Int</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Sqrt_Div_Arccos_Int_UInt</span></code></p></td>
+<td><p>lying label: the constructor checks SInt, UInt</p></td>
+</tr>
+<tr class="row-even"><td><p>17</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_PartialQubit</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Hadamard_Partial</span></code></p></td>
+<td><p>variant-suffix rule (Section 3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>18</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CondRot_General_Bool_fast</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CondRot_General_Bool_Fast</span></code></p></td>
+<td><p>variant suffix in PascalCase (Section 3); C+±only, not bound to Python; the alias <code class="docutils literal notranslate"><span class="pre">CondRot_General_Bool</span></code> stays unchanged</p></td>
+</tr>
+<tr class="row-even"><td><p>19</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearchFast</span></code> (namespace CKS)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch_Fast</span></code></p></td>
+<td><p>variant-suffix rule; the base name <code class="docutils literal notranslate"><span class="pre">QuantumBinarySearch</span></code> is untouched</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Verified and <strong>not renamed</strong>: the <code class="docutils literal notranslate"><span class="pre">GetRotateAngle_Int_Int</span></code> implementation interprets the value as signed via <code class="docutils literal notranslate"><span class="pre">get_complement</span></code>,
+so <code class="docutils literal notranslate"><span class="pre">_Int_Int</span></code> is honest; kept as compliant.</p>
+</section>
+<section id="idempotent-operator-layer-compliant-exempt-list">
+<h3>11.2 Idempotent-Operator Layer — Compliant/Exempt List<a class="headerlink" href="#idempotent-operator-layer-compliant-exempt-list" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Arithmetic (quantum_arithmetic.h): <code class="docutils literal notranslate"><span class="pre">FlipBools</span></code> (exempt), <code class="docutils literal notranslate"><span class="pre">Swap_Bool_Bool</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ShiftLeft_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">ShiftRight_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">Mult_UInt_ConstUInt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Add_Mult_UInt_ConstUInt_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">Mod_Mult_UInt_ConstUInt_InPlace</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt</span></code>, <code class="docutils literal notranslate"><span class="pre">Add_UInt_UInt_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">Add_UInt_ConstUInt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Add_ConstUInt_InPlace</span></code>, <code class="docutils literal notranslate"><span class="pre">GetRotateAngle_Int_Int</span></code>, <code class="docutils literal notranslate"><span class="pre">Assign</span></code> (exempt),
+<code class="docutils literal notranslate"><span class="pre">Compare_UInt_UInt</span></code>, <code class="docutils literal notranslate"><span class="pre">Less_UInt_UInt</span></code>, <code class="docutils literal notranslate"><span class="pre">Swap_General_General</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GetMid_UInt_UInt</span></code>, <code class="docutils literal notranslate"><span class="pre">CustomArithmetic</span></code> (exempt) — compliant.</p></li>
+<li><p>Gate family (basic_gates.h): <code class="docutils literal notranslate"><span class="pre">Phase_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Rot_Bool</span></code>, plus the 11 renamed fixed gates — compliant.</p></li>
+<li><p>Hadamard (hadamard.h): <code class="docutils literal notranslate"><span class="pre">Hadamard_Int</span></code>, <code class="docutils literal notranslate"><span class="pre">Hadamard_Int_Full</span></code>, <code class="docutils literal notranslate"><span class="pre">Hadamard_Bool</span></code> — compliant.</p></li>
+<li><p>QFT (qft.h): <code class="docutils literal notranslate"><span class="pre">QFT</span></code>, <code class="docutils literal notranslate"><span class="pre">QFT_Full</span></code> — compliant.</p></li>
+<li><p>Conditional rotation (condrot.h): <code class="docutils literal notranslate"><span class="pre">CondRot_Rational_Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">CondRot_Fixed_Bool</span></code> — compliant.</p></li>
+<li><p>Phase and reflection (parallel_phase_operations.h): <code class="docutils literal notranslate"><span class="pre">ZeroConditionalPhaseFlip</span></code>,
+<code class="docutils literal notranslate"><span class="pre">RangeConditionalPhaseFlip</span></code>, <code class="docutils literal notranslate"><span class="pre">Reflection_Bool</span></code> — compliant.</p></li>
+<li><p>Rotation and state preparation (rot.h): <code class="docutils literal notranslate"><span class="pre">Rot_GeneralUnitary</span></code>, <code class="docutils literal notranslate"><span class="pre">Rot_GeneralStatePrep</span></code> — compliant
+(here <code class="docutils literal notranslate"><span class="pre">General</span></code> is a Family morpheme meaning “arbitrary dimension / arbitrary target”, not a TypeTag — do not confuse them).</p></li>
+<li><p>System operators (system_operations.h): <code class="docutils literal notranslate"><span class="pre">ClearZero</span></code> — exempt (global class).</p></li>
+<li><p>Dark magic (dark_magic.h): <code class="docutils literal notranslate"><span class="pre">Normalize</span></code>, <code class="docutils literal notranslate"><span class="pre">Init_Unsafe</span></code> — exempt (global classes;
+the <code class="docutils literal notranslate"><span class="pre">_Unsafe</span></code> suffix marks a non-physical operation and is retained).</p></li>
+</ul>
+</section>
+<section id="other-layers">
+<h3>11.3 Other Layers<a class="headerlink" href="#other-layers" title="Link to this heading">¶</a></h3>
+<p>State-management layer, measurement and readout layer, debug and verification layer, comparison functor layer, free-function layer:
+all are handled under the layered rules of Section 1; <strong>zero renames</strong> in the first batch.</p>
+</section>
+<section id="recorded-legacy-deviations-not-addressed-for-awareness-only">
+<h3>11.4 Recorded Legacy Deviations (Not Addressed; for Awareness Only)<a class="headerlink" href="#recorded-legacy-deviations-not-addressed-for-awareness-only" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>The QRAM family is exempt as a whole</strong>: the <code class="docutils literal notranslate"><span class="pre">_qutrit</span></code> snake-case disambiguation suffix of <code class="docutils literal notranslate"><span class="pre">QRAMCircuit_qutrit</span></code> and
+the underscore-free variant suffix of <code class="docutils literal notranslate"><span class="pre">QRAMLoadFast</span></code> both deviate from the grammar of Section 3; by decision the <strong>status quo is kept</strong>.</p></li>
+<li><p><strong>Ghost reference</strong>: <code class="docutils literal notranslate"><span class="pre">QRAMLoad_Qubit</span></code>, mentioned in a comment in <code class="docutils literal notranslate"><span class="pre">SparQ/include/qram.h</span></code>, does not exist in the code base.</p></li>
+<li><p>The Hamiltonian-simulation class name <code class="docutils literal notranslate"><span class="pre">T</span></code> in <code class="docutils literal notranslate"><span class="pre">SparQ_Algorithm</span></code> collides conceptually with the gate <code class="docutils literal notranslate"><span class="pre">T_Bool</span></code> (the former is not bound to Python).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Sort*</span></code> family (<code class="docutils literal notranslate"><span class="pre">SortExceptKey</span></code> etc.) consists of simulator-internal interference-optimization operations; their naming semantics
+(Except/Key/Bit/Unconditional/ByAmplitude) are as recorded here and do not follow the arithmetic grammar.</p></li>
+<li><p>Two classes named <code class="docutils literal notranslate"><span class="pre">QRAMCircuit</span></code> live in the <code class="docutils literal notranslate"><span class="pre">qram_qutrit</span></code> / <code class="docutils literal notranslate"><span class="pre">qram_qubit</span></code> namespaces respectively, disambiguated by the namespace.</p></li>
+</ul>
+</section>
+</section>
+<section id="maintenance-obligations">
+<h2>Maintenance Obligations<a class="headerlink" href="#maintenance-obligations" title="Link to this heading">¶</a></h2>
+<p>When adding a new operator you must: name it according to Sections 3–9; if a new TypeTag/Modifier/Variant morpheme is introduced,
+revise this specification first; if renaming, provide aliases on both sides per Section 10 and update this table and <code class="docutils literal notranslate"><span class="pre">docs/operators.md</span></code>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../api/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">API Reference</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="operators.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Quantum Arithmetic Operator Constraints</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">SparQ Operator Naming Conventions</a><ul>
+<li><a class="reference internal" href="#scope-and-symbol-layers">1. Scope and Symbol Layers</a></li>
+<li><a class="reference internal" href="#capitalization-rules">2. Capitalization Rules</a></li>
+<li><a class="reference internal" href="#operator-naming-grammar">3. Operator Naming Grammar</a></li>
+<li><a class="reference internal" href="#slot-rules">4. Slot Rules</a></li>
+<li><a class="reference internal" href="#the-semantics-of-bool">5. The Semantics of <code class="docutils literal notranslate"><span class="pre">_Bool</span></code></a></li>
+<li><a class="reference internal" href="#the-inplace-contract">6. The <code class="docutils literal notranslate"><span class="pre">_InPlace</span></code> Contract</a></li>
+<li><a class="reference internal" href="#inversion-principles">7. Inversion Principles</a></li>
+<li><a class="reference internal" href="#gate-family-rules">8. Gate-Family Rules</a></li>
+<li><a class="reference internal" href="#compound-verb-pipelines-rpn-reading">9. Compound Verb Pipelines (RPN Reading)</a></li>
+<li><a class="reference internal" href="#deprecation-and-alias-mechanism">10. Deprecation and Alias Mechanism</a></li>
+<li><a class="reference internal" href="#audit-cross-reference-table">11. Audit Cross-Reference Table</a><ul>
+<li><a class="reference internal" href="#first-batch-renames-19-items">11.1 First-Batch Renames (19 Items)</a></li>
+<li><a class="reference internal" href="#idempotent-operator-layer-compliant-exempt-list">11.2 Idempotent-Operator Layer — Compliant/Exempt List</a></li>
+<li><a class="reference internal" href="#other-layers">11.3 Other Layers</a></li>
+<li><a class="reference internal" href="#recorded-legacy-deviations-not-addressed-for-awareness-only">11.4 Recorded Legacy Deviations (Not Addressed; for Awareness Only)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#maintenance-obligations">Maintenance Obligations</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=95e61db4"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

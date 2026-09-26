@@ -1,0 +1,446 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论" href="qubit_qram_pruning.html"><link rel="prev" title="剪枝与全量演化的精确性验证" href="exactness_validation.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>qubit 振幅阻尼的精确联合抽样 - QRAM-Simulator 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator 文档</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator 文档</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <strong>中文</strong>
+  <span class="sidebar-langswitch-sep">·</span>
+  <a href="../../en/paper/joint_damping.html">English</a>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">使用指南</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/installation.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart.html">快速上手</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/architecture.html">QRAM-Simulator 架构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/operators.html">量子算术算子约束说明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/naming_conventions.html">SparQ 算子命名规范</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API 参考</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API 参考</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">论文与实验</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">论文复现文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reproduction.html">论文实验复现指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exactness_validation.html">剪枝与全量演化的精确性验证</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">qubit 振幅阻尼的精确联合抽样</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_qram_pruning.html">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_error_propagation.html">Qubit-QRAM 错误传播机制：理论走读与单错误注入验证</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/paper/joint_damping.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/paper/joint_damping.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="qubit">
+<h1>qubit 振幅阻尼的精确联合抽样<a class="headerlink" href="#qubit" title="链接到此标题。">¶</a></h1>
+<p>qubit 引擎现在对同一阻尼时间片只做<strong>一次联合辅助掩码抽样</strong>，随后批量作用 Kraus 算符，并统一归一化一次。保留候选点预采样和 good 分支预测，不要求对指数多个物理位点逐一计算布居数或 rescale。</p>
+<p>本文取代旧文档中逐 <code class="docutils literal notranslate"><span class="pre">Damp_Full</span></code> 独立抽样、以及把原始轨迹范数称为 survival 的说明。此次实现针对 <strong>qubit 编码</strong>。qutrit 引擎仍保留历史抽样规则，其 faithful mirror 测试只能视为旧行为回归，不能认证标准阻尼通道。</p>
+<section id="id1">
+<h2>物理通道与作用范围<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h2>
+<p>每个树比特的标准通道为</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[K_0=|0\rangle\langle0|+\sqrt{1-\gamma}|1\rangle\langle1|,\qquad
+K_1=\sqrt\gamma|0\rangle\langle1|,\quad 0\leq\gamma&lt;1.\]</div>
+</div>
+<p>每个阻尼时间片对整树 <span class="math notranslate nohighlight">\(M=2(2^n-1)\)</span> 个比特施加此通道，外部地址和总线不受噪声。Pauli 噪声仍采用调度器的活动前沿范围。独立电路基线明确使用相同放置规则。同一片内先执行抽中的 Pauli 操作，再执行连续的联合阻尼层：保留候选生成时的 RNG 顺序，但把候选操作记录移到 Pauli 之后。联合阻尼中穿插门或使用不一致的 gamma 会明确报错。</p>
+<p>整树阻尼与既有 <code class="docutils literal notranslate"><span class="pre">Damp_Common</span></code> 和 good 分支的解析曝光计数一致。旧代码只在活动前沿抽 K1 候选，却对整树作用 K0，导致前沿以外的激发没有对应跳跃通道；根部地址复制早期甚至可能出现前沿为空而根部已有激发的情况。因此，扩大 qubit 阻尼候选范围是物理通道修正的一部分。</p>
+</section>
+<section id="id2">
+<h2>联合辅助抽样及证明<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<p>设片初完整归一化态为 <span class="math notranslate nohighlight">\(|\psi\rangle=\sum_xc_x|x\rangle\)</span>，<span class="math notranslate nohighlight">\(X(x)\)</span> 是配置 <span class="math notranslate nohighlight">\(x\)</span> 的树激发集合：</p>
+<ol class="arabic simple">
+<li><p>预采样候选集合 <span class="math notranslate nohighlight">\(C\)</span>，各位点独立以概率 <span class="math notranslate nohighlight">\(\gamma\)</span> 入选。现有 binomial 数目加均匀子集的分布可以保留。</p></li>
+<li><p>按 <span class="math notranslate nohighlight">\(|c_x|^2\)</span> 抽一次辅助配置 <span class="math notranslate nohighlight">\(x\)</span>。</p></li>
+<li><p>确定实际跳跃集合 <span class="math notranslate nohighlight">\(J=C\cap X(x)\)</span>。</p></li>
+<li><p>对<strong>原完整相干态</strong>作用 <span class="math notranslate nohighlight">\(K_J=\prod_{q\in J}K_{1,q}\prod_{q\notin J}K_{0,q}\)</span>，然后统一归一化。</p></li>
+</ol>
+<p>辅助配置只用于产生环境 Kraus 标签，绝不能用它替换模拟态，否则会破坏相干性。</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\Pr(J)=\sum_{x:J\subseteq X(x)}|c_x|^2\gamma^{|J|}(1-\gamma)^{|X(x)|-|J|}
+=\langle\psi|K_J^\dagger K_J|\psi\rangle.\]</div>
+</div>
+<p>所以归一化条件轨迹的平均严格等于完整 Kraus 通道。这是有限 gamma 下的恒等式，没有小时间步或单跳跃近似。不同位置的局域通道对易；顺序执行时的条件概率仍依赖此前结果。</p>
+<p>实现中只抽辅助配置在候选集上的限制：用 <code class="docutils literal notranslate"><span class="pre">std::map&lt;vector&lt;size_t&gt;,</span> <span class="pre">double&gt;</span></code> 汇总 <span class="math notranslate nohighlight">\(C\cap X\)</span> 的分布。无需构造辅助配置的其余部分。掩码按规范顺序排列，使 pruned/full 在相同随机数下选择相同区间。非空候选片消耗一个均匀随机数；候选为空时不消耗辅助随机数。</p>
+</section>
+<section id="id3">
+<h2>稀疏更新与预测分支<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<p>对每个存储分量的激发集合 <span class="math notranslate nohighlight">\(X\)</span>：若 <span class="math notranslate nohighlight">\(J\not\subseteq X\)</span> 就将其投影掉；否则清除 <span class="math notranslate nohighlight">\(J\)</span>，振幅乘 <span class="math notranslate nohighlight">\((\sqrt{1-\gamma})^{|X|-|J|}\)</span>。公共因子 <span class="math notranslate nohighlight">\((\sqrt\gamma)^{|J|}\)</span> 并入条件态的整体尺度。最后只做一次完整代表态的范数计算和整体归一化。该范数不能再当作额外的存活权重。</p>
+<p><code class="docutils literal notranslate"><span class="pre">damping_mask_weights</span></code> 包含显式组以及所有隐式 good 组。后者通过参照组在候选掩码上的<strong>联合分布</strong>，乘以输入权重和地址衰减因子计入。这要求比单点布居相同更强的不变量：预测组在候选集合上的联合分布与参照一致，仅整体存活权重不同。候选坏区间排除和共享树结构是其依据；多候选回归验证最终逐轨迹等价性。</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_multiplier_qubit(gamma,</span> <span class="pre">step)</span></code> 表示本片之前的衰减；完成 K0 后、统一归一化前使用 <code class="docutils literal notranslate"><span class="pre">step+1</span></code>。只 rescale 显式组，隐式组通过参照同步获得相同尺度。参照湮灭时仍需在物化时清零对应 good 组。</p>
+<p>输入语义必须明确：同一地址下不同 <code class="docutils literal notranslate"><span class="pre">branches</span></code> 的概率账本保留正交的输入列标签，<code class="docutils literal notranslate"><span class="pre">branch_probs</span></code> 不能表示不同总线输入列之间的相干交叉项。电路级物理验证采用每地址一个输入总线列的 data-loading 输入；单个 Branch 内的任意复叠加由局域通道测试覆盖。此修改不宣称已实现任意相干多列输入 API。</p>
+</section>
+<section id="id4">
+<h2>旧方法的问题<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<p>旧代码外层候选概率为 <span class="math notranslate nohighlight">\(\gamma\)</span>，候选内接受概率为 <span class="math notranslate nohighlight">\(p_1\)</span>，<strong>没有重复乘 gamma</strong>。把第二次 C++ 抽样描述为 <span class="math notranslate nohighlight">\(\gamma p_1\)</span>，混淆了无条件跳跃概率和候选内条件概率。</p>
+<p>实际错误是联合分布：跳跃时立即投影；拒绝跳跃时不更新，直到片末才统一作用 K0。后续布居因此缺少此前无跳跃带来的条件信息。记 <span class="math notranslate nohighlight">\(q_A=\langle n_A\rangle\)</span>、<span class="math notranslate nohighlight">\(q_B=\langle n_B\rangle\)</span>、<span class="math notranslate nohighlight">\(q_{AB}=\langle n_An_B\rangle\)</span>，则</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[q_{B\mid A0}=\frac{q_B-\gamma q_{AB}}{1-\gamma q_A}.\]</div>
+</div>
+<p>对 Bell 态，标准零次、一次、两次跳跃概率分别为 <span class="math notranslate nohighlight">\(1-\gamma+\gamma^2/2\)</span>、<span class="math notranslate nohighlight">\(\gamma-\gamma^2\)</span>、<span class="math notranslate nohighlight">\(\gamma^2/2\)</span>；旧方法为 <span class="math notranslate nohighlight">\(1-\gamma+\gamma^2/4\)</span>、<span class="math notranslate nohighlight">\(\gamma-3\gamma^2/4\)</span>、<span class="math notranslate nohighlight">\(\gamma^2/2\)</span>。gamma=0.2 时，一次跳跃被从 0.16 算成 0.17。结束后逐轨迹归一化也修复不了已抽错的跳跃分布。</p>
+<p>另有两个不能靠内部对照掩盖的问题：</p>
+<ul class="simple">
+<li><p>整树 K0 与仅活动前沿 K1 不组成同一保迹通道。</p></li>
+<li><p>已按结果概率抽出的轨迹不能再用原始范数重复加权；旧的状态依赖 faithful 密度矩阵 mirror 也不是固定线性 CPTP 通道。它与旧引擎一致、或 pruned 与 full 一致，都不能代替标准通道验证。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>复杂度和兼容性<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<p>记显式分量数为 <span class="math notranslate nohighlight">\(S\)</span>、每分量稀疏激发上限为 <span class="math notranslate nohighlight">\(h\)</span>、候选数为 <span class="math notranslate nohighlight">\(c\)</span>、预测组数为 <span class="math notranslate nohighlight">\(G\)</span>。提取掩码时遍历激发集合并在有序候选中二分查找，不扫描所有 <span class="math notranslate nohighlight">\(M\)</span> 个树位点。还需计入不同掩码的 map 聚合成本、一次稀疏投影/衰减、代表态范数与 rescale，以及对 <span class="math notranslate nohighlight">\(G\)</span> 个预测权重的汇总和解析曝光计算。</p>
+<p>这不等于总体多项式复杂度证明：显式候选表每片期望大小仍为 <span class="math notranslate nohighlight">\(M\gamma\)</span>，态支持大小、总线宽度和预测维护也可能增长。</p>
+<p>候选域、RNG 消耗、轨迹归一化及 seed 到历史的映射均已改变。所有旧的非零阻尼数据和计时图都需要重跑。新的 pruned/full 必须逐 seed 一致，但不应要求新旧采样器给出同一历史。保留的公开 <code class="docutils literal notranslate"><span class="pre">run_damp_full</span></code> 只是一候选投影兼容接口；连续独立调用不能替代 <code class="docutils literal notranslate"><span class="pre">run_damping_layer</span></code>。</p>
+</section>
+<section id="id6">
+<h2>验证与复现<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>-DCACHED_REGISTER_SIZE<span class="o">=</span><span class="m">8</span>
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+ctest<span class="w"> </span>--test-dir<span class="w"> </span>build<span class="w"> </span>--output-on-failure
+./build/bin/CorrectnessTest
+./build/bin/ExecutabilityTest
+./build/bin/Experiment_QRAM_QubitPaperExactTest<span class="w"> </span>--perf-shard<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">QubitJointDampingChannel</span></code>：1–4 比特，gamma={0,1e-5,0.2,0.7,0.95}，基态、全激发、GHZ、随机复态，共 80 组完整枚举；比较独立稠密逐比特 Kraus 通道的全部密度矩阵元。另含 60,000 条 Bell 抽样和逐片范数检查。</p></li>
+<li><p>两套 exactness 电池：比较树测量前后完整加权复分量、地址概率、保真度、RNG、候选历史和实际联合跳跃标签。固定历史覆盖参照死亡、存活及电路复用。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verify_noisy_simulation</span></code>：9 比特编码电路（n=2,k=1），共享调度输入但使用独立矩阵门和通道后端。包括逐历史回放、每组 2,000 条轨迹的 pure depolarizing / pure damping / mixed 比较，并测试 gamma=0.2。严格检查标准通道和轨迹均值迹为 1，完整密度矩阵 Frobenius 误差与 Monte Carlo 估计误差比较，同时报告 TVD 和保真度。qutrit 旧 mirror 单独标为 legacy。</p></li>
+</ul>
+<p>初始实测：局域密度矩阵最大误差约 <span class="math notranslate nohighlight">\(4.45\times10^{-16}\)</span>；Bell 一次跳跃频率 0.15875（精确值 0.16）；电路输出 TVD 为 0.0017–0.0133，完整密度矩阵误差为 0.0089–0.0165，与 Monte Carlo 误差相容。有限回归通过不能替代所有共享参照不变量的数学证明。</p>
+<p>外部 uniqc/QuTiP 对照另通过 pure damping 与 mixed noise 两组测试（各 2,000 条轨迹、6 条固定历史回放）。新导出记录 <code class="docutils literal notranslate"><span class="pre">joint_auxiliary_whole_tree_v1</span></code>，driver 自动采用标准 Kraus 通道并在回放时逐片归一化。</p>
+<p>最终 pruned/full 验证：155 例主电池与 120 例分通道电池全部通过；主电池触发 178 次跳跃，加权复分量最大差 6.67e-16，保真度最大差 1.34e-15。外部 pure damping 导出须显式设置 <code class="docutils literal notranslate"><span class="pre">--depolarizing</span> <span class="pre">0</span></code>，因为 CLI 默认 Pauli 率并非零。</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="qubit_qram_pruning.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="exactness_validation.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">剪枝与全量演化的精确性验证</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">qubit 振幅阻尼的精确联合抽样</a><ul>
+<li><a class="reference internal" href="#id1">物理通道与作用范围</a></li>
+<li><a class="reference internal" href="#id2">联合辅助抽样及证明</a></li>
+<li><a class="reference internal" href="#id3">稀疏更新与预测分支</a></li>
+<li><a class="reference internal" href="#id4">旧方法的问题</a></li>
+<li><a class="reference internal" href="#id5">复杂度和兼容性</a></li>
+<li><a class="reference internal" href="#id6">验证与复现</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=470db953"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>
