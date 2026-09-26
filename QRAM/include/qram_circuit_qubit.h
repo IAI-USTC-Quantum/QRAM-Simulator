@@ -53,6 +53,8 @@ namespace qram_simulator {
 		public:
 			/// Total probability of the sampled output branches (for normalization checks)
 			double total_prob = 0;
+			/// Number of damping (K1) jumps fired during the last run (diagnostic: lets tests assert the fired-jump path was actually exercised)
+			size_t fired_jump_count = 0;
 			/// Final system state obtained from sampling
 			qram_state_t final_system_state;
 

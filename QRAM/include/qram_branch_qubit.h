@@ -328,11 +328,17 @@ namespace qram_simulator {
 			BranchGroup* good_ref = nullptr;
 			/// Relative Damping multiplier (relative to the reference good group)
 			double relative_multiplier = 1.0;
-			/* set once the good group's final states have been materialized
-			from the reference branch (XOR mirror), after which the generic
-			prob/fidelity paths apply */
-			/// Set once the reference good branch's system states have been materialized (XOR mirror), after which the generic probability/fidelity paths apply
+			/// Whether final states have been reconstructed; probability and fidelity then use those states.
 			bool predicted = false;
+			/**
+			 * @brief Whether the predicted group has zero surviving weight.
+			 *
+			 * Set during materialization when the shared reference has no surviving
+			 * component. All probability, fidelity and sampling paths must then
+			 * contribute zero. Mid-run estimates already inherit the reference norm.
+			 * reset() clears this flag while retaining the original input weights.
+			 */
+			bool annihilated = false;
 
 			/// @brief Constructs an empty group at address addr.
 			BranchGroup(size_t addr) : address(addr)
@@ -344,6 +350,8 @@ namespace qram_simulator {
 			void set_good(BranchGroup* good_ref_);
 			/// Clears all branch states (branch skeleton kept)
 			void set_empty_state();
+			/// Marks the group as annihilated by a fired damping jump (zero weight everywhere) and clears all branch states
+			void mark_annihilated();
 
 			/// Fidelity amplitude against the data tree (modulus not squared)
 			complex_t get_fidelity(const memory_t& memory) const;

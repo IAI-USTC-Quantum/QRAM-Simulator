@@ -229,14 +229,8 @@ namespace qram_simulator
 
 		void SystemState::run_bitphaseflip(size_t qubit_id)
 		{
-			/* Y flip (matching the odd-position semantics of the qutrit
-			   architecture): flip first, then apply a -1 phase when the
-			   flipped value is 1, i.e. |0>->-|1>, |1>->|0> (ZX = iY,
-			   unitary). The previous implementation was |1>->-|0>,
-			   |0>->|0> (rank-1 non-unitary, equivalent to the -K1 decay
-			   operator), which made Depolarizing trajectories lose
-			   coherence and weight and triggered the zero-norm Bad-result
-			   crash in sample_output. */
+			// ZX = iY: |0> -> -|1>, |1> -> |0>. Flip first and apply the
+			// phase to the resulting |1> state, matching the qutrit data slot.
 			state.flip(qubit_id);
 			if (state.state_of(qubit_id) == OneState)
 				amplitude *= -1;
@@ -500,6 +494,7 @@ namespace qram_simulator
 			branches = branches_input;
 			is_good = false;
 			predicted = false;
+			annihilated = false;
 			relative_multiplier = 1.0;
 		}
 
@@ -514,8 +509,18 @@ namespace qram_simulator
 			branches.clear();
 		}
 
+		void BranchGroup::mark_annihilated()
+		{
+			// Only the current trajectory is empty; branch_probs defines reusable input.
+			annihilated = true;
+			for (auto& branch : branches) {
+				branch.remove_all_state();
+			}
+		}
+
 		complex_t BranchGroup::get_fidelity(const memory_t& memory) const
 		{
+			if (annihilated) return 0.;
 			if (is_good && !predicted) return good_ref->get_fidelity(memory);
 
 			complex_t ret = 0;
@@ -543,8 +548,11 @@ namespace qram_simulator
 
 		double BranchGroup::get_prob() const
 		{
+			/* an annihilated good group carries zero weight even though it
+			   was never materialized */
+			if (annihilated) return 0.;
 			/* before materialization a good group only carries its input
-			weight; afterwards the generic state sum is exact */
+			   weight; afterwards the generic state sum is exact */
 			if (is_good && !predicted)
 			{
 				double ret = 0;

@@ -177,10 +177,12 @@ Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）见
 
 ### 复现论文结果
 
-详细的实验复现指南见 [docs/paper/](docs/paper/) 目录：
+- [剪枝与全量演化的精确性验证](docs/sphinx/source/zh/paper/exactness_validation.md)：完整状态对照、回归覆盖与复现命令。
 
-- [docs/paper/README.md](docs/paper/README.md) - 论文关联文档
-- [docs/paper/reproduction.md](docs/paper/reproduction.md) - [QRAM-Simulator](https://arxiv.org/abs/2503.13832) 实验复现指南
+详细的实验复现指南见 [docs/paper/](docs/sphinx/source/zh/paper/) 目录：
+
+- [docs/paper/README.md](docs/sphinx/source/zh/paper/README.md) - 论文关联文档
+- [docs/paper/reproduction.md](docs/sphinx/source/zh/paper/reproduction.md) - [QRAM-Simulator](https://arxiv.org/abs/2503.13832) 实验复现指南
 
 ## 项目结构
 

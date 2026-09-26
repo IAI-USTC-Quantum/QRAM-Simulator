@@ -109,6 +109,7 @@ namespace qram_simulator {
 			good_branch_group_ids.clear();
 			first_good_branch_group = -1;
 			valid_branch_group_view.clear();
+			fired_jump_count = 0;
 			std::for_each(branch_groups.begin(), branch_groups.end(),
 				[](BranchGroup& branchgroup) { branchgroup.reset(); }
 			);
@@ -399,9 +400,8 @@ namespace qram_simulator {
 
 		void QRAMCircuit::run_damp_full(size_t qubit_id, size_t step, double gamma) {
 
-			/* check the state of first_good_branch
-			* skip the case of no damping
-			*/
+			// Include predicted groups through the reference's surviving population
+			// and each group's input weight and address attenuation.
 			std::vector<double> prob_damp;
 			int damp_op_num = 1;
 			if constexpr (Branch::qunit_type == arch_qubit)
@@ -428,6 +428,7 @@ namespace qram_simulator {
 
 				for (size_t i = 0; i < good_branch_group_ids.size(); ++i) {
 					size_t id = good_branch_group_ids[i];
+					if (branch_groups[id].annihilated) continue;
 					double g_input = 0;
 					for (double bp : branch_groups[id].branch_probs) g_input += bp;
 					for (auto k = 0; k < damp_op_num; ++k) {
@@ -446,6 +447,7 @@ namespace qram_simulator {
 				}
 			}
 			double global_coef = get_normalization_factor_with_damping();
+			// Consume exactly one draw per damping spot in both execution modes.
 			double r = random_engine::get_instance().uniform01() * global_coef;
 			for (size_t k = 0; k < prob_damp.size(); ++k)
 			{
@@ -461,6 +463,13 @@ namespace qram_simulator {
 							}
 						);
 					}
+					/* Predicted groups inherit this projection through the reference.
+					   A surviving reference still represents surviving good components;
+					   a fired jump alone does not imply that those groups are empty.
+					   If the reference dies, its zero norm also zeros the mid-run
+					   population estimates. Materialization propagates that empty
+					   state to the predicted groups before output sampling. */
+					++fired_jump_count;
 					break;
 				}
 				r -= prob_damp[k];
@@ -581,6 +590,7 @@ namespace qram_simulator {
 				for (size_t i = 0; i < good_branch_group_ids.size(); ++i)
 				{
 					const auto& g = branch_groups[good_branch_group_ids[i]];
+					if (g.annihilated) continue;
 					double g_input = 0;
 					for (double bp : g.branch_probs) g_input += bp;
 					new_prob += ref_unit_norm * g.relative_multiplier * g_input;
@@ -627,21 +637,34 @@ namespace qram_simulator {
 			if (first_good_branch_group < 0) return;
 
 			auto& ref = branch_groups[first_good_branch_group];
+
+			/* any reference branch carries the full 2^k data-bus
+			   structure; pick the first with a surviving state */
+			Branch* ref_branch = nullptr;
+			for (auto& rb : ref.branches)
+				if (rb.system_states_sz > 0) { ref_branch = &rb; break; }
+
+			if (ref_branch == nullptr)
+			{
+				/* Shared-state prediction maps an empty reference to empty groups.
+				   Clear their stored input states and nominal weights before any
+				   output probability, normalization or fidelity is evaluated.
+				   Input probabilities remain intact for the next query's reset. */
+				for (size_t id : good_branch_group_ids)
+					branch_groups[id].mark_annihilated();
+				return;
+			}
+
 			for (size_t idx = 0; idx < good_branch_group_ids.size(); ++idx)
 			{
 				size_t id = good_branch_group_ids[idx];
 				auto& group = branch_groups[id];
+				if (group.annihilated) continue;
 				double amp_factor = std::sqrt(group.relative_multiplier);
 
 				for (size_t b = 0; b < group.branches.size(); ++b)
 				{
 					auto& br = group.branches[b];
-					/* any reference branch carries the full 2^k data-bus
-					structure; pick the first with a surviving state */
-					Branch* ref_branch = nullptr;
-					for (auto& rb : ref.branches)
-						if (rb.system_states_sz > 0) { ref_branch = &rb; break; }
-					if (ref_branch == nullptr) continue;
 
 					size_t delta = (ref_branch->bus_input ^ memory[ref.address])
 						^ (br.bus_input ^ memory[group.address]);

@@ -175,6 +175,8 @@ Extends Register Level Programming into a general-purpose sparse-state quantum s
 
 ### Reproducing the Paper Results
 
+- [Pruned/full exactness validation](docs/sphinx/source/en/paper/exactness_validation.md): complete-state comparisons, regression coverage and reproduction commands.
+
 Detailed guides for reproducing the experiments live in the [docs/sphinx/source/en/paper/](docs/sphinx/source/en/paper/) directory:
 
 - [docs/sphinx/source/en/paper/README.md](docs/sphinx/source/en/paper/README.md) - paper-related documentation

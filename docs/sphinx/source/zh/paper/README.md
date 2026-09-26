@@ -1,5 +1,7 @@
 # 论文复现文档
 
+qubit QRAM 的完整状态等价性要求、测试覆盖及运行命令见[剪枝与全量演化的精确性验证](exactness_validation.md)。
+
 本目录包含与论文相关的文档和复现指南。
 
 ## Paper 1: QRAM-Simulator — [arXiv:2503.13832](https://arxiv.org/abs/2503.13832)

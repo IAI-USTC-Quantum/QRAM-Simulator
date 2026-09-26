@@ -1,5 +1,7 @@
 # Paper Reproduction Documentation
 
+For the qubit-QRAM complete-state equivalence protocol, test coverage and commands, see [Pruned/full exactness validation](exactness_validation.md).
+
 This directory contains paper-related documentation and reproduction guides.
 
 ## Paper 1: QRAM-Simulator — [arXiv:2503.13832](https://arxiv.org/abs/2503.13832)

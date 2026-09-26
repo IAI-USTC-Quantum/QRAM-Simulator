@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Propagate an empty qubit reference group to all predicted groups during
+  materialization, preserving input probabilities for subsequent queries.
+  Surviving reference components remain available for exact reconstruction.
+
+### Validation
+- Compare pruned and full complex components before and after tree measurement,
+  together with sampled trees, RNG states, input-weighted probabilities and
+  fidelity. Cover reference projection, circuit reuse, five noise channels,
+  multiple bus widths and the 1000-pair performance grid.
+- Publish the verification protocol and reproduction commands in the English
+  and Chinese documentation.
+
 ### Added
 - **Circuit-level QRAM baseline in the Python package** (`qram_simulator.baseline`,
   extra `pip install "qram-simulator[baseline]"`): a gate-level re-implementation

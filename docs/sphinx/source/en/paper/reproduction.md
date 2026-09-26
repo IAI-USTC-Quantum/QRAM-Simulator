@@ -1,5 +1,7 @@
 # Paper Experiment Reproduction Guide
 
+The current qubit-QRAM seed-by-seed verification workflow is documented in [Pruned/full exactness validation](exactness_validation.md), including complete-state checks and the 1000-pair performance grid.
+
 This document provides detailed experiment setups, parameter ranges, and run commands for reproducing the numerical results in the paper.
 
 ## Paper Information

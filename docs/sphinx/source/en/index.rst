@@ -38,6 +38,7 @@ memory) loading circuits:
 
    paper/README
    paper/reproduction
+   paper/exactness_validation
    paper/qubit_qram_pruning
    paper/qubit_error_propagation
 
