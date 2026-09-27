@@ -1,0 +1,562 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="索引" href="../genindex.html"><link rel="search" title="搜索" href="../search.html"><link rel="next" title="qubit 振幅阻尼的精确联合抽样" href="joint_damping.html"><link rel="prev" title="论文实验复现指南" href="reproduction.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>剪枝与全量演化的精确性验证 - QRAM-Simulator 文档</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QRAM-Simulator 文档</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator 文档</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <strong>中文</strong>
+  <span class="sidebar-langswitch-sep">·</span>
+  <a href="../../en/paper/exactness_validation.html">English</a>
+</div><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="搜索" name="q" aria-label="搜索">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">使用指南</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guide/installation.html">安装</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart.html">快速上手</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/architecture.html">QRAM-Simulator 架构</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/operators.html">量子算术算子约束说明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/naming_conventions.html">SparQ 算子命名规范</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API 参考</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API 参考</a><input aria-label="Toggle navigation of API 参考" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/cpp.html">C++ API 参考</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">论文与实验</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">论文复现文档</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reproduction.html">论文实验复现指南</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">剪枝与全量演化的精确性验证</a></li>
+<li class="toctree-l1"><a class="reference internal" href="joint_damping.html">qubit 振幅阻尼的精确联合抽样</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_qram_pruning.html">面向 Qubit 架构 QRAM 的分支剪枝与快速模拟：H–K₀–H 可预测性理论</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qubit_error_propagation.html">Qubit-QRAM 错误传播机制：理论走读与单错误注入验证</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/docs/sphinx/source/paper/exactness_validation.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/IAI-USTC-Quantum/QRAM-Simulator/edit/main/docs/sphinx/source/paper/exactness_validation.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1>剪枝与全量演化的精确性验证<a class="headerlink" href="#id1" title="链接到此标题。">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">QRAMCircuitQubit</span></code> 提供全量演化（<code class="docutils literal notranslate"><span class="pre">FULL_VER</span></code>）和剪枝演化（<code class="docutils literal notranslate"><span class="pre">NORMAL_VER</span></code>）。
+对于相同输入、存储内容和噪声历史，两种模式必须实现相同的轨迹。
+剪枝通过参考组重建可预测的分支组，不为这些分支的演化引入截断或概率近似。</p>
+<p>本文说明验证流程及其可复现程序 <code class="docutils literal notranslate"><span class="pre">Experiment_QRAM_QubitPaperExactTest</span></code>。</p>
+<section id="id2">
+<h2>等价性要求<a class="headerlink" href="#id2" title="链接到此标题。">¶</a></h2>
+<p>先用相同的配置种子构造两个电路，再分别在运行前重置为相同的轨迹种子。
+以下量需要单独比较：</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>比较对象</p></th>
+<th class="head"><p>要求</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>采样操作</p></td>
+<td><p>噪声操作历史完全相同</p></td>
+</tr>
+<tr class="row-odd"><td><p>随机数生成器</p></td>
+<td><p>演化结束及输出采样结束时，生成器状态分别相同</p></td>
+</tr>
+<tr class="row-even"><td><p>阻尼跳跃</p></td>
+<td><p>实际触发次数相同</p></td>
+</tr>
+<tr class="row-odd"><td><p>测量前状态</p></td>
+<td><p>先物化预测组，再比较带输入权重的全部复振幅</p></td>
+</tr>
+<tr class="row-even"><td><p>采样树态</p></td>
+<td><p>残余树配置相同</p></td>
+</tr>
+<tr class="row-odd"><td><p>测量后状态</p></td>
+<td><p>比较归一化后、带输入权重的全部复振幅</p></td>
+</tr>
+<tr class="row-even"><td><p>地址概率</p></td>
+<td><p>计入每个输入分支的概率权重，总概率为一</p></td>
+</tr>
+<tr class="row-odd"><td><p>保真度</p></td>
+<td><p>对相同理想输出、使用相同定义进行比较</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>分量使用 <code class="docutils literal notranslate"><span class="pre">(address,</span> <span class="pre">input</span> <span class="pre">bus,</span> <span class="pre">output</span> <span class="pre">bus,</span> <span class="pre">residual</span> <span class="pre">tree)</span></code> 作为键。
+保留输入分支标签相当于逐列检查所表示的轨迹映射，避免不同输入列的误差
+在单一保真度指标中抵消。分量与地址概率的断言容差为 <span class="math notranslate nohighlight">\(10^{-12}\)</span>，
+保真度容差为 <span class="math notranslate nohighlight">\(10^{-9}\)</span>。这些阈值用于容纳浮点累加顺序造成的舍入差异，
+不是剪枝算法的近似参数。</p>
+<p>检查测量前状态时，必须<strong>先物化预测组</strong>。尚未演化的输入分量不能当作输出态比较。
+检查测量后状态时，两种模式均须完成树态采样和归一化。</p>
+</section>
+<section id="id3">
+<h2>共享参考组的不变量<a class="headerlink" href="#id3" title="链接到此标题。">¶</a></h2>
+<p>阻尼跳跃会投影参考组中的分量。若仍有分量存活，它们的振幅继续作为重建依据。
+因此，发生一次跳跃本身不足以判定所有预测组都应清空。</p>
+<p>若参考组没有任何存活分量，由同一参考组表示的全部预测组必须贡献零概率和零保真度。
+<code class="docutils literal notranslate"><span class="pre">materialize_good_branches()</span></code> 会将这些组标记为 <code class="docutils literal notranslate"><span class="pre">annihilated</span></code>，并清除当前轨迹分量。
+输入概率 <code class="docutils literal notranslate"><span class="pre">branch_probs</span></code> 保持不变，以便下一次查询重用；<code class="docutils literal notranslate"><span class="pre">reset()</span></code> 恢复轨迹初态并清除标记。
+演化中预测组的占据概率估计已经包含参考组的存活范数。</p>
+<p>每个非空阻尼候选片在两种模式中都恰好消耗一次联合辅助抽样；空候选片不消耗辅助随机数。实际联合跳跃集合和候选操作历史都必须一致。物理通道修正及 seed 映射变化见<a class="reference internal" href="joint_damping.html"><span class="std std-doc">联合阻尼抽样</span></a>。
+qubit 的物化规则与 qutrit 的参考别名表示是不同的数据表示，应分别验证。</p>
+</section>
+<section id="id4">
+<h2>测试覆盖<a class="headerlink" href="#id4" title="链接到此标题。">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>入口</p></th>
+<th class="head"><p>覆盖内容</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>默认运行</p></td>
+<td><p>155 例固定种子、压力与无噪声测试；包含全地址零总线输入及采样均匀分支输入</p></td>
+</tr>
+<tr class="row-odd"><td><p>固定历史用例</p></td>
+<td><p>参考组死亡、参考组存活、投影后重用同一个电路对象</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--channels</span></code></p></td>
+<td><p>120 例：Damping、Depolarizing、BitFlip、PhaseFlip、BitPhaseFlip；<span class="math notranslate nohighlight">\(n=3,5\)</span>，<span class="math notranslate nohighlight">\(k=1,2,4\)</span>；均匀及非均匀输入权重</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--perf-shard</span> <span class="pre">i</span> <span class="pre">count</span></code></p></td>
+<td><p>1000 对性能网格：<span class="math notranslate nohighlight">\(k=3\)</span>，<span class="math notranslate nohighlight">\(n=4,6,8,10,12\)</span>，<span class="math notranslate nohighlight">\(\varepsilon=\gamma\in\{0,10^{-5},10^{-4},10^{-3}\}\)</span>，每点 50 个种子</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--case</span> <span class="pre">n</span> <span class="pre">eps</span> <span class="pre">seed</span> <span class="pre">[uniform]</span></code></p></td>
+<td><p>重放一条混合噪声轨迹；可选采样均匀分支输入</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>固定历史用例不依赖平台特定的噪声分布实现，直接覆盖参考组投影后的两种结果。
+默认的 155 例测试还要求实际触发的阻尼跳跃总数不少于 50。</p>
+<p>C++ 标准不保证不同标准库产生逐位相同的分布样本，因此 full/pruned 对照应在
+相同工具链内进行。固定随机种子的特定 MSVC 跳跃结果只在 MSVC 上强制断言；
+各平台均保留数值对照，并必须通过固定历史的投影用例。</p>
+</section>
+<section id="id5">
+<h2>构建与运行<a class="headerlink" href="#id5" title="链接到此标题。">¶</a></h2>
+<p>在仓库根目录运行，确保 C++17 编译器和 CMake 可用：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-exact<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCACHED_REGISTER_SIZE<span class="o">=</span><span class="m">8</span><span class="w"> </span>-DQRAM_BUILD_TESTS<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DQRAM_BUILD_EXPERIMENTS<span class="o">=</span>ON
+cmake<span class="w"> </span>--build<span class="w"> </span>build-exact<span class="w"> </span>--parallel<span class="w"> </span><span class="m">8</span>
+<span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>ctest<span class="w"> </span>--test-dir<span class="w"> </span>build-exact<span class="w"> </span>--output-on-failure
+./build-exact/bin/CorrectnessTest
+</pre></div>
+</div>
+<p>CTest 运行 <code class="docutils literal notranslate"><span class="pre">QubitPaperExactness</span></code>、<code class="docutils literal notranslate"><span class="pre">QubitPaperExactnessChannels</span></code> 及已有的
+<code class="docutils literal notranslate"><span class="pre">verify_noisy_simulation</span></code> 电路级检查。任何断言失败均返回非零退出码。
+默认精确性测试包含固定历史用例和跳跃总数覆盖断言。</p>
+<p>Windows 多配置生成器使用 <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">Release</span></code> 构建，并运行
+<code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">--test-dir</span> <span class="pre">build-exact</span> <span class="pre">-C</span> <span class="pre">Release</span> <span class="pre">--output-on-failure</span></code>。
+可执行文件位于 <code class="docutils literal notranslate"><span class="pre">build-exact/bin/</span></code>，后缀为 <code class="docutils literal notranslate"><span class="pre">.exe</span></code>。</p>
+<p>单独运行某类检查或完整性能网格：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-exact/bin/Experiment_QRAM_QubitPaperExactTest<span class="w"> </span>--fixtures
+./build-exact/bin/Experiment_QRAM_QubitPaperExactTest<span class="w"> </span>--channels
+./build-exact/bin/Experiment_QRAM_QubitPaperExactTest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--case<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="m">0</span>.001<span class="w"> </span><span class="m">9208654621621431296</span>
+./build-exact/bin/Experiment_QRAM_QubitPaperExactTest<span class="w"> </span>--perf-shard<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>若使用八个独立进程，分别运行 <code class="docutils literal notranslate"><span class="pre">--perf-shard</span> <span class="pre">i</span> <span class="pre">8</span></code>，其中 <code class="docutils literal notranslate"><span class="pre">i</span></code> 取 0 至 7，
+并要求八个进程全部正常退出。<code class="docutils literal notranslate"><span class="pre">--battery-shard</span> <span class="pre">i</span> <span class="pre">8</span></code> 同样可划分 155 例测试。
+分片运行不执行默认测试中的跳跃总数断言和固定历史用例，因此仍应运行默认测试。
+并行时使用独立进程，因为每个进程内部共用一个模拟器 RNG。</p>
+</section>
+<section id="full">
+<h2>论文数据与稳定的 full 基线<a class="headerlink" href="#full" title="链接到此标题。">¶</a></h2>
+<p>论文原始数据应与分量级对照分别生成：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build-exact/bin/Experiment_QRAM_QubitPaper<span class="w"> </span>perf<span class="w"> </span>build-exact/validation
+./build-exact/bin/Experiment_QRAM_QubitPaper<span class="w"> </span>equiv<span class="w"> </span>build-exact/validation
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">perf_scan.csv</span></code> 包含 2000 行，即 1000 个 <code class="docutils literal notranslate"><span class="pre">(eps,</span> <span class="pre">n,</span> <span class="pre">traj,</span> <span class="pre">runseed)</span></code> 键各有
+一行 full 和一行 normal。检查配对完整性后再比较保真度。
+CSV 检查是分量级验证的补充；保真度相等本身不能推出状态相等。</p>
+<p>修改重建逻辑时，应使用相同编译器和配置单独构建参考版本，将其 full 行与
+新版本 full 行比较。比较字段为 <code class="docutils literal notranslate"><span class="pre">arch</span></code>、<code class="docutils literal notranslate"><span class="pre">eps</span></code>、<code class="docutils literal notranslate"><span class="pre">n</span></code>、<code class="docutils literal notranslate"><span class="pre">traj</span></code>、<code class="docutils literal notranslate"><span class="pre">runseed</span></code>、
+<code class="docutils literal notranslate"><span class="pre">version</span></code>、<code class="docutils literal notranslate"><span class="pre">fid</span></code>、<code class="docutils literal notranslate"><span class="pre">states</span></code>、<code class="docutils literal notranslate"><span class="pre">branches</span></code>。墙钟时间不具有确定性，
+因此 <code class="docutils literal notranslate"><span class="pre">time_run_ms</span></code> 和 <code class="docutils literal notranslate"><span class="pre">time_sample_ms</span></code> 不参与一致性断言。</p>
+<p>性能测试应控制机器负载。多个验证进程争用资源时记录的时间不应替换论文的运行时间基准。
+每份数据应保留代码版本、编译器、构建选项、输入约定及种子。</p>
+</section>
+<section id="id6">
+<h2>已验证的数值参考<a class="headerlink" href="#id6" title="链接到此标题。">¶</a></h2>
+<p>2026-09-26 的 CPU Release 验证使用 GCC 14.4.0/libstdc++、CMake 4.4.3、
+Ninja、<code class="docutils literal notranslate"><span class="pre">CACHED_REGISTER_SIZE=8</span></code>，每个进程设置一个 OpenMP 线程。</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>检查</p></th>
+<th class="head"><p>结果</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>默认种子测试</p></td>
+<td><p>155/155 对通过；68 次跳跃</p></td>
+</tr>
+<tr class="row-odd"><td><p>单通道测试</p></td>
+<td><p>120/120 对通过</p></td>
+</tr>
+<tr class="row-even"><td><p>性能网格</p></td>
+<td><p>1000/1000 对通过；64 次跳跃</p></td>
+</tr>
+<tr class="row-odd"><td><p>性能网格测量前最大分量差</p></td>
+<td><p><span class="math notranslate nohighlight">\(8.47\times10^{-16}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>性能网格测量后最大分量差</p></td>
+<td><p><span class="math notranslate nohighlight">\(6.94\times10^{-16}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>性能网格最大保真度差</p></td>
+<td><p><span class="math notranslate nohighlight">\(8.99\times10^{-15}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>275 例种子/通道测试的最大物理地址概率差</p></td>
+<td><p><span class="math notranslate nohighlight">\(2.78\times10^{-16}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>full 与参考版本 <code class="docutils literal notranslate"><span class="pre">d91e4f0</span></code> 的物理 CSV 行</p></td>
+<td><p>1000/1000 完全一致</p></td>
+</tr>
+<tr class="row-even"><td><p>附录等价性网格</p></td>
+<td><p>12/12 对通过；最大 $</p></td>
+</tr>
+<tr class="row-odd"><td><p>已注册 CTest 套件</p></td>
+<td><p>3/3 通过</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>生成的 CSV、汇总指标和日志应存放在被忽略的构建目录，例如
+<code class="docutils literal notranslate"><span class="pre">build-exact/validation/</span></code>。CTest 详细日志位于
+<code class="docutils literal notranslate"><span class="pre">build-exact/Testing/Temporary/LastTest.log</span></code>。</p>
+<p>这些检查建立了所测试噪声及输入约定下与 <code class="docutils literal notranslate"><span class="pre">FULL_VER</span></code> 的数值等价性，
+并为共享状态的数学论证提供验证。独立检验物理通道与验证剪枝变换是两个不同的验证任务。</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="joint_damping.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">qubit 振幅阻尼的精确联合抽样</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="reproduction.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">论文实验复现指南</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">剪枝与全量演化的精确性验证</a><ul>
+<li><a class="reference internal" href="#id2">等价性要求</a></li>
+<li><a class="reference internal" href="#id3">共享参考组的不变量</a></li>
+<li><a class="reference internal" href="#id4">测试覆盖</a></li>
+<li><a class="reference internal" href="#id5">构建与运行</a></li>
+<li><a class="reference internal" href="#full">论文数据与稳定的 full 基线</a></li>
+<li><a class="reference internal" href="#id6">已验证的数值参考</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=470db953"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

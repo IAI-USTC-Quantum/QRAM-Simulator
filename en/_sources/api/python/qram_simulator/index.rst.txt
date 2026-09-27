@@ -1,0 +1,845 @@
+qram_simulator
+==============
+
+.. py:module:: qram_simulator
+
+.. autoapi-nested-parse::
+
+   qram_simulator -- Python bindings for the QRAM-Simulator C++ core.
+
+   Exports QRAMCircuit for both QRAM architectures (qubit / qutrit), the
+   full-amplitude bridge QRAMFullAmp, the timing & noise scheduler TimeStep,
+   and global random-seed control. See the ``_core`` module docstring and
+   the project documentation for details.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/python/qram_simulator/baseline/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   qram_simulator.ARCH_QUBIT
+   qram_simulator.ARCH_QUTRIT
+   qram_simulator.BitFlip
+   qram_simulator.BitPhaseFlip
+   qram_simulator.ControlSwap
+   qram_simulator.CopyIn
+   qram_simulator.CopyOut
+   qram_simulator.Damp_Common
+   qram_simulator.Damp_Full
+   qram_simulator.Damping
+   qram_simulator.Depolarizing
+   qram_simulator.FetchData
+   qram_simulator.FirstCopy
+   qram_simulator.HadamardData
+   qram_simulator.Identity_Active
+   qram_simulator.Identity_Inactive
+   qram_simulator.PhaseFlip
+   qram_simulator.SetZero
+   qram_simulator.SwapInternal
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.Operation
+   qram_simulator.OperationPack
+   qram_simulator.OperationType
+   qram_simulator.QRAMCircuitQubit
+   qram_simulator.QRAMCircuitQutrit
+   qram_simulator.QRAMFullAmp
+   qram_simulator.TimeSlices
+   qram_simulator.TimeStep
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   qram_simulator.get_seed
+   qram_simulator.set_seed
+
+
+Package Contents
+----------------
+
+.. py:class:: Operation
+
+   A single quantum operation: type, target qubits, and optional coefficients (noise parameters).
+
+
+   .. py:method:: reverse() -> Operation
+
+      Return the inverse of this operation.
+
+
+
+   .. py:method:: to_string() -> str
+
+      Return a human-readable string representation.
+
+
+
+   .. py:property:: coefficients
+      :type: list[float]
+
+
+      Noise coefficients (e.g. gamma for Damping).
+
+
+   .. py:property:: dagger
+      :type: bool
+
+
+      Whether this is the conjugate-transpose (inverse) operation.
+
+
+   .. py:property:: targets
+      :type: list[int]
+
+
+      List of target qubit / node indices.
+
+
+   .. py:property:: type
+      :type: OperationType
+
+
+      Operation type (OperationType).
+
+
+.. py:class:: OperationPack
+
+   A set of operations executed concurrently within one time slice (identified by name).
+
+
+   .. py:method:: empty() -> bool
+
+      Whether this operation group is empty.
+
+
+
+   .. py:method:: reverse() -> OperationPack
+
+      Return the inverse operation group (each operation inverted, then reordered as in the original).
+
+
+
+   .. py:method:: to_string() -> str
+
+      Return a human-readable string representation.
+
+
+
+   .. py:property:: name
+      :type: str
+
+
+      Name of this operation group.
+
+
+   .. py:property:: operations
+      :type: list[Operation]
+
+
+      Operations of this slice, in execution order (list[Operation]; reads return a copy).
+
+
+.. py:class:: OperationType(value: SupportsInt | SupportsIndex)
+
+   Enum of QRAM operation types.
+
+   Serves both as the key type of noise models (dict keys of
+   set_noise_models) and as the type tag of an Operation. Noise members
+   (BitFlip / PhaseFlip / BitPhaseFlip / Depolarizing / Damping, etc.) take
+   occurrence probabilities in [0, 1]; Damping additionally requires
+   gamma < 1 (gamma = 1 decays all excitations within a single step,
+   breaking sampling and normalization).
+
+
+   Members:
+
+     ControlSwap
+
+     HadamardData
+
+     CopyIn
+
+     CopyOut
+
+     SwapInternal
+
+     FirstCopy
+
+     FetchData
+
+     SetZero
+
+     Damping
+
+     Damp_Common
+
+     Damp_Full
+
+     BitFlip
+
+     PhaseFlip
+
+     BitPhaseFlip
+
+     Depolarizing
+
+     Identity_Active
+
+     Identity_Inactive
+
+
+   .. py:attribute:: BitFlip
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: BitPhaseFlip
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: ControlSwap
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: CopyIn
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: CopyOut
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Damp_Common
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Damp_Full
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Damping
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Depolarizing
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: FetchData
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: FirstCopy
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: HadamardData
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Identity_Active
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: Identity_Inactive
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: PhaseFlip
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: SetZero
+      :type:  ClassVar[OperationType]
+
+
+   .. py:attribute:: SwapInternal
+      :type:  ClassVar[OperationType]
+
+
+   .. py:property:: name
+      :type: str
+
+
+
+   .. py:property:: value
+      :type: int
+
+
+
+.. py:class:: QRAMCircuitQubit(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex)
+              QRAMCircuitQubit(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex, memory: collections.abc.Sequence[SupportsInt | SupportsIndex])
+
+   Branch-based sparse simulator of the qubit-architecture QRAM loading circuit.
+
+   Carries (address, bus_input) input branches as trajectories, evolves the
+   sparse SystemState along the noisy operation sequence generated by
+   TimeStep, and supports good/bad branch pruning (run_normal), the
+   unpruned reference (run_full), and fidelity sampling.
+
+   Typical workflow:
+       qram = QRAMCircuitQubit(addr_size, data_size[, memory])
+       qram.set_noise_models({...})       # optional
+       qram.set_input_uniform(n)          # or set_input_random(n)
+       qram.run_normal()                  # or run_full() / run("normal")
+       qram.sample_and_get_fidelity()
+
+   Construct the QRAM circuit initialized with the given memory (memory length must be 2^addr_size).
+
+
+   .. py:method:: get_fidelity() -> float
+
+      Alias of sample_and_get_fidelity.
+
+
+
+   .. py:method:: get_fidelity_conventions() -> dict
+
+      Return the three no-post-selection fidelity statistics of the current
+      run as a dict (call after run_full, before sample_and_get_fidelity):
+
+        overlap_fid: |<psi_ideal|psi_traj>|^2, tree-sensitive -- statistically
+          matches the channel-level <psi_ideal|rho|psi_ideal> of the baseline;
+        fid_nopost: same inner product but tree-insensitive (bus-correct
+          amplitudes with residual tree excitations still counted);
+        fid_incoh: incoherent (branch-projected) combination of the same.
+
+
+
+   .. py:method:: get_memory() -> list[int]
+
+      Return the data tree (reference view).
+
+
+
+   .. py:method:: get_noise_models() -> dict[OperationType, float]
+
+      Return the current noise models (reference view).
+
+
+
+   .. py:method:: get_output_distribution() -> dict[str, float]
+
+      Return the marginal (address:bus) output distribution of the current
+      branch groups as a {"addr:bus": prob} dict (call after run_full / run_normal;
+      mutating calls such as sample_and_get_fidelity invalidate it).
+
+
+
+   .. py:method:: get_qubit_num() -> int
+
+      Return the number of physical qubits used by the circuit: 2 * (2^addr_size - 1).
+
+
+
+   .. py:method:: has_damping() -> bool
+
+      Whether the current noise models include Damping.
+
+
+
+   .. py:method:: initialize_system() -> None
+
+      Generate the noisy operation sequence via TimeStep and reset all branch groups (called internally by the run family).
+
+
+
+   .. py:method:: is_noise_free() -> bool
+
+      Whether no noise has been set.
+
+
+
+   .. py:method:: memory_size() -> int
+
+      Return the total number of memory slots.
+
+
+
+   .. py:method:: run() -> None
+                  run(version: str) -> None
+
+      Run by version string: "full" (unpruned) / "normal" (pruned) / "fast" (good branches only).
+
+
+
+   .. py:method:: run_full() -> None
+
+      Unpruned run over all branches, serving as the ground-truth reference of the pruned result.
+
+
+
+   .. py:method:: run_normal() -> None
+
+      Pruned run: all bad branches plus one good branch as reference (the default entry point for daily use).
+
+
+
+   .. py:method:: sample_and_get_fidelity() -> float
+
+      Sample the output branches and compute the loading fidelity (squared modulus of the inner product between the ideal and actual states).
+
+
+
+   .. py:method:: set_input_random(n_inputs: SupportsInt | SupportsIndex) -> None
+
+      Randomly sample n input branches, drawing input probabilities ~ U(0,1) then normalizing.
+
+
+
+   .. py:method:: set_input_uniform(n_inputs: SupportsInt | SupportsIndex) -> None
+
+      Randomly sample n input branches with equal input probability each.
+
+
+
+   .. py:method:: set_input_zerobus() -> None
+
+      Set the zerobus input: an equal-probability branch per address, all with
+      bus input 0 (deterministic, no RNG draw; the discriminating input used by
+      the circuit-level baseline comparison).
+
+
+
+   .. py:method:: set_memory(memory: collections.abc.Sequence[SupportsInt | SupportsIndex]) -> None
+
+      Set the data tree (memory length must be 2^addr_size).
+
+
+
+   .. py:method:: set_memory_random() -> None
+
+      Randomly fill the entire data tree using the global random engine.
+
+
+
+   .. py:method:: set_noise_models(noises: collections.abc.Mapping[OperationType, SupportsFloat | SupportsIndex]) -> None
+
+      Set noise models {OperationType: probability}.
+
+      Probabilities must lie in [0,1]; Damping requires gamma < 1, otherwise a RuntimeError is raised.
+
+
+
+   .. py:method:: to_string() -> str
+
+      Return a summary of the circuit.
+
+
+
+   .. py:method:: to_string_full_info() -> str
+
+      Return the full information including branch details.
+
+
+
+   .. py:property:: addr_size
+      :type: int
+
+
+      Address width.
+
+
+   .. py:property:: data_size
+      :type: int
+
+
+      Data width.
+
+
+.. py:class:: QRAMCircuitQutrit(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex)
+              QRAMCircuitQutrit(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex, memory: collections.abc.Sequence[SupportsInt | SupportsIndex])
+
+   Branch-based sparse simulator of the qutrit-architecture QRAM loading circuit.
+
+   Each tree node is a three-level system (addr ∈ {W, L, R}, data), evolved
+   along the noisy operation sequence via SubBranch trajectories. The
+   workflow matches QRAMCircuitQubit: construct -> set memory -> set noise
+   -> set_input_* -> run_normal/run_full -> sample_and_get_fidelity.
+
+   Construct the QRAM circuit initialized with the given memory.
+
+
+   .. py:method:: get_branch_probs() -> list[float]
+
+      Return the normalized probabilities of all branches (reference view).
+
+
+
+   .. py:method:: get_memory() -> list[int]
+
+      Return the data tree (reference view).
+
+
+
+   .. py:method:: get_noise_models() -> dict[OperationType, float]
+
+      Return the current noise models (reference view).
+
+
+
+   .. py:method:: get_qubit_num() -> int
+
+      Return the number of physical qubits used by the circuit: 2 * (2^address_size - 1).
+
+
+
+   .. py:method:: has_damping() -> bool
+
+      Whether the current noise models include Damping.
+
+
+
+   .. py:method:: initialize_system() -> None
+
+      Generate the noisy operation sequence via TimeStep and initialize the branch structure (called internally by the run family).
+
+
+
+   .. py:method:: is_noise_free() -> bool
+
+      Whether no noise has been set.
+
+
+
+   .. py:method:: memory_size() -> int
+
+      Return the total number of memory slots.
+
+
+
+   .. py:method:: run(version: str) -> None
+
+      Run by version string ("full" / "normal", etc.; same as QRAMCircuitQubit.run).
+
+
+
+   .. py:method:: run_full() -> None
+
+      Unpruned run over all branches, serving as the ground-truth reference of the pruned result.
+
+
+
+   .. py:method:: run_normal() -> None
+
+      Pruned run: all bad branches plus one good branch as reference (the default entry point for daily use).
+
+
+
+   .. py:method:: sample_and_get_fidelity() -> float
+
+      Sample the output branches and compute the loading fidelity.
+
+
+
+   .. py:method:: set_input_random(n_inputs: SupportsInt | SupportsIndex) -> None
+
+      Randomly sample n input branches and fill the branch probabilities.
+
+
+
+   .. py:method:: set_input_uniform(n_inputs: SupportsInt | SupportsIndex) -> None
+
+      Randomly sample n input branches with equal input probability each.
+
+
+
+   .. py:method:: set_memory(memory: collections.abc.Sequence[SupportsInt | SupportsIndex]) -> None
+
+      Set the data tree.
+
+
+
+   .. py:method:: set_memory_random() -> None
+
+      Randomly fill the entire data tree using the global random engine.
+
+
+
+   .. py:method:: set_noise_models(noises: collections.abc.Mapping[OperationType, SupportsFloat | SupportsIndex]) -> None
+
+      Set noise models {OperationType: probability}.
+
+      Probabilities must lie in [0,1]; Damping requires gamma < 1, otherwise a RuntimeError is raised.
+
+
+
+   .. py:method:: to_string() -> str
+
+      Return a summary of the circuit.
+
+
+
+   .. py:method:: to_string_full_info() -> str
+
+      Return the full information including branch details.
+
+
+
+   .. py:property:: address_size
+      :type: int
+
+
+      Address width.
+
+
+   .. py:property:: data_size
+      :type: int
+
+
+      Data width.
+
+
+.. py:class:: QRAMFullAmp(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex, memory: collections.abc.Sequence[SupportsInt | SupportsIndex])
+
+   Bridge from the QRAM circuit to a full-amplitude state vector (qutrit
+   architecture only).
+
+   An external full-amplitude simulator (or a user script) supplies the
+   state vector and qubit mapping; apply composites one QRAM loading onto
+   that state vector and returns the new vector, embedding QRAM simulation
+   into a larger circuit-evolution pipeline.
+
+   .. rubric:: Example
+
+   manipulator = QRAMFullAmp(2, 2, [0, 1, 2, 3])
+   manipulator.set_noise_models({OperationType.Depolarizing: 1e-3})
+   out = manipulator.apply(state, [0, 1], [2, 3], [], version="normal")
+
+   Construct the bridge: internally creates a qutrit QRAMCircuit loaded with the given memory.
+
+
+   .. py:method:: apply(state: collections.abc.Sequence[complex | SupportsComplex | SupportsFloat | SupportsIndex], address_qubits: collections.abc.Sequence[SupportsInt | SupportsIndex], data_qubits: collections.abc.Sequence[SupportsInt | SupportsIndex], other_qubits: collections.abc.Sequence[SupportsInt | SupportsIndex], version: str = 'normal') -> list[complex]
+
+      Composite one QRAM loading onto a full-amplitude state vector.
+
+      :param state: list of complex amplitudes (length 2^total qubit count)
+      :param address_qubits / data_qubits / other_qubits: indices of the three qubit groups
+      :param version: "normal" (pruned) or "full" (unpruned)
+
+      :returns: the new state vector after loading (list of complex numbers)
+
+
+
+   .. py:method:: set_noise_models(noises: collections.abc.Mapping[OperationType, SupportsFloat | SupportsIndex]) -> None
+
+      Set the noise models of the internal QRAMCircuit (same constraints as QRAMCircuitQutrit).
+
+
+
+.. py:class:: TimeSlices
+
+   The complete QRAM loading schedule: a sequence of OperationPacks ordered by time slice.
+
+
+   .. py:method:: clear() -> None
+
+      Clear the schedule.
+
+
+
+   .. py:method:: reverse() -> TimeSlices
+
+      Return the reversed schedule (overall order flipped and each group inverted).
+
+
+
+   .. py:method:: to_string() -> str
+
+      Return a human-readable string representation.
+
+
+
+   .. py:property:: time_slices
+      :type: list[OperationPack]
+
+
+      List of time slices (list[OperationPack]; reads return a copy).
+
+
+.. py:class:: TimeStep(addr_size: SupportsInt | SupportsIndex, data_size: SupportsInt | SupportsIndex)
+
+   Timing and noise scheduler for the QRAM loading circuit.
+
+   Derives the routing, copy, and swap operations of each time slice from
+   the address / data widths, and can insert noise operations after every
+   time slice according to the noise models, producing the complete
+   TimeSlices schedule. QRAMCircuit holds a TimeStep instance internally
+   and calls generate in initialize_system to produce the noisy operation
+   sequence.
+
+   Construct the scheduler.
+
+   :param addr_size: address width
+   :param data_size: data width
+
+
+   .. py:method:: full_step() -> int
+
+      Total number of time slices of the full loading procedure.
+
+
+
+   .. py:method:: generate(noises: collections.abc.Mapping[OperationType, SupportsFloat | SupportsIndex], arch_type: SupportsInt | SupportsIndex) -> TimeSlices
+
+      Generate the noisy schedule.
+
+      :param noises: noise models, a {OperationType: probability} dict (may be empty)
+      :param arch_type: architecture constant, ARCH_QUBIT or ARCH_QUTRIT
+
+
+
+   .. py:method:: generate_step(step: SupportsInt | SupportsIndex) -> OperationPack
+
+      Generate the operation group of the given time slice (noise-free).
+
+      :param step: time-slice index (1-based)
+
+
+
+   .. py:method:: get_bad_range_qubit(bad_qubit: SupportsInt | SupportsIndex) -> tuple[int, int]
+
+      Qubit architecture: the bad-branch address range [lo, hi] derived from the bad qubit.
+
+
+
+   .. py:method:: get_bad_range_qutrit(bad_qubit: SupportsInt | SupportsIndex) -> tuple[int, int]
+
+      Qutrit architecture: the bad-branch address range [lo, hi] derived from the bad qubit.
+
+
+
+   .. py:method:: is_bad_branch(addr: SupportsInt | SupportsIndex) -> bool
+
+      Check whether address addr falls inside the bad-branch range (bad range).
+
+
+
+   .. py:method:: layer_entangle_max(step: SupportsInt | SupportsIndex) -> int
+
+      Maximum number of tree layers entangled at the given time slice.
+
+      Position-sampled noise of that slice lives on the tree positions
+      [0, 2*(2^l - 1)); steps with l = 0 carry none (addr_size = 1 therefore
+      has no position-sampled noise; under Damping only Damp_Common acts).
+
+
+
+   .. py:method:: print() -> None
+
+      Print the detailed schedule of all time slices (fmt output to stdout).
+
+
+
+   .. py:property:: addr_size
+      :type: int
+
+
+      Address width.
+
+
+   .. py:property:: data_size
+      :type: int
+
+
+      Data width.
+
+
+   .. py:property:: time_slices_noise_free
+      :type: TimeSlices
+
+
+      Noise-free schedule (TimeSlices).
+
+
+.. py:function:: get_seed() -> int
+
+   Return the current seed of the global random engine.
+
+
+.. py:function:: set_seed(seed: SupportsInt | SupportsIndex) -> None
+
+   Set the seed of the global random engine (MT19937-64 singleton).
+   QRAMCircuit memory generation, input sampling and output sampling all
+   use this engine; fixing the seed reproduces the whole simulation chain.
+
+
+.. py:data:: ARCH_QUBIT
+   :type:  int
+   :value: 6939
+
+
+.. py:data:: ARCH_QUTRIT
+   :type:  int
+   :value: 6682
+
+
+.. py:data:: BitFlip
+   :type:  _core.OperationType
+
+.. py:data:: BitPhaseFlip
+   :type:  _core.OperationType
+
+.. py:data:: ControlSwap
+   :type:  _core.OperationType
+
+.. py:data:: CopyIn
+   :type:  _core.OperationType
+
+.. py:data:: CopyOut
+   :type:  _core.OperationType
+
+.. py:data:: Damp_Common
+   :type:  _core.OperationType
+
+.. py:data:: Damp_Full
+   :type:  _core.OperationType
+
+.. py:data:: Damping
+   :type:  _core.OperationType
+
+.. py:data:: Depolarizing
+   :type:  _core.OperationType
+
+.. py:data:: FetchData
+   :type:  _core.OperationType
+
+.. py:data:: FirstCopy
+   :type:  _core.OperationType
+
+.. py:data:: HadamardData
+   :type:  _core.OperationType
+
+.. py:data:: Identity_Active
+   :type:  _core.OperationType
+
+.. py:data:: Identity_Inactive
+   :type:  _core.OperationType
+
+.. py:data:: PhaseFlip
+   :type:  _core.OperationType
+
+.. py:data:: SetZero
+   :type:  _core.OperationType
+
+.. py:data:: SwapInternal
+   :type:  _core.OperationType
+

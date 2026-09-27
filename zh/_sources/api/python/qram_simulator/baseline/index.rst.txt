@@ -1,0 +1,154 @@
+qram_simulator.baseline
+=======================
+
+.. py:module:: qram_simulator.baseline
+
+.. autoapi-nested-parse::
+
+   Circuit-level QRAM baseline simulator (qubit architecture, 1-2 tree layers).
+
+   This subpackage provides an independent, gate-by-gate re-implementation of the
+   qubit-architecture QRAM loading circuit on the UnifiedQuantum (``uniqc``) QuTiP
+   density-matrix backend, used as a semi-quantitative cross-check baseline for the
+   symbolic sparse-tree trajectory engine exported by :class:`qram_simulator.QRAMCircuitQubit`.
+
+   The noise model mirrors the TimeStep scheduler of the C++ core: channels are
+   placed only on the QRAM routing-tree qubits (never on the address register or
+   the data bus), on every active position ``[0, 2*(2^l - 1))`` of each time slice
+   whose entangled-layer count is ``l``, with marginal probability ``p`` per
+   position per step (the channel-level counterpart of the C++ "nerror ~
+   Binomial(N, p), uniform positions" trajectory sampling).
+
+   See ``compare`` for the packaged comparison experiment and the module docstring
+   of ``circuit_qram`` for the encoding and operator conventions.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/python/qram_simulator/baseline/circuit_qram/index
+   /api/python/qram_simulator/baseline/metrics/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.baseline.CircuitQRAMQubit
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   qram_simulator.baseline.classical_fidelity
+   qram_simulator.baseline.tvd
+
+
+Package Contents
+----------------
+
+.. py:class:: CircuitQRAMQubit(addr_size: int, data_size: int, memory: Sequence[int], *, depolarizing: float = 0.0, damping: float = 0.0, input_mode: str = 'zerobus')
+
+   Circuit-level baseline of the qubit-architecture QRAM loading circuit.
+
+       Parameters
+       ----------
+       addr_size : int
+           Address width = tree depth. Only 1 or 2 is supported (density-matrix
+           size limit); addr=1 only exercises the noise-free bridge (plus the
+           whole-tree part of Damping).
+       data_size : int
+           Bits per memory cell (1 or 2).
+       memory : sequence of int
+           Data tree, length 2**addr_size, every entry < 2**data_size (the C++
+           fidelity XORs raw values; out-of-range entries are silently scored 0).
+       depolarizing, damping : float
+           Noise probabilities of the two supported channels, mirroring
+           ``QRAMCircuitQubit.set_noise_models``. Applied on tree qubits only.
+       input_mode : {"zerobus", "uniform"}
+           "zerobus" (default): uniform superposition of addresses, bus = 0 --
+           the discriminating input; "uniform": uniform address and bus.
+
+
+
+   .. py:method:: fidelity_with_ideal(rho: numpy.ndarray, rho_ideal: numpy.ndarray = None) -> float
+
+      <psi_ideal|rho|psi_ideal>, the same convention as the C++ overlap_fid.
+
+              For the pure ideal state this equals Re Tr(rho @ rho_ideal); it is the
+              statistic that matches the QRAM-Simulator trajectory average
+              ``E|<psi_ideal|psi_traj>|^2`` (avg_overlap_fid).
+
+
+
+
+   .. py:method:: ideal_density_matrix() -> numpy.ndarray
+
+      Density matrix of the noise-free circuit (pure state, trace 1).
+
+
+
+   .. py:method:: marginal_distribution(rho: numpy.ndarray) -> dict[str, float]
+
+      Marginal (address:bus) distribution of a density matrix.
+
+              Same key convention as ``QRAMCircuitQubit.get_output_distribution``
+              ("addr:bus" with the plain integers), so the two sides compare
+              key-for-key.
+
+
+
+
+   .. py:method:: run(mode: str = 'faithful') -> dict[str, Any]
+
+      Convenience wrapper: ideal + noisy density matrices and all metrics.
+
+              Returns a dict with ``ideal_rho``/``ideal_dist``, ``rho``/``dist``/``trace``
+              and ``fidelity`` (= fidelity_with_ideal); ``dist`` is sub-normalized
+              under damping (sum = channel survival, comparable to the QRAM side's
+              survival after the same renormalization convention).
+
+
+
+
+   .. py:method:: simulate_density(mode: str = 'faithful') -> numpy.ndarray
+
+      Run the noisy circuit on the uniqc QuTiP density-matrix backend.
+
+              Parameters
+              ----------
+              mode : {"faithful", "textbook", "nojump"}
+                  "faithful" (default): depolarizing as the {I,X,Z,Y} mixture and
+                  damping as the rho-dependent mirror of the C++ sampling scheme
+                  (the convention validated by the ChannelCorrespondence experiment);
+                  "textbook": TP textbook channels (Pauli depolarizing / full
+                  amplitude damping) -- identical for depolarizing, systematically
+                  off for damping; "nojump": damping K0 branch only (trace = no-jump
+                  survival probability).
+
+
+
+
+   .. py:method:: to_gate_list() -> list[Gate]
+
+      Flat noise-free gate list (input preparation gates excluded).
+
+
+
+.. py:function:: classical_fidelity(p: Mapping[str, float], q: Mapping[str, float]) -> float
+
+   Classical distribution fidelity (sum of sqrt(p*q))^2.
+
+
+.. py:function:: tvd(p: Mapping[str, float], q: Mapping[str, float]) -> float
+
+   Total variation distance 0.5 * sum |p - q|.
+
+

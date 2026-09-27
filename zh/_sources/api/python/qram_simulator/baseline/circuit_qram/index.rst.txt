@@ -1,0 +1,217 @@
+qram_simulator.baseline.circuit_qram
+====================================
+
+.. py:module:: qram_simulator.baseline.circuit_qram
+
+.. autoapi-nested-parse::
+
+   Gate-level (circuit-level) qubit-architecture QRAM simulator.
+
+   An independent re-implementation of the qubit-architecture QRAM loading circuit
+   (the symbolic sparse-tree engine of ``qram_qubit::QRAMCircuit``) as an explicit
+   quantum circuit, simulated gate by gate on the UnifiedQuantum (``uniqc``) QuTiP
+   density-matrix backend.  Serves as the semi-quantitative baseline against
+   :class:`qram_simulator.QRAMCircuitQubit` (see ``qram_simulator.baseline.compare``).
+
+   Why only 1-2 tree layers
+   ------------------------
+   The density matrix lives on ``addr + data + 2*(2^addr - 1)`` qubits
+   (9 qubits for addr=2/data=1); addr=3 already needs 25 qubits (2^50 amplitudes).
+   With ``addr_size = 1`` every step has ``layer_entangle_max == 0``, so the
+   position-sampled noise (Depolarizing / Damp_Full) vanishes -- the instance
+   degenerates to the noise-free bridge (under Damping only the whole-tree
+   Damp_Common still acts); ``addr_size = 2`` is the smallest fully noisy instance.
+
+   Encoding (identical to ``Experiments/QRAM/ChannelCorrespondence``)
+   ------------------------------------------------------------------
+   - address register: ``addr_size`` qubits, address bit ``b`` = qubit ``b``;
+   - data bus: ``data_size`` qubits starting at ``addr_size``;
+   - routing-tree node ``v`` (heap numbering, ``v in [0, 2^addr - 1)``): two
+     qubits -- ``a = addr + data + 2v`` (routing/addr slot) and
+     ``d = addr + data + 2v + 1`` (data slot); the tree is at ``|0...0>`` ground.
+   - noise position convention: ``pos = 2v + lr`` with ``lr = 0 -> a, 1 -> d``.
+
+   Gate translation (bitwise-verified against the C++ engine by the
+   ChannelCorrespondence experiment, Stage 0/1)
+   ------------------------------------------------
+   - ``FirstCopy{l}``   -> CNOT(addr[addr-1-l], node0.d)   (MSB-first)
+   - ``CopyIn{d}``      -> H on all bus qubits when d == 0, SWAP(bus[d], node0.d)
+   - ``CopyOut{d}``     -> SWAP(bus[d], node0.d), H on all bus qubits when d == last
+   - ``SwapInternal{l}``-> SWAP(a, d) on every node of layer l
+   - ``ControlSwap{l}``  -> per node v of layer l: SWAP(d_v, d_2v+1) controlled by
+     a_v == 0 and SWAP(d_v, d_2v+2) controlled by a_v == 1
+   - ``FetchData{k}``   -> U1(pi) on each leaf d_v controlled by (a_v == lr) for
+     every memory cell whose bit k is set (phase-kickback fetch)
+
+   The gate sequence and the per-step entangled-layer counts are pulled from the
+   C++ ``TimeStep`` scheduler through ``qram_simulator._core`` (single source of
+   truth) -- this module never re-derives the schedule.
+
+   Noise model (channel level, mirrors the C++ trajectory sampler)
+   ---------------------------------------------------------------
+   Noise channels are placed **only on the routing-tree qubits** (never on the
+   address register or the bus).  After the gates of each time slice with
+   entangled-layer count ``l``, a channel acts on every active position
+   ``[0, 2*(2^l - 1))`` with marginal probability ``p`` -- the channel-level
+   counterpart of the C++ per-trajectory sampler (``nerror ~ Binomial(N, p)``
+   placed uniformly on the N active positions, hence each position is hit with
+   probability exactly ``p``).  Depolarizing applies the ``{I, X, Z, Y}``
+   unitary mixture (all unitary after the Y-flip fix, so the textbook TP channel
+   and the faithful mixture coincide); Damping follows the validated "faithful
+   mirror" of the C++ non-linear sampling scheme (whole-tree K0 + jumps on active
+   positions weighted by the excitation population), with the textbook
+   amplitude-damping channel available as ``mode="textbook"`` for contrast.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.baseline.circuit_qram.CircuitQRAMQubit
+   qram_simulator.baseline.circuit_qram.QubitQRAMEncoding
+
+
+Module Contents
+---------------
+
+.. py:class:: CircuitQRAMQubit(addr_size: int, data_size: int, memory: Sequence[int], *, depolarizing: float = 0.0, damping: float = 0.0, input_mode: str = 'zerobus')
+
+   Circuit-level baseline of the qubit-architecture QRAM loading circuit.
+
+       Parameters
+       ----------
+       addr_size : int
+           Address width = tree depth. Only 1 or 2 is supported (density-matrix
+           size limit); addr=1 only exercises the noise-free bridge (plus the
+           whole-tree part of Damping).
+       data_size : int
+           Bits per memory cell (1 or 2).
+       memory : sequence of int
+           Data tree, length 2**addr_size, every entry < 2**data_size (the C++
+           fidelity XORs raw values; out-of-range entries are silently scored 0).
+       depolarizing, damping : float
+           Noise probabilities of the two supported channels, mirroring
+           ``QRAMCircuitQubit.set_noise_models``. Applied on tree qubits only.
+       input_mode : {"zerobus", "uniform"}
+           "zerobus" (default): uniform superposition of addresses, bus = 0 --
+           the discriminating input; "uniform": uniform address and bus.
+
+
+
+   .. py:method:: fidelity_with_ideal(rho: numpy.ndarray, rho_ideal: numpy.ndarray = None) -> float
+
+      <psi_ideal|rho|psi_ideal>, the same convention as the C++ overlap_fid.
+
+              For the pure ideal state this equals Re Tr(rho @ rho_ideal); it is the
+              statistic that matches the QRAM-Simulator trajectory average
+              ``E|<psi_ideal|psi_traj>|^2`` (avg_overlap_fid).
+
+
+
+
+   .. py:method:: ideal_density_matrix() -> numpy.ndarray
+
+      Density matrix of the noise-free circuit (pure state, trace 1).
+
+
+
+   .. py:method:: marginal_distribution(rho: numpy.ndarray) -> dict[str, float]
+
+      Marginal (address:bus) distribution of a density matrix.
+
+              Same key convention as ``QRAMCircuitQubit.get_output_distribution``
+              ("addr:bus" with the plain integers), so the two sides compare
+              key-for-key.
+
+
+
+
+   .. py:method:: run(mode: str = 'faithful') -> dict[str, Any]
+
+      Convenience wrapper: ideal + noisy density matrices and all metrics.
+
+              Returns a dict with ``ideal_rho``/``ideal_dist``, ``rho``/``dist``/``trace``
+              and ``fidelity`` (= fidelity_with_ideal); ``dist`` is sub-normalized
+              under damping (sum = channel survival, comparable to the QRAM side's
+              survival after the same renormalization convention).
+
+
+
+
+   .. py:method:: simulate_density(mode: str = 'faithful') -> numpy.ndarray
+
+      Run the noisy circuit on the uniqc QuTiP density-matrix backend.
+
+              Parameters
+              ----------
+              mode : {"faithful", "textbook", "nojump"}
+                  "faithful" (default): depolarizing as the {I,X,Z,Y} mixture and
+                  damping as the rho-dependent mirror of the C++ sampling scheme
+                  (the convention validated by the ChannelCorrespondence experiment);
+                  "textbook": TP textbook channels (Pauli depolarizing / full
+                  amplitude damping) -- identical for depolarizing, systematically
+                  off for damping; "nojump": damping K0 branch only (trace = no-jump
+                  survival probability).
+
+
+
+
+   .. py:method:: to_gate_list() -> list[Gate]
+
+      Flat noise-free gate list (input preparation gates excluded).
+
+
+
+.. py:class:: QubitQRAMEncoding(addr_size: int, data_size: int)
+
+   Qubit-index layout of the encoded QRAM circuit.
+
+
+   .. py:method:: addr_qubit(bit: int) -> int
+
+
+   .. py:method:: bus_qubit(digit: int) -> int
+
+
+   .. py:method:: layer_nodes(layer: int) -> list[int]
+
+
+   .. py:method:: node_a(v: int) -> int
+
+
+   .. py:method:: node_d(v: int) -> int
+
+
+   .. py:method:: noise_qubit(pos: int) -> int
+
+      Tree qubit of flat noise position ``pos = 2v + lr`` (lr: 0 -> a, 1 -> d).
+
+
+
+   .. py:property:: address_qubits
+      :type: list[int]
+
+
+
+   .. py:property:: bus_qubits
+      :type: list[int]
+
+
+
+   .. py:property:: num_nodes
+      :type: int
+
+
+
+   .. py:property:: num_qubits
+      :type: int
+
+
+
+   .. py:property:: tree_qubits
+      :type: list[int]
+
+
+

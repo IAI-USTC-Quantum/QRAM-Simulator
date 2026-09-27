@@ -1,0 +1,1912 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 --><title>Index - QRAM-Simulator Documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #2563eb;
+  --color-brand-content: #1d4ed8;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3b82f6;
+  --color-brand-content: #60a5fa;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">QRAM-Simulator Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">QRAM-Simulator Documentation</span>
+  
+</a>
+<div class="sidebar-langswitch">
+  <span class="sidebar-langswitch-label">Language:</span>
+  <a href="../zh/genindex.html">中文</a>
+  <span class="sidebar-langswitch-sep">·</span>
+  <strong>English</strong>
+</div><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/architecture.html">QRAM-Simulator Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/operators.html">Quantum Arithmetic Operator Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/naming_conventions.html">SparQ Operator Naming Conventions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/cpp.html">C++ API Reference</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Papers and Experiments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="paper/README.html">Paper Reproduction Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paper/reproduction.html">Paper Experiment Reproduction Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paper/exactness_validation.html">Pruned/full exactness validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paper/joint_damping.html">Exact joint sampling of qubit amplitude damping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paper/qubit_qram_pruning.html">Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM: The H–K₀–H Predictability Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paper/qubit_error_propagation.html">The Qubit-QRAM Error Propagation Mechanism: A Theoretical Walkthrough with Single-Error Injection Verification</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/python/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/python/qram_simulator/index.html">qram_simulator</a><input aria-label="Toggle navigation of qram_simulator" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/python/qram_simulator/baseline/index.html">qram_simulator.baseline</a><input aria-label="Toggle navigation of qram_simulator.baseline" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/python/qram_simulator/baseline/circuit_qram/index.html">qram_simulator.baseline.circuit_qram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/python/qram_simulator/baseline/metrics/index.html">qram_simulator.baseline.metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#V"><strong>V</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.addr_qubit">addr_qubit() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.addr_size">addr_size (qram_simulator.QRAMCircuitQubit property)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.addr_size">(qram_simulator.TimeStep property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.address_qubits">address_qubits (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.address_size">address_size (qram_simulator.QRAMCircuitQutrit property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMFullAmp.apply">apply() (qram_simulator.QRAMFullAmp method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.ARCH_QUBIT">ARCH_QUBIT (in module qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.ARCH_QUTRIT">ARCH_QUTRIT (in module qram_simulator)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.BitFlip">BitFlip (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.BitFlip">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.BitPhaseFlip">BitPhaseFlip (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.BitPhaseFlip">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.bus_qubit">bus_qubit() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.bus_qubits">bus_qubits (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit">CircuitQRAMQubit (class in qram_simulator.baseline)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit">(class in qram_simulator.baseline.circuit_qram)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.classical_fidelity">classical_fidelity() (in module qram_simulator.baseline)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/metrics/index.html#qram_simulator.baseline.metrics.classical_fidelity">(in module qram_simulator.baseline.metrics)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeSlices.clear">clear() (qram_simulator.TimeSlices method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.coefficients">coefficients (qram_simulator.Operation property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.ControlSwap">ControlSwap (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.ControlSwap">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.CopyIn">CopyIn (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.CopyIn">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.CopyOut">CopyOut (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.CopyOut">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.dagger">dagger (qram_simulator.Operation property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Damp_Common">Damp_Common (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Damp_Common">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Damp_Full">Damp_Full (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Damp_Full">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Damping">Damping (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Damping">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.data_size">data_size (qram_simulator.QRAMCircuitQubit property)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.data_size">(qram_simulator.QRAMCircuitQutrit property)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.data_size">(qram_simulator.TimeStep property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Depolarizing">Depolarizing (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Depolarizing">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/metrics/index.html#qram_simulator.baseline.metrics.dist_total">dist_total() (in module qram_simulator.baseline.metrics)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack.empty">empty() (qram_simulator.OperationPack method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.FetchData">FetchData (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.FetchData">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.fidelity_with_ideal">fidelity_with_ideal() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.fidelity_with_ideal">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.FirstCopy">FirstCopy (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.FirstCopy">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.full_step">full_step() (qram_simulator.TimeStep method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.generate">generate() (qram_simulator.TimeStep method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.generate_step">generate_step() (qram_simulator.TimeStep method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.get_bad_range_qubit">get_bad_range_qubit() (qram_simulator.TimeStep method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.get_bad_range_qutrit">get_bad_range_qutrit() (qram_simulator.TimeStep method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.get_branch_probs">get_branch_probs() (qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_fidelity">get_fidelity() (qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_fidelity_conventions">get_fidelity_conventions() (qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_memory">get_memory() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.get_memory">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_noise_models">get_noise_models() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.get_noise_models">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_output_distribution">get_output_distribution() (qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.get_qubit_num">get_qubit_num() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.get_qubit_num">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.get_seed">get_seed() (in module qram_simulator)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.HadamardData">HadamardData (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.HadamardData">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.has_damping">has_damping() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.has_damping">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.ideal_density_matrix">ideal_density_matrix() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.ideal_density_matrix">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Identity_Active">Identity_Active (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Identity_Active">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Identity_Inactive">Identity_Inactive (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.Identity_Inactive">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.initialize_system">initialize_system() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.initialize_system">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.is_bad_branch">is_bad_branch() (qram_simulator.TimeStep method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.is_noise_free">is_noise_free() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.is_noise_free">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.layer_entangle_max">layer_entangle_max() (qram_simulator.TimeStep method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.layer_nodes">layer_nodes() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.marginal_distribution">marginal_distribution() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.marginal_distribution">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/metrics/index.html#qram_simulator.baseline.metrics.mean_of_dists">mean_of_dists() (in module qram_simulator.baseline.metrics)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.memory_size">memory_size() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.memory_size">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    module
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#module-qram_simulator">qram_simulator</a>
+</li>
+          <li><a href="api/python/qram_simulator/baseline/index.html#module-qram_simulator.baseline">qram_simulator.baseline</a>
+</li>
+          <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#module-qram_simulator.baseline.circuit_qram">qram_simulator.baseline.circuit_qram</a>
+</li>
+          <li><a href="api/python/qram_simulator/baseline/metrics/index.html#module-qram_simulator.baseline.metrics">qram_simulator.baseline.metrics</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack.name">name (qram_simulator.OperationPack property)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.name">(qram_simulator.OperationType property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.node_a">node_a() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.node_d">node_d() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.noise_qubit">noise_qubit() (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/metrics/index.html#qram_simulator.baseline.metrics.normalize">normalize() (in module qram_simulator.baseline.metrics)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.num_nodes">num_nodes (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.num_qubits">num_qubits (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation">Operation (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack">OperationPack (class in qram_simulator)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack.operations">operations (qram_simulator.OperationPack property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType">OperationType (class in qram_simulator)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.PhaseFlip">PhaseFlip (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.PhaseFlip">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.print">print() (qram_simulator.TimeStep method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    qram_simulator
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#module-qram_simulator">module</a>
+</li>
+        </ul></li>
+        <li>
+    qram_simulator.baseline
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#module-qram_simulator.baseline">module</a>
+</li>
+        </ul></li>
+        <li>
+    qram_simulator.baseline.circuit_qram
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#module-qram_simulator.baseline.circuit_qram">module</a>
+</li>
+        </ul></li>
+        <li>
+    qram_simulator.baseline.metrics
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/metrics/index.html#module-qram_simulator.baseline.metrics">module</a>
+</li>
+        </ul></li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRangeE">qram_simulator::ContinuousRange (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator15ContinuousRange6acceptEi">qram_simulator::ContinuousRange::accept (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRange5clearEv">qram_simulator::ContinuousRange::clear (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRange15ContinuousRangeEii">qram_simulator::ContinuousRange::ContinuousRange (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRange5mergeEii">qram_simulator::ContinuousRange::merge (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRangecvNSt6stringEEv">qram_simulator::ContinuousRange::operator std::string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator15ContinuousRange11range_boundE">qram_simulator::ContinuousRange::range_bound (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0EN14qram_simulator11DenseMatrixE">qram_simulator::DenseMatrix (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseMatrix8allcloseERK11DenseMatrixI2TyEd">qram_simulator::DenseMatrix::allclose (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseMatrix6daggerEv">qram_simulator::DenseMatrix::dagger (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11DenseMatrix10from_eigenERKN5Eigen7MatrixXI2TyEE">qram_simulator::DenseMatrix::from_eigen (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseMatrix12is_HermitianEd">qram_simulator::DenseMatrix::is_Hermitian (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseMatrix10is_unitaryEd">qram_simulator::DenseMatrix::is_unitary (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseMatrix8to_eigenEv">qram_simulator::DenseMatrix::to_eigen (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0EN14qram_simulator11DenseVectorE">qram_simulator::DenseVector (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseVector8allcloseERK11DenseVectorI2TyEd">qram_simulator::DenseVector::allclose (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11DenseVector10from_eigenERK8EigenVecI2TyE">qram_simulator::DenseVector::from_eigen (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11DenseVector8to_eigenEv">qram_simulator::DenseVector::to_eigen (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator6LoggerE">qram_simulator::Logger (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator6Logger12autofilenameENSt6stringENSt6stringE">qram_simulator::Logger::autofilename (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator6Logger8instanceEv">qram_simulator::Logger::instance (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator6Logger9timer_endEd">qram_simulator::Logger::timer_end (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator6Logger11timer_startEv">qram_simulator::Logger::timer_start (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9OperationE">qram_simulator::Operation (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Operation12coefficientsE">qram_simulator::Operation::coefficients (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Operation6daggerE">qram_simulator::Operation::dagger (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator9Operation11get_targetsEv">qram_simulator::Operation::get_targets (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Operation7reverseEv">qram_simulator::Operation::reverse (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Operation7targetsE">qram_simulator::Operation::targets (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator9Operation9to_stringEv">qram_simulator::Operation::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Operation4typeE">qram_simulator::Operation::type (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPackE">qram_simulator::OperationPack (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack6appendE13OperationPack">qram_simulator::OperationPack::append (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack6appendE9Operation">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator13OperationPack5emptyEv">qram_simulator::OperationPack::empty (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack4nameE">qram_simulator::OperationPack::name (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack10operationsE">qram_simulator::OperationPack::operations (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack7reverseEv">qram_simulator::OperationPack::reverse (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13OperationPack8set_nameENSt6stringE">qram_simulator::OperationPack::set_name (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator13OperationPack9to_stringEv">qram_simulator::OperationPack::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9OutputterE">qram_simulator::Outputter (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4IDpEN14qram_simulator7productE">qram_simulator::product (C++ class)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator7product5beginEv">qram_simulator::product::begin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator7product3endEv">qram_simulator::product::end (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator7product8iteratorE">qram_simulator::product::iterator (C++ class)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator7product8iteratorneERK8iterator">qram_simulator::product::iterator::operator!= (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator7product8iteratormlEv">qram_simulator::product::iterator::operator* (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator7product8iteratorppEv">qram_simulator::product::iterator::operator++ (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator7product7productEDpRK10Containers">qram_simulator::product::product (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8profilerE">qram_simulator::profiler (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6BranchE">qram_simulator::qram_qubit::Branch (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch7addressE">qram_simulator::qram_qubit::Branch::address (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch6BranchE6size_t6size_t">qram_simulator::qram_qubit::Branch::Branch (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch6BranchE6size_t6size_t5bus_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch9bus_inputE">qram_simulator::qram_qubit::Branch::bus_input (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch8bus_sizeE">qram_simulator::qram_qubit::Branch::bus_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch15clear_all_stateEv">qram_simulator::qram_qubit::Branch::clear_all_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch14damp_prob_typeE">qram_simulator::qram_qubit::Branch::damp_prob_type (C++ type)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch12get_branchidEv">qram_simulator::qram_qubit::Branch::get_branchid (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch12get_fidelityERK8memory_t">qram_simulator::qram_qubit::Branch::get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch22get_good_branch_systemEv">qram_simulator::qram_qubit::Branch::get_good_branch_system (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch8get_probEv">qram_simulator::qram_qubit::Branch::get_prob (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch13get_prob_dampE6size_t">qram_simulator::qram_qubit::Branch::get_prob_damp (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch8good_refE">qram_simulator::qram_qubit::Branch::good_ref (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch7is_goodEv">qram_simulator::qram_qubit::Branch::is_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch7iterbegEv">qram_simulator::qram_qubit::Branch::iterbeg (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch7iterbegEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch7iterendEv">qram_simulator::qram_qubit::Branch::iterend (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch7iterendEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6BranchltERK6Branch">qram_simulator::qram_qubit::Branch::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6BrancheqERK6Branch">qram_simulator::qram_qubit::Branch::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch10qunit_typeE">qram_simulator::qram_qubit::Branch::qunit_type (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch19relative_multiplierE">qram_simulator::qram_qubit::Branch::relative_multiplier (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch16remove_all_stateEv">qram_simulator::qram_qubit::Branch::remove_all_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0EN14qram_simulator10qram_qubit6Branch9remove_ifEv4Pred">qram_simulator::qram_qubit::Branch::remove_if (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch21remove_mismatch_stateERKN5State12element_typeE">qram_simulator::qram_qubit::Branch::remove_mismatch_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch5resetEv">qram_simulator::qram_qubit::Branch::reset (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch15run_damp_commonEd">qram_simulator::qram_qubit::Branch::run_damp_common (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch13run_damp_fullE6size_t6size_t">qram_simulator::qram_qubit::Branch::run_damp_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch13run_fetchdataER8memory_t6size_t">qram_simulator::qram_qubit::Branch::run_fetchdata (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch12run_hadamardEv">qram_simulator::qram_qubit::Branch::run_hadamard (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch8set_goodEP6Branch">qram_simulator::qram_qubit::Branch::set_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch13system_statesE">qram_simulator::qram_qubit::Branch::system_states (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch16system_states_szE">qram_simulator::qram_qubit::Branch::system_states_sz (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit6Branch9to_stringEv">qram_simulator::qram_qubit::Branch::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit6Branch9try_mergeEv">qram_simulator::qram_qubit::Branch::try_merge (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroupE">qram_simulator::qram_qubit::BranchGroup (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup7addressE">qram_simulator::qram_qubit::BranchGroup::address (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup11annihilatedE">qram_simulator::qram_qubit::BranchGroup::annihilated (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup12branch_probsE">qram_simulator::qram_qubit::BranchGroup::branch_probs (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup8branchesE">qram_simulator::qram_qubit::BranchGroup::branches (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup14branches_inputE">qram_simulator::qram_qubit::BranchGroup::branches_input (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup11BranchGroupE6size_t">qram_simulator::qram_qubit::BranchGroup::BranchGroup (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11BranchGroup12get_fidelityERK8memory_t">qram_simulator::qram_qubit::BranchGroup::get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11BranchGroup8get_probEv">qram_simulator::qram_qubit::BranchGroup::get_prob (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11BranchGroup13get_prob_dampE6size_t">qram_simulator::qram_qubit::BranchGroup::get_prob_damp (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup8good_refE">qram_simulator::qram_qubit::BranchGroup::good_ref (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup7is_goodE">qram_simulator::qram_qubit::BranchGroup::is_good (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup16mark_annihilatedEv">qram_simulator::qram_qubit::BranchGroup::mark_annihilated (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup9predictedE">qram_simulator::qram_qubit::BranchGroup::predicted (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup19relative_multiplierE">qram_simulator::qram_qubit::BranchGroup::relative_multiplier (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup21remove_mismatch_stateERKN6Branch12element_typeE">qram_simulator::qram_qubit::BranchGroup::remove_mismatch_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup5resetEv">qram_simulator::qram_qubit::BranchGroup::reset (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup24sample_output_no_dampingERN6Branch12element_typeERd">qram_simulator::qram_qubit::BranchGroup::sample_output_no_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup26sample_output_with_dampingERN6Branch12element_typeERd">qram_simulator::qram_qubit::BranchGroup::sample_output_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup15set_empty_stateEv">qram_simulator::qram_qubit::BranchGroup::set_empty_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup8set_goodEP11BranchGroup">qram_simulator::qram_qubit::BranchGroup::set_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11BranchGroup11state_probsE">qram_simulator::qram_qubit::BranchGroup::state_probs (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuitE">qram_simulator::qram_qubit::QRAMCircuit (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit15_set_input_implE6size_tb">qram_simulator::qram_qubit::QRAMCircuit::_set_input_impl (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit15add_noise_modelE13OperationTyped">qram_simulator::qram_qubit::QRAMCircuit::add_noise_model (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9addr_sizeE">qram_simulator::qram_qubit::QRAMCircuit::addr_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit21apply_damping_outcomeERKNSt6vectorI6size_tEEd">qram_simulator::qram_qubit::QRAMCircuit::apply_damping_outcome (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13branch_groupsE">qram_simulator::qram_qubit::QRAMCircuit::branch_groups (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11clear_noiseEv">qram_simulator::qram_qubit::QRAMCircuit::clear_noise (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit19clear_zero_elementsEv">qram_simulator::qram_qubit::QRAMCircuit::clear_zero_elements (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit18DampingMaskWeightsE">qram_simulator::qram_qubit::QRAMCircuit::DampingMaskWeights (C++ type)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit14DampingOutcomeE">qram_simulator::qram_qubit::QRAMCircuit::DampingOutcome (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9data_sizeE">qram_simulator::qram_qubit::QRAMCircuit::data_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit18final_system_stateE">qram_simulator::qram_qubit::QRAMCircuit::final_system_state (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16fired_jump_countE">qram_simulator::qram_qubit::QRAMCircuit::fired_jump_count (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit23first_good_branch_groupE">qram_simulator::qram_qubit::QRAMCircuit::first_good_branch_group (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit8FULL_VERE">qram_simulator::qram_qubit::QRAMCircuit::FULL_VER (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17get_branch_groupsEv">qram_simulator::qram_qubit::QRAMCircuit::get_branch_groups (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit17get_branch_groupsEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit12get_fidelityEv">qram_simulator::qram_qubit::QRAMCircuit::get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10get_memoryEv">qram_simulator::qram_qubit::QRAMCircuit::get_memory (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit10get_memoryEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit24get_normalization_factorEv">qram_simulator::qram_qubit::QRAMCircuit::get_normalization_factor (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit37get_normalization_factor_with_dampingEv">qram_simulator::qram_qubit::QRAMCircuit::get_normalization_factor_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit14get_operationsEv">qram_simulator::qram_qubit::QRAMCircuit::get_operations (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit14get_operationsEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit13get_qubit_numEv">qram_simulator::qram_qubit::QRAMCircuit::get_qubit_num (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit21good_branch_group_idsE">qram_simulator::qram_qubit::QRAMCircuit::good_branch_group_ids (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit11has_dampingEv">qram_simulator::qram_qubit::QRAMCircuit::has_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17initialize_systemEv">qram_simulator::qram_qubit::QRAMCircuit::initialize_system (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit13is_noise_freeEv">qram_simulator::qram_qubit::QRAMCircuit::is_noise_free (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit25materialize_good_branchesEv">qram_simulator::qram_qubit::QRAMCircuit::materialize_good_branches (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit13mem_to_stringEv">qram_simulator::qram_qubit::QRAMCircuit::mem_to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit6memoryE">qram_simulator::qram_qubit::QRAMCircuit::memory (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit11memory_sizeEv">qram_simulator::qram_qubit::QRAMCircuit::memory_size (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16noise_parametersE">qram_simulator::qram_qubit::QRAMCircuit::noise_parameters (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10NORMAL_VERE">qram_simulator::qram_qubit::QRAMCircuit::NORMAL_VER (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13normalizationEv">qram_simulator::qram_qubit::QRAMCircuit::normalization (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10operationsE">qram_simulator::qram_qubit::QRAMCircuit::operations (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11prepare_allEv">qram_simulator::qram_qubit::QRAMCircuit::prepare_all (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11prepare_badEv">qram_simulator::qram_qubit::QRAMCircuit::prepare_bad (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17prepare_good_onlyEv">qram_simulator::qram_qubit::QRAMCircuit::prepare_good_only (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11QRAMCircuitE6size_t6size_t">qram_simulator::qram_qubit::QRAMCircuit::QRAMCircuit (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11QRAMCircuitE6size_t6size_tRR8memory_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit14raw_operationsE">qram_simulator::qram_qubit::QRAMCircuit::raw_operations (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit3runENSt6stringE">qram_simulator::qram_qubit::QRAMCircuit::run (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit3runEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9run_acopyEi">qram_simulator::qram_qubit::QRAMCircuit::run_acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit7run_allEv">qram_simulator::qram_qubit::QRAMCircuit::run_all (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit7run_badEv">qram_simulator::qram_qubit::QRAMCircuit::run_bad (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit11run_bitflipE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_bitflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16run_bitphaseflipE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_bitphaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9run_businE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10run_busoutE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9run_cswapE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit15run_damp_commonEd">qram_simulator::qram_qubit::QRAMCircuit::run_damp_common (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13run_damp_fullE6size_t6size_td">qram_simulator::qram_qubit::QRAMCircuit::run_damp_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17run_damping_layerERKNSt6vectorI6size_tEE6size_td">qram_simulator::qram_qubit::QRAMCircuit::run_damping_layer (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16run_depolarizingE6size_td">qram_simulator::qram_qubit::QRAMCircuit::run_depolarizing (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13run_fetchdataE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_fetchdata (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit8run_fullEv">qram_simulator::qram_qubit::QRAMCircuit::run_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit8run_goodEv">qram_simulator::qram_qubit::QRAMCircuit::run_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13run_good_onlyEv">qram_simulator::qram_qubit::QRAMCircuit::run_good_only (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit12run_hadamardEv">qram_simulator::qram_qubit::QRAMCircuit::run_hadamard (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10run_normalEv">qram_simulator::qram_qubit::QRAMCircuit::run_normal (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13run_phaseflipE6size_td">qram_simulator::qram_qubit::QRAMCircuit::run_phaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit8run_swapE6size_t">qram_simulator::qram_qubit::QRAMCircuit::run_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit23sample_and_get_fidelityEv">qram_simulator::qram_qubit::QRAMCircuit::sample_and_get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit13sample_outputEv">qram_simulator::qram_qubit::QRAMCircuit::sample_output (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit12set_branchesERKNSt6vectorI11BranchGroupEE">qram_simulator::qram_qubit::QRAMCircuit::set_branches (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit12set_branchesERRNSt6vectorI11BranchGroupEE">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16set_input_randomE6size_t">qram_simulator::qram_qubit::QRAMCircuit::set_input_random (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17set_input_uniformE6size_t">qram_simulator::qram_qubit::QRAMCircuit::set_input_uniform (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10set_memoryERK8memory_t">qram_simulator::qram_qubit::QRAMCircuit::set_memory (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10set_memoryERR8memory_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit17set_memory_randomEv">qram_simulator::qram_qubit::QRAMCircuit::set_memory_random (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit16set_noise_modelsERKNSt3mapI13OperationTypedEE">qram_simulator::qram_qubit::QRAMCircuit::set_noise_models (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit9time_stepE">qram_simulator::qram_qubit::QRAMCircuit::time_step (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit9to_stringEv">qram_simulator::qram_qubit::QRAMCircuit::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11QRAMCircuit19to_string_full_infoEv">qram_simulator::qram_qubit::QRAMCircuit::to_string_full_info (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit10total_probE">qram_simulator::qram_qubit::QRAMCircuit::total_prob (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11QRAMCircuit23valid_branch_group_viewE">qram_simulator::qram_qubit::QRAMCircuit::valid_branch_group_view (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5StateE">qram_simulator::qram_qubit::State (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State5acopyEb">qram_simulator::qram_qubit::State::acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State5businER5bus_t6size_t">qram_simulator::qram_qubit::State::busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State6busoutER5bus_t6size_t">qram_simulator::qram_qubit::State::busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State5clearEv">qram_simulator::qram_qubit::State::clear (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State19clear_zero_elementsEv">qram_simulator::qram_qubit::State::clear_zero_elements (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State4cnotE6size_tb">qram_simulator::qram_qubit::State::cnot (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State5cswapE6size_t">qram_simulator::qram_qubit::State::cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State11cswap_layerE6size_t">qram_simulator::qram_qubit::State::cswap_layer (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State4flipE6size_t">qram_simulator::qram_qubit::State::flip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State12general_swapE6size_t6size_t">qram_simulator::qram_qubit::State::general_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State14get_layer_iterE6size_t">qram_simulator::qram_qubit::State::get_layer_iter (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State23get_layer_nonzero_nodesE6size_tRNSt3setI6size_tEE">qram_simulator::qram_qubit::State::get_layer_nonzero_nodes (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State30get_layer_nonzero_parent_nodesE6size_tRNSt3setI6size_tEE">qram_simulator::qram_qubit::State::get_layer_nonzero_parent_nodes (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State15get_nz_locationE6size_t6size_t">qram_simulator::qram_qubit::State::get_nz_location (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State15get_nz_locationE6size_t6size_t6size_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State13internal_swapE6size_t">qram_simulator::qram_qubit::State::internal_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State19internal_swap_layerE6size_t">qram_simulator::qram_qubit::State::internal_swap_layer (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State7left_ofE6size_t">qram_simulator::qram_qubit::State::left_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State11nz_elementsE">qram_simulator::qram_qubit::State::nz_elements (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit5StateltERK5State">qram_simulator::qram_qubit::State::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit5StateeqERK5State">qram_simulator::qram_qubit::State::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State9parent_ofE6size_t">qram_simulator::qram_qubit::State::parent_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State8right_ofE6size_t">qram_simulator::qram_qubit::State::right_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit5State8set_zeroE6size_t">qram_simulator::qram_qubit::State::set_zero (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit5State8state_ofE6size_t">qram_simulator::qram_qubit::State::state_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemStateE">qram_simulator::qram_qubit::SystemState (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState9amplitudeE">qram_simulator::qram_qubit::SystemState::amplitude (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState8bus_sizeE">qram_simulator::qram_qubit::SystemState::bus_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState5clearEv">qram_simulator::qram_qubit::SystemState::clear (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState8data_busE">qram_simulator::qram_qubit::SystemState::data_bus (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11SystemStateltERK11SystemState">qram_simulator::qram_qubit::SystemState::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10qram_qubit11SystemStateeqERK11SystemState">qram_simulator::qram_qubit::SystemState::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState9run_acopyEb">qram_simulator::qram_qubit::SystemState::run_acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState11run_bitflipE6size_t">qram_simulator::qram_qubit::SystemState::run_bitflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState16run_bitphaseflipE6size_t">qram_simulator::qram_qubit::SystemState::run_bitphaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState9run_businE6size_t">qram_simulator::qram_qubit::SystemState::run_busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState10run_busoutE6size_t">qram_simulator::qram_qubit::SystemState::run_busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState9run_cswapE6size_t">qram_simulator::qram_qubit::SystemState::run_cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState15run_damp_commonEd">qram_simulator::qram_qubit::SystemState::run_damp_common (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState16run_depolarizingE6size_td">qram_simulator::qram_qubit::SystemState::run_depolarizing (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState13run_phaseflipE6size_td">qram_simulator::qram_qubit::SystemState::run_phaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState8run_swapE6size_t">qram_simulator::qram_qubit::SystemState::run_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState8set_zeroE6size_t">qram_simulator::qram_qubit::SystemState::set_zero (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState5stateE">qram_simulator::qram_qubit::SystemState::state (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10qram_qubit11SystemState11SystemStateE5bus_t6size_t">qram_simulator::qram_qubit::SystemState::SystemState (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6BranchE">qram_simulator::qram_qutrit::Branch (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch7addressE">qram_simulator::qram_qutrit::Branch::address (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch9arch_typeE">qram_simulator::qram_qutrit::Branch::arch_type (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch6BranchE6size_t6size_t">qram_simulator::qram_qutrit::Branch::Branch (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch6BranchE6size_t6size_t14memory_entry_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch11branch_probE">qram_simulator::qram_qutrit::Branch::branch_prob (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch9bus_inputE">qram_simulator::qram_qutrit::Branch::bus_input (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch8bus_sizeE">qram_simulator::qram_qutrit::Branch::bus_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch15clear_all_stateEv">qram_simulator::qram_qutrit::Branch::clear_all_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch11damp_op_numE">qram_simulator::qram_qutrit::Branch::damp_op_num (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch14damp_prob_typeE">qram_simulator::qram_qutrit::Branch::damp_prob_type (C++ type)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch12get_branchidEv">qram_simulator::qram_qutrit::Branch::get_branchid (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch12get_fidelityERK8memory_t">qram_simulator::qram_qutrit::Branch::get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch22get_good_branch_systemEv">qram_simulator::qram_qutrit::Branch::get_good_branch_system (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch14get_multiplierEdRK8TimeStep6size_tRNSt6vectorI6BranchEE6size_tRKNSt6vectorI6size_tEERK8memory_t">qram_simulator::qram_qutrit::Branch::get_multiplier (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch8get_probEv">qram_simulator::qram_qutrit::Branch::get_prob (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch13get_prob_dampE6size_t">qram_simulator::qram_qutrit::Branch::get_prob_damp (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch8good_refE">qram_simulator::qram_qutrit::Branch::good_ref (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch7is_goodEv">qram_simulator::qram_qutrit::Branch::is_good (C++ function)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch7iterbegEv">qram_simulator::qram_qutrit::Branch::iterbeg (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch7iterbegEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch7iterendEv">qram_simulator::qram_qutrit::Branch::iterend (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch7iterendEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6BranchltERK6Branch">qram_simulator::qram_qutrit::Branch::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6BrancheqERK6Branch">qram_simulator::qram_qutrit::Branch::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch19relative_multiplierE">qram_simulator::qram_qutrit::Branch::relative_multiplier (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch16remove_all_stateEv">qram_simulator::qram_qutrit::Branch::remove_all_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0EN14qram_simulator11qram_qutrit6Branch9remove_ifEv4Pred">qram_simulator::qram_qutrit::Branch::remove_if (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch21remove_mismatch_stateERKN9QRAMState12element_typeE">qram_simulator::qram_qutrit::Branch::remove_mismatch_state (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch5resetEv">qram_simulator::qram_qutrit::Branch::reset (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch15run_damp_commonEd">qram_simulator::qram_qutrit::Branch::run_damp_common (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch13run_damp_fullE6size_t6size_t">qram_simulator::qram_qutrit::Branch::run_damp_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch13run_fetchdataER8memory_t6size_t">qram_simulator::qram_qutrit::Branch::run_fetchdata (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch12run_hadamardEv">qram_simulator::qram_qutrit::Branch::run_hadamard (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch8set_goodEP6Branch">qram_simulator::qram_qutrit::Branch::set_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch11system_sizeEv">qram_simulator::qram_qutrit::Branch::system_size (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit6Branch9to_stringEv">qram_simulator::qram_qutrit::Branch::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit6Branch9try_mergeEv">qram_simulator::qram_qutrit::Branch::try_merge (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuitE">qram_simulator::qram_qutrit::QRAMCircuit (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit12address_sizeE">qram_simulator::qram_qutrit::QRAMCircuit::address_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit12branch_probsE">qram_simulator::qram_qutrit::QRAMCircuit::branch_probs (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8branchesE">qram_simulator::qram_qutrit::QRAMCircuit::branches (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit19clear_zero_elementsEv">qram_simulator::qram_qutrit::QRAMCircuit::clear_zero_elements (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit9data_sizeE">qram_simulator::qram_qutrit::QRAMCircuit::data_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit18final_system_stateE">qram_simulator::qram_qutrit::QRAMCircuit::final_system_state (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit17first_good_branchE">qram_simulator::qram_qutrit::QRAMCircuit::first_good_branch (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8FULL_VERE">qram_simulator::qram_qutrit::QRAMCircuit::FULL_VER (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16get_branch_probsEv">qram_simulator::qram_qutrit::QRAMCircuit::get_branch_probs (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit16get_branch_probsEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit12get_branchesEv">qram_simulator::qram_qutrit::QRAMCircuit::get_branches (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit12get_branchesEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10get_memoryEv">qram_simulator::qram_qutrit::QRAMCircuit::get_memory (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit10get_memoryEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16get_noise_modelsEv">qram_simulator::qram_qutrit::QRAMCircuit::get_noise_models (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit16get_noise_modelsEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit24get_normalization_factorEv">qram_simulator::qram_qutrit::QRAMCircuit::get_normalization_factor (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit37get_normalization_factor_with_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::get_normalization_factor_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit40get_normalization_factor_without_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::get_normalization_factor_without_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit14get_operationsEv">qram_simulator::qram_qutrit::QRAMCircuit::get_operations (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit14get_operationsEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit13get_qubit_numEv">qram_simulator::qram_qutrit::QRAMCircuit::get_qubit_num (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit15good_branch_idsE">qram_simulator::qram_qutrit::QRAMCircuit::good_branch_ids (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit11has_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::has_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit17initialize_systemEv">qram_simulator::qram_qutrit::QRAMCircuit::initialize_system (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit13is_noise_freeEv">qram_simulator::qram_qutrit::QRAMCircuit::is_noise_free (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit6memoryE">qram_simulator::qram_qutrit::QRAMCircuit::memory (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit11memory_sizeEv">qram_simulator::qram_qutrit::QRAMCircuit::memory_size (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16noise_parametersE">qram_simulator::qram_qutrit::QRAMCircuit::noise_parameters (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10NORMAL_VERE">qram_simulator::qram_qutrit::QRAMCircuit::NORMAL_VER (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13normalizationEv">qram_simulator::qram_qutrit::QRAMCircuit::normalization (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit26normalization_with_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::normalization_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit29normalization_without_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::normalization_without_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10operationsE">qram_simulator::qram_qutrit::QRAMCircuit::operations (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8pick_allEv">qram_simulator::qram_qutrit::QRAMCircuit::pick_all (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13pick_good_badEv">qram_simulator::qram_qutrit::QRAMCircuit::pick_good_bad (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit11QRAMCircuitE6size_t6size_t">qram_simulator::qram_qutrit::QRAMCircuit::QRAMCircuit (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit11QRAMCircuitE6size_t6size_tRK8memory_t">[1]</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit11QRAMCircuitE6size_t6size_tRR8memory_t">[2]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit3runERKNSt6stringE">qram_simulator::qram_qutrit::QRAMCircuit::run (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit9run_acopyEi">qram_simulator::qram_qutrit::QRAMCircuit::run_acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit11run_bitflipE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_bitflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16run_bitphaseflipE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_bitphaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit9run_businE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10run_busoutE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit9run_cswapE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit15run_damp_commonEd">qram_simulator::qram_qutrit::QRAMCircuit::run_damp_common (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13run_damp_fullE6size_t6size_td">qram_simulator::qram_qutrit::QRAMCircuit::run_damp_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16run_depolarizingE6size_td">qram_simulator::qram_qutrit::QRAMCircuit::run_depolarizing (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13run_fetchdataE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_fetchdata (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8run_fullEv">qram_simulator::qram_qutrit::QRAMCircuit::run_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8run_goodEv">qram_simulator::qram_qutrit::QRAMCircuit::run_good (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13run_good_onlyEv">qram_simulator::qram_qutrit::QRAMCircuit::run_good_only (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit26run_good_only_with_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::run_good_only_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit29run_good_only_without_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::run_good_only_without_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit12run_hadamardEv">qram_simulator::qram_qutrit::QRAMCircuit::run_hadamard (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10run_normalEv">qram_simulator::qram_qutrit::QRAMCircuit::run_normal (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13run_phaseflipE6size_td">qram_simulator::qram_qutrit::QRAMCircuit::run_phaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit8run_swapE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::run_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit18run_valid_branchesEv">qram_simulator::qram_qutrit::QRAMCircuit::run_valid_branches (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit23sample_and_get_fidelityEv">qram_simulator::qram_qutrit::QRAMCircuit::sample_and_get_fidelity (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit13sample_outputEv">qram_simulator::qram_qutrit::QRAMCircuit::sample_output (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit35sample_output_without_normalizationEv">qram_simulator::qram_qutrit::QRAMCircuit::sample_output_without_normalization (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit48sample_output_without_normalization_with_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::sample_output_without_normalization_with_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit51sample_output_without_normalization_without_dampingEv">qram_simulator::qram_qutrit::QRAMCircuit::sample_output_without_normalization_without_damping (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16set_input_randomE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::set_input_random (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit17set_input_uniformE6size_t">qram_simulator::qram_qutrit::QRAMCircuit::set_input_uniform (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10set_memoryERK8memory_t">qram_simulator::qram_qutrit::QRAMCircuit::set_memory (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit10set_memoryERR8memory_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit17set_memory_randomEv">qram_simulator::qram_qutrit::QRAMCircuit::set_memory_random (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit16set_noise_modelsERK7noise_t">qram_simulator::qram_qutrit::QRAMCircuit::set_noise_models (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit9time_stepE">qram_simulator::qram_qutrit::QRAMCircuit::time_step (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit9to_stringEv">qram_simulator::qram_qutrit::QRAMCircuit::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit11QRAMCircuit19to_string_full_infoEv">qram_simulator::qram_qutrit::QRAMCircuit::to_string_full_info (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit11QRAMCircuit17valid_branch_viewE">qram_simulator::qram_qutrit::QRAMCircuit::valid_branch_view (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNodeE">qram_simulator::qram_qutrit::QRAMNode (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode4addrE">qram_simulator::qram_qutrit::QRAMNode::addr (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode9addr_flipEv">qram_simulator::qram_qutrit::QRAMNode::addr_flip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit8QRAMNode7check_0Ev">qram_simulator::qram_qutrit::QRAMNode::check_0 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode4dataE">qram_simulator::qram_qutrit::QRAMNode::data (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode17data_control_flipEb">qram_simulator::qram_qutrit::QRAMNode::data_control_flip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode9data_flipEv">qram_simulator::qram_qutrit::QRAMNode::data_flip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode8data_setEb">qram_simulator::qram_qutrit::QRAMNode::data_set (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode11data_setoneEv">qram_simulator::qram_qutrit::QRAMNode::data_setone (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode12data_setzeroEv">qram_simulator::qram_qutrit::QRAMNode::data_setzero (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode13internal_swapEv">qram_simulator::qram_qutrit::QRAMNode::internal_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit8QRAMNodecvNSt6stringEEv">qram_simulator::qram_qutrit::QRAMNode::operator std::string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit8QRAMNodeltERK8QRAMNode">qram_simulator::qram_qutrit::QRAMNode::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit8QRAMNodeeqERK8QRAMNode">qram_simulator::qram_qutrit::QRAMNode::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode8QRAMNodeEii">qram_simulator::qram_qutrit::QRAMNode::QRAMNode (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode9rotate_A1Ev">qram_simulator::qram_qutrit::QRAMNode::rotate_A1 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit8QRAMNode9rotate_A2Ev">qram_simulator::qram_qutrit::QRAMNode::rotate_A2 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMStateE">qram_simulator::qram_qutrit::QRAMState (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState31_impl_conditional_internal_swapE6size_t">qram_simulator::qram_qutrit::QRAMState::_impl_conditional_internal_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState15_impl_iter_swapE10iterator_t6size_t">qram_simulator::qram_qutrit::QRAMState::_impl_iter_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState28_unconditional_internal_swapE6size_t">qram_simulator::qram_qutrit::QRAMState::_unconditional_internal_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState5acopyEb">qram_simulator::qram_qutrit::QRAMState::acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState5businER5bus_t6size_t">qram_simulator::qram_qutrit::QRAMState::busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState6busoutER5bus_t6size_t">qram_simulator::qram_qutrit::QRAMState::busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState19clear_zero_elementsEv">qram_simulator::qram_qutrit::QRAMState::clear_zero_elements (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState5cswapE6size_t">qram_simulator::qram_qutrit::QRAMState::cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState11cswap_layerE6size_t">qram_simulator::qram_qutrit::QRAMState::cswap_layer (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState12element_typeE">qram_simulator::qram_qutrit::QRAMState::element_type (C++ type)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState4flipE6size_t">qram_simulator::qram_qutrit::QRAMState::flip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState16get_nnz_locationE6size_t6size_t">qram_simulator::qram_qutrit::QRAMState::get_nnz_location (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState19internal_swap_layerE6size_t">qram_simulator::qram_qutrit::QRAMState::internal_swap_layer (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState7iterendEv">qram_simulator::qram_qutrit::QRAMState::iterend (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMState7iterendEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState6iterofE6size_t">qram_simulator::qram_qutrit::QRAMState::iterof (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMState6iterofE6size_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState7left_ofE6size_t">qram_simulator::qram_qutrit::QRAMState::left_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMStateltERK9QRAMState">qram_simulator::qram_qutrit::QRAMState::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMStateeqERK9QRAMState">qram_simulator::qram_qutrit::QRAMState::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState9parent_ofE6size_t">qram_simulator::qram_qutrit::QRAMState::parent_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState8right_ofE6size_t">qram_simulator::qram_qutrit::QRAMState::right_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState9rotate_A1E6size_t">qram_simulator::qram_qutrit::QRAMState::rotate_A1 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState9rotate_A2E6size_t">qram_simulator::qram_qutrit::QRAMState::rotate_A2 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9QRAMState8set_zeroE6size_t">qram_simulator::qram_qutrit::QRAMState::set_zero (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMState8state_ofE6size_t">qram_simulator::qram_qutrit::QRAMState::state_of (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9QRAMState9to_stringEv">qram_simulator::qram_qutrit::QRAMState::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranchE">qram_simulator::qram_qutrit::SubBranch (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9amplitudeE">qram_simulator::qram_qutrit::SubBranch::amplitude (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch8data_busE">qram_simulator::qram_qutrit::SubBranch::data_bus (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9data_sizeE">qram_simulator::qram_qutrit::SubBranch::data_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9SubBranchltERK9SubBranch">qram_simulator::qram_qutrit::SubBranch::operator&lt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator11qram_qutrit9SubBrancheqERK9SubBranch">qram_simulator::qram_qutrit::SubBranch::operator== (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch6run_A1E6size_t">qram_simulator::qram_qutrit::SubBranch::run_A1 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch8run_A1_2E6size_t">qram_simulator::qram_qutrit::SubBranch::run_A1_2 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch6run_A2E6size_t">qram_simulator::qram_qutrit::SubBranch::run_A2 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch8run_A2_2E6size_t">qram_simulator::qram_qutrit::SubBranch::run_A2_2 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9run_acopyEb">qram_simulator::qram_qutrit::SubBranch::run_acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch11run_bitflipE6size_t">qram_simulator::qram_qutrit::SubBranch::run_bitflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch16run_bitphaseflipE6size_t">qram_simulator::qram_qutrit::SubBranch::run_bitphaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9run_businE6size_t">qram_simulator::qram_qutrit::SubBranch::run_busin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch10run_busoutE6size_t">qram_simulator::qram_qutrit::SubBranch::run_busout (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9run_cswapE6size_t">qram_simulator::qram_qutrit::SubBranch::run_cswap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch16run_depolarizingE6size_td">qram_simulator::qram_qutrit::SubBranch::run_depolarizing (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch13run_phaseflipE6size_td">qram_simulator::qram_qutrit::SubBranch::run_phaseflip (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch8run_swapE6size_t">qram_simulator::qram_qutrit::SubBranch::run_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch8set_zeroE6size_t">qram_simulator::qram_qutrit::SubBranch::set_zero (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch5stateE">qram_simulator::qram_qutrit::SubBranch::state (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11qram_qutrit9SubBranch9SubBranchE14memory_entry_t6size_t">qram_simulator::qram_qutrit::SubBranch::SubBranch (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmpE">qram_simulator::QRAMFullAmp (C++ class)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp12_reconstructERNSt6vectorINSt7complexIdEEEERKNSt6vectorINSt7complexIdEEEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEE">qram_simulator::QRAMFullAmp::_reconstruct (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp13_set_branchesERKNSt6vectorINSt7complexIdEEEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEE">qram_simulator::QRAMFullAmp::_set_branches (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp18_set_branches_fullERKNSt6vectorINSt7complexIdEEEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEE">qram_simulator::QRAMFullAmp::_set_branches_full (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp5applyERKNSt6vectorINSt7complexIdEEEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEERKNSt6vectorI6size_tEENSt6stringE">qram_simulator::QRAMFullAmp::apply (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp12get_instanceEv">qram_simulator::QRAMFullAmp::get_instance (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmpptEv">qram_simulator::QRAMFullAmp::operator-&gt; (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmp11QRAMFullAmpE6size_t6size_tRK8memory_t">qram_simulator::QRAMFullAmp::QRAMFullAmp (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator11QRAMFullAmpD0Ev">qram_simulator::QRAMFullAmp::~QRAMFullAmp (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator17quantum_simulator13MeasureResultE">qram_simulator::quantum_simulator::MeasureResult (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator17quantum_simulator13MeasureResult12measure_maskE">qram_simulator::quantum_simulator::MeasureResult::measure_mask (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator17quantum_simulator13MeasureResult14measure_resultE">qram_simulator::quantum_simulator::MeasureResult::measure_result (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator17quantum_simulator13MeasureResult11probabilityE">qram_simulator::quantum_simulator::MeasureResult::probability (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engineE">qram_simulator::random_engine (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine11_get_engineEv">qram_simulator::random_engine::_get_engine (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator13random_engine11_get_engineEv">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine9_get_seedEv">qram_simulator::random_engine::_get_seed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine8_randintEii">qram_simulator::random_engine::_randint (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine4_rngEv">qram_simulator::random_engine::_rng (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine9_set_seedE6seed_t">qram_simulator::random_engine::_set_seed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine8_uniformEdd">qram_simulator::random_engine::_uniform (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine10_uniform01Ev">qram_simulator::random_engine::_uniform01 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine10get_engineEv">qram_simulator::random_engine::get_engine (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine12get_instanceEv">qram_simulator::random_engine::get_instance (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine8get_seedEv">qram_simulator::random_engine::get_seed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine7randintEii">qram_simulator::random_engine::randint (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine4rengE">qram_simulator::random_engine::reng (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine6reseedEv">qram_simulator::random_engine::reseed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine3rngEv">qram_simulator::random_engine::rng (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine4seedE">qram_simulator::random_engine::seed (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine8set_seedE6seed_t">qram_simulator::random_engine::set_seed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine9time_seedEv">qram_simulator::random_engine::time_seed (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine7uniformEdd">qram_simulator::random_engine::uniform (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator13random_engine9uniform01Ev">qram_simulator::random_engine::uniform01 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator5rangeE">qram_simulator::range (C++ class)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator5range5beginEv">qram_simulator::range::begin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator5range3endEv">qram_simulator::range::end (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator5range8iteratorE">qram_simulator::range::iterator (C++ class)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator5range8iteratorneERK8iterator">qram_simulator::range::iterator::operator!= (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator5range8iteratormlEv">qram_simulator::range::iterator::operator* (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator5range8iteratorppEv">qram_simulator::range::iterator::operator++ (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator5range5rangeE6size_t">qram_simulator::range::range (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator5range5rangeE6size_t6size_t6size_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator12SparseMatrixE">qram_simulator::SparseMatrix (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator12SparseMatrix8get_dataEv">qram_simulator::SparseMatrix::get_data (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator12SparseMatrix6get_j0Ed">qram_simulator::SparseMatrix::get_j0 (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator12SparseMatrix9get_kappaEv">qram_simulator::SparseMatrix::get_kappa (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator12SparseMatrix19get_sparsity_offsetEv">qram_simulator::SparseMatrix::get_sparsity_offset (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator12SparseMatrix8to_eigenEv">qram_simulator::SparseMatrix::to_eigen (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0EN14qram_simulator9StatisticE">qram_simulator::Statistic (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Statistic7recordsE">qram_simulator::Statistic::records (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Statistic5shotsE">qram_simulator::Statistic::shots (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Statistic3sumE">qram_simulator::Statistic::sum (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator9Statistic7sum_sqrE">qram_simulator::Statistic::sum_sqr (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlicesE">qram_simulator::TimeSlices (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlices6appendERK10TimeSlices">qram_simulator::TimeSlices::append (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlices6appendERK13OperationPack">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlices5clearEv">qram_simulator::TimeSlices::clear (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlices7reverseEv">qram_simulator::TimeSlices::reverse (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator10TimeSlices11time_slicesE">qram_simulator::TimeSlices::time_slices (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator10TimeSlices9to_stringEv">qram_simulator::TimeSlices::to_string (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStepE">qram_simulator::TimeStep (C++ struct)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep26_get_multiplier_impl_qubitE6size_t6size_t">qram_simulator::TimeStep::_get_multiplier_impl_qubit (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep27_get_multiplier_impl_qutritE6size_t6size_t6size_tRK8memory_t">qram_simulator::TimeStep::_get_multiplier_impl_qutrit (C++ function)</a>, <a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep27_get_multiplier_impl_qutritE6size_t6size_tRK8memory_t">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep5acopyE6size_t">qram_simulator::TimeStep::acopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep9acopy_outE6size_t">qram_simulator::TimeStep::acopy_out (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep9addr_sizeE">qram_simulator::TimeStep::addr_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep12append_noiseERKNSt3mapI13OperationTypedEEi">qram_simulator::TimeStep::append_noise (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep23append_noise_range_onlyERKNSt3mapI13OperationTypedEEi">qram_simulator::TimeStep::append_noise_range_only (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep2crE">qram_simulator::TimeStep::cr (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep9data_sizeE">qram_simulator::TimeStep::data_size (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep5dcopyE6size_t">qram_simulator::TimeStep::dcopy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep9dcopy_outE6size_t">qram_simulator::TimeStep::dcopy_out (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep14fill_bad_rangeE6size_ti">qram_simulator::TimeStep::fill_bad_range (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep9full_stepEv">qram_simulator::TimeStep::full_step (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep8generateERKNSt3mapI13OperationTypedEEi">qram_simulator::TimeStep::generate (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep13generate_stepE6size_t">qram_simulator::TimeStep::generate_step (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep19get_bad_range_qubitE6size_t">qram_simulator::TimeStep::get_bad_range_qubit (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep20get_bad_range_qutritE6size_t">qram_simulator::TimeStep::get_bad_range_qutrit (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0ENK14qram_simulator8TimeStep20get_multiplier_qubitEvd6size_tRNSt6vectorI10BranchTypeEE6size_tRKNSt6vectorI6size_tEE">qram_simulator::TimeStep::get_multiplier_qubit (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4I0ENK14qram_simulator8TimeStep21get_multiplier_qutritEvd6size_tRNSt6vectorI10BranchTypeEE6size_tRKNSt6vectorI6size_tEERK8memory_t">qram_simulator::TimeStep::get_multiplier_qutrit (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep15init_noise_freeEv">qram_simulator::TimeStep::init_noise_free (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep13internal_swapE6size_t">qram_simulator::TimeStep::internal_swap (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep17internal_swap_outE6size_t">qram_simulator::TimeStep::internal_swap_out (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep13is_bad_branchE6size_t">qram_simulator::TimeStep::is_bad_branch (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep9last_stepEv">qram_simulator::TimeStep::last_step (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep18layer_entangle_maxE6size_t">qram_simulator::TimeStep::layer_entangle_max (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep11memory_copyE6size_t">qram_simulator::TimeStep::memory_copy (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep14noise_one_stepE6size_tRKNSt3mapI13OperationTypedEEi">qram_simulator::TimeStep::noise_one_step (C++ function)</a>, <a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep14noise_one_stepER13OperationPack6size_tRKNSt3mapI13OperationTypedEEi">[1]</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep3outE6size_t">qram_simulator::TimeStep::out (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep5printEv">qram_simulator::TimeStep::print (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep5routeE6size_t6size_t">qram_simulator::TimeStep::route (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep11route_beginE6size_t">qram_simulator::TimeStep::route_begin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep10route_evenE6size_t6size_t">qram_simulator::TimeStep::route_even (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep9route_oddE6size_t6size_t">qram_simulator::TimeStep::route_odd (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4NK14qram_simulator8TimeStep16route_wait_beginE6size_t">qram_simulator::TimeStep::route_wait_begin (C++ function)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep22time_slices_noise_freeE">qram_simulator::TimeStep::time_slices_noise_free (C++ member)</a>
+</li>
+        <li><a href="api/cpp.html#_CPPv4N14qram_simulator8TimeStep8TimeStepE6size_t6size_t">qram_simulator::TimeStep::TimeStep (C++ function)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit">QRAMCircuitQubit (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit">QRAMCircuitQutrit (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMFullAmp">QRAMFullAmp (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding">QubitQRAMEncoding (class in qram_simulator.baseline.circuit_qram)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.reverse">reverse() (qram_simulator.Operation method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack.reverse">(qram_simulator.OperationPack method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeSlices.reverse">(qram_simulator.TimeSlices method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.run">run() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.run">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.run">(qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.run">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.run_full">run_full() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.run_full">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.run_normal">run_normal() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.run_normal">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.sample_and_get_fidelity">sample_and_get_fidelity() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.sample_and_get_fidelity">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_input_random">set_input_random() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.set_input_random">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_input_uniform">set_input_uniform() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.set_input_uniform">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_input_zerobus">set_input_zerobus() (qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_memory">set_memory() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.set_memory">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_memory_random">set_memory_random() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.set_memory_random">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.set_noise_models">set_noise_models() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.set_noise_models">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMFullAmp.set_noise_models">(qram_simulator.QRAMFullAmp method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.set_seed">set_seed() (in module qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.SetZero">SetZero (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.SetZero">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.simulate_density">simulate_density() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.simulate_density">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.SwapInternal">SwapInternal (in module qram_simulator)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.SwapInternal">(qram_simulator.OperationType attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.targets">targets (qram_simulator.Operation property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeSlices.time_slices">time_slices (qram_simulator.TimeSlices property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep.time_slices_noise_free">time_slices_noise_free (qram_simulator.TimeStep property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeSlices">TimeSlices (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeStep">TimeStep (class in qram_simulator)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.CircuitQRAMQubit.to_gate_list">to_gate_list() (qram_simulator.baseline.circuit_qram.CircuitQRAMQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.CircuitQRAMQubit.to_gate_list">(qram_simulator.baseline.CircuitQRAMQubit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.to_string">to_string() (qram_simulator.Operation method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationPack.to_string">(qram_simulator.OperationPack method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.to_string">(qram_simulator.QRAMCircuitQubit method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.to_string">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.TimeSlices.to_string">(qram_simulator.TimeSlices method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQubit.to_string_full_info">to_string_full_info() (qram_simulator.QRAMCircuitQubit method)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/index.html#qram_simulator.QRAMCircuitQutrit.to_string_full_info">(qram_simulator.QRAMCircuitQutrit method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/baseline/circuit_qram/index.html#qram_simulator.baseline.circuit_qram.QubitQRAMEncoding.tree_qubits">tree_qubits (qram_simulator.baseline.circuit_qram.QubitQRAMEncoding property)</a>
+</li>
+        <li><a href="api/python/qram_simulator/baseline/index.html#qram_simulator.baseline.tvd">tvd() (in module qram_simulator.baseline)</a>
+
+        <ul>
+          <li><a href="api/python/qram_simulator/baseline/metrics/index.html#qram_simulator.baseline.metrics.tvd">(in module qram_simulator.baseline.metrics)</a>
+</li>
+        </ul></li>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.Operation.type">type (qram_simulator.Operation property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/python/qram_simulator/index.html#qram_simulator.OperationType.value">value (qram_simulator.OperationType property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2026, IAI-USTC-Quantum
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=95e61db4"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
