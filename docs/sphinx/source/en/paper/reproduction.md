@@ -10,7 +10,7 @@ This document provides detailed experiment setups, parameter ranges, and run com
 
 - **Title**: Efficient Simulation of Quantum Random Access Memory
 - **arXiv**: [2503.13832](https://arxiv.org/abs/2503.13832)
-- **Code repository**: https://github.com/IAI-USTC-Quantum/QRAM-Simulator
+- **Code repository**: [https://github.com/IAI-USTC-Quantum/QRAM-Simulator](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
 
 ## Environment Preparation
 
@@ -38,6 +38,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc) Experiment_QRAM_Fidelity Experiment_QRAM_FidelityV2 Experiment_ErrorFiltration
 ```
 
+See the [Installation Guide](../guide/installation.md) for detailed environment and dependency setup.
+
 ### Windows (PowerShell) Build
 
 ```powershell
@@ -59,9 +61,9 @@ cmake --build . --target Experiment_QRAM_Fidelity Experiment_QRAM_FidelityV2 Exp
 
 ## Experiment 1: QRAM Fidelity
 
-**Code location**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`
+**Code location**: [`Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp)
 
-**Build target**: `Experiment_QRAM_Fidelity`
+**Build target**: [`Experiment_QRAM_Fidelity`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/CMakeLists.txt)
 
 ### Command-Line Arguments
 
@@ -132,9 +134,9 @@ The program output contains:
 
 ## Experiment 2: QRAM Simulator Comparison
 
-**Code location**: `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`
+**Code location**: [`Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp)
 
-**Build target**: `Experiment_QRAM_FidelityV2`
+**Build target**: [`Experiment_QRAM_FidelityV2`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/CMakeLists.txt)
 
 ### Command-Line Arguments
 
@@ -147,7 +149,7 @@ The program output contains:
 | `--depolarizing` | Depolarizing noise strength | 0.0 |
 | `--damping` | Amplitude damping noise strength | 0.0 |
 | `--seed` | Random seed | 123456789 |
-| `--architecture` | QRAM architecture: `qutrit` or `qubit` (qubit currently supports only full mode, serving as the ground truth) | qutrit |
+| `--architecture` | QRAM architecture: `qutrit` or `qubit` ([qubit currently supports only full mode, serving as the ground truth](qubit_qram_pruning.md)) | qutrit |
 | `--experimentname` | Experiment name label | test |
 
 ### Run Examples
@@ -180,9 +182,9 @@ The program output contains:
 
 ## Experiment 3: Error Filtration
 
-**Code location**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`
+**Code location**: [`Experiments/ErrorFiltration/testMultiEFQRAM.cpp`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/testMultiEFQRAM.cpp)
 
-**Build target**: `Experiment_ErrorFiltration`
+**Build target**: [`Experiment_ErrorFiltration`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/CMakeLists.txt)
 
 ### Command-Line Arguments (positional)
 
@@ -218,7 +220,7 @@ The program output contains:
 
 ## Noise Model Description
 
-All experiments use the following noise models:
+All experiments use the following [noise models](../guide/architecture.md#arch-noise):
 
 ### Depolarizing Noise
 
@@ -240,9 +242,9 @@ Models the $|1\rangle \rightarrow |0\rangle$ decay caused by energy dissipation.
 
 | Experiment | Depolarizing | Damping |
 |------|--------|------|
-| QRAMFidelityTest | 0.0 (default), 1e-4 (demo) | 0.0 (default), 1e-5 (demo) |
-| QRAMSimulatorTest | 0.0 (default), 1e-4 (demo) | 0.0 (default), 1e-4 (demo) |
-| ErrorFiltration | 1e-5 | 1e-5 |
+| [QRAMFidelityTest](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp) | 0.0 (default), 1e-4 (demo) | 0.0 (default), 1e-5 (demo) |
+| [QRAMSimulatorTest](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp) | 0.0 (default), 1e-4 (demo) | 0.0 (default), 1e-4 (demo) |
+| [ErrorFiltration](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/testMultiEFQRAM.cpp) | 1e-5 | 1e-5 |
 
 ---
 
@@ -286,5 +288,11 @@ A: Experiment results are written to standard output (stdout) by default. You ca
 ## Contact
 
 If you run into problems reproducing the results, please reach out via:
-- Open a GitHub issue
+- Open a [GitHub issue](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/issues)
 - Email: chenzhaoyun@iai.ustc.edu.cn
+
+## Related Pages
+
+- [Paper Reproduction Documentation](README.md) — experiment list and paper mapping
+- [Installation Guide](../guide/installation.md) — environment setup
+- [Branch Pruning and Fast Simulation for the Qubit-Architecture QRAM](qubit_qram_pruning.md) — pruning mechanism

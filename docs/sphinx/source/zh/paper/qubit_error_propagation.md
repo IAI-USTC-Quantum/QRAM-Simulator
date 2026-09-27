@@ -1,10 +1,10 @@
 # Qubit-QRAM 错误传播机制：理论走读与单错误注入验证
 
-> 本文是 `qubit_qram_pruning.md` 的机制附录。回答一个问题：**为什么 qubit 编码的坏分支判据不能沿用 qutrit 的子树包含，而要"左孩子上溯父节点"**（即 `TimeStep::get_bad_range_qubit` 的现行逻辑）。全部结论以代码语义为规范、以 n=3 全地址单错误注入实验为验证。
+> 本文是 [`qubit_qram_pruning.md`](qubit_qram_pruning.md) 的机制附录。回答一个问题：**为什么 qubit 编码的坏分支判据不能沿用 qutrit 的子树包含，而要"左孩子上溯父节点"**（即 [`TimeStep::get_bad_range_qubit`](../api/cpp.rst#cppapi-timestep) 的现行逻辑）。全部结论以代码语义为规范、以 n=3 全地址单错误注入实验为验证。
 
 ## 1. 微观动力学（从代码重建）
 
-以 n=3、k=1 的无噪调度为例（`TimeStep::generate_step`；k>3 时窗口拉长、结构不变），一个地址 i=0b011 的正常查询激发轨迹（实测 dump）：
+以 n=3、k=1 的无噪调度为例（[`TimeStep::generate_step`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)；k>3 时窗口拉长、结构不变），一个地址 i=0b011 的正常查询激发轨迹（实测 dump）：
 
 | 步 | 操作 | 激发位置（node:slot） |
 |---|---|---|
@@ -19,8 +19,8 @@
 
 结构要点（qubit 特有）：
 
-1. **没有空闲能级**：`State::cswap`（`qram_branch_qubit.cpp:171`）里 `addr==0 → 与左孩子交换`。指针值 0 与"空闲"取值相同且不可区分。
-2. **cswap 层反复触发**：`cSwap[0]` 在整个查询期间每逢偶数步都执行（n=3,k=1 时 s4,6,8,12,14,16），`cswap_layer` 的选点（`qram_branch_qubit.cpp:187-193`）包含**"孩子有激发的空闲父节点"**——正常操作靠层间流水线保证不误回传，但**错位激发（stray）会在反复触发下迁移**。
+1. **没有空闲能级**：[`State::cswap`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qubit.cpp)（[`qram_branch_qubit.cpp:171`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qubit.cpp)）里 `addr==0 → 与左孩子交换`。指针值 0 与"空闲"取值相同且不可区分。
+2. **cswap 层反复触发**：`cSwap[0]` 在整个查询期间每逢偶数步都执行（n=3,k=1 时 s4,6,8,12,14,16），[`cswap_layer`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qubit.cpp) 的选点（[`qram_branch_qubit.cpp:187-193`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qubit.cpp)）包含**"孩子有激发的空闲父节点"**——正常操作靠层间流水线保证不误回传，但**错位激发（stray）会在反复触发下迁移**。
 3. **uncompute 只回撤路径激发**：空闲节点上的任何翻转都不会被清理，成为**永久残留**。
 
 ## 2. 故障分类学（单 X 错误，n=3 全地址注入实测）
@@ -58,7 +58,7 @@
 - **右孩子位置的残留**：空闲父（=0）交换的是左孩子槽位，右孩子永不被拉；且右孩子路径外 ⇔ 父指针向左——**只有向右指的父才会拉它，而那正是它落在路径上的情形（已损坏家族）**。故右孩子残留**只困于自己的子树**。
 - **根的孩子（node1/node2）**：根永远持有 a0（从不空闲），node1（左孩子）的残留只对 {0..3}（根向左指 = 已损坏家族）继续上拉；{4..7} 均匀停在 node1 → **代码对 node1 特判"只标左半区"是机制正确的**，不是随意截断。
 
-**构型家族与塌缩耦合**：剪枝预测器要求所有 good 分支共享一个末态构型（定理 3 的 |Q̃₀⟩）。残留位置不同 = 家族不同；模拟器终态采样（`sample_output` 的 `remove_mismatch_state`）只保留被抽中构型的分量——家族间相互耦合，不能把别的家族当 good 预测。因此：
+**构型家族与塌缩耦合**：剪枝预测器要求所有 good 分支共享一个末态构型（定理 3 的 |Q̃₀⟩）。残留位置不同 = 家族不同；模拟器终态采样（[`sample_output`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h) 的 [`remove_mismatch_state`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h)）只保留被抽中构型的分量——家族间相互耦合，不能把别的家族当 good 预测。因此：
 
 > **qubit 的坏区间 = 构型家族分歧的包络**：
 > - 右孩子故障：分歧只在 subtree(v) 内（兄弟家族与更远家族的残留位置相同——都停在 v）→ bad = subtree(v)；
@@ -69,18 +69,18 @@
 
 ## 4. Qutrit 对照：为什么那边子树包含就够了
 
-同实验跑 qutrit 电路（`run_bitflip`，语义：data 槽 0↔1；addr 槽仅当非 W 时翻转——**空闲 W 的 addr 根本翻不动**）：
+同实验跑 qutrit 电路（[`run_bitflip`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qutrit.h)，语义：data 槽 0↔1；addr 槽仅当非 W 时翻转——**空闲 W 的 addr 根本翻不动**）：
 
 | 故障 | wrongbus | 路径外分量 |
 |---|---|---|
 | addr 故障（任意节点） | subtree(v) | **完全干净**（W 不可翻） |
-| data 故障（左/右孩子皆同） | ⊆ subtree(v) | **均匀残留、冻结在 v 原地**（`QRAMState::cswap` 的 `case W: do nothing` 守卫 + `cswap_layer` 只遍历非零节点，残留不会迁移） |
+| data 故障（左/右孩子皆同） | ⊆ subtree(v) | **均匀残留、冻结在 v 原地**（[`QRAMState::cswap`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp) 的 `case W: do nothing` 守卫 + [`cswap_layer`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp) 只遍历非零节点，残留不会迁移） |
 
 qutrit 的残留**不可迁移**：路径外所有分量共享同一个构型（"全零 + v 处冻结残留"），家族分歧**永不越出 subtree(v)**——子树包含既是损坏判据也是预测器安全判据。这正是 PR APPL 把该判据当作编码无关时漏掉的 qubit 陷阱：**判据的真正要求不是"损坏局限于子树"（这对 qubit 也成立），而是"路径外分量的末态构型保持同一"（qubit 因残留迁移而失败）**。
 
 ## 5. 对剪枝算法的影响
 
-1. **阻尼通道豁免**：K₁ 跳变只在激发（|1⟩）处发生，空闲节点无激发可跳 → 不产生路径外残留；阻尼造成的错路由/搁浅损坏 ⊆ subtree(v)。**纯阻尼噪声下 qubit 仍可用纯子树判据**（本文 H–K₀–H 数据总线闭式的适用范围不受影响）。
+1. **阻尼通道豁免**：K₁ 跳变只在激发（|1⟩）处发生，空闲节点无激发可跳 → 不产生路径外残留；阻尼造成的错路由/搁浅损坏 ⊆ subtree(v)。**纯阻尼噪声下 qubit 仍可用纯子树判据**（[本文 H–K₀–H 数据总线闭式](qubit_qram_pruning.md#pruning-bus-model)的适用范围不受影响）。
 2. **退极化通道**：X/Y 分量会在路径外制造迁移残留 → 必须用本附录的家族分歧判据（即现行 `get_bad_range_qubit`）。
 3. **bad 比例标度变化**：qubit 下左孩子故障标记父区间（质量翻倍），期望坏分支质量从 qutrit 的 O(n²p)（每节点只背自己的子树质量）升为 O(n²p) 常数因子更大的版本；最坏情形（根附近）单故障即可标记一半或全部地址。剪枝收益对 depolarizing 通道相应下降，但复杂度类不变。
 4. **待核实的深层风险（n>3 未验证）**：沿空闲链的多级爬升（左孩子的左孩子的左孩子…）在更深树中可能让分歧越出 subtree(parent(v))，现行单级上溯是欠近似的候选场景；机制上多级爬升要求连续祖先空闲且向左，对应全 0 高位地址前缀的分量——多已落入损坏家族，故 n=3 实测未见越界。建议剪枝实现时对 n≥4 做一次同款注入扫描回归。
@@ -88,3 +88,8 @@ qutrit 的残留**不可迁移**：路径外所有分量共享同一个构型（
 ## 6. 验证方法（可复现）
 
 探针：单文件 C++ 程序（链接仓库静态库），对 (节点×槽位×时序) 注入单个 BitFlip，全地址输入，逐地址报告 wrongbus/残留位置；`QTRACE=1` 可逐步 dump 树状态。qubit/qutrit 两种电路同框架对照。数据与本文表格一一对应。
+
+## 相关页面
+
+- [qubit QRAM 剪枝理论](qubit_qram_pruning.md) — 本文是其机制附录
+- [架构文档](../guide/architecture.md) — 噪声注入与全振幅桥接

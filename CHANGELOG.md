@@ -502,4 +502,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Keep a Changelog](https://keepachangelog.com/)
 - [Semantic Versioning](https://semver.org/)
-- Project documentation: [README.md](README.md) | [ARCHITECTURE.md](docs/architecture.md)
+- Project documentation: [README.md](README.md) | [Architecture guide](docs/sphinx/source/en/guide/architecture.md)

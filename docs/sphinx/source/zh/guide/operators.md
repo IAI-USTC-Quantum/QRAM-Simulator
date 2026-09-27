@@ -14,13 +14,17 @@
 
 ## 概述
 
-QRAM-Simulator 采用 "Register Level Programming" 范式，所有算子直接操作寄存器。每个算子都经过精心设计以保证 quantum unitary 性质。
+QRAM-Simulator 采用 "[Register Level Programming](../paper/README.md)" 范式，所有算子直接操作寄存器。每个算子都经过精心设计以保证 quantum unitary 性质。
+
+(operators-key-concepts)=
 
 ### 关键概念
 
-1. **Out-of-place 操作**: 结果存储在独立的输出寄存器中，通过 XOR 保证 unitary
-2. **In-place 操作**: 结果直接修改输入寄存器，需要显式实现 dagger 方法保证可逆性
-3. **SelfAdjoint 算子**: 满足 U† = U，应用两次等于恒等操作
+1. **Out-of-place 操作**: 结果存储在独立的输出寄存器中，通过 [XOR](#operators-xor) 保证 unitary
+2. [**In-place 操作**](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L748): 结果直接修改输入寄存器，需要显式实现 dagger 方法保证可逆性 ([第 6 节 `_InPlace` 契约](naming_conventions.md#naming-inplace))
+3. [**SelfAdjoint 算子**](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L802): 满足 U† = U，应用两次等于恒等操作
+
+(operators-width-truncation)=
 
 ## 宽度与截断约定
 
@@ -30,77 +34,87 @@ QRAM-Simulator 采用 "Register Level Programming" 范式，所有算子直接�
 1. **LSB 对齐**:所有操作数与输出按最低有效位对齐,不存在隐式移位。
 2. **读扩展由名字槽位决定**:`_UInt_` 槽把操作数零扩展到计算域;`_SInt_` 槽按
    二补码符号扩展;`_Bool_` 槽按单比特;`AnyInt` 槽按寄存器**声明类型**扩展
-   (UInt→零扩展,SInt→符号扩展)。实现把扩展逻辑直接写死,release 构建同样正确。
+   (UInt→零扩展,SInt→符号扩展)。实现把扩展逻辑直接写死,release 构建同样正确。(与[命名规范的槽位语义承载规则](naming_conventions.md#naming-grammar)互为镜像)
 3. **计算域**:中间量按全精度求值——乘法经 64 位高低半分解(等价 128 位精度),
    加/减/比较在无符号 64 位回绕域上等价成立,除法/开方商域 ≤ 64 位。
 4. **写入**:结果取 `mod 2^out_width` 后 **XOR** 进输出寄存器。输出宽度可与
-   任意输入宽度不同;输入寄存器的值永不被 out-of-place 算子修改。
+   任意输入宽度不同;输入寄存器的值永不被 [out-of-place](#operators-key-concepts) 算子修改。
 5. **域外全量化**:可逆性要求算子在全部基矢上是确定性函数,因此核心算子不抛
-   定义域异常——`Div_UInt_UInt` 在除数为零时商取 0;`Sqrt_UInt` 只接受幅度
+   定义域异常——[`Div_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1644) 在除数为零时商取 0;[`Sqrt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1726) 只接受幅度
    (非负)输入。定义域/溢出信息一律由专用 flag 算子另行报告。
-6. **flag 谓词**:flag 输出 XOR 进 1-bit Boolean 寄存器;谓词在**全精度域**上
-   求值。以 `out` 为参数的 flag 算子(`Carry_UInt_UInt` 等)**只取该寄存器的
-   宽度、不读其值**,因此对输出寄存器的初始内容没有前置假设。
+6. **flag 谓词**:[flag 输出](naming_conventions.md#naming-slots) XOR 进 1-bit Boolean 寄存器;谓词在**全精度域**上
+   求值。以 `out` 为参数的 flag 算子([`Carry_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2207) 等)**只取该寄存器的
+   宽度、不读其值**,因此对输出寄存器的初始内容没有前置假设。(谓词算子命名遵循[命名规范第 4 节](naming_conventions.md#naming-slots))
 7. **宽度边界**:1..64 全支持。所有 `pow2(w)`/`1<<w` 于 w=64 的未定义行为
-   一律以 `width_mask`(64 特判)替代;算子读取宽度一律在执行期经
-   `System::size_of`,不在构造期快照。
+   一律以 [`width_mask`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/basic.h#L45)(64 特判)替代;算子读取宽度一律在执行期经
+   [`System::size_of`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L414),不在构造期快照。
 8. **别名约束**:输出(含 flag)与任一输入不得别名——always-on 检查(与
    debug/release 无关)。
-9. **约定例外**:`GetMid_UInt_UInt` 与 `Swap_General_General` 维持等宽要求
+9. **约定例外**:[`GetMid_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L3145) 与 [`Swap_General_General`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L3054) 维持等宽要求
    (中点溢出与原值交换的语义本质上依赖等宽),是本约定仅有的两个例外。
 10. **存量兼容**:既有 Add 族(读零扩展 + 写 `mod 2^dst`)与本约定一致。
-    唯一的历史行为修正是 `Add_AnyInt_AnyInt_InPlace`:AnyInt 槽自本约定起按
+    唯一的历史行为修正是 [`Add_AnyInt_AnyInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2643):AnyInt 槽自本约定起按
     寄存器声明类型扩展(此前一律按无符号位模式读),并补上 `lhs == rhs` 的
     别名拒绝与执行期宽度读取。
 
+(operators-classification)=
+
 ## 算子分类
+
+(operators-outofplace)=
 
 ### 1. Out-of-place 算子 (SelfAdjointOperator)
 
 | 算子 | 操作 | 输入类型 | 输出类型 | 约束 |
 |------|------|----------|----------|------|
-| `Add_UInt_UInt` | res ^= lhs + rhs | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
-| `Add_UInt_ConstUInt` | res ^= lhs + const | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
-| `Mult_UInt_ConstUInt` | res ^= lhs * const | UnsignedInteger | UnsignedInteger | const 应为奇数以保证双射 |
-| `Assign` | reg2 ^= reg1 | 任意 | 与 reg1 相同 | 宽度任意，reg2 按 mod 2^reg2_w 截断 |
-| `Compare_UInt_UInt` | 输出比较标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
-| `Less_UInt_UInt` | 输出小于标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
+| [`Add_UInt_UInt`](#op-add-uint-uint) | res ^= lhs + rhs | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
+| [`Add_UInt_ConstUInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L875) | res ^= lhs + const | UnsignedInteger | UnsignedInteger | 所有寄存器大小任意，结果截断 |
+| [`Mult_UInt_ConstUInt`](#op-mult-uint-constuint) | res ^= lhs * const | UnsignedInteger | UnsignedInteger | const 应为奇数以保证双射 |
+| [`Assign`](#op-assign) | reg2 ^= reg1 | 任意 | 与 reg1 相同 | 宽度任意，reg2 按 mod 2^reg2_w 截断 |
+| [`Compare_UInt_UInt`](#op-compare-uint-uint) | 输出比较标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
+| [`Less_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2958) | 输出小于标志 | UnsignedInteger | Boolean | 输出寄存器大小为 1 |
 | `GetMid_UInt_UInt` | mid ^= (l+r)/2 | UnsignedInteger | UnsignedInteger | 三个寄存器大小必须相同 |
-| `FlipBools` | reg ^= ~reg | UnsignedInteger/SignedInteger | - | 按位取反所有位 |
-| `Swap_Bool_Bool` | 交换单个比特 | 任意 | 任意 | 位索引在有效范围内 |
+| [`FlipBools`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L58) | reg ^= ~reg | UnsignedInteger/SignedInteger | - | 按位取反所有位 |
+| [`Swap_Bool_Bool`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L116) | 交换单个比特 | 任意 | 任意 | 位索引在有效范围内 |
 | `Swap_General_General` | 交换整个寄存器 | 任意 | 任意 | 两寄存器大小必须相同 |
-| `Div_Sqrt_Arccos_UInt_UInt` | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
-| `Sqrt_Div_Arccos_Int_UInt` | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
-| `GetRotateAngle_Int_Int` | res ^= atan2(r,l)/2π | 整数类型 | Rational | 结果在 [0,1) 范围内 |
-| `Sub_UInt_UInt` | res ^= lhs − rhs | UnsignedInteger | UnsignedInteger | 宽度任意（约定通用行） |
-| `Neg_UInt` | res ^= 0 − reg | UnsignedInteger | UnsignedInteger | 宽度任意 |
-| `Abs_SInt` | res ^= \|sext(reg)\| | SignedInteger | UnsignedInteger | 补码最小值回绕自身 |
-| `Mul_UInt_UInt` | res ^= lhs · rhs | UnsignedInteger | UnsignedInteger | 宽度任意，结果 mod 2^res_w |
+| [`Div_Sqrt_Arccos_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1066) | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
+| [`Sqrt_Div_Arccos_Int_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1166) | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
+| [`GetRotateAngle_Int_Int`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1266) | res ^= atan2(r,l)/2π | 整数类型 | Rational | 结果在 [0,1) 范围内 |
+| [`Sub_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1332) | res ^= lhs − rhs | UnsignedInteger | UnsignedInteger | 宽度任意（约定通用行） |
+| [`Neg_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1413) | res ^= 0 − reg | UnsignedInteger | UnsignedInteger | 宽度任意 |
+| [`Abs_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1488) | res ^= \|sext(reg)\| | SignedInteger | UnsignedInteger | 补码最小值回绕自身 |
+| [`Mul_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1561) | res ^= lhs · rhs | UnsignedInteger | UnsignedInteger | 宽度任意，结果 mod 2^res_w |
 | `Div_UInt_UInt` | res ^= lhs // rhs | UnsignedInteger | UnsignedInteger | **除零 → 商 0**（域外全量化） |
 | `Sqrt_UInt` | res ^= isqrt(reg) | UnsignedInteger | UnsignedInteger | 整数开方（floor） |
-| `Select_Bool_UInt_UInt` | res ^= cond ? lhs : rhs | Boolean, UInt×2 | UnsignedInteger | cond 宽度为 1 |
-| `And_UInt_UInt` / `Or_UInt_UInt` / `Xor_UInt_UInt` | 按位与/或/异或 | UnsignedInteger×2 | UnsignedInteger | 宽度任意 |
-| `Less_SInt_SInt` | flag ^= sext(lhs) < sext(rhs) | SignedInteger×2 | Boolean | 有符号比较 |
+| [`Select_Bool_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1799) | res ^= cond ? lhs : rhs | Boolean, UInt×2 | UnsignedInteger | cond 宽度为 1 |
+| [`And_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1887) / [`Or_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1966) / [`Xor_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2045) | 按位与/或/异或 | UnsignedInteger×2 | UnsignedInteger | 宽度任意 |
+| [`Less_SInt_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2125) | flag ^= sext(lhs) < sext(rhs) | SignedInteger×2 | Boolean | 有符号比较 |
 | `Carry_UInt_UInt` | flag ^= lhs+rhs ≥ 2^res_w | UnsignedInteger×2 | Boolean | res 仅提供宽度，不读不写 |
-| `Overflow_SInt_SInt` | flag ^= 有符号加溢出 | SignedInteger×2 | Boolean | res 仅提供宽度；内部按 res 宽度求值 |
-| `MulOverflow_UInt_UInt` | flag ^= lhs·rhs ≥ 2^res_w (全精度) | UnsignedInteger×2 | Boolean | res 仅提供宽度 |
-| `IsZero_UInt` | flag ^= reg == 0 | UnsignedInteger | Boolean | — |
-| `Negative_SInt` | flag ^= sext(reg) < 0 | SignedInteger | Boolean | — |
-| `CustomArithmetic` | res ^= func(inputs) | 任意 | 任意 | func 必须是确定性函数 |
+| [`Overflow_SInt_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2297) | flag ^= 有符号加溢出 | SignedInteger×2 | Boolean | res 仅提供宽度；内部按 res 宽度求值 |
+| [`MulOverflow_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2388) | flag ^= lhs·rhs ≥ 2^res_w (全精度) | UnsignedInteger×2 | Boolean | res 仅提供宽度 |
+| [`IsZero_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2474) | flag ^= reg == 0 | UnsignedInteger | Boolean | — |
+| [`Negative_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2547) | flag ^= sext(reg) < 0 | SignedInteger | Boolean | — |
+| [`CustomArithmetic`](#op-custom-arithmetic) | res ^= func(inputs) | 任意 | 任意 | func 必须是确定性函数 |
+
+(operators-inplace)=
 
 ### 2. In-place 算子 (BaseOperator)
 
 | 算子 | 操作 | 输入类型 | Dagger 实现 | 约束 |
 |------|------|----------|-------------|------|
-| `Add_UInt_UInt_InPlace` | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | 宽度任意，lhs 零扩展，rhs 按 mod 2^rhs_w 回绕 |
-| `Add_Mult_UInt_ConstUInt_InPlace` | res += lhs * const (lhs不变) | UnsignedInteger | res -= lhs * const | lhs不变，仅res更新 |
-| `Add_ConstUInt_InPlace` | reg += const | UnsignedInteger/SignedInteger | reg += (2^N - const) | 模 2^N 回绕 |
-| `Mod_Mult_UInt_ConstUInt_InPlace` | y = y * a^(2^x) mod N | UnsignedInteger | y = y * a^(-2^x) mod N | gcd(a, N) = 1，寄存器 ≥ ⌈log₂(N)⌉ |
+| [`Add_UInt_UInt_InPlace`](#op-add-uint-uint-inplace) | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | 宽度任意，lhs 零扩展，rhs 按 mod 2^rhs_w 回绕 |
+| [`Add_Mult_UInt_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L484) | res += lhs * const (lhs不变) | UnsignedInteger | res -= lhs * const | lhs不变，仅res更新 |
+| [`Add_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L964) | reg += const | UnsignedInteger/SignedInteger | reg += (2^N - const) | 模 2^N 回绕 |
+| [`Mod_Mult_UInt_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L583) | y = y * a^(2^x) mod N | UnsignedInteger | y = y * a^(-2^x) mod N | gcd(a, N) = 1，寄存器 ≥ ⌈log₂(N)⌉ |
 | `Add_AnyInt_AnyInt_InPlace` | lhs += rhs | 整数类型 | lhs -= rhs (mod 2^N) | 混合类型；rhs 按声明类型扩展（SInt 符号扩展）；lhs≠rhs |
-| `ShiftLeft_InPlace` | 循环左移 | UnsignedInteger/SignedInteger | 循环右移相同位数 | 移位量 ≤ 寄存器大小 |
-| `ShiftRight_InPlace` | 循环右移 | UnsignedInteger/SignedInteger | 循环左移相同位数 | 移位量 ≤ 寄存器大小 |
+| [`ShiftLeft_InPlace`](#op-shift-inplace) | 循环左移 | UnsignedInteger/SignedInteger | 循环右移相同位数 | 移位量 ≤ 寄存器大小 |
+| [`ShiftRight_InPlace`](#op-shift-inplace) | 循环右移 | UnsignedInteger/SignedInteger | 循环左移相同位数 | 移位量 ≤ 寄存器大小 |
+
+(operators-details)=
 
 ## 算子详细说明
+
+(op-add-uint-uint)=
 
 ### Add_UInt_UInt
 
@@ -124,9 +138,11 @@ Init_Unsafe(rhs, 5);
 Add_UInt_UInt("lhs", "rhs", "res");
 ```
 
+(op-add-uint-uint-inplace)=
+
 ### Add_UInt_UInt_InPlace
 
-**操作**: `rhs += lhs` (mod 2^N) (in-place)
+**操作**: `rhs += lhs` (mod 2^N) ([in-place](#operators-key-concepts))
 
 **Unitary 保证**: 通过模运算实现 dagger。`rhs = (rhs + (2^N - lhs)) mod 2^N` 恢复原值。
 
@@ -148,6 +164,8 @@ Add_UInt_UInt_InPlace("lhs", "rhs");
 // dagger: rhs = (10 + 9) % 16 = 3 (恢复原值)
 op.dag(state);
 ```
+
+(op-shift-inplace)=
 
 ### ShiftLeft_InPlace / ShiftRight_InPlace
 
@@ -172,11 +190,13 @@ ShiftRight_InPlace("reg", 1);
 ShiftLeft_InPlace("reg", 1).dag(state);  // 撤销
 ```
 
+(op-mult-uint-constuint)=
+
 ### Mult_UInt_ConstUInt
 
 **操作**: `res ^= lhs * mult` (out-of-place)
 
-**Unitary 保证**: 通过 XOR 实现。注意：只有当 `mult` 与 2^N 互质时，乘法才是双射。
+**Unitary 保证**: 通过 XOR 实现。注意：只有当 `mult` 与 2^N 互质时，乘法才是[双射](#operators-bijection)。
 
 **约束条件**:
 - `lhs`, `res` 必须是 UnsignedInteger 类型
@@ -184,6 +204,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // 撤销
 - 乘法结果按 `res` 寄存器大小截断
 
 **警告**: 如果 `mult` 为偶数，乘法不是双射，可能导致信息丢失。例如，乘以 2 会丢失最低位。
+
+(op-assign)=
 
 ### Assign
 
@@ -197,6 +219,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // 撤销
 - 两个寄存器大小必须相同
 - 类型可以不同（位模式被复制）
 
+(op-compare-uint-uint)=
+
 ### Compare_UInt_UInt
 
 **操作**: `|l>|r>|0>|0> → |l>|r>|l<r?>|l==r?>`
@@ -206,6 +230,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // 撤销
 **约束条件**:
 - `left`, `right` 必须是 UnsignedInteger
 - `compare_less`, `compare_equal` 必须是 Boolean（大小为 1）
+
+(op-custom-arithmetic)=
 
 ### CustomArithmetic
 
@@ -218,7 +244,11 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // 撤销
 - `func` 不应该有副作用
 - 用户负责确保 `func` 的正确性
 
+(operators-unitarity)=
+
 ## Unitary 性质保证机制
+
+(operators-xor)=
 
 ### 1. XOR 机制 (Out-of-place)
 
@@ -229,6 +259,8 @@ output.value ^= compute_result(input_values);
 ```
 
 因为 `x ⊕ y ⊕ y = x`，应用两次操作会恢复原值，保证 U† = U。
+
+(operators-modulo)=
 
 ### 2. 模运算机制 (In-place)
 
@@ -246,6 +278,8 @@ reg.value = (reg.value + ((1ULL << N) - value)) % (1ULL << N);
 
 因为 `(x + y) + (2^N - y) ≡ x (mod 2^N)`，操作和 dagger 互相抵消。
 
+(operators-bijection)=
+
 ### 3. 双射验证
 
 对于 out-of-place 算子，使用 `verify_outofplace_unitarity` 模板验证：
@@ -260,7 +294,7 @@ reg.value = (reg.value + ((1ULL << N) - value)) % (1ULL << N);
 
 ### Debug 模式检查
 
-在非 `QRAM_Release` 模式下，所有算子构造函数会检查：
+在非 [`QRAM_Release`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/bindings/python/CMakeLists.txt#L9) 模式下，所有算子构造函数会检查：
 - 输入/输出寄存器类型是否符合要求
 - 寄存器大小是否匹配（对于需要匹配的操作）
 - 操作数是否在有效范围内
@@ -289,7 +323,7 @@ reg.value = (reg.value + ((1ULL << N) - value)) % (1ULL << N);
 ### 2. Unitary 验证
 
 - 使用提供的测试模板验证自定义算子的 unitary 性
-- 对于关键操作，在算法中使用 `CheckNormalization` 验证状态归一化
+- 对于关键操作，在算法中使用 [`CheckNormalization`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/debugger.h#L78) 验证状态归一化
 
 ### 3. 性能优化
 
@@ -308,4 +342,10 @@ reg.value = (reg.value + ((1ULL << N) - value)) % (1ULL << N);
 
 - [量子计算中的可逆计算](https://en.wikipedia.org/wiki/Reversible_computing)
 - [Unitary 矩阵](https://en.wikipedia.org/wiki/Unitary_matrix)
-- 项目论文: arXiv:2503.13832, arXiv:2503.15118
+- 项目论文: [arXiv:2503.13832](https://arxiv.org/abs/2503.13832), [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
+- [论文与实验](../paper/README.md)
+
+## 相关页面
+
+- [SparQ 算子命名规范](naming_conventions.md) — 命名文法、槽位规则、`_InPlace` 契约
+- [QRAM-Simulator 架构](architecture.md) — 模块划分与数据流

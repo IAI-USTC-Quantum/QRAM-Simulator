@@ -14,77 +14,91 @@ This document details the constraints of the quantum arithmetic operators pre-im
 
 ## Overview
 
-QRAM-Simulator adopts the "Register Level Programming" paradigm: every operator acts directly on registers. Each operator is carefully designed to preserve the quantum unitary property.
+QRAM-Simulator adopts the "[Register Level Programming](../paper/README.md)" paradigm: every operator acts directly on registers. Each operator is carefully designed to preserve the quantum unitary property.
+
+(operators-key-concepts)=
 
 ### Key Concepts
 
-1. **Out-of-place operations**: the result is stored in a separate output register; unitarity is guaranteed via XOR
-2. **In-place operations**: the result modifies the input register directly; an explicit dagger method is required to guarantee reversibility
-3. **SelfAdjoint operators**: satisfy U† = U; applying the operator twice is the identity
+1. **Out-of-place operations**: the result is stored in a separate output register; unitarity is guaranteed via [XOR](#operators-xor)
+2. [**In-place operations**](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L748): the result modifies the input register directly; an explicit dagger method is required to guarantee reversibility ([Section 6 (the `_InPlace` contract)](naming_conventions.md#naming-inplace))
+3. [**SelfAdjoint operators**](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L802): satisfy U† = U; applying the operator twice is the identity
+
+(operators-width-truncation)=
 
 ## Width and Truncation Conventions
 
 This section is the **authoritative contract** for the width behavior of every arithmetic operator (established 2026-09). Principle: **semantics are carried by the operator name, not by the build mode**; validation of register declared types runs only as an additional step in debug builds.
 
 1. **LSB alignment**: all operands and outputs are aligned at the least significant bit; there are no implicit shifts.
-2. **Read extension is decided by the name slots**: a `_UInt_` slot zero-extends the operand into the computation domain; an `_SInt_` slot sign-extends in two's complement; a `_Bool_` slot reads a single bit; an `AnyInt` slot extends according to the register's **declared type** (UInt → zero-extension, SInt → sign-extension). The extension logic is hard-coded, so release builds behave identically.
+2. **Read extension is decided by the name slots**: a `_UInt_` slot zero-extends the operand into the computation domain; an `_SInt_` slot sign-extends in two's complement; a `_Bool_` slot reads a single bit; an `AnyInt` slot extends according to the register's **declared type** (UInt → zero-extension, SInt → sign-extension). The extension logic is hard-coded, so release builds behave identically. (mirrored by [the slot-carried semantics rule in the naming conventions](naming_conventions.md#naming-grammar))
 3. **Computation domain**: intermediate quantities are evaluated at full precision — multiplication goes through a 64-bit high/low-half decomposition (equivalent to 128-bit precision), addition/subtraction/comparison hold equivalently over the unsigned 64-bit wrapping domain, and the quotient domain of division/square root is ≤ 64 bits.
-4. **Write**: the result is reduced `mod 2^out_width` and then **XOR**-ed into the output register. The output width may differ from any input width; the values of input registers are never modified by an out-of-place operator.
-5. **Totalization outside the domain**: reversibility requires the operator to be a deterministic function on every basis state, so the core operators never raise domain exceptions — `Div_UInt_UInt` returns quotient 0 when the divisor is zero; `Sqrt_UInt` accepts only magnitude (non-negative) inputs. Domain/overflow information is invariably reported by dedicated flag operators.
-6. **Flag predicates**: flag outputs are XOR-ed into 1-bit Boolean registers; predicates are evaluated over the **full-precision domain**. Flag operators that take `out` as a parameter (`Carry_UInt_UInt` etc.) **take only that register's width and never read its value**, so they make no assumption about the initial content of the output register.
-7. **Width bounds**: 1..64 are all supported. Every `pow2(w)` / `1<<w` undefined behavior at w=64 is replaced by `width_mask` (with a special case for 64); operators always read widths at execution time via `System::size_of` and never snapshot them at construction time.
+4. **Write**: the result is reduced `mod 2^out_width` and then **XOR**-ed into the output register. The output width may differ from any input width; the values of input registers are never modified by an [out-of-place](#operators-key-concepts) operator.
+5. **Totalization outside the domain**: reversibility requires the operator to be a deterministic function on every basis state, so the core operators never raise domain exceptions — [`Div_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1644) returns quotient 0 when the divisor is zero; [`Sqrt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1726) accepts only magnitude (non-negative) inputs. Domain/overflow information is invariably reported by dedicated flag operators.
+6. **Flag predicates**: [flag outputs](naming_conventions.md#naming-slots) are XOR-ed into 1-bit Boolean registers; predicates are evaluated over the **full-precision domain**. Flag operators that take `out` as a parameter ([`Carry_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2207) etc.) **take only that register's width and never read its value**, so they make no assumption about the initial content of the output register. (predicate-operator naming follows [Section 4 of the naming conventions](naming_conventions.md#naming-slots))
+7. **Width bounds**: 1..64 are all supported. Every `pow2(w)` / `1<<w` undefined behavior at w=64 is replaced by [`width_mask`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/basic.h#L45) (with a special case for 64); operators always read widths at execution time via [`System::size_of`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/basic_components.h#L414) and never snapshot them at construction time.
 8. **Aliasing constraint**: the output (including flags) must not alias any input — an always-on check, independent of debug/release.
-9. **Exceptions to the contract**: `GetMid_UInt_UInt` and `Swap_General_General` keep their equal-width requirement (the semantics of midpoint overflow and whole-register exchange inherently depend on equal widths); they are the only two exceptions to this contract.
-10. **Legacy compatibility**: the existing Add family (zero-extended reads + writes `mod 2^dst`) already conforms to this contract. The only historical behavior correction is `Add_AnyInt_AnyInt_InPlace`: from this contract onward, the AnyInt slot extends according to the register's declared type (previously it was always read as an unsigned bit pattern), and the `lhs == rhs` aliasing rejection plus execution-time width reads were added.
+9. **Exceptions to the contract**: [`GetMid_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L3145) and [`Swap_General_General`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L3054) keep their equal-width requirement (the semantics of midpoint overflow and whole-register exchange inherently depend on equal widths); they are the only two exceptions to this contract.
+10. **Legacy compatibility**: the existing Add family (zero-extended reads + writes `mod 2^dst`) already conforms to this contract. The only historical behavior correction is [`Add_AnyInt_AnyInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2643): from this contract onward, the AnyInt slot extends according to the register's declared type (previously it was always read as an unsigned bit pattern), and the `lhs == rhs` aliasing rejection plus execution-time width reads were added.
+
+(operators-classification)=
 
 ## Operator Classification
+
+(operators-outofplace)=
 
 ### 1. Out-of-place Operators (SelfAdjointOperator)
 
 | Operator | Operation | Input Type | Output Type | Constraints |
 |------|------|----------|----------|------|
-| `Add_UInt_UInt` | res ^= lhs + rhs | UnsignedInteger | UnsignedInteger | all register sizes arbitrary, result truncated |
-| `Add_UInt_ConstUInt` | res ^= lhs + const | UnsignedInteger | UnsignedInteger | all register sizes arbitrary, result truncated |
-| `Mult_UInt_ConstUInt` | res ^= lhs * const | UnsignedInteger | UnsignedInteger | const should be odd to keep the map bijective |
-| `Assign` | reg2 ^= reg1 | any | same as reg1 | widths arbitrary, reg2 truncated to mod 2^reg2_w |
-| `Compare_UInt_UInt` | outputs comparison flags | UnsignedInteger | Boolean | output register size is 1 |
-| `Less_UInt_UInt` | outputs the less-than flag | UnsignedInteger | Boolean | output register size is 1 |
+| [`Add_UInt_UInt`](#op-add-uint-uint) | res ^= lhs + rhs | UnsignedInteger | UnsignedInteger | all register sizes arbitrary, result truncated |
+| [`Add_UInt_ConstUInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L875) | res ^= lhs + const | UnsignedInteger | UnsignedInteger | all register sizes arbitrary, result truncated |
+| [`Mult_UInt_ConstUInt`](#op-mult-uint-constuint) | res ^= lhs * const | UnsignedInteger | UnsignedInteger | const should be odd to keep the map bijective |
+| [`Assign`](#op-assign) | reg2 ^= reg1 | any | same as reg1 | widths arbitrary, reg2 truncated to mod 2^reg2_w |
+| [`Compare_UInt_UInt`](#op-compare-uint-uint) | outputs comparison flags | UnsignedInteger | Boolean | output register size is 1 |
+| [`Less_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2958) | outputs the less-than flag | UnsignedInteger | Boolean | output register size is 1 |
 | `GetMid_UInt_UInt` | mid ^= (l+r)/2 | UnsignedInteger | UnsignedInteger | the three registers must have the same size |
-| `FlipBools` | reg ^= ~reg | UnsignedInteger/SignedInteger | - | negates all bits |
-| `Swap_Bool_Bool` | swaps a single bit | any | any | bit index within the valid range |
+| [`FlipBools`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L58) | reg ^= ~reg | UnsignedInteger/SignedInteger | - | negates all bits |
+| [`Swap_Bool_Bool`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L116) | swaps a single bit | any | any | bit index within the valid range |
 | `Swap_General_General` | swaps entire registers | any | any | the two registers must have the same size |
-| `Div_Sqrt_Arccos_UInt_UInt` | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
-| `Sqrt_Div_Arccos_Int_UInt` | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
-| `GetRotateAngle_Int_Int` | res ^= atan2(r,l)/2π | integer types | Rational | result in the range [0,1) |
-| `Sub_UInt_UInt` | res ^= lhs − rhs | UnsignedInteger | UnsignedInteger | widths arbitrary (generic contract row) |
-| `Neg_UInt` | res ^= 0 − reg | UnsignedInteger | UnsignedInteger | widths arbitrary |
-| `Abs_SInt` | res ^= \|sext(reg)\| | SignedInteger | UnsignedInteger | two's-complement minimum wraps to itself |
-| `Mul_UInt_UInt` | res ^= lhs · rhs | UnsignedInteger | UnsignedInteger | widths arbitrary, result mod 2^res_w |
+| [`Div_Sqrt_Arccos_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1066) | res ^= arccos(√(l/r)) | UnsignedInteger | Rational | lhs < rhs |
+| [`Sqrt_Div_Arccos_Int_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1166) | res ^= arccos(l/√r) | SignedInteger, UnsignedInteger | Rational | \|lhs\| ≤ √rhs |
+| [`GetRotateAngle_Int_Int`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1266) | res ^= atan2(r,l)/2π | integer types | Rational | result in the range [0,1) |
+| [`Sub_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1332) | res ^= lhs − rhs | UnsignedInteger | UnsignedInteger | widths arbitrary (generic contract row) |
+| [`Neg_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1413) | res ^= 0 − reg | UnsignedInteger | UnsignedInteger | widths arbitrary |
+| [`Abs_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1488) | res ^= \|sext(reg)\| | SignedInteger | UnsignedInteger | two's-complement minimum wraps to itself |
+| [`Mul_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1561) | res ^= lhs · rhs | UnsignedInteger | UnsignedInteger | widths arbitrary, result mod 2^res_w |
 | `Div_UInt_UInt` | res ^= lhs // rhs | UnsignedInteger | UnsignedInteger | **division by zero → quotient 0** (totalization outside the domain) |
 | `Sqrt_UInt` | res ^= isqrt(reg) | UnsignedInteger | UnsignedInteger | integer square root (floor) |
-| `Select_Bool_UInt_UInt` | res ^= cond ? lhs : rhs | Boolean, UInt×2 | UnsignedInteger | cond width is 1 |
-| `And_UInt_UInt` / `Or_UInt_UInt` / `Xor_UInt_UInt` | bitwise AND/OR/XOR | UnsignedInteger×2 | UnsignedInteger | widths arbitrary |
-| `Less_SInt_SInt` | flag ^= sext(lhs) < sext(rhs) | SignedInteger×2 | Boolean | signed comparison |
+| [`Select_Bool_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1799) | res ^= cond ? lhs : rhs | Boolean, UInt×2 | UnsignedInteger | cond width is 1 |
+| [`And_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1887) / [`Or_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L1966) / [`Xor_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2045) | bitwise AND/OR/XOR | UnsignedInteger×2 | UnsignedInteger | widths arbitrary |
+| [`Less_SInt_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2125) | flag ^= sext(lhs) < sext(rhs) | SignedInteger×2 | Boolean | signed comparison |
 | `Carry_UInt_UInt` | flag ^= lhs+rhs ≥ 2^res_w | UnsignedInteger×2 | Boolean | res only supplies its width; never read or written |
-| `Overflow_SInt_SInt` | flag ^= signed addition overflow | SignedInteger×2 | Boolean | res only supplies its width; evaluated internally at the res width |
-| `MulOverflow_UInt_UInt` | flag ^= lhs·rhs ≥ 2^res_w (full precision) | UnsignedInteger×2 | Boolean | res only supplies its width |
-| `IsZero_UInt` | flag ^= reg == 0 | UnsignedInteger | Boolean | — |
-| `Negative_SInt` | flag ^= sext(reg) < 0 | SignedInteger | Boolean | — |
-| `CustomArithmetic` | res ^= func(inputs) | any | any | func must be a deterministic function |
+| [`Overflow_SInt_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2297) | flag ^= signed addition overflow | SignedInteger×2 | Boolean | res only supplies its width; evaluated internally at the res width |
+| [`MulOverflow_UInt_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2388) | flag ^= lhs·rhs ≥ 2^res_w (full precision) | UnsignedInteger×2 | Boolean | res only supplies its width |
+| [`IsZero_UInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2474) | flag ^= reg == 0 | UnsignedInteger | Boolean | — |
+| [`Negative_SInt`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L2547) | flag ^= sext(reg) < 0 | SignedInteger | Boolean | — |
+| [`CustomArithmetic`](#op-custom-arithmetic) | res ^= func(inputs) | any | any | func must be a deterministic function |
+
+(operators-inplace)=
 
 ### 2. In-place Operators (BaseOperator)
 
 | Operator | Operation | Input Type | Dagger Implementation | Constraints |
 |------|------|----------|-------------|------|
-| `Add_UInt_UInt_InPlace` | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | widths arbitrary; lhs zero-extended, rhs wraps mod 2^rhs_w |
-| `Add_Mult_UInt_ConstUInt_InPlace` | res += lhs * const (lhs unchanged) | UnsignedInteger | res -= lhs * const | lhs unchanged, only res is updated |
-| `Add_ConstUInt_InPlace` | reg += const | UnsignedInteger/SignedInteger | reg += (2^N - const) | wraps mod 2^N |
-| `Mod_Mult_UInt_ConstUInt_InPlace` | y = y * a^(2^x) mod N | UnsignedInteger | y = y * a^(-2^x) mod N | gcd(a, N) = 1, register ≥ ⌈log₂(N)⌉ |
+| [`Add_UInt_UInt_InPlace`](#op-add-uint-uint-inplace) | rhs += lhs | UnsignedInteger | rhs += (2^N - lhs) | widths arbitrary; lhs zero-extended, rhs wraps mod 2^rhs_w |
+| [`Add_Mult_UInt_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L484) | res += lhs * const (lhs unchanged) | UnsignedInteger | res -= lhs * const | lhs unchanged, only res is updated |
+| [`Add_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L964) | reg += const | UnsignedInteger/SignedInteger | reg += (2^N - const) | wraps mod 2^N |
+| [`Mod_Mult_UInt_ConstUInt_InPlace`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/quantum_arithmetic.h#L583) | y = y * a^(2^x) mod N | UnsignedInteger | y = y * a^(-2^x) mod N | gcd(a, N) = 1, register ≥ ⌈log₂(N)⌉ |
 | `Add_AnyInt_AnyInt_InPlace` | lhs += rhs | integer types | lhs -= rhs (mod 2^N) | mixed types; rhs extends per its declared type (SInt sign-extends); lhs≠rhs |
-| `ShiftLeft_InPlace` | rotate left | UnsignedInteger/SignedInteger | rotate right by the same amount | shift amount ≤ register size |
-| `ShiftRight_InPlace` | rotate right | UnsignedInteger/SignedInteger | rotate left by the same amount | shift amount ≤ register size |
+| [`ShiftLeft_InPlace`](#op-shift-inplace) | rotate left | UnsignedInteger/SignedInteger | rotate right by the same amount | shift amount ≤ register size |
+| [`ShiftRight_InPlace`](#op-shift-inplace) | rotate right | UnsignedInteger/SignedInteger | rotate left by the same amount | shift amount ≤ register size |
+
+(operators-details)=
 
 ## Detailed Operator Descriptions
+
+(op-add-uint-uint)=
 
 ### Add_UInt_UInt
 
@@ -108,9 +122,11 @@ Init_Unsafe(rhs, 5);
 Add_UInt_UInt("lhs", "rhs", "res");
 ```
 
+(op-add-uint-uint-inplace)=
+
 ### Add_UInt_UInt_InPlace
 
-**Operation**: `rhs += lhs` (mod 2^N) (in-place)
+**Operation**: `rhs += lhs` (mod 2^N) ([in-place](#operators-key-concepts))
 
 **Unitarity guarantee**: the dagger is realized through modular arithmetic. `rhs = (rhs + (2^N - lhs)) mod 2^N` restores the original value.
 
@@ -132,6 +148,8 @@ Add_UInt_UInt_InPlace("lhs", "rhs");
 // dagger: rhs = (10 + 9) % 16 = 3 (restores the original value)
 op.dag(state);
 ```
+
+(op-shift-inplace)=
 
 ### ShiftLeft_InPlace / ShiftRight_InPlace
 
@@ -156,11 +174,13 @@ ShiftRight_InPlace("reg", 1);
 ShiftLeft_InPlace("reg", 1).dag(state);  // undo
 ```
 
+(op-mult-uint-constuint)=
+
 ### Mult_UInt_ConstUInt
 
 **Operation**: `res ^= lhs * mult` (out-of-place)
 
-**Unitarity guarantee**: realized through XOR. Note: the multiplication is bijective only when `mult` is coprime to 2^N.
+**Unitarity guarantee**: realized through XOR. Note: the multiplication is [bijective](#operators-bijection) only when `mult` is coprime to 2^N.
 
 **Constraints**:
 - `lhs`, `res` must be of UnsignedInteger type
@@ -168,6 +188,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // undo
 - the product is truncated to the size of the `res` register
 
 **Warning**: if `mult` is even, the multiplication is not bijective and can lose information — multiplying by 2, for example, loses the lowest bit.
+
+(op-assign)=
 
 ### Assign
 
@@ -181,6 +203,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // undo
 - the two registers must have the same size
 - the types may differ (the bit pattern is copied)
 
+(op-compare-uint-uint)=
+
 ### Compare_UInt_UInt
 
 **Operation**: `|l>|r>|0>|0> → |l>|r>|l<r?>|l==r?>`
@@ -190,6 +214,8 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // undo
 **Constraints**:
 - `left`, `right` must be UnsignedInteger
 - `compare_less`, `compare_equal` must be Boolean (size 1)
+
+(op-custom-arithmetic)=
 
 ### CustomArithmetic
 
@@ -202,7 +228,11 @@ ShiftLeft_InPlace("reg", 1).dag(state);  // undo
 - `func` must not have side effects
 - the user is responsible for the correctness of `func`
 
+(operators-unitarity)=
+
 ## Unitarity Guarantee Mechanisms
+
+(operators-xor)=
 
 ### 1. The XOR Mechanism (Out-of-place)
 
@@ -213,6 +243,8 @@ output.value ^= compute_result(input_values);
 ```
 
 Because `x ⊕ y ⊕ y = x`, applying the operation twice restores the original value, guaranteeing U† = U.
+
+(operators-modulo)=
 
 ### 2. The Modular-Arithmetic Mechanism (In-place)
 
@@ -230,6 +262,8 @@ reg.value = (reg.value + ((1ULL << N) - value)) % (1ULL << N);
 
 Because `(x + y) + (2^N - y) ≡ x (mod 2^N)`, the operation and its dagger cancel out.
 
+(operators-bijection)=
+
 ### 3. Bijection Verification
 
 For out-of-place operators, the `verify_outofplace_unitarity` template verifies:
@@ -244,7 +278,7 @@ For in-place operators, the `verify_inplace_unitarity` template verifies:
 
 ### Debug-Mode Checks
 
-In any mode other than `QRAM_Release`, every operator constructor checks:
+In any mode other than [`QRAM_Release`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/bindings/python/CMakeLists.txt#L9), every operator constructor checks:
 - whether the input/output register types meet the requirements
 - whether the register sizes match (for operations that require matching)
 - whether the operands are within the valid range
@@ -273,7 +307,7 @@ In any mode other than `QRAM_Release`, every operator constructor checks:
 ### 2. Unitarity Verification
 
 - use the provided test templates to verify the unitarity of custom operators
-- for critical operations, verify state normalization with `CheckNormalization` inside the algorithm
+- for critical operations, verify state normalization with [`CheckNormalization`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/include/debugger.h#L78) inside the algorithm
 
 ### 3. Performance
 
@@ -292,4 +326,10 @@ In any mode other than `QRAM_Release`, every operator constructor checks:
 
 - [Reversible computing in quantum computing](https://en.wikipedia.org/wiki/Reversible_computing)
 - [Unitary matrix](https://en.wikipedia.org/wiki/Unitary_matrix)
-- Project papers: arXiv:2503.13832, arXiv:2503.15118
+- Project papers: [arXiv:2503.13832](https://arxiv.org/abs/2503.13832), [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
+- [Paper Reproduction Documentation](../paper/README.md)
+
+## Related Pages
+
+- [SparQ Operator Naming Conventions](naming_conventions.md) — naming grammar, slot rules, the `_InPlace` contract
+- [QRAM-Simulator Architecture](architecture.md) — module layout and data flow

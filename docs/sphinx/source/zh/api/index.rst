@@ -11,5 +11,5 @@ pybind11-stubgen 生成的类型桩自动构建；在线站点上见左侧
 "api/python" 章节。docstring 与本页 C++ 注释同源（Doxygen），
 如需查阅完整注释亦可直接阅读仓库头文件：
 
-- ``QRAM/include/`` —— 两套 QRAM 电路与分支结构
-- ``Common/include/`` —— 全振幅桥接、随机引擎、矩阵、日志等基础设施
+- `QRAM/include/ <https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/QRAM/include>`__ —— 两套 QRAM 电路与分支结构
+- `Common/include/ <https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Common/include>`__ —— 全振幅桥接、随机引擎、矩阵、日志等基础设施

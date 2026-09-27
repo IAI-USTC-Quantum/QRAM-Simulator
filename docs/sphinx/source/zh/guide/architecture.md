@@ -5,7 +5,7 @@
 > 仓库分工：本仓库是**纯 C++ QRAM 模拟基座**（含 pybind11 薄绑定与
 > `qram-simulator` PyPI 包）；稀疏态模拟器框架（SparQ）、高层算法与
 > `pysparq` 富绑定位于 [SparQSim 仓库](https://github.com/IAI-USTC-Quantum/SparQSim)，
-> 后者以 git submodule（`extern/qram-simulator`）形式消费本仓库。
+> 后者以 git submodule（[`extern/qram-simulator`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/extern/qram-simulator)）形式消费本仓库。
 
 ---
 
@@ -17,8 +17,8 @@ QRAM-Simulator 是用于模拟**量子随机存取存储器（QRAM）装载电�
 
 - **qubit / qutrit 双架构**：物理比特树与三能级节点树两种 QRAM 实现
 - **噪声感知**：比特翻转 / 相位翻转 / 联合翻转 / 去极化 / 振幅衰减按时间片注入
-- **分支剪枝**：good/bad 分支剪枝把仿真规模压缩到"坏分支全算 + 一条好分支作基准"
-- **Python 绑定**：pybind11 薄绑定（`pip install qram-simulator`）导出全部核心工作类
+- [**分支剪枝**](../paper/qubit_qram_pruning.md)：good/bad 分支剪枝把仿真规模压缩到"坏分支全算 + 一条好分支作基准"
+- **Python 绑定**：pybind11 薄绑定（[`pip install qram-simulator`](installation.md#inst-python)）导出全部核心工作类
 - CUDA/GPU 后端保留在代码中，当前 CMake 暂时屏蔽 GPU 构建，默认 CPU-only
 
 ### 1.2 设计哲学
@@ -26,7 +26,7 @@ QRAM-Simulator 是用于模拟**量子随机存取存储器（QRAM）装载电�
 1. **稀疏态优先**：树态只记录非基态节点，复杂度与非零元素数同阶而非 2^n
 2. **分支即轨迹**：以 (address, bus_input) 输入分支为仿真单元，噪声在轨迹振幅上累积
 3. **性能与易用性并重**：C++ 核心（OpenMP/TBB 并行）提供性能，Python 绑定提供易用性
-4. **自包含构建**：Eigen / fmt / argparse 全部 vendor 于 `ThirdParty/`，构建期不联网
+4. **自包含构建**：Eigen / fmt / argparse 全部 vendor 于 [`ThirdParty/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/ThirdParty)，构建期不联网
 
 ---
 
@@ -51,27 +51,27 @@ QRAM-Simulator/
 
 | 文件 | 功能 |
 |------|------|
-| `typedefs.h` | 通用类型别名（`complex_t` / `memory_t` / `bus_t` / `u22_t`）、qutrit 能级常量（W/L/R） |
-| `basic.h` | 位运算工具（`pow2` / `bitcount` / 补码）、定点编码、保真度、数据树随机填充 |
-| `matrix.h` | 定点化稀疏矩阵 `SparseMatrix`、稠密矩阵/向量 `DenseMatrix` / `DenseVector` 与 Eigen 互转 |
-| `state_manipulator.h` | `QRAMFullAmp`：QRAM 电路 ↔ 全振幅态向量桥接器 |
-| `simple_quantum_simulator.h` | 简单全振幅电路原语（单比特门 / 测量 / 比特序工具） |
-| `random_engine.h` | 全局 MT19937-64 单例（固定种子可复现整条仿真链路） |
-| `logger.h` | 文件日志、计时器、RAII 函数剖面器、在线统计量、实验结果输出器 |
-| `error_handler.h` | 统一异常族与 `TEST` / `TEST_FAIL` 测试宏 |
-| `iterable.h` | Python 风格 `range` 与笛卡尔积 `product` 迭代器 |
+| [`typedefs.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/typedefs.h) | 通用类型别名（[`complex_t`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/typedefs.h) / [`memory_t`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/typedefs.h) / [`bus_t`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/typedefs.h) / [`u22_t`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/typedefs.h)）、qutrit 能级常量（W/L/R） |
+| [`basic.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/basic.h) | 位运算工具（[`pow2`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/basic.h) / [`bitcount`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/basic.h) / 补码）、定点编码、保真度、数据树随机填充 |
+| [`matrix.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/matrix.h) | 定点化稀疏矩阵 [`SparseMatrix`](../api/cpp.rst#cppapi-sparsematrix)、稠密矩阵/向量 [`DenseMatrix`](../api/cpp.rst#cppapi-densematrix) / [`DenseVector`](../api/cpp.rst#cppapi-densevector) 与 Eigen 互转 |
+| [`state_manipulator.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/state_manipulator.h) | [`QRAMFullAmp`](../api/cpp.rst#cppapi-qramfullamp)：QRAM 电路 ↔ 全振幅态向量桥接器 |
+| [`simple_quantum_simulator.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/simple_quantum_simulator.h) | 简单全振幅电路原语（单比特门 / 测量 / 比特序工具） |
+| [`random_engine.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/random_engine.h) | 全局 MT19937-64 单例（固定种子可复现整条仿真链路） |
+| [`logger.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/logger.h) | 文件日志、计时器、RAII 函数剖面器、在线统计量、实验结果输出器 |
+| [`error_handler.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/error_handler.h) | 统一异常族与 [`TEST`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/error_handler.h#L87) / [`TEST_FAIL`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/error_handler.h#L93) 测试宏 |
+| [`iterable.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Common/include/iterable.h) | Python 风格 [`range`](../api/cpp.rst#cppapi-range) 与笛卡尔积 [`product`](../api/cpp.rst#cppapi-product) 迭代器 |
 
 ### 2.2 QRAM/ —— QRAM 电路核心
 
 | 文件 | 内容 |
 |------|------|
-| `qram_circuit_qubit.h/.cpp` | `qram_qubit::QRAMCircuit`：qubit 架构电路（剪枝仿真主入口） |
-| `qram_circuit_qutrit.h/.cpp` | `qram_qutrit::QRAMCircuit`：qutrit 架构电路 |
-| `qram_branch_qubit.h/.cpp` | `State` / `SystemState` / `Branch` / `BranchGroup`（qubit 分支结构） |
-| `qram_branch_qutrit.h/.cpp` | `QRAMNode` / `QRAMState` / `SubBranch` / `Branch`（qutrit 分支结构） |
-| `time_step.h/.cpp` | `TimeStep` 时序与噪声调度器、`OperationType` 枚举、`TimeSlices` 调度结构 |
+| [`qram_circuit_qubit.h/.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h) | [`qram_qubit::QRAMCircuit`](../api/cpp.rst#cppapi-qramcircuit-qubit)：qubit 架构电路（剪枝仿真主入口） |
+| [`qram_circuit_qutrit.h/.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qutrit.h) | [`qram_qutrit::QRAMCircuit`](../api/cpp.rst#cppapi-qramcircuit-qutrit)：qutrit 架构电路 |
+| [`qram_branch_qubit.h/.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h) | [`State`](../api/cpp.rst#cppapi-state) / [`SystemState`](../api/cpp.rst#cppapi-systemstate) / [`Branch`](../api/cpp.rst#cppapi-branch-qubit) / [`BranchGroup`](../api/cpp.rst#cppapi-branchgroup)（qubit 分支结构） |
+| [`qram_branch_qutrit.h/.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qutrit.h) | [`QRAMNode`](../api/cpp.rst#cppapi-qramnode) / [`QRAMState`](../api/cpp.rst#cppapi-qramstate) / [`SubBranch`](../api/cpp.rst#cppapi-subbranch) / [`Branch`](../api/cpp.rst#cppapi-branch-qutrit)（qutrit 分支结构） |
+| [`time_step.h/.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) | [`TimeStep`](../api/cpp.rst#cppapi-timestep) 时序与噪声调度器、[`OperationType`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) 枚举、[`TimeSlices`](../api/cpp.rst#cppapi-timeslices) 调度结构 |
 
-两套架构共享同一个 `TimeStep` 调度器（以 `arch_qubit` / `arch_qutrit` 常量区分），
+两套架构共享同一个 [`TimeStep`](../api/cpp.rst#cppapi-timestep) 调度器（以 [`arch_qubit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) / [`arch_qutrit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) 常量区分），
 接口形状一致，可互换使用：
 
 ```cpp
@@ -81,29 +81,29 @@ qram_simulator::qram_qutrit::QRAMCircuit qram_t(4, 2);   // qutrit 架构
 
 ### 2.3 bindings/python/ —— Python 绑定层
 
-`core_binding.cpp` 以 pybind11 导出核心工作类，scikit-build-core 负责打包：
+[`core_binding.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/bindings/python/core_binding.cpp) 以 pybind11 导出核心工作类，scikit-build-core 负责打包：
 
 | C++ 类 | Python 名 | 说明 |
 |--------|-----------|------|
-| `qram_qubit::QRAMCircuit` | `QRAMCircuitQubit` | qubit 架构电路 |
-| `qram_qutrit::QRAMCircuit` | `QRAMCircuitQutrit` | qutrit 架构电路 |
-| `QRAMFullAmp` | `QRAMFullAmp` | 全振幅态向量桥接（外部库集成入口） |
-| `TimeStep` / `TimeSlices` / `OperationPack` / `Operation` | 同名 | 时序与噪声调度 |
-| `OperationType` + `arch_qubit` / `arch_qutrit` | 同名 | 噪声模型键与架构常量 |
-| `random_engine::set_seed` / `get_seed` | `set_seed` / `get_seed` | 全局随机种子控制 |
+| [`qram_qubit::QRAMCircuit`](../api/cpp.rst#cppapi-qramcircuit-qubit) | `QRAMCircuitQubit` | qubit 架构电路 |
+| [`qram_qutrit::QRAMCircuit`](../api/cpp.rst#cppapi-qramcircuit-qutrit) | `QRAMCircuitQutrit` | qutrit 架构电路 |
+| [`QRAMFullAmp`](../api/cpp.rst#cppapi-qramfullamp) | `QRAMFullAmp` | 全振幅态向量桥接（外部库集成入口） |
+| [`TimeStep`](../api/cpp.rst#cppapi-timestep) / [`TimeSlices`](../api/cpp.rst#cppapi-timeslices) / [`OperationPack`](../api/cpp.rst#cppapi-operationpack) / [`Operation`](../api/cpp.rst#cppapi-operation) | 同名 | 时序与噪声调度 |
+| [`OperationType`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) + [`arch_qubit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) / [`arch_qutrit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) | 同名 | 噪声模型键与架构常量 |
+| [`random_engine::set_seed`](../api/cpp.rst#cppapi-random-engine) / [`get_seed`](../api/cpp.rst#cppapi-random-engine) | `set_seed` / `get_seed` | 全局随机种子控制 |
 
-构建开关 `QRAM_BUILD_PYTHON_BINDINGS`（默认 OFF）保证嵌入消费方
+构建开关 [`QRAM_BUILD_PYTHON_BINDINGS`](installation.md#inst-options)（默认 OFF）保证嵌入消费方
 （SparQSim 的 `add_subdirectory`）与纯 C++ CI 不受影响。
 
 ### 2.4 Experiments/ —— 论文实验
 
 | 实验 | 说明 |
 |------|------|
-| `verify_noisy_simulation` | CI 回归对拍：QRAM 电路级噪声 ↔ 算子级 channel（ctest 注册） |
-| `QRAM/QubitPaper` | arXiv:2503.13832 论文图件复现（PRA 化） |
-| `QRAM/ChannelCorrespondence` | 噪声模型 ↔ 电路级 channel 对应关系审计 |
-| `QRAM/QRAMFidelityV2` | 保真度模拟器对比 |
-| `QRAM/TimeStep_BadRange` | 坏分支区间理论验证 |
+| [`verify_noisy_simulation`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/verify_noisy_simulation.cpp) | CI 回归对拍：QRAM 电路级噪声 ↔ 算子级 channel（ctest 注册） |
+| [`QRAM/QubitPaper`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM/QubitPaper) | arXiv:2503.13832 论文图件复现（PRA 化） |
+| [`QRAM/ChannelCorrespondence`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM/ChannelCorrespondence) | 噪声模型 ↔ 电路级 channel 对应关系审计 |
+| [`QRAM/QRAMFidelityV2`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM/QRAMFidelityV2) | 保真度模拟器对比 |
+| [`QRAM/TimeStep_BadRange`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM/TimeStep_BadRange) | 坏分支区间理论验证 |
 
 ---
 
@@ -148,11 +148,13 @@ run_normal() / run_full() / run(version)
 sample_and_get_fidelity()                      ← 采样输出分支，|<理想|实际>|²
 ```
 
+(arch-noise)=
+
 ### 3.3 噪声注入
 
-`TimeStep::noise_one_step` 在每个时间片后按噪声模型插入噪声操作：
+[`TimeStep::noise_one_step`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h#L266) 在每个时间片后按噪声模型插入噪声操作：
 
-| 噪声 | OperationType | 作用 |
+| 噪声 | [OperationType](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) | 作用 |
 |------|---------------|------|
 | 比特翻转 | `BitFlip` | 轨迹分裂：翻转 / 不翻转，振幅按 √p 加权 |
 | 相位翻转 | `PhaseFlip` | 轨迹振幅乘 −1（概率 p） |
@@ -186,7 +188,7 @@ sample_and_get_fidelity()                      ← 采样输出分支，|<理想
 门数更少、噪声累积更低。
 
 **Qubit 架构**：节点为标准二能级比特，硬件兼容性更好，理论工具链更成熟；
-配合 **good/bad 分支剪枝**——由 `TimeStep::get_bad_range_*` 推导坏分支地址区间，
+配合 **good/bad 分支剪枝**——由 [`TimeStep::get_bad_range_*`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h#L253) 推导坏分支地址区间，
 好地址的分支组只需物化一条基准轨迹，其余按 XOR 镜像预测，
 是 qubit 架构在大规模仿真下的核心加速手段（见
 [qubit QRAM 剪枝理论](../paper/qubit_qram_pruning.md)）。
@@ -195,13 +197,13 @@ sample_and_get_fidelity()                      ← 采样输出分支，|<理想
 
 ### 4.2 版本化运行入口
 
-`run(version)` 接受 `"full"` / `"normal"` / `"fast"` 等字符串；
+[`run(version)`](../api/cpp.rst#cppapi-qramcircuit-qutrit) 接受 `"full"` / `"normal"` / `"fast"` 等字符串；
 qutrit 架构要求非空噪声模型才允许走 `run(version)`（无噪场景应在电路
-之外直接处理），而 `run_normal()` / `run_full()` 无此约束。
+之外直接处理），而 [`run_normal()`](../api/cpp.rst#cppapi-qramcircuit-qutrit) / [`run_full()`](../api/cpp.rst#cppapi-qramcircuit-qutrit) 无此约束。
 
 ### 4.3 CUDA 集成（保留代码）
 
-`QRAM/include/cuda/qram_circuit_qutrit.cuh`（`CuQRAMCircuit`，thrust
+[`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)（[`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)，thrust
 `device_vector` 内存镜像）保留在代码库中；CondRot 原语重构期间 CMake
 强制 `CUDA_FOUND FALSE`，默认 CPU-only（OpenMP 必需，TBB 可选加速）。
 
@@ -213,3 +215,5 @@ qutrit 架构要求非空噪声模型才允许走 `run(version)`（无噪场景�
 - 安装指南：[installation.md](installation.md)
 - 论文 1：[arXiv:2503.13832](https://arxiv.org/abs/2503.13832)
 - 论文 2：[arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
+- [量子算术算子约束说明](operators.md) — 算子语义与 Unitary 保证
+- [论文与实验](../paper/README.md) — 论文列表与实验总览

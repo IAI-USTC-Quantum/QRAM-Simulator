@@ -6,7 +6,7 @@
 
 ## 摘要
 
-稀疏态 QRAM 模拟器（本仓库）对 qutrit 编码的 bucket-brigade QRAM 实现了含噪快速模拟：噪声历史被预先采样为一棵"分支树"，路由路径不经过任何噪声点的 good 分支不做真实演化，其末态振幅由解析公式直接预测；只有 good/bad 划分由子树包含判据预先确定的 bad 分支需要显式演化。该技巧在 qutrit 方案中之所以简单，是因为数据总线在计算基中传输，无跳变 Kraus 算子 $K_0$ 在其上是对角的，good 分支的全部阻尼效应退化为一个可数的标量衰减因子。然而在 qubit 编码方案中，数据比特必须以 $\{|+\rangle,|-\rangle\}$ 基穿过整棵树（CZ 相位取数协议要求先作用 Hadamard），$K_0=\mathrm{diag}(1,a)$ 在 X 基下非对角，标量预测失效。本文证明：这一 $H\to K_0^d\to H$ 结构依然是**闭式可预测**的——第二个 H 门所作用的正是 $(|0\rangle+(-1)^{b\oplus m}a^d|1\rangle)/\sqrt{2}$ 形式的态，输出振幅为 $(1\pm a^d)/2$；$k$ 个数据比特给出 $2^k$ 个只依赖错误图样 Hamming 权重的闭式分量。据此我们给出完整的 qubit-QRAM 剪枝算法，保持与 qutrit 方案相同的复杂度标度 $\mathcal{O}(d+p\cdot\mathrm{poly}(n))$，并阐明其误差结构：good 分支的一阶效应仅为范数流失（被蒙特卡洛轨迹权重自然吸收），真正的分支内误差是二阶的相干泄漏，一阶错误全部集中于被显式演化的 bad 分支。
+稀疏态 QRAM 模拟器（[本仓库](../guide/architecture.md)）对 qutrit 编码的 bucket-brigade QRAM 实现了含噪快速模拟：噪声历史被预先采样为一棵"分支树"，路由路径不经过任何噪声点的 good 分支不做真实演化，其末态振幅由解析公式直接预测；只有 good/bad 划分由子树包含判据预先确定的 bad 分支需要显式演化。该技巧在 qutrit 方案中之所以简单，是因为数据总线在计算基中传输，无跳变 Kraus 算子 $K_0$ 在其上是对角的，good 分支的全部阻尼效应退化为一个可数的标量衰减因子。然而在 qubit 编码方案中，数据比特必须以 $\{|+\rangle,|-\rangle\}$ 基穿过整棵树（CZ 相位取数协议要求先作用 Hadamard），$K_0=\mathrm{diag}(1,a)$ 在 X 基下非对角，标量预测失效。本文证明：这一 $H\to K_0^d\to H$ 结构依然是**闭式可预测**的——第二个 H 门所作用的正是 $(|0\rangle+(-1)^{b\oplus m}a^d|1\rangle)/\sqrt{2}$ 形式的态，输出振幅为 $(1\pm a^d)/2$；$k$ 个数据比特给出 $2^k$ 个只依赖错误图样 Hamming 权重的闭式分量。据此我们给出完整的 qubit-QRAM 剪枝算法，保持与 qutrit 方案相同的复杂度标度 $\mathcal{O}(d+p\cdot\mathrm{poly}(n))$，并阐明其误差结构：good 分支的一阶效应仅为范数流失（被蒙特卡洛轨迹权重自然吸收），真正的分支内误差是二阶的相干泄漏，一阶错误全部集中于被显式演化的 bad 分支。
 
 ---
 
@@ -14,7 +14,7 @@
 
 量子随机存取存储器（QRAM）以 $\mathcal{O}(\log N)$ 的查询深度实现叠加寻址的数据读取，是量子数据库搜索、量子态制备、量子机器学习等算法的核心部件；其代价是需要 $\mathcal{O}(N)$ 个物理量子比特的二叉路由树。Wang 等人 [1] 提出的稀疏态模拟器利用两个观察实现了 QRAM 的高效经典模拟：(i) bucket-brigade 电路全部由非分支（non-branching）可逆门构成，每个输入基态分量的树配置演化是确定的、唯一的；(ii) 含噪演化可按蒙特卡洛轨迹展开，每个噪声点只影响路由路径经过它的那些分支（子树包含），其余 good 分支的末态可以解析预测而不必演化。模拟复杂度从全密度矩阵的指数级降到 $\mathcal{O}(d+p\cdot\mathrm{poly}(n))$（$d$ 为输入叠加分支数，$p$ 为单比特噪声率，$n$ 为地址位数）。
 
-该工作及其代码实现以 **qutrit 编码**为主力方案：路由节点取三能级 $\{|W\rangle,|L\rangle,|R\rangle\}$，空闲态 $|W\rangle$ 是阻尼信道无跳变算子 $K_0$ 的不动点，数据传输在计算基中完成。对于物理上更常见的 **qubit 编码**（每个路由节点两个二能级比特，地址比特 $|0\rangle\equiv L$、$|1\rangle\equiv R$，无空闲态），快速模拟的支持一直不完整：仓库中 qubit 版好分支乘子只实现了地址路由部分的标量计数（`TimeStep::_get_multiplier_impl_qubit`，且接线代码处于注释停用状态，见 `QRAM/include/qram_branch_qubit.h:213-225`），而数据总线部分——正是本文主题——缺少理论公式。
+该工作及其代码实现以 **qutrit 编码**为主力方案：路由节点取三能级 $\{|W\rangle,|L\rangle,|R\rangle\}$，空闲态 $|W\rangle$ 是阻尼信道无跳变算子 $K_0$ 的不动点，数据传输在计算基中完成。对于物理上更常见的 **qubit 编码**（每个路由节点两个二能级比特，地址比特 $|0\rangle\equiv L$、$|1\rangle\equiv R$，无空闲态），快速模拟的支持一直不完整：仓库中 qubit 版好分支乘子只实现了地址路由部分的标量计数（[`TimeStep::_get_multiplier_impl_qubit`](../api/cpp.rst#cppapi-timestep)，且接线代码处于注释停用状态，见 [`QRAM/include/time_step.h:291`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)），而数据总线部分——正是本文主题——缺少理论公式。
 
 qubit 方案与 qutrit 方案的本质区别在于数据取数方式 [2]：qutrit 方案用经典控制的 CNOT 在计算基翻转数据比特；qubit 方案用 **CZ 相位编码**——经典存储位作为控制，对途经叶子的数据比特施加 $Z$。为了让"激活节点的 $|0\rangle$"与"未激活节点"可区分，数据总线进入树之前必须先作用 Hadamard，把 $\{|0\rangle,|1\rangle\}$ 换到 $\{|+\rangle,|-\rangle\}$ 基，取出数据返回后再作用一次 H 换回原基。于是每个数据比特在两次 H 之间以 X 基叠加态穿行整棵树，持续承受振幅阻尼的 $K_0$ 作用——这就是本文分析的 **$H\to K_0^d\to H$ 结构**。
 
@@ -35,7 +35,7 @@ $$
 $$
 其中 $n$ 为地址比特数（$N=2^n$），$k$ 为数据比特数，$d_i\in\{0,1\}^k$ 为经典存储内容 [1,2]。
 
-bucket-brigade 查询在一棵深度 $n$ 的全二叉树上流水执行：地址比特逐位注入根节点并下钻建立路由路径，数据总线比特逐个换入（CopyIn）、沿路径下行、在叶子与存储作用后原路返回、换出（CopyOut），最后全部操作逆序执行以解除纠缠（uncompute）。模拟器把电路组织为 $T=6n+2k$ 个时间片（`TimeStep::full_step`，`QRAM/src/time_step.cpp:118-121`），关键调度点为（`time_step.cpp:133-203`）：
+bucket-brigade 查询在一棵深度 $n$ 的全二叉树上流水执行：地址比特逐位注入根节点并下钻建立路由路径，数据总线比特逐个换入（CopyIn）、沿路径下行、在叶子与存储作用后原路返回、换出（CopyOut），最后全部操作逆序执行以解除纠缠（uncompute）。模拟器把电路组织为 $T=6n+2k$ 个时间片（[`TimeStep::full_step`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)，[`QRAM/src/time_step.cpp:118-121`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)），关键调度点为（[`time_step.cpp:133-203`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)）：
 
 | 事件 | 数据比特 $i$ 的时间片 |
 |---|---|
@@ -44,17 +44,17 @@ bucket-brigade 查询在一棵深度 $n$ 的全二叉树上流水执行：地址
 | FetchData$_i$（叶子处 CZ 取数） | $\tau_{\mathrm{fetch}}(i)=3n+2i+1$ |
 | CopyOut$_i$（数据比特 $i$ 换出） | $\tau_{\mathrm{out}}(i)=4n+2i+1$ |
 
-调度关于中线镜像对称：$\mathrm{out}(t)=T-t$。注意 $\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n$ 与 $i$ 无关，且 $\tau_{\mathrm{fetch}}(i)$ 恰为窗口中点。在 qubit 架构中，两片 Hadamard 分别挂接在 CopyIn$_0$ 之前与 CopyOut$_{k-1}$ 之后（`QRAM/include/qram_circuit_qubit.h:1039-1048`），作用于整个数据总线寄存器。
+调度关于中线镜像对称：$\mathrm{out}(t)=T-t$。注意 $\tau_{\mathrm{out}}(i)-\tau_{\mathrm{in}}(i)=2n$ 与 $i$ 无关，且 $\tau_{\mathrm{fetch}}(i)$ 恰为窗口中点。在 qubit 架构中，两片 Hadamard 分别挂接在 CopyIn$_0$ 之前与 CopyOut$_{k-1}$ 之后（[`QRAM/src/qram_circuit_qubit.cpp:777-784`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_circuit_qubit.cpp)），作用于整个数据总线寄存器。
 
 ### 2.2 噪声模型与蒙特卡洛轨迹展开
 
-每个时间片的门操作之后，对当前已纠缠子树内的每个物理比特独立地以概率施加噪声（`TimeStep::noise_one_step`，`time_step.cpp:341-385`）：
+每个时间片的门操作之后，对当前已纠缠子树内的每个物理比特独立地以概率施加噪声（[`TimeStep::noise_one_step`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)，[`time_step.cpp:341-385`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)）：
 
 - **振幅阻尼**（强度 $\gamma$）：Kraus 算子
 $$
 K_0=|0\rangle\langle0|+\sqrt{1-\gamma}\,|1\rangle\langle1|=\mathrm{diag}(1,a),\qquad K_1=\sqrt{\gamma}\,|0\rangle\langle1|,
 $$
-记 $a\equiv\sqrt{1-\gamma}$ 为单步衰减因子。模拟中拆为两部分：$K_0$ 作为**默认算子**确定性作用（`Damp_Common`：每步将每个处于 $|1\rangle$ 的激发振幅乘以 $a$，`qram_branch_qubit.h:84-87`）；跳变算子 $K_1$ 只在预先采样的噪声点处作为**准测量**处理（`Damp_Full`：按当前未归一化态计算跳变概率、掷点、命中则对所有分支投影复位，`qram_circuit_qubit.h:468-558`）。
+记 $a\equiv\sqrt{1-\gamma}$ 为单步衰减因子。模拟中拆为两部分：$K_0$ 作为**默认算子**确定性作用（[`Damp_Common`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h)：每步将每个处于 $|1\rangle$ 的激发振幅乘以 $a$，[`qram_branch_qubit.h:149-152`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h)）；跳变算子 $K_1$ 只在预先采样的噪声点处作为**准测量**处理（[`Damp_Full`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_circuit_qubit.cpp)：按当前未归一化态计算跳变概率、掷点、命中则对所有分支投影复位，[`QRAM/src/qram_circuit_qubit.cpp:401-482`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_circuit_qubit.cpp)）。
 - **退极化**（强度 $\varepsilon$）：随机 Pauli $X/Z/Y$，在采样到的噪声点处显式施加。
 
 一条轨迹 = 一份预先采样的噪声历史（噪声点位置、种类）+ 默认 $K_0$ 的全程作用。状态始终保持为（未归一化的）稀疏纯态，只在准测量与末态采样处归一化 [1, SI §III]。多轨迹平均即还原密度矩阵层面的观测量。
@@ -65,24 +65,25 @@ Wang 等人的剪枝算法建立在三条支柱上 [1]：
 
 **(P1) 唯一树配置定理。** 电路线全由 CSWAP/SWAP/CNOT/CZ 等非分支门构成（只置换计算基态、不产生叠加），因此对每个地址 $|i\rangle$ 存在唯一的树配置轨道 $|\Psi_i(t)\rangle$；无噪演化无需解方程即可经典推演。
 
-**(P2) 默认算子的对角性。** $K_0$ 在节点计算基下对角，故无跳变轨迹中 good 分支的基态轨道与无噪轨道完全相同，阻尼的全部效应是乘上一个**可数的标量衰减因子**：振幅因子 $a^{c}$，其中 $c$ 为该分支的"激发数 × 时间步"计数，由调度表解析给出而无需模拟。不同 good 分支之间的相对权重为 $a^{\Delta c}$（实现：`TimeStep::get_multiplier_qutrit`，`QRAM/include/time_step.h:209-234`）。
+**(P2) 默认算子的对角性。** $K_0$ 在节点计算基下对角，故无跳变轨迹中 good 分支的基态轨道与无噪轨道完全相同，阻尼的全部效应是乘上一个**可数的标量衰减因子**：振幅因子 $a^{c}$，其中 $c$ 为该分支的"激发数 × 时间步"计数，由调度表解析给出而无需模拟。不同 good 分支之间的相对权重为 $a^{\Delta c}$（实现：[`TimeStep::get_multiplier_qutrit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)，[`QRAM/include/time_step.h:350`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)）。
 
 **(P3) 子树包含判据。** 节点 $(l,p)$ 处的故障只影响其叶子子树对应的地址区间
 $$
 i\in\big[2^{\,n-l}p,\;2^{\,n-l}(p+1)-1\big],
 $$
-故给定噪声历史后，good/bad 分支集合可**在演化之前**解析确定（实现：`get_bad_range_qutrit` + 区间并集 `ContinuousRange`，`time_step.cpp:267-339`）。期望 bad 分支比例为 $\mathcal{O}(n^2p)$ [1, v1 Eq. (6)]。
+故给定噪声历史后，good/bad 分支集合可**在演化之前**解析确定（实现：[`get_bad_range_qutrit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) + 区间并集 [`ContinuousRange`](../api/cpp.rst#cppapi-continuousrange)，[`time_step.cpp:267-339`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)）。期望 bad 分支比例为 $\mathcal{O}(n^2p)$ [1, v1 Eq. (6)]。
 
-**注意 (P3) 的编码依赖性（详见姊妹篇 `qubit_error_propagation.md`）。** 该判据对 qutrit 的真正依据不是"输出损坏局限于子树"（这一点对 qubit 也成立），而是"**路径外分量的末态树构型保持同一**"：qutrit 的故障残留被 $|W\rangle$ 守卫（`QRAMState::cswap` 的 `case W: do nothing`）冻结在故障节点原地，所有路径外分量共享同一构型，可作 good 分支预测。qubit 编码没有这个守卫，X 型故障的残留会沿"空闲=指向左"的祖先链**迁移上拉**，使构型家族在更大范围内分歧——坏区间必须改用左孩子上溯规则（§3、§5.1）。
+**注意 (P3) 的编码依赖性（详见姊妹篇 [`qubit_error_propagation.md`](qubit_error_propagation.md)）。** 该判据对 qutrit 的真正依据不是"输出损坏局限于子树"（这一点对 qubit 也成立），而是"**路径外分量的末态树构型保持同一**"：qutrit 的故障残留被 $|W\rangle$ 守卫（[`QRAMState::cswap`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp) 的 `case W: do nothing`）冻结在故障节点原地，所有路径外分量共享同一构型，可作 good 分支预测。qubit 编码没有这个守卫，X 型故障的残留会沿"空闲=指向左"的祖先链**迁移上拉**，使构型家族在更大范围内分歧——坏区间必须改用左孩子上溯规则（[§3](#pruning-sec3-gap)、[§5.1](#pruning-sec51-climb)）。
 
-qutrit 方案中数据传输在计算基完成、不需要 H 门，两片 H 的挂接点退化为纯合并操作（`qram_branch_qutrit.cpp:547-573` 的 `run_hadamard` 只做 `try_merge`），因此 (P2) 直接覆盖数据总线：good 分支不分裂，末态为 $|i\rangle|j\oplus d_i\rangle|Q_0\rangle$ 乘标量因子。
+qutrit 方案中数据传输在计算基完成、不需要 H 门，两片 H 的挂接点退化为纯合并操作（[`qram_branch_qutrit.cpp:547-573`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp) 的 [`run_hadamard`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp) 只做 [`try_merge`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_branch_qutrit.cpp)），因此 (P2) 直接覆盖数据总线：good 分支不分裂，末态为 $|i\rangle|j\oplus d_i\rangle|Q_0\rangle$ 乘标量因子。
 
+(pruning-sec3-gap)=
 ## 3. qubit 方案的缺口
 
 qubit 编码中支柱 (P1) 逐字成立（非分支门集与能级编码无关）。缺口有两处——(P2) 的数据总线部分，以及 (P3) 的构型同一性：
 
-- **(P3′) 构型家族分歧（X 型故障）**：输出损坏（wrongbus）本身仍 ⊆ subtree(v)（单错误注入实测），但 X 翻转在**所有**叠加分量留下永久残留（空闲节点无人清理），且残留会被"空闲=指向左"的祖先上拉迁移：左孩子位置的残留对父节点空闲的分量上溯一级，右孩子位置的残留被困于自身子树。路径外分量因此分裂为不同末态构型家族，家族分歧的包络为 **bad = 左孩子取 subtree(parent(v))，右孩子取 subtree(v)**（即现行 `get_bad_range_qubit`；根与根的孩子有特判）。阻尼跳变（K₁）不产生路径外残留（空闲无激发可跳），**纯阻尼通道仍可用纯子树判据**。机制推导与 n=3 全注入验证见 `qubit_error_propagation.md`。
-- **(P2) 地址/路由部分**：路由比特处于 $|1\rangle$ 时同样被 $K_0$ 逐步衰减，暴露窗口由调度表给出，仍是可数标量（仓库已实现 `_get_multiplier_impl_qubit`，`time_step.cpp:462-475`）。这部分没有新困难。
+- **(P3′) 构型家族分歧（X 型故障）**：输出损坏（wrongbus）本身仍 ⊆ subtree(v)（单错误注入实测），但 X 翻转在**所有**叠加分量留下永久残留（空闲节点无人清理），且残留会被"空闲=指向左"的祖先上拉迁移：左孩子位置的残留对父节点空闲的分量上溯一级，右孩子位置的残留被困于自身子树。路径外分量因此分裂为不同末态构型家族，家族分歧的包络为 **bad = 左孩子取 subtree(parent(v))，右孩子取 subtree(v)**（即现行 [`get_bad_range_qubit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)；根与根的孩子有特判）。阻尼跳变（K₁）不产生路径外残留（空闲无激发可跳），**纯阻尼通道仍可用纯子树判据**。机制推导与 n=3 全注入验证见 [`qubit_error_propagation.md`](qubit_error_propagation.md)。
+- **(P2) 地址/路由部分**：路由比特处于 $|1\rangle$ 时同样被 $K_0$ 逐步衰减，暴露窗口由调度表给出，仍是可数标量（仓库已实现 `_get_multiplier_impl_qubit`，[`time_step.cpp:462-475`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)）。这部分没有新困难。
 - **(P2) 数据总线部分**：数据比特 $i$ 在第 $\tau_{\mathrm{in}}(i)=2n+2i+1$ 步换入、第 $\tau_{\mathrm{out}}(i)=4n+2i+1$ 步换出，其间以 $(|0\rangle\pm|1\rangle)/\sqrt{2}$ 的形式存在于树内。$K_0$ 在 X 基下非对角：
 $$
 K_0|+\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle+a|1\rangle\big),\qquad K_0|-\rangle=\tfrac{1}{\sqrt2}\big(|0\rangle-a|1\rangle\big).
@@ -91,6 +92,7 @@ $$
 
 ## 4. 主要理论结果
 
+(pruning-bus-model)=
 ### 4.1 H–K₀–H 引理
 
 **引理 1（单比特闭式）。** 设 $a=\sqrt{1-\gamma}$，$d\in\mathbb{N}$，$m\in\{0,1\}$，定义
@@ -125,9 +127,9 @@ $$
 \boxed{\;A(c)\;=\;\frac{1}{2^{k}}\,(1+a^{2n})^{\,k-w}\,(1-a^{2n})^{\,w}\;=\;\alpha_{2n}^{\,k-w}\,\beta_{2n}^{\,w}\;}
 $$
 
-**证明。** 不同数据比特的路由由同一地址路径引导、在不同时间片流水通过，彼此之间无任何门耦合；每比特的取数 $Z^{d^{(t)}}$ 与 $K_0$ 暴露各自独立。故两片 H 之间的总对角算子是逐比特张量积，总映射为 $\bigotimes_t N_{d^{(t)},d_t}$。由调度表，$d_t=\tau_{\mathrm{out}}(t)-\tau_{\mathrm{in}}(t)=(4n+2t+1)-(2n+2t+1)=2n$ 对所有比特相同（端点计数约定至多为 $\pm1$ 的修正，且对全部比特一致，可被参考分支自校准，见 §5.2）。对每个比特应用引理 1，$c_t=b_{\mathrm{out},t}$ 贡献 $\alpha_{2n}$、$c_t=\overline{b_{\mathrm{out},t}}$ 贡献 $\beta_{2n}$，按错误位数 $w$ 归并即得。$\square$
+**证明。** 不同数据比特的路由由同一地址路径引导、在不同时间片流水通过，彼此之间无任何门耦合；每比特的取数 $Z^{d^{(t)}}$ 与 $K_0$ 暴露各自独立。故两片 H 之间的总对角算子是逐比特张量积，总映射为 $\bigotimes_t N_{d^{(t)},d_t}$。由调度表，$d_t=\tau_{\mathrm{out}}(t)-\tau_{\mathrm{in}}(t)=(4n+2t+1)-(2n+2t+1)=2n$ 对所有比特相同（端点计数约定至多为 $\pm1$ 的修正，且对全部比特一致，可被参考分支自校准，见 [§5.2](#pruning-sec52-calibration)）。对每个比特应用引理 1，$c_t=b_{\mathrm{out},t}$ 贡献 $\alpha_{2n}$、$c_t=\overline{b_{\mathrm{out},t}}$ 贡献 $\beta_{2n}$，按错误位数 $w$ 归并即得。$\square$
 
-**与 qutrit 计数器的对照值得强调**：qutrit 版数据窗口依赖输入/输出比特值（$b_{\mathrm{in}},b_{\mathrm{out}}$ 决定激发在去程/回程是否存在于树内，见 `_get_multiplier_impl_qutrit` 的数据部分，`time_step.cpp:510-534`），而 qubit 版数据比特**始终以半激发态在树内驻留完整窗口 $2n$**，与比特值无关——X 基传输使暴露窗口变得平凡，这反而简化了计数。
+**与 qutrit 计数器的对照值得强调**：qutrit 版数据窗口依赖输入/输出比特值（$b_{\mathrm{in}},b_{\mathrm{out}}$ 决定激发在去程/回程是否存在于树内，见 [`_get_multiplier_impl_qutrit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp) 的数据部分，[`time_step.cpp:510-534`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp)），而 qubit 版数据比特**始终以半激发态在树内驻留完整窗口 $2n$**，与比特值无关——X 基传输使暴露窗口变得平凡，这反而简化了计数。
 
 ### 4.3 地址路由部分的标量因子
 
@@ -139,9 +141,9 @@ $$
 $$
 \frac{p_i}{p_{i_{\mathrm{ref}}}}=(1-\gamma)^{\,c_{\mathrm{addr}}(i)-c_{\mathrm{addr}}(i_{\mathrm{ref}})}\;\equiv\;a^{2\Delta c},
 $$
-即 `get_multiplier_qubit` 的 `relative_multiplier`（`time_step.h:186-207`）。
+即 [`get_multiplier_qubit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) 的 [`relative_multiplier`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)（[`time_step.h:314`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h)）。
 
-注意 qubit 方案的地址暴露窗口是**全查询程**（$\sim T$ 量级），而 qutrit 方案的地址激发采用传播式激活、每比特仅暴露 $\mathcal{O}(t)$ 步（`time_step.cpp:490-509` 的 $[2t+1,3t+2]$ 及镜像段）——这正是协议层面 qubit 方案 infidelity 标度 $\mathcal{O}((n+k)n^2\varepsilon)$ 比 qutrit 方案 $\mathcal{O}((n+k)n\varepsilon)$ 差一个因子 $n$ 的来源 [2, §III]，与本模拟算法无关但值得在物理解读中注明。
+注意 qubit 方案的地址暴露窗口是**全查询程**（$\sim T$ 量级），而 qutrit 方案的地址激发采用传播式激活、每比特仅暴露 $\mathcal{O}(t)$ 步（[`time_step.cpp:490-509`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/time_step.cpp) 的 $[2t+1,3t+2]$ 及镜像段）——这正是协议层面 qubit 方案 infidelity 标度 $\mathcal{O}((n+k)n^2\varepsilon)$ 比 qutrit 方案 $\mathcal{O}((n+k)n\varepsilon)$ 差一个因子 $n$ 的来源 [2, §III]，与本模拟算法无关但值得在物理解读中注明。
 
 ### 4.4 Good 分支末态预测定理
 
@@ -180,12 +182,13 @@ $$
 $Damp\_Full$ 噪声点处的准测量概率需汇总**所有**分支（含不演化的 good 分支）在出错比特上的占据权重。两点观察使 qubit 方案可以保持解析折算：
 
 1. **数据部分输入无关。** X 基传输下，每个驻留数据比特对任一途经位置的平均占据概率恒为 $1/2$，与输入 $j$、存储 $d$ 无关（$\pm$ 相位不影响概率）。故参考 good 分支的数据部分跳变概率对全体 good 分支**精确成立**，无需逐分支修正。
-2. **地址部分按相对乘子折算。** 与 qutrit 版相同：$\mathrm{prob}_{\mathrm{damp}}^{(i)}=\mathrm{prob}_{\mathrm{damp}}^{(\mathrm{ref})}\times\mathrm{relative\_multiplier}_i$（实现位置：`qram_circuit_qubit.h:496-519`）。
+2. **地址部分按相对乘子折算。** 与 qutrit 版相同：$\mathrm{prob}_{\mathrm{damp}}^{(i)}=\mathrm{prob}_{\mathrm{damp}}^{(\mathrm{ref})}\times\mathrm{relative\_multiplier}_i$（实现位置：[`QRAM/src/qram_circuit_qubit.cpp:425-441`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/src/qram_circuit_qubit.cpp)）。
 
 因此引入本文的数据总线闭式后，跳变采样的全局一致性不被破坏。
 
 ## 5. 算法
 
+(pruning-sec51-climb)=
 ### 5.1 伪代码
 
 ```
@@ -213,11 +216,12 @@ $Damp\_Full$ 噪声点处的准测量概率需汇总**所有**分支（含不演
 6  末态采样（可选）：按未归一化权重轮盘赌选定末态后归一化。
 ```
 
+(pruning-sec52-calibration)=
 ### 5.2 正确性
 
 - 步骤 1–3 与 qutrit 版相同，正确性由 (P1)(P3) 与轨迹法给出 [1]。
 - 步骤 4 的正确性即定理 3；其中窗口计数 $d_t=2n$ 的端点约定（$\pm1$）对全部 good 分支一致，且与参考分支真实演化中的逐步 `Damp_Common` 计数自校准——相对权重 $r_i$ 不含该约定，绝对因子 $(1+a^{2n})/2$ 的标定可通过与参考分支的 $2^k$ 分量比对一次性完成。
-- 步骤 5 中 good 分支的 $2^k$ 展开是精确恒等式（定理 2），不是近似；与 qutrit 版"乘 $\sqrt{\mathrm{multiplier}}$ + 修正 bus 输出"（`SparQ/src/qram.cpp:100-170`，现位于 SparQSim 仓库）相比，仅多了按 $A(c)$ 分配的展开循环。
+- 步骤 5 中 good 分支的 $2^k$ 展开是精确恒等式（定理 2），不是近似；与 qutrit 版"乘 $\sqrt{\mathrm{multiplier}}$ + 修正 bus 输出"（[`SparQ/src/qram.cpp:100-170`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/SparQ/src/qram.cpp)，现位于 SparQSim 仓库）相比，仅多了按 $A(c)$ 分配的展开循环。
 
 ### 5.3 复杂度
 
@@ -238,26 +242,26 @@ $2^k$ 因子是 qubit 编码的内在输出宽度（每个数据比特携带一�
 |---|---|---|
 | 空闲态 | $\|W\rangle$ 是 $K_0$ 不动点 | 无；路由 $\|1\rangle$ 全程暴露 |
 | 数据取数 | CNOT（计算基翻转） | CZ（相位编码），需 $H$ 换基 |
-| 两片 H | 退化（仅 try_merge） | 真实分裂/合并 |
+| 两片 H | 退化（仅 `try_merge`） | 真实分裂/合并 |
 | 数据比特阻尼暴露 | 计算基，窗口依赖 $b_{\mathrm{in}},b_{\mathrm{out}}$ | X 基，固定窗口 $2n$，与比特值无关 |
 | good 分支数据输出 | 确定值 $\|j\oplus d_i\rangle$ | 已知积态 $\bigotimes_t(\alpha\|b_{\mathrm{out},t}\rangle+\beta\|\overline{b_{\mathrm{out},t}}\rangle)$ |
 | good 分支内误差 | 0（纯标量衰减） | $\mathcal{O}(n^2\gamma^2)$ 相干泄漏/比特 |
 | 地址激发暴露 | $\mathcal{O}(t)$ 步/比特（传播式） | 全程 $\sim T$ 步/比特（驻留式） |
 | X 型故障残留 | 冻结在故障节点（W 守卫），路径外构型同一 | 沿空闲祖先迁移，家族分歧至 subtree(parent) |
 | 预测公式 | $a^{\Delta c}$ 标量 | $a^{\Delta c}$ 标量 × Hamming 权重公式 |
-| 坏区间判据 | 子树包含（两通道通用） | 阻尼：子树包含；退极化 X：左孩子上溯（§3） |
+| 坏区间判据 | 子树包含（两通道通用） | 阻尼：子树包含；退极化 X：左孩子上溯（[§3](#pruning-sec3-gap)） |
 
 ## 7. 本仓库的实现缺口与路线图
 
 对照当前代码，落地本算法需要：
 
-1. ~~**qubit 噪声采样接通**~~（已完成）：`fill_bad_range` 已支持 qubit 架构（`time_step.cpp`），`arch2str` 补上 qubit 分支。
-2. ~~**Full（不剪枝）ground truth**~~（已完成）：`qram_qubit::QRAMCircuit` 补齐 `set_input_uniform`/`set_input_random`、`run_full()`（= 全分支演化）、`sample_and_get_fidelity()`；修复了 `BranchGroup::get_prob_damp` 的概率折算索引、`sample_output_*` 的权重口径（`branch_probs × |amp|²`）、`Branch::run_damp_full` 缺失的跳变复位（投影后须把该比特置回 $|0\rangle$）、`Branch::get_fidelity` 的实现。实验入口：`Experiment_QRAM_FidelityV2 --architecture qubit`（full-only）。
-3. ~~**数据总线闭式预测（核心缺口）**~~（已完成）：good 分支末态以 **XOR 镜像物化**实现——`data_bus ^= (b_out^{ref} ⊕ b_out^{good})`、振幅 × √relative_multiplier，直接从参考分支复制出 $2^k$ 分量（`materialize_good_branches`，`qram_circuit_qubit.h`）。数学依据即定理 2（Hamming 权重公式 + $d_i=2n$ 输入无关性），物化后所有通用路径（概率/采样/保真度）无需 good 特判。
-4. ~~**qubit 版 good 分支接线**~~（已完成）：`sample_output` 重写为物化后全组游走（与 full 模式同序同权重，保证同种子塌缩一致）；`normalization` 覆盖全部组；修复了 good 折算的**输入权重双重计数**（分组版 `get_prob()` 已含组输入权重，需除回参考组权重取单位范数——qutrit 扁平分支无此问题，移植时引入）。
+1. ~~**qubit 噪声采样接通**~~（已完成）：[`fill_bad_range`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h#L260) 已支持 qubit 架构（`time_step.cpp`），[`arch2str`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h#L432) 补上 qubit 分支。
+2. ~~**Full（不剪枝）ground truth**~~（已完成）：[`qram_qubit::QRAMCircuit`](../api/cpp.rst#cppapi-qramcircuit-qubit) 补齐 [`set_input_uniform`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L110)/[`set_input_random`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L108)、[`run_full()`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L271)（= 全分支演化）、[`sample_and_get_fidelity()`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L166)；修复了 [`BranchGroup::get_prob_damp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h#L368) 的概率折算索引、[`sample_output_*`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L249) 的权重口径（`branch_probs × |amp|²`）、[`Branch::run_damp_full`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h#L292) 缺失的跳变复位（投影后须把该比特置回 $|0\rangle$）、[`Branch::get_fidelity`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h#L272) 的实现。实验入口：[`Experiment_QRAM_FidelityV2`](reproduction.md) `--architecture qubit`（full-only）。
+3. ~~**数据总线闭式预测（核心缺口）**~~（已完成）：good 分支末态以 **XOR 镜像物化**实现——`data_bus ^= (b_out^{ref} ⊕ b_out^{good})`、振幅 × √relative_multiplier，直接从参考分支复制出 $2^k$ 分量（[`materialize_good_branches`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L241)，[`qram_circuit_qubit.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h)）。数学依据即定理 2（Hamming 权重公式 + $d_i=2n$ 输入无关性），物化后所有通用路径（概率/采样/保真度）无需 good 特判。
+4. ~~**qubit 版 good 分支接线**~~（已完成）：`sample_output` 重写为物化后全组游走（与 full 模式同序同权重，保证同种子塌缩一致）；[`normalization`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h#L238) 覆盖全部组；修复了 good 折算的**输入权重双重计数**（分组版 [`get_prob()`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_branch_qubit.h#L371) 已含组输入权重，需除回参考组权重取单位范数——qutrit 扁平分支无此问题，移植时引入）。
 5. **跳变概率的数据部分折算**：qubit 版 `run_damp_full`（`qram_circuit_qubit.h`）已包含参考分支折算框架，按 §4.6 补上数据部分（输入无关、恒 $1/2$ 占据）即可。
-6. ~~**验证**~~（已完成）：`test_qubit_compare`（`--architecture qubit`）在 1e-5 depol+damping、n=3..10、每点 50 种子下 **full/normal 全部一致（400/400）**；强噪声压力（1e-4~3e-4）150 试验亦全过；n=12 剪枝收益 17×（2565ms→150ms）。剩余：good-only 模式（`QRAMLoadFast` 的 qubit 对应物）。
-7. ~~**坏区间判据确认**~~（已完成）：`get_bad_range_qubit` 的"左孩子上溯父区间、右孩子取自身子树"逻辑经机制推导与 n=3 单错误注入验证为**构型家族分歧的正确包络**（node1 特判亦机制正确：根从不空闲），此前被误记为"疑似怪癖"。推导见 `qubit_error_propagation.md`。注意两点：纯阻尼通道可用更紧的纯子树判据；n≥4 的深层树上"沿空闲链多级爬升"是否越出 subtree(parent(v)) 未验证，剪枝实现时建议做一次 n=4/5 注入回归。
+6. ~~**验证**~~（已完成）：[`test_qubit_compare`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp#L344)（`--architecture qubit`）在 1e-5 depol+damping、n=3..10、每点 50 种子下 **full/normal 全部一致（400/400）**；强噪声压力（1e-4~3e-4）150 试验亦全过；n=12 剪枝收益 17×（2565ms→150ms）。剩余：good-only 模式（[`QRAMLoadFast`](../guide/naming_conventions.md#naming-legacy) 的 qubit 对应物）。
+7. ~~**坏区间判据确认**~~（已完成）：`get_bad_range_qubit` 的"左孩子上溯父区间、右孩子取自身子树"逻辑经机制推导与 n=3 单错误注入验证为**构型家族分歧的正确包络**（node1 特判亦机制正确：根从不空闲），此前被误记为"疑似怪癖"。推导见 [`qubit_error_propagation.md`](qubit_error_propagation.md)。注意两点：纯阻尼通道可用更紧的纯子树判据；n≥4 的深层树上"沿空闲链多级爬升"是否越出 subtree(parent(v)) 未验证，剪枝实现时建议做一次 n=4/5 注入回归。
 
 ## 8. 结论
 
@@ -286,3 +290,9 @@ $2^k$ 因子是 qubit 编码的内在输出宽度（每个数据比特携带一�
 | $c_{\mathrm{addr}}(i)$ | 地址 $i$ 的路由激发暴露计数 |
 | $b_{\mathrm{out}}$ | $j\oplus d_i$，理想输出数据 |
 | $w$ | 错误图样 $c\oplus b_{\mathrm{out}}$ 的 Hamming 权重 |
+
+## 相关页面
+
+- [误差传播机制附录](qubit_error_propagation.md) — 本文引用的 Damping/BitFlip 闭式推导
+- [实验复现指南](reproduction.md) — 本文实验的逐步复现
+- [架构文档](../guide/architecture.md) — 稀疏树态表示与噪声注入

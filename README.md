@@ -29,7 +29,7 @@ Dependency direction: **SparQSim → QRAM-Simulator**. SparQSim consumes this re
 
 ## Core Capabilities
 
-- **QRAM circuit simulation**: two implementations, Qutrit-based (`qram_circuit_qutrit.h`) and Qubit-based (`qram_circuit_qubit.h`)
+- **QRAM circuit simulation**: two implementations, Qutrit-based ([`qram_circuit_qutrit.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qutrit.h)) and Qubit-based ([`qram_circuit_qubit.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h))
 - **Noise models**: depolarizing (Depolarizing) and amplitude damping (Damping), with probability parameter range validation
 - **Architecture pruning**: the qubit architecture's normal (pruned) mode and full (unpruned) mode are cross-checked version by version
 - **Common components**: sparse/dense matrices, random engines, error handling, state manipulators, and more
@@ -53,8 +53,8 @@ Build options (each controllable via `-D...=ON/OFF`):
 
 | Option | Default | Description |
 |------|------|------|
-| `QRAM_BUILD_TESTS` | ON | Build the C++ tests (test/) |
-| `QRAM_BUILD_EXPERIMENTS` | ON | Build the QRAM experiment programs (Experiments/) |
+| [`QRAM_BUILD_TESTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt) | ON | Build the C++ tests (test/) |
+| [`QRAM_BUILD_EXPERIMENTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt) | ON | Build the QRAM experiment programs (Experiments/) |
 
 ### Core Usage
 
@@ -88,7 +88,7 @@ double fidelity = qram.sample_and_get_fidelity();
 pip install qram-simulator
 ```
 
-The binding layer (`bindings/python/`, pybind11) exports the core working classes: `QRAMCircuitQubit` / `QRAMCircuitQutrit` (the two architecture circuits), `QRAMFullAmp` (full-amplitude bridge), `TimeStep` (time-step and noise scheduling), `OperationType`, and global random-seed control, so external libraries can drive the full construct → set noise → run → fidelity workflow directly:
+The binding layer ([`bindings/python/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/bindings/python), pybind11) exports the core working classes: [`QRAMCircuitQubit`](https://iai-ustc-quantum.github.io/QRAM-Simulator/en/api/cpp.html#cppapi-qramcircuit-qubit) / [`QRAMCircuitQutrit`](https://iai-ustc-quantum.github.io/QRAM-Simulator/en/api/cpp.html#cppapi-qramcircuit-qutrit) (the two architecture circuits), [`QRAMFullAmp`](https://iai-ustc-quantum.github.io/QRAM-Simulator/en/api/cpp.html#cppapi-qramfullamp) (full-amplitude bridge), [`TimeStep`](https://iai-ustc-quantum.github.io/QRAM-Simulator/en/api/cpp.html#cppapi-timestep) (time-step and noise scheduling), [`OperationType`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h), and global random-seed control, so external libraries can drive the full construct → set noise → run → fidelity workflow directly:
 
 ```python
 from qram_simulator import QRAMCircuitQubit, OperationType, set_seed
@@ -145,7 +145,7 @@ This repository is driven by two papers:
 - **Sparse-state optimization**: stores only non-zero amplitudes, enabling simulation of structured algorithms with 64+ qubits
 - **Error filtering**: error filtering schemes for noisy QRAM
 
-**Corresponding code**: `QRAM/`, `Experiments/QRAM/` (the error-filtering experiments live in the SparQSim repository)
+**Corresponding code**: [`QRAM/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/QRAM), [`Experiments/QRAM/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM) (the error-filtering experiments live in the SparQSim repository)
 
 ### Paper 2: SparQ — [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
 
@@ -153,7 +153,7 @@ This repository is driven by two papers:
 
 Extends Register Level Programming into a general-purpose sparse-state quantum simulator (QFT, Grover, Hamiltonian simulation, QDA, QCNN, and other algorithms, plus an extended algorithm library).
 
-**Corresponding code**: `SparQ/`, `SparQ_Algorithm/`, and the algorithm experiments have been migrated to the [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) repository.
+**Corresponding code**: `SparQ/`, `SparQ_Algorithm/`, and the algorithm experiments have been migrated to the [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) repository ([`SparQ/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/SparQ), [`SparQ_Algorithm/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/SparQ_Algorithm), [`Experiments/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/Experiments)).
 
 ### BibTeX
 
@@ -199,7 +199,7 @@ QRAM-Simulator/
 
 1. Merge changes into main on Gitea (the primary development repository);
 2. Sync to the GitHub upstream `IAI-USTC-Quantum/QRAM-Simulator`;
-3. Update `CHANGELOG.md` and tag (`vX.Y.Z`; note that v0.1.x already exists historically, the new series starts at v0.2.0);
+3. Update [`CHANGELOG.md`](CHANGELOG.md) and tag (`vX.Y.Z`; note that v0.1.x already exists historically, the new series starts at v0.2.0);
 4. Push the tag or create a GitHub Release → `pypi-publish.yml` automatically builds cp310-cp313 manylinux / win_amd64 wheels and the sdist, and publishes the `qram-simulator` package via PyPI trusted publishing; `pysparq` is still released from the SparQSim repository.
 
 ## About Us

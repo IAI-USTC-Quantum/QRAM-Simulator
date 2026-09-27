@@ -10,7 +10,7 @@
 
 - **标题**: Efficient Simulation of Quantum Random Access Memory
 - **arXiv**: [2503.13832](https://arxiv.org/abs/2503.13832)
-- **代码仓库**: https://github.com/IAI-USTC-Quantum/QRAM-Simulator
+- **代码仓库**: [https://github.com/IAI-USTC-Quantum/QRAM-Simulator](https://github.com/IAI-USTC-Quantum/QRAM-Simulator)
 
 ## 环境准备
 
@@ -38,6 +38,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc) Experiment_QRAM_Fidelity Experiment_QRAM_FidelityV2 Experiment_ErrorFiltration
 ```
 
+环境与依赖的详细准备见[安装指南](../guide/installation.md)。
+
 ### Windows (PowerShell) 构建
 
 ```powershell
@@ -59,9 +61,9 @@ cmake --build . --target Experiment_QRAM_Fidelity Experiment_QRAM_FidelityV2 Exp
 
 ## 实验 1: QRAM Fidelity
 
-**代码位置**: `Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`
+**代码位置**: [`Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp)
 
-**编译目标**: `Experiment_QRAM_Fidelity`
+**编译目标**: [`Experiment_QRAM_Fidelity`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/CMakeLists.txt)
 
 ### 命令行参数
 
@@ -132,9 +134,9 @@ done
 
 ## 实验 2: QRAM Simulator Comparison
 
-**代码位置**: `Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`
+**代码位置**: [`Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp)
 
-**编译目标**: `Experiment_QRAM_FidelityV2`
+**编译目标**: [`Experiment_QRAM_FidelityV2`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/CMakeLists.txt)
 
 ### 命令行参数
 
@@ -147,7 +149,7 @@ done
 | `--depolarizing` | 退极化噪声强度 | 0.0 |
 | `--damping` | 振幅阻尼噪声强度 | 0.0 |
 | `--seed` | 随机数种子 | 123456789 |
-| `--architecture` | QRAM 架构: `qutrit` 或 `qubit`（qubit 当前仅 full 模式，作为 ground truth） | qutrit |
+| `--architecture` | QRAM 架构: `qutrit` 或 `qubit`（[qubit 当前仅 full 模式，作为 ground truth](qubit_qram_pruning.md)） | qutrit |
 | `--experimentname` | 实验名称标识 | test |
 
 ### 运行示例
@@ -180,9 +182,9 @@ done
 
 ## 实验 3: Error Filtration
 
-**代码位置**: `Experiments/ErrorFiltration/testMultiEFQRAM.cpp`
+**代码位置**: [`Experiments/ErrorFiltration/testMultiEFQRAM.cpp`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/testMultiEFQRAM.cpp)
 
-**编译目标**: `Experiment_ErrorFiltration`
+**编译目标**: [`Experiment_ErrorFiltration`](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/CMakeLists.txt)
 
 ### 命令行参数 (位置参数)
 
@@ -218,7 +220,7 @@ done
 
 ## 噪声模型说明
 
-所有实验使用以下噪声模型：
+所有实验使用以下[噪声模型](../guide/architecture.md#arch-noise)：
 
 ### 退极化噪声 (Depolarizing)
 
@@ -240,9 +242,9 @@ OperationType::Damping
 
 | 实验 | 退极化 | 阻尼 |
 |------|--------|------|
-| QRAMFidelityTest | 0.0 (默认), 1e-4 (演示) | 0.0 (默认), 1e-5 (演示) |
-| QRAMSimulatorTest | 0.0 (默认), 1e-4 (演示) | 0.0 (默认), 1e-4 (演示) |
-| ErrorFiltration | 1e-5 | 1e-5 |
+| [QRAMFidelityTest](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/QRAM/QRAMFidelity/QRAMFidelityTest.cpp) | 0.0 (默认), 1e-4 (演示) | 0.0 (默认), 1e-5 (演示) |
+| [QRAMSimulatorTest](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/Experiments/QRAM/QRAMFidelityV2/QRAMSimulatorTest.cpp) | 0.0 (默认), 1e-4 (演示) | 0.0 (默认), 1e-4 (演示) |
+| [ErrorFiltration](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/Experiments/ErrorFiltration/testMultiEFQRAM.cpp) | 1e-5 | 1e-5 |
 
 ---
 
@@ -286,5 +288,11 @@ A: 实验结果默认输出到标准输出 (stdout)。可以重定向到文件�
 ## 联系
 
 如有复现问题，请通过以下方式联系：
-- 提交 GitHub Issue
+- 提交 [GitHub Issue](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/issues)
 - 邮件: chenzhaoyun@iai.ustc.edu.cn
+
+## 相关页面
+
+- [论文与实验总览](README.md) — 实验列表与论文对应关系
+- [安装指南](../guide/installation.md) — 环境准备
+- [qubit QRAM 剪枝理论](qubit_qram_pruning.md) — 剪枝机制原理

@@ -8,13 +8,13 @@ memory) loading circuits:
 
 - **Two architectures**: the qubit architecture (physical-qubit tree + good/bad branch
   pruning) and the qutrit architecture (three-level node tree), sharing a single timing
-  and noise scheduler, ``TimeStep``;
+  and noise scheduler, :ref:`TimeStep <cppapi-timestep>`;
 - **Noise models**: bit flip / phase flip / combined flip / depolarizing / amplitude
   damping, which can be injected per time slice in arbitrary combinations;
 - **Fidelity evaluation**: loading fidelity estimated from output sampling, with support
   for cross-checking pruned runs against unpruned ground-truth baselines;
 - **Python bindings**: ``pip install qram-simulator`` gives you all the core working
-  classes (QRAMCircuitQubit / QRAMCircuitQutrit / QRAMFullAmp / TimeStep).
+  classes (:ref:`QRAMCircuitQubit <cppapi-qramcircuit-qubit>` / :ref:`QRAMCircuitQutrit <cppapi-qramcircuit-qutrit>` / :ref:`QRAMFullAmp <cppapi-qramfullamp>` / TimeStep).
 
 .. toctree::
    :maxdepth: 2

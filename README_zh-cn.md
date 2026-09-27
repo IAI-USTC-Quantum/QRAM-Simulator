@@ -33,8 +33,8 @@ SparQSim 仓库：
 
 ## 核心能力
 
-- **QRAM 电路模拟**：Qutrit-based（`qram_circuit_qutrit.h`）与 Qubit-based
-  （`qram_circuit_qubit.h`）两种实现
+- **QRAM 电路模拟**：Qutrit-based（[`qram_circuit_qutrit.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qutrit.h)）与 Qubit-based
+  （[`qram_circuit_qubit.h`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/qram_circuit_qubit.h)）两种实现
 - **噪声模型**：退极化（Depolarizing）与振幅阻尼（Damping），含概率参数范围校验
 - **架构剪枝**：qubit 架构 normal（剪枝）模式与 full（不剪枝）模式逐版本对拍
 - **公共组件**：稀疏/稠密矩阵、随机引擎、错误处理、state manipulator 等
@@ -58,8 +58,8 @@ make -j$(nproc)
 
 | 开关 | 默认 | 说明 |
 |------|------|------|
-| `QRAM_BUILD_TESTS` | ON | 构建 C++ 测试（test/） |
-| `QRAM_BUILD_EXPERIMENTS` | ON | 构建 QRAM 实验程序（Experiments/） |
+| [`QRAM_BUILD_TESTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt) | ON | 构建 C++ 测试（test/） |
+| [`QRAM_BUILD_EXPERIMENTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt) | ON | 构建 QRAM 实验程序（Experiments/） |
 
 ### 核心用法
 
@@ -93,9 +93,9 @@ double fidelity = qram.sample_and_get_fidelity();
 pip install qram-simulator
 ```
 
-绑定层（`bindings/python/`，pybind11）导出核心工作类：`QRAMCircuitQubit` /
-`QRAMCircuitQutrit`（两套架构电路）、`QRAMFullAmp`（全振幅桥接）、`TimeStep`
-（时序与噪声调度）、`OperationType` 与全局随机种子控制，供外部库直接驱动
+绑定层（[`bindings/python/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/bindings/python)，pybind11）导出核心工作类：[`QRAMCircuitQubit`](https://iai-ustc-quantum.github.io/QRAM-Simulator/zh/api/cpp.html#cppapi-qramcircuit-qubit) /
+[`QRAMCircuitQutrit`](https://iai-ustc-quantum.github.io/QRAM-Simulator/zh/api/cpp.html#cppapi-qramcircuit-qutrit)（两套架构电路）、[`QRAMFullAmp`](https://iai-ustc-quantum.github.io/QRAM-Simulator/zh/api/cpp.html#cppapi-qramfullamp)（全振幅桥接）、[`TimeStep`](https://iai-ustc-quantum.github.io/QRAM-Simulator/zh/api/cpp.html#cppapi-timestep)
+（时序与噪声调度）、[`OperationType`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/time_step.h) 与全局随机种子控制，供外部库直接驱动
 完整的"构造 → 设噪声 → 运行 → 保真度"工作流：
 
 ```python
@@ -145,7 +145,7 @@ Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）见
 - **稀疏态优化**：仅存储非零振幅，可实现 64+ 量子比特的结构化算法模拟
 - **错误过滤**：针对含噪 QRAM 的错误过滤方案
 
-**对应代码**：`QRAM/`、`Experiments/QRAM/`（错误过滤实验在 SparQSim 仓库）
+**对应代码**：[`QRAM/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/QRAM)、[`Experiments/QRAM/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/Experiments/QRAM)（错误过滤实验在 SparQSim 仓库）
 
 ### Paper 2: SparQ — [arXiv:2503.15118](https://arxiv.org/abs/2503.15118)
 
@@ -155,7 +155,7 @@ Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）见
 模拟、QDA、QCNN 等算法与扩展算法库）。
 
 **对应代码**：`SparQ/`、`SparQ_Algorithm/` 与算法类实验已迁至
-[SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) 仓库。
+[SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) 仓库（[`SparQ/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/SparQ)、[`SparQ_Algorithm/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/SparQ_Algorithm)、[`Experiments/`](https://github.com/IAI-USTC-Quantum/SparQSim/tree/main/Experiments)）。
 
 ### BibTeX
 
@@ -179,10 +179,10 @@ Python 侧（pysparq 全功能绑定与 qram_simulator 薄绑定）见
 
 - [剪枝与全量演化的精确性验证](docs/sphinx/source/zh/paper/exactness_validation.md)：完整状态对照、回归覆盖与复现命令。
 
-详细的实验复现指南见 [docs/paper/](docs/sphinx/source/zh/paper/) 目录：
+详细的实验复现指南见 [docs/sphinx/source/zh/paper/](docs/sphinx/source/zh/paper/) 目录：
 
-- [docs/paper/README.md](docs/sphinx/source/zh/paper/README.md) - 论文关联文档
-- [docs/paper/reproduction.md](docs/sphinx/source/zh/paper/reproduction.md) - [QRAM-Simulator](https://arxiv.org/abs/2503.13832) 实验复现指南
+- [docs/sphinx/source/zh/paper/README.md](docs/sphinx/source/zh/paper/README.md) - 论文关联文档
+- [docs/sphinx/source/zh/paper/reproduction.md](docs/sphinx/source/zh/paper/reproduction.md) - [QRAM-Simulator](https://arxiv.org/abs/2503.13832) 实验复现指南
 
 ## 项目结构
 
@@ -201,7 +201,7 @@ QRAM-Simulator/
 
 1. 在 Gitea（开发主仓）合并变更到 main；
 2. 同步到 GitHub 上游 `IAI-USTC-Quantum/QRAM-Simulator`；
-3. 更新 `CHANGELOG.md`，打 tag（`vX.Y.Z`，注意历史上已有 v0.1.x，新系列从 v0.2.0 起）；
+3. 更新 [`CHANGELOG.md`](CHANGELOG.md)，打 tag（`vX.Y.Z`，注意历史上已有 v0.1.x，新系列从 v0.2.0 起）；
 4. push tag 或创建 GitHub Release → `pypi-publish.yml` 自动构建
    cp310–cp313 的 manylinux / win_amd64 wheel 与 sdist，经 PyPI
    trusted publishing 发布 `qram-simulator` 包；`pysparq` 仍由

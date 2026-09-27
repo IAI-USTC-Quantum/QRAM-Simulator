@@ -6,13 +6,13 @@ QRAM-Simulator 文档
 QRAM-Simulator 是面向 QRAM（量子随机存储器）装载电路的高性能 C++ 模拟核心：
 
 - **两种架构**：qubit 架构（物理比特树 + good/bad 分支剪枝）与
-  qutrit 架构（三能级节点树），共享同一时序与噪声调度器 ``TimeStep``；
+  qutrit 架构（三能级节点树），共享同一时序与噪声调度器 :ref:`TimeStep <cppapi-timestep>`；
 - **噪声模型**：比特翻转 / 相位翻转 / 联合翻转 / 去极化 / 振幅衰减
   （Damping），可按时间片注入任意组合；
 - **保真度评估**：基于输出采样的装载保真度，支持剪枝运行与
   不剪枝 ground-truth 基准对拍；
 - **Python 绑定**：``pip install qram-simulator`` 即可获得全部核心
-  工作类（QRAMCircuitQubit / QRAMCircuitQutrit / QRAMFullAmp / TimeStep）。
+  工作类（:ref:`QRAMCircuitQubit <cppapi-qramcircuit-qubit>` / :ref:`QRAMCircuitQutrit <cppapi-qramcircuit-qutrit>` / :ref:`QRAMFullAmp <cppapi-qramfullamp>` / TimeStep）。
 
 .. toctree::
    :maxdepth: 2

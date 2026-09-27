@@ -111,7 +111,8 @@ This repository is a pure C++ base and contains no Python bindings. The
 
 Quantum operator naming (type slots, variant suffixes, inverse-operation
 notation, etc.) follows
-[docs/naming_conventions.md](docs/naming_conventions.md); please read it
+[docs/sphinx/source/en/guide/naming_conventions.md](docs/sphinx/source/en/guide/naming_conventions.md)
+(中文版: [docs/sphinx/source/zh/guide/naming_conventions.md](docs/sphinx/source/zh/guide/naming_conventions.md)); please read it
 before adding new operators.
 
 ### Header File Rules

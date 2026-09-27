@@ -56,12 +56,12 @@ qram.run_normal()
 print(qram.sample_and_get_fidelity())
 ```
 
-> 注意：qutrit 架构的 `run(version)` 分发入口要求先设置**非空**噪声
-> 模型；无噪声场景请直接调用 `run_normal()` / `run_full()`。
+> 注意：qutrit 架构的 [`run(version)`](../api/cpp.rst#cppapi-qramcircuit-qutrit) 分发入口要求先设置**非空**噪声
+> 模型；无噪声场景请直接调用 [`run_normal()`](../api/cpp.rst#cppapi-qramcircuit-qutrit) / [`run_full()`](../api/cpp.rst#cppapi-qramcircuit-qutrit)。
 
 ## Python：嵌入外部全振幅模拟器（QRAMFullAmp）
 
-`QRAMFullAmp` 把一次 QRAM 装载复合到全振幅态向量上——外部库提供
+[`QRAMFullAmp`](../api/cpp.rst#cppapi-qramfullamp) 把一次 QRAM 装载复合到全振幅态向量上——外部库提供
 态向量与比特映射即可：
 
 ```python
@@ -140,6 +140,7 @@ cmake --build build --parallel
 
 ## 下一步
 
+- [安装指南](installation.md)：环境准备与构建选项
 - [架构文档](architecture.md)：模块划分、数据流与剪枝机制
 - {doc}`C++ API 参考 <../api/cpp>`：全部核心类的 Doxygen 文档
 - [论文复现指南](../paper/reproduction.md)：arXiv:2503.13832 图件复现

@@ -56,11 +56,11 @@ qram.run_normal()
 print(qram.sample_and_get_fidelity())
 ```
 
-> Note: the `run(version)` dispatch entry of the qutrit architecture requires a **non-empty** noise model to be set first; in noise-free scenarios call `run_normal()` / `run_full()` directly.
+> Note: the [`run(version)`](../api/cpp.rst#cppapi-qramcircuit-qutrit) dispatch entry of the qutrit architecture requires a **non-empty** noise model to be set first; in noise-free scenarios call [`run_normal()`](../api/cpp.rst#cppapi-qramcircuit-qutrit) / [`run_full()`](../api/cpp.rst#cppapi-qramcircuit-qutrit) directly.
 
 ## Python: Embedding into an External Full-Amplitude Simulator (QRAMFullAmp)
 
-`QRAMFullAmp` composites a single QRAM loading onto a full-amplitude state vector — the external library only needs to provide the state vector and the qubit mapping:
+[`QRAMFullAmp`](../api/cpp.rst#cppapi-qramfullamp) composites a single QRAM loading onto a full-amplitude state vector — the external library only needs to provide the state vector and the qubit mapping:
 
 ```python
 from qram_simulator import QRAMFullAmp, OperationType, set_seed
@@ -138,6 +138,7 @@ cmake --build build --parallel
 
 ## Next Steps
 
+- [Installation guide](installation.md): environment setup and build options
 - [Architecture document](architecture.md): module layout, data flow, and the pruning mechanism
 - {doc}`C++ API reference <../api/cpp>`: complete Doxygen documentation for all core classes
 - [Paper reproduction guide](../paper/reproduction.md): reproducing the figures of arXiv:2503.13832
