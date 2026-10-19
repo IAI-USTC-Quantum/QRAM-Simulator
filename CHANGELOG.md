@@ -33,6 +33,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bridge at machine precision, and over the full noise sweep F_cls ≥ 0.9988 /
   TVD ≤ 0.026 with `⟨ψ_ideal|ρ|ψ_ideal⟩` = `E|⟨ψ_ideal|ψ_traj⟩|²` within Monte
   Carlo error (see `bindings/python/qram_simulator/baseline/results.md`).
+- **MPI ensemble parallel execution** (`qram_simulator.mpi`): trajectory-level
+  parallelism for noisy QRAM Monte-Carlo ensembles under `mpirun` — ranks shard
+  trajectories cyclically (`[rank::size]`), every trajectory is reseeded
+  deterministically (`set_seed(seed + index)`) so aggregated results are
+  independent of the process count (per-trajectory samples bit-identical; the
+  histogram matches a serial run up to float summation order, ~1e-16), and
+  rank 0 gathers and aggregates. Without mpi4py the same code path degenerates
+  to a serial `SerialComm` run (importable and testable in MPI-less
+  environments). Honest scope: single-node multi-process **CPU** ensemble
+  parallelism — the bindings are CPU-only (`gpu_per_rank = 0` is recorded), it
+  is not multi-GPU and not a distributed sparse-state partitioning. Tests in
+  `bindings/python/test/test_mpi_ensemble.py` (logic layer runs everywhere;
+  the `mpirun -np 4` integration test runs where mpirun + mpi4py exist).
 
 ### Changed
 - **`QRAMCircuitQubit` binding surface for scripted experiments**: new

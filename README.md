@@ -115,6 +115,28 @@ python -m qram_simulator.baseline.compare --addr 2 --runs 500 --outdir results
 
 See [bindings/python/qram_simulator/baseline/README.md](bindings/python/qram_simulator/baseline/README.md) for the encoding/noise conventions and [results.md](bindings/python/qram_simulator/baseline/results.md) for the packaged run (noise-free bridge at machine precision; F_cls ≥ 0.9988, TVD ≤ 0.026 and `⟨ψ|ρ|ψ⟩` = `E|⟨ψ|ψ_traj⟩|²` within Monte Carlo error over the full noise sweep).
 
+### MPI Ensemble Parallelism
+
+`qram_simulator.mpi` parallelizes noisy QRAM Monte-Carlo ensembles across CPU processes under MPI — ranks shard trajectories cyclically, every trajectory is reseeded deterministically (`set_seed(seed + index)`), and rank 0 aggregates, so the results are **independent of the process count** (per-trajectory samples bit-identical; histogram up to float summation order):
+
+```python
+import qram_simulator as qs
+from qram_simulator.mpi import run_ensemble, world_comm
+
+comm = world_comm()          # mpi4py COMM_WORLD under mpirun; SerialComm otherwise
+res = run_ensemble(qs, depth=20, data_size=1,
+                   noise={qs.OperationType.PhaseFlip: 1e-5},
+                   runs=100, seed=20261105, memory=memory_list, comm=comm)
+if res is not None:          # rank 0 only
+    ...                      # res["hist"], res["overlap_fid"], res["mpi"]["nranks"], ...
+```
+
+```bash
+mpirun -np 4 python noisy_ensemble.py    # each rank enters the script once
+```
+
+`mpi4py` is optional at runtime — without it (or without `mpirun`) the same code path runs serially via `SerialComm`, which keeps the module importable and CI-testable. Honest scope: single-node multi-process **CPU** ensemble parallelism — the bindings are CPU-only (`gpu_per_rank = 0` is recorded honestly), this is not multi-GPU and not a distributed sparse-state partitioning. Details: [docs/sphinx/source/en/guide/mpi.md](docs/sphinx/source/en/guide/mpi.md); tests: `bindings/python/test/test_mpi_ensemble.py`.
+
 ### Consuming as a CMake Subproject (the SparQSim Way)
 
 ```cmake

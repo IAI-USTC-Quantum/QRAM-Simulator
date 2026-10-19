@@ -24,7 +24,8 @@ del _metadata
 # The circuit-level baseline subpackage pulls in the optional uniqc/qutip
 # dependencies, so it is imported lazily on first attribute access
 # (`qs.baseline.CircuitQRAMQubit`) instead of at package import time.
-_LAZY = ("baseline",)
+# The MPI ensemble runner imports mpi4py/numpy on use only — lazy as well.
+_LAZY = ("baseline", "mpi")
 
 
 def __getattr__(name: str):

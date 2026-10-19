@@ -114,6 +114,33 @@ print(qram.sample_and_get_fidelity())
 本地开发：`pip install -v .`（CMake ≥ 3.18 + C++17 + OpenMP），
 测试：`pytest bindings/python/test`。
 
+### MPI 系综并行
+
+`qram_simulator.mpi` 在 MPI 下以多 CPU 进程并行执行噪声 QRAM 蒙特卡洛系综——各 rank 循环分片轨迹、逐轨迹确定性重播（`set_seed(seed + index)`）、rank 0 聚合，**结果与进程数无关**（逐轨迹样本逐位一致；直方图仅差浮点求和顺序）：
+
+```python
+import qram_simulator as qs
+from qram_simulator.mpi import run_ensemble, world_comm
+
+comm = world_comm()          # mpirun 下为 mpi4py COMM_WORLD；否则 SerialComm
+res = run_ensemble(qs, depth=20, data_size=1,
+                   noise={qs.OperationType.PhaseFlip: 1e-5},
+                   runs=100, seed=20261105, memory=memory_list, comm=comm)
+if res is not None:          # 仅 rank 0
+    ...                      # res["hist"], res["overlap_fid"], res["mpi"]["nranks"], ...
+```
+
+```bash
+mpirun -np 4 python noisy_ensemble.py    # 每个 rank 各进入脚本一次
+```
+
+`mpi4py` 为运行时可选依赖——缺失（或未用 `mpirun` 启动）时同一代码路径经
+`SerialComm` 串行退化执行，模块保持可导入、可在 CI 测试。如实口径：单机多进程
+**CPU** 系综并行——Python 绑定为 CPU-only（如实记录 `gpu_per_rank = 0`），
+非多 GPU、非稀疏态分布式切分。详见
+[docs/sphinx/source/zh/guide/mpi.md](docs/sphinx/source/zh/guide/mpi.md)；
+测试：`bindings/python/test/test_mpi_ensemble.py`。
+
 ### 作为 CMake 子项目消费（SparQSim 的方式）
 
 ```cmake

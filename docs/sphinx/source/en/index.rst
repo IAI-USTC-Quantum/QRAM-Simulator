@@ -24,6 +24,7 @@ memory) loading circuits:
    guide/quickstart
    guide/architecture
    guide/operators
+   guide/mpi
    guide/naming_conventions
 
 .. toctree::
