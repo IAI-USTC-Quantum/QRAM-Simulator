@@ -193,7 +193,7 @@ The two implementations share the same `TimeStep` scheduler and noise-model form
 
 ### 4.3 CUDA Integration (Retained Code)
 
-[`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh) ([`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh), a thrust `device_vector` memory mirror) is retained in the code base; for the duration of the CondRot primitive refactor, CMake forces `CUDA_FOUND FALSE`, so the default is CPU-only (OpenMP required, TBB an optional accelerator).
+[`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh) ([`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh), a thrust `device_vector` memory mirror) is retained in the code base; for the duration of the CondRot primitive refactor, CMake forces `CUDA_FOUND FALSE`, so the default is CPU-only (OpenMP required, TBB an optional accelerator). The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
 
 ---
 

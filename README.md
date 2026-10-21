@@ -33,6 +33,7 @@ Dependency direction: **SparQSim → QRAM-Simulator**. SparQSim consumes this re
 - **Noise models**: depolarizing (Depolarizing) and amplitude damping (Damping), with probability parameter range validation
 - **Architecture pruning**: the qubit architecture's normal (pruned) mode and full (unpruned) mode are cross-checked version by version
 - **Common components**: sparse/dense matrices, random engines, error handling, state manipulators, and more
+- **MPI ensemble parallelism**: `qram_simulator.mpi` shards noisy Monte-Carlo trajectories across single-node CPU processes with deterministic per-trajectory reseeding, so aggregate results are independent of the process count ([guide](docs/sphinx/source/en/guide/mpi.md))
 
 ## C++ Quick Start
 
@@ -48,6 +49,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 
 make -j$(nproc)
 ```
+
+GPU builds: the CUDA/GPU backend is retained in code but disabled in CMake for the duration of the CondRot primitive refactor (the configure step reports `CUDA support disabled - building CPU-only`). The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
 
 Build options (each controllable via `-D...=ON/OFF`):
 
@@ -237,7 +240,7 @@ Main developers: Agony5757 (chenzhaoyun@iai.ustc.edu.cn), RichardSun, Itachixc, 
 
 ## Related Projects
 
-- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - the SparQ framework and Python ecosystem (pysparq)
+- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - the SparQ framework and Python ecosystem (pysparq): the CUDA sparse-state quantum virtual machine plus the quantum algorithm library. Recent linear-solver results on A800 (CUDA 12.8): the QDA discrete-adiabatic solver and the CKS linear solver with QRAM-free direct oracles each completed 2^20-dimensional Poiseuille tridiagonal production runs (CKS: directional residual 0 ≤ 1e-6, fidelity 1.0, 44.7 min) — verification records [v1d](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1d-qda-linsolver-a800.md) / [v1e](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1e-cks-direct-oracle-linsolver.md)
 - [UnifiedQuantum](https://github.com/IAI-USTC-Quantum/UnifiedQuantum) - a unified quantum computing framework
 
 ## License

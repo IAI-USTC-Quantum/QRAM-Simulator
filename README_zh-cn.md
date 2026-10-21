@@ -38,6 +38,9 @@ SparQSim 仓库：
 - **噪声模型**：退极化（Depolarizing）与振幅阻尼（Damping），含概率参数范围校验
 - **架构剪枝**：qubit 架构 normal（剪枝）模式与 full（不剪枝）模式逐版本对拍
 - **公共组件**：稀疏/稠密矩阵、随机引擎、错误处理、state manipulator 等
+- **MPI 系综并行**：`qram_simulator.mpi` 在单机多 CPU 进程间循环分片噪声
+  蒙特卡洛轨迹、逐轨迹确定性重播，聚合结果与进程数无关
+  （[使用指南](docs/sphinx/source/zh/guide/mpi.md)）
 
 ## C++ 快速开始
 
@@ -53,6 +56,12 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 
 make -j$(nproc)
 ```
+
+GPU 构建：本仓库的 CUDA/GPU 后端代码保留，但 CondRot 原语重构期间在 CMake 中
+强制屏蔽（配置阶段输出 `CUDA support disabled - building CPU-only`），构建恒为
+CPU-only。当前活跃开发的 GPU 路径——CUDA 稀疏态模拟器——位于姊妹仓库
+[SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim)，已在 8×A800 服务器上
+以 CUDA 12.8 实测通过（[v1c 验证记录](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)）。
 
 构建开关（均可通过 `-D...=ON/OFF` 控制）：
 
@@ -247,7 +256,12 @@ IAI-USTC Quantum 是合肥综合性国家科学中心人工智能研究院（Ins
 
 ## 相关项目
 
-- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - SparQ 框架与 Python 生态（pysparq）
+- [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim) - SparQ 框架与 Python 生态（pysparq）：CUDA 稀疏态量子虚拟机 + 量子算法库。
+  近期 A800（CUDA 12.8）线性求解器成果：QDA 离散绝热求解器与免 QRAM 直接
+  Oracle 的 CKS 线性求解器均完成 2^20 维 Poiseuille 三对角生产运行（CKS 方向
+  残差 0 ≤ 1e-6、保真度 1.0、44.7 min），验证记录
+  [v1d](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1d-qda-linsolver-a800.md) /
+  [v1e](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1e-cks-direct-oracle-linsolver.md)
 - [UnifiedQuantum](https://github.com/IAI-USTC-Quantum/UnifiedQuantum) - 统一量子计算框架
 
 ## 许可证

@@ -205,7 +205,10 @@ qutrit 架构要求非空噪声模型才允许走 `run(version)`（无噪场景�
 
 [`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)（[`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)，thrust
 `device_vector` 内存镜像）保留在代码库中；CondRot 原语重构期间 CMake
-强制 `CUDA_FOUND FALSE`，默认 CPU-only（OpenMP 必需，TBB 可选加速）。
+强制 `CUDA_FOUND FALSE`，默认 CPU-only（OpenMP 必需，TBB 可选加速）。当前活跃
+开发的 GPU 路径——CUDA 稀疏态模拟器——位于姊妹仓库
+[SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim)，已在 8×A800 服务器上
+以 CUDA 12.8 实测通过（[v1c 验证记录](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)）。
 
 ---
 
