@@ -1,0 +1,156 @@
+qram_simulator.mpi
+==================
+
+.. py:module:: qram_simulator.mpi
+
+.. autoapi-nested-parse::
+
+   qram_simulator.mpi — MPI ensemble parallel execution (trajectory level).
+
+   Single-node multi-process CPU parallelism for the noisy QRAM ensemble
+   workload (the ``T2-MPI`` benchmark family):
+
+   - ranks shard the Monte-Carlo trajectory ensemble cyclically
+     (``[rank::size]``);
+   - every trajectory is seeded deterministically via
+     ``set_seed(seed + trajectory_index)`` before ``run_normal()``, so the
+     per-trajectory outcome is independent of the process count and of the
+     sharding;
+   - rank 0 gathers the per-rank partials and aggregates them into exactly
+     the same artifacts a serial run of the same total trajectory count
+     would produce (per-trajectory samples identical; the histogram may
+     differ only by floating-point summation order, ~1e-16 relative).
+
+   Honest scope: this is trajectory/ensemble-level parallelism over CPU
+   processes (the Python bindings are CPU-only). It is not multi-GPU and
+   not a distributed sparse-state partitioning.
+
+   Usage under MPI::
+
+       mpirun -np 4 python bench_script.py --mpi   # each rank enters the script
+
+   Without a process manager ``world_comm()`` returns :class:`SerialComm`
+   (the same code path runs serially), which keeps the module importable and
+   testable in environments without an MPI runtime (e.g. CI). This guard is
+   also required for correctness: importing mpi4py outside ``mpirun``
+   triggers OpenMPI's *singleton init*, which ``setenv()``s ``OMPI_*``/``PMI*``
+   variables at C level (invisible to ``os.environ``); any ``mpirun`` child
+   launched later inherits them and aborts with a silent exit code 1.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.mpi.SerialComm
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   qram_simulator.mpi.aggregate
+   qram_simulator.mpi.mpi_metadata
+   qram_simulator.mpi.run_ensemble
+   qram_simulator.mpi.run_trajectories
+   qram_simulator.mpi.shard_indices
+   qram_simulator.mpi.world_comm
+
+
+Package Contents
+----------------
+
+.. py:class:: SerialComm
+
+   Drop-in stand-in for ``mpi4py.MPI.COMM_WORLD`` with size == 1.
+
+
+   .. py:method:: allgather(obj)
+
+
+   .. py:method:: barrier() -> None
+
+
+   .. py:method:: bcast(obj, root: int = 0)
+
+
+   .. py:method:: gather(obj, root: int = 0)
+
+
+   .. py:attribute:: rank
+      :type:  ClassVar[int]
+      :value: 0
+
+
+
+   .. py:attribute:: size
+      :type:  ClassVar[int]
+      :value: 1
+
+
+
+.. py:function:: aggregate(partials: list[dict], runs: int) -> dict
+
+   Deterministically merge per-rank partials into ensemble outputs.
+
+       Per-trajectory samples are re-ordered by trajectory index, so they are
+       bit-identical across shardings; the histogram is summed over partials
+       in rank order (a serial global-order sum differs only by float
+       associativity, ~1e-16 relative).
+
+
+
+.. py:function:: mpi_metadata(comm) -> dict
+
+   Runtime facts for the parallel-execution record (ranks + GPUs, honestly).
+
+
+.. py:function:: run_ensemble(qs, *, depth: int, data_size: int, noise: dict[Any, float], runs: int, seed: int, memory: Sequence[int] | None = None, input_mode: str = 'zerobus', n_inputs: int = 0, comm=None) -> dict | None
+
+   Execute the whole ensemble under ``comm``; aggregate on rank 0.
+
+       Returns the :func:`aggregate` result plus an ``mpi`` metadata block on
+       rank 0 (``None`` on other ranks). ``noise`` maps ``OperationType``
+       members (or their names / int values) to channel probabilities. When
+       ``memory`` is None, rank 0 draws it via ``set_memory_random`` and
+       broadcasts it, so every rank simulates the same memory.
+
+
+
+.. py:function:: run_trajectories(qs, *, indices: Sequence[int], seed: int, noise: dict[Any, float], depth: int, data_size: int, memory: Sequence[int] | None = None, input_mode: str = 'zerobus', n_inputs: int = 0) -> dict
+
+   Run the bench-faithful pruned trajectory loop over ``indices``.
+
+       Mirrors the reference serial loop of the T2 benchmark
+       (``run_normal -> sample_and_get_fidelity -> get_output_distribution
+       -> get_fidelity_conventions``), with the single addition of a
+       deterministic per-trajectory reseed ``set_seed(seed + index)``.
+
+       ``qs`` is the ``qram_simulator`` module (injected so tests and the
+       source-tree fallback loader can pass whichever import succeeded).
+
+
+
+.. py:function:: shard_indices(runs: int, size: int, rank: int) -> list[int]
+
+   Cyclic trajectory shard ``[rank::size]`` (balances per-trajectory cost).
+
+
+.. py:function:: world_comm()
+
+   Return ``mpi4py.MPI.COMM_WORLD`` under a process manager, else :class:`SerialComm`.
+
+       Launched under ``mpirun``/``mpiexec`` the launcher sets rank/size
+       environment variables on every rank — only then is mpi4py imported and
+       ``COMM_WORLD`` returned. Otherwise a :class:`SerialComm` is returned so
+       the exact same code path runs serially *without* importing mpi4py:
+       importing it outside a process manager triggers OpenMPI's singleton
+       init, whose C-level ``setenv()`` side effects (invisible to
+       ``os.environ``) silently break any ``mpirun`` child spawned later from
+       this process (exit code 1, no diagnostics).
+
+
+

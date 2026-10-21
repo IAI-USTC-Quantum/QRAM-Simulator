@@ -1,0 +1,17 @@
+/* Custom styles for the QRAM-Simulator documentation (furo theme) */
+
+/* Slightly smaller code blocks so long formulas scroll horizontally */
+.highlight {
+    font-size: 0.85em;
+}
+
+/* Sidebar language switcher */
+.sidebar-langswitch {
+    font-size: 0.9em;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.4rem;
+}
+.sidebar-langswitch-sep {
+    margin: 0 0.35em;
+    opacity: 0.6;
+}
