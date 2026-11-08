@@ -22,6 +22,92 @@ from qram_simulator.baseline.compare import run_circuit_side, run_qram_side
 MEMORY = [0, 1, 1, 0]
 
 
+def _density_in_sdk_order(reference):
+    """Encode a QuTiP reference tensor using the real SDK's observed bit order."""
+    from uniqc.simulator.qutip_sim_impl import DensityOperatorSimulatorQutip
+
+    backend = DensityOperatorSimulatorQutip()
+    backend.init_n_qubit(2)
+    backend.x(0)
+    flipped = int(np.argmax(np.real(backend.density_matrix.diag())))
+    assert flipped in (1, 2), "backend X(0) did not identify a basis convention"
+    if flipped == 1:
+        # Reference axes start with qubit0; SDK matrix index has qubit0 last.
+        reference = reference.permute(list(reversed(range(len(reference.dims[0])))))
+    return reference.full()
+
+
+def test_physical_partial_trace_agrees_with_qutip_and_keeps_complex_coherence():
+    import qutip
+
+    circuit = CircuitQRAMQubit(1, 1, [0, 1])
+    # Reference tensor axes: address, bus, then the two router bits.
+    # Reorder visible MSB tensor indices to address + (bus << addr_size).
+    visible = qutip.Qobj([0, 1j*np.sqrt(0.7), np.sqrt(0.3), 0], dims=[[2, 2], [1, 1]])
+    tree = np.sqrt(0.4)*qutip.basis(4, 0)+1j*np.sqrt(0.6)*qutip.basis(4, 3)
+    tree.dims = [[2, 2], [1, 1]]
+    joint = qutip.tensor(visible, tree).proj()
+    order = [0, 2, 1, 3]
+    expected = joint.ptrace([0, 1]).full()[np.ix_(order, order)]
+    actual = circuit.logical_density_matrix(_density_in_sdk_order(joint))
+    np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-12)
+    assert abs(actual[1, 2].imag) > 0.4  # Populations cannot pass this test.
+    assert np.trace(actual) == pytest.approx(1)
+
+
+def test_router_excitation_and_which_path_information_are_distinguished():
+    import qutip
+
+    circuit = CircuitQRAMQubit(1, 1, [0, 1])
+    bell = (qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0)) +
+            qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1)))/np.sqrt(2)
+    tree = qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1))
+    joint = _density_in_sdk_order(qutip.tensor(bell, tree).proj())
+    assert circuit.fidelity_with_ideal(joint) == pytest.approx(0, abs=1e-12)
+    assert circuit.logical_fidelity_with_ideal(joint) == pytest.approx(1, abs=1e-12)
+    which_path = (qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0),
+                              qutip.basis(2, 0), qutip.basis(2, 0)) +
+                  qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1),
+                              qutip.basis(2, 1), qutip.basis(2, 1)))/np.sqrt(2)
+    assert circuit.logical_fidelity_with_ideal(_density_in_sdk_order(which_path.proj())) == pytest.approx(0.5, abs=1e-12)
+
+
+@pytest.mark.parametrize("channel,parameter", [("BitFlip", "bit_flip"),
+    ("PhaseFlip", "phase_flip"), ("Depolarizing", "depolarizing"), ("Damping", "damping")])
+def test_logical_query_fidelity_matches_independent_complete_channel(channel, parameter, tmp_path):
+    import json
+    import math
+
+    probability, samples, delta = 0.06, 4096, 1e-9
+    circuit = CircuitQRAMQubit(2, 1, MEMORY, **{parameter: probability})
+    rho = circuit.simulate_density("faithful")
+    expected = circuit.logical_fidelity_with_ideal(rho)
+    full_overlap = circuit.fidelity_with_ideal(rho)
+    assert np.trace(rho) == pytest.approx(1, abs=1e-11)
+    assert expected+1e-12 >= full_overlap
+    qram = qs.QRAMCircuitQubit(2, 1, MEMORY)
+    qram.set_input_zerobus()
+    qram.set_noise_models({getattr(qs.OperationType, channel): probability})
+    values = []
+    for trajectory in range(samples):
+        qs.set_seed(20261109+trajectory)
+        qram.run_normal()
+        value = qram.get_logical_query_fidelity()
+        assert -1e-12 <= value <= 1+1e-12
+        values.append(value)
+    mean = float(np.mean(values))
+    # A declared, fixed bounded-variable concentration bound, not a fitted
+    # tolerance or a retry-until-pass Monte-Carlo sample selection.
+    radius = math.sqrt(math.log(2/delta)/(2*samples))
+    report = {"channel": channel, "probability": probability, "trajectories": samples,
+              "seed_start": 20261109, "density_reference": expected,
+              "full_circuit_overlap": full_overlap, "trajectory_mean": mean,
+              "standard_error": float(np.std(values, ddof=1)/math.sqrt(samples)),
+              "confidence_radius": radius, "delta": delta}
+    (tmp_path/"logical-channel.json").write_text(json.dumps(report, indent=2)+"\n")
+    assert abs(mean-expected) <= radius
+
+
 @pytest.mark.parametrize("addr,data,memory", [
     (1, 1, [0, 1]),
     (2, 1, MEMORY),

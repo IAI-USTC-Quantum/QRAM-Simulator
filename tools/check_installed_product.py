@@ -57,7 +57,8 @@ def check() -> None:
           flush=True)
     if not args.notices_only:
         subprocess.run([sys.executable, "-m", "pytest", "-q",
-                        str(project/"bindings/python/test/test_demo.py")], check=True)
+                        str(project/"bindings/python/test/test_demo.py"),
+                        str(project/"bindings/python/test/test_logical_fidelity.py")], check=True)
 
 
 if __name__ == "__main__":

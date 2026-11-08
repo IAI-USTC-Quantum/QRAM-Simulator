@@ -175,6 +175,18 @@ namespace qram_simulator {
 			/// Alias of sample_and_get_fidelity
 			double get_fidelity() { return sample_and_get_fidelity(); }
 
+            /// Materialize implicit pruned outputs without measuring or drawing RNG.
+            void prepare_observables();
+            /** Fidelity of the reduced address/bus state with the ideal query.
+             * Requires one canonical ground-tree, zero-bus input column per
+             * address with normalized nonnegative branch probabilities. Call
+             * after a completed run, before any output/tree measurement.
+             * Traces out the routing tree; it does not postselect or demand
+             * that the tree return to its ground state. Materializes pruned
+             * outputs through prepare_observables() and consumes no RNG.
+             */
+            double logical_query_fidelity();
+
 			/**
 			 * @brief Preparation phase of a pruned run (called internally by run()).
 			 *

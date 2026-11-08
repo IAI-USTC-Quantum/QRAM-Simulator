@@ -134,6 +134,64 @@ namespace qram_simulator {
 			return abs_sqr(ret);
 		}
 
+        void QRAMCircuit::prepare_observables() {
+            auto damping = noise_parameters.find(OperationType::Damping);
+            if (damping != noise_parameters.end() && first_good_branch_group >= 0)
+                time_step.get_multiplier_qubit(damping->second, time_step.last_step(),
+                    branch_groups, first_good_branch_group, good_branch_group_ids);
+            materialize_good_branches();
+        }
+
+        double QRAMCircuit::logical_query_fidelity() {
+            if (branch_groups.empty())
+                throw std::invalid_argument("logical query fidelity requires nonempty zero-bus inputs");
+            // Validate the input contract before materializing any output.
+            double input_weight = 0;
+            std::set<size_t> addresses;
+            for (const auto& group : branch_groups) {
+                if (group.address >= memory.size() || !addresses.insert(group.address).second ||
+                    group.branches_input.size() != 1 || group.branch_probs.size() != 1)
+                    throw std::invalid_argument("logical query fidelity requires one zero-bus column per address");
+                const auto& input = group.branches_input.front();
+                if (input.address != group.address || input.bus_input != 0 ||
+                    input.system_states_sz != 1 || input.system_states.empty() ||
+                    input.system_states.front().data_bus != 0 ||
+                    !input.system_states.front().state.nz_elements.empty() ||
+                    input.system_states.front().amplitude != complex_t{1.0, 0.0})
+                    throw std::invalid_argument("logical query fidelity requires canonical ground-tree zero-bus input columns");
+                double weight = group.branch_probs.front();
+                if (!std::isfinite(weight) || weight < 0)
+                    throw std::invalid_argument("logical query fidelity requires finite nonnegative input weights");
+                input_weight += weight;
+            }
+            if (std::abs(input_weight-1.0) > 1e-10)
+                throw std::invalid_argument("logical query fidelity requires normalized input weights");
+            prepare_observables();
+            // For |psi> = sum_i sqrt(p_i) |i> sum_{b,e} c_i(b,e)|b,e>,
+            // <ideal|Tr_tree(|psi><psi|)|ideal> =
+            // sum_e |sum_i p_i c_i(memory[i],e)|^2.
+            // Different environment basis states are incoherent after tracing;
+            // identical ones must retain their complex cross-address coherence.
+            std::map<std::set<size_t>, complex_t> projected;
+            bus_t mask = pow2(data_size)-1;
+            for (const auto& group : branch_groups) {
+                if (group.annihilated) continue;
+                if (group.branches.size() != 1)
+                    throw std::invalid_argument("run the zero-bus circuit before reading logical query fidelity");
+                const auto& branch = group.branches.front();
+                if (branch.address != group.address || branch.bus_input != 0 ||
+                    branch.system_states_sz > branch.system_states.size())
+                    throw std::invalid_argument("invalid evolved zero-bus column");
+                for (auto component = branch.iterbeg(); component != branch.iterend(); ++component)
+                    if (component->data_bus == (memory[group.address] & mask))
+                        projected[component->state.nz_elements] +=
+                            group.branch_probs.front()*component->amplitude;
+            }
+            double result = 0;
+            for (const auto& entry : projected) result += abs_sqr(entry.second);
+            return result;
+        }
+
 		void QRAMCircuit::prepare_bad()
 		{
 			profiler _("QRAMCircuit::prepare_bad");
