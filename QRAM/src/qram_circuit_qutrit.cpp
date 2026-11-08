@@ -777,7 +777,7 @@ namespace qram_simulator {
 			// assert if not set
 			if (!set)
 			{
-				fmt::print(to_string());
+				fmt::print("{}", to_string());
 				throw_bad_result();
 			}
 			for (auto branch_ptr : valid_branch_view) {

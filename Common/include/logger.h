@@ -279,8 +279,8 @@ namespace qram_simulator {
 	/// Print to stdout and write to the log after formatting
 	template <typename... Ty>
 	void print_and_log(std::string fmt_str, Ty&&...args) {
-		std::string str = format(fmt_str, std::forward<Ty>(args)...);
-		fmt::print(str);
+		std::string str = fmt::format(fmt::runtime(fmt_str), std::forward<Ty>(args)...);
+		fmt::print("{}", str);
 		logger << str;
 		logger.flush();
 	}
