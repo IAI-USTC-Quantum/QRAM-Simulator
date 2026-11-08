@@ -182,6 +182,15 @@ if res is not None:          # rank 0 only
 mpirun -np 4 python noisy_ensemble.py    # each rank enters the script once
 ```
 
+The four-rank host-memory regression defaults its child process to
+`UCX_TLS=tcp,self`, following the
+[UCX transport configuration](https://openucx.readthedocs.io/en/master/faq.html#selecting-networks-and-transports).
+Some hosted VMs expose a MANA verbs device but reject the UD queue-pair
+operation selected by automatic discovery. An explicit caller transport
+setting is respected; production library defaults are unchanged. This test
+still starts four actual MPI ranks and compares their output with serial
+execution. It is not an RDMA or GPU-memory transport benchmark.
+
 `mpi4py` is optional at runtime — without it (or without `mpirun`) the same code path runs serially via `SerialComm`, which keeps the module importable and CI-testable. Honest scope: single-node multi-process **CPU** ensemble parallelism — the bindings are CPU-only (`gpu_per_rank = 0` is recorded honestly), this is not multi-GPU and not a distributed sparse-state partitioning. Details: [docs/sphinx/source/en/guide/mpi.md](docs/sphinx/source/en/guide/mpi.md); tests: `bindings/python/test/test_mpi_ensemble.py`.
 
 ### Consuming as a CMake Subproject (the SparQSim Way)

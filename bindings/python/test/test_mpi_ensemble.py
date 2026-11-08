@@ -216,6 +216,11 @@ def test_mpi_subprocess_matches_serial(qs, tmp_path):
     # in this process breaks mpirun children with a silent exit 1)
     child_env = {k: v for k, v in os.environ.items()
                  if not k.startswith(("OMPI_", "PMI", "PMIX"))}
+    # This is a host-memory, single-node test. Hosted VMs can expose a MANA
+    # verbs device whose UD queue-pair operation is unavailable to UCX.
+    # Select documented TCP/self transports for this child only; honor an
+    # explicit caller setting and leave library/production defaults alone.
+    child_env.setdefault("UCX_TLS", "tcp,self")
     cmd = ["mpirun", *(["--allow-run-as-root"] if as_root else []), "-np", "4", *base]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
                           env=child_env)
@@ -224,7 +229,11 @@ def test_mpi_subprocess_matches_serial(qs, tmp_path):
         proc = subprocess.run(["mpirun", "-np", "4", *base],
                               capture_output=True, text=True, timeout=300,
                               env=child_env)
+    (tmp_path/"mpi.stdout.log").write_text(proc.stdout, encoding="utf-8")
+    (tmp_path/"mpi.stderr.log").write_text(proc.stderr, encoding="utf-8")
     assert proc.returncode == 0, (
-        f"cmd={cmd}\n--- stdout ---\n{proc.stdout[-2000:]}\n--- stderr ---\n{proc.stderr[-2000:]}")
+        f"cmd={cmd}; UCX_TLS={child_env['UCX_TLS']}\n"
+        f"--- stdout ---\n{proc.stdout[-2000:]}\n"
+        f"--- stderr start ---\n{proc.stderr[:2000]}\n--- stderr end ---\n{proc.stderr[-2000:]}")
     hist = np.load(child)
     np.testing.assert_allclose(hist, ref["hist"], atol=1e-12)
