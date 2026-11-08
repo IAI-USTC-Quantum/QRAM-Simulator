@@ -16,12 +16,20 @@ from .demo import Experiment, information
 
 
 def make_server(port: int = 0) -> ThreadingHTTPServer:
+    if type(port) is not int or not 0 <= port <= 65535:
+        raise ValueError("port must be an integer in [0,65535]")
     token = secrets.token_urlsafe(32)
     slot = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
+
+        def handle(self):
+            try:
+                super().handle()
+            except ConnectionError:
+                pass  # The browser may close while its worker is running.
 
         def send(self, code, body, mime="application/json; charset=utf-8"):
             data = body if isinstance(body, bytes) else json.dumps(body).encode()
@@ -79,6 +87,8 @@ def make_server(port: int = 0) -> ThreadingHTTPServer:
                 if child.returncode:
                     return self.send(422, {"error": child.stderr.strip()[-1024:]})
                 self.send(200, json.loads(child.stdout))
+            except ConnectionError:
+                pass  # Do not try to write another response to a closed socket.
             except subprocess.TimeoutExpired:
                 self.send(504, {"error": "experiment exceeded 60 seconds"})
             except (OSError, ValueError) as exc:

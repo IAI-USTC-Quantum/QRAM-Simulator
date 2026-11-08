@@ -1,18 +1,94 @@
 """Exercise the installed standalone product through native evolution and HTTP."""
 import hashlib
 import json
+import os
 import random
 import re
+import socket
+import struct
 import subprocess
 import sys
 import threading
+import time
+import traceback
 import urllib.error
 import urllib.request
+from unittest import mock
 
 import pytest
 
 from qram_simulator.demo import Experiment, run
 from qram_simulator.demo_server import make_server
+
+
+@pytest.mark.parametrize("port", [-1, 65536, True])
+def test_invalid_gui_ports_fail_cleanly(port):
+    with pytest.raises(ValueError):
+        make_server(port)
+
+
+def _exercise_client_reset(server_factory):
+    """Reset a real client after a real native worker, then verify recovery."""
+    completed = threading.Event()
+    allow_reply = threading.Event()
+    errors, native_reports = [], []
+    real_run = subprocess.run
+
+    def synchronized_run(*args, **kwargs):
+        # Synchronize transport timing only; execute the actual native worker
+        # and retain its real stdout, stderr and return code unchanged.
+        result = real_run(*args, **kwargs)
+        if not completed.is_set():
+            native_reports.append(result)
+            completed.set()
+            if not allow_reply.wait(10):
+                raise RuntimeError("client-reset test barrier timed out")
+        return result
+
+    with server_factory() as server:
+        server.handle_error = lambda *_: errors.append(traceback.format_exc())
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        base = f"http://127.0.0.1:{server.server_port}"
+        try:
+            with urllib.request.urlopen(base) as response:
+                token = re.search(r"const token='([^']+)'", response.read().decode()).group(1)
+            payload = json.dumps(dict(depth=2, inputs=4, trajectories=2,
+                                      channel="none", probability=0)).encode()
+            with mock.patch.object(subprocess, "run", side_effect=synchronized_run):
+                with socket.create_connection(("127.0.0.1", server.server_port), timeout=5) as client:
+                    headers = (f"POST /api/run HTTP/1.0\r\nHost: 127.0.0.1:{server.server_port}\r\n"
+                               f"X-Session: {token}\r\nContent-Type: application/json\r\n"
+                               f"Content-Length: {len(payload)}\r\n\r\n").encode()
+                    client.sendall(headers+payload)
+                    assert completed.wait(10), "real native worker did not finish"
+                    assert native_reports[0].returncode == 0, native_reports[0].stderr
+                    assert json.loads(native_reports[0].stdout)["fidelity"]["mean"] == pytest.approx(1)
+                    client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER,
+                                      struct.pack("HH" if os.name == "nt" else "ii", 1, 0))
+                time.sleep(0.05)  # Let the local TCP reset reach the server socket.
+                allow_reply.set()
+                deadline = time.monotonic()+10
+                while True:
+                    request = urllib.request.Request(base+"/api/run", data=payload,
+                        headers={"Content-Type": "application/json", "X-Session": token})
+                    try:
+                        with urllib.request.urlopen(request, timeout=10) as response:
+                            report = json.load(response)
+                        break
+                    except urllib.error.HTTPError as exc:
+                        assert exc.code == 409 and time.monotonic() < deadline
+                        time.sleep(0.01)
+                assert report["fidelity"]["mean"] == pytest.approx(1)
+            assert not errors, errors
+        finally:
+            allow_reply.set()
+            server.shutdown()
+            thread.join(timeout=3)
+
+
+def test_client_reset_does_not_double_reply_or_hold_the_experiment_slot():
+    _exercise_client_reset(make_server)
 
 
 @pytest.mark.parametrize("channel", ["none", "BitFlip", "PhaseFlip", "Depolarizing", "Damping"])
