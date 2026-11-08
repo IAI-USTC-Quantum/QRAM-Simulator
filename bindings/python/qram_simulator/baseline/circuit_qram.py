@@ -10,10 +10,9 @@ Why only 1-2 tree layers
 ------------------------
 The density matrix lives on ``addr + data + 2*(2^addr - 1)`` qubits
 (9 qubits for addr=2/data=1); addr=3 already needs 25 qubits (2^50 amplitudes).
-With ``addr_size = 1`` every step has ``layer_entangle_max == 0``, so the
-position-sampled noise (Depolarizing / Damp_Full) vanishes -- the instance
-degenerates to the noise-free bridge (under Damping only the whole-tree
-Damp_Common still acts); ``addr_size = 2`` is the smallest fully noisy instance.
+With ``addr_size = 1`` every step has ``layer_entangle_max == 0``, so Pauli
+noise on the active front vanishes. Whole-tree amplitude damping still acts;
+the one-layer case is not a noise-free bridge when damping is nonzero.
 
 Encoding (identical to ``Experiments/QRAM/ChannelCorrespondence``)
 ------------------------------------------------------------------
@@ -50,10 +49,11 @@ counterpart of the C++ per-trajectory sampler (``nerror ~ Binomial(N, p)``
 placed uniformly on the N active positions, hence each position is hit with
 probability exactly ``p``).  Depolarizing applies the ``{I, X, Z, Y}``
 unitary mixture (all unitary after the Y-flip fix, so the textbook TP channel
-and the faithful mixture coincide); Damping follows the validated "faithful
-mirror" of the C++ non-linear sampling scheme (whole-tree K0 + jumps on active
-positions weighted by the excitation population), with the textbook
-amplitude-damping channel available as ``mode="textbook"`` for contrast.
+and the faithful mixture coincide). Damping uses fixed standard Kraus matrices
+on every tree qubit, matching the current exact joint trajectory sampler.
+Its trajectory norm and the density trace are one. ``mode="legacy"`` retains
+the retired state-dependent, non-TP mirror for archived comparisons only;
+``mode="nojump"`` retains only K0 and reports its sub-normalized weight.
 """
 
 from __future__ import annotations
@@ -381,17 +381,15 @@ class CircuitQRAMQubit:
 
         Parameters
         ----------
-        mode : {"faithful", "textbook", "nojump"}
+        mode : {"faithful", "textbook", "legacy", "nojump"}
             "faithful" (default): depolarizing as the {I,X,Z,Y} mixture and
-            damping as the rho-dependent mirror of the C++ sampling scheme
-            (the convention validated by the ChannelCorrespondence experiment);
-            "textbook": TP textbook channels (Pauli depolarizing / full
-            amplitude damping) -- identical for depolarizing, systematically
-            off for damping; "nojump": damping K0 branch only (trace = no-jump
-            survival probability).
+            fixed whole-tree amplitude damping, matching the current core;
+            "textbook": equivalent standard TP channels; "legacy": retired
+            rho-dependent damping mirror, not a standard channel certificate;
+            "nojump": damping K0 branch only (trace = no-jump weight).
         """
-        if mode not in ("faithful", "textbook", "nojump"):
-            raise ValueError(f"mode must be faithful/textbook/nojump (got {mode})")
+        if mode not in ("faithful", "textbook", "legacy", "nojump"):
+            raise ValueError(f"mode must be faithful/textbook/legacy/nojump (got {mode})")
         backend_cls = _require_uniqc()
         be = self._init_backend(backend_cls)
         textbook = mode == "textbook"
@@ -404,7 +402,7 @@ class CircuitQRAMQubit:
                     self._apply_depolarizing(be, self.encoding.noise_qubit(pos),
                                              self.depolarizing, textbook)
             if self.damping > 0.0:
-                self._apply_damping(be, entangle, self.damping, textbook,
+                self._apply_damping(be, entangle, self.damping, mode in ("faithful", "textbook"),
                                     nojump=(mode == "nojump"))
         return np.asarray(be.density_matrix.full())
 
@@ -446,9 +444,9 @@ class CircuitQRAMQubit:
         """Convenience wrapper: ideal + noisy density matrices and all metrics.
 
         Returns a dict with ``ideal_rho``/``ideal_dist``, ``rho``/``dist``/``trace``
-        and ``fidelity`` (= fidelity_with_ideal); ``dist`` is sub-normalized
-        under damping (sum = channel survival, comparable to the QRAM side's
-        survival after the same renormalization convention).
+        and ``fidelity`` (= fidelity_with_ideal). The modern complete channels
+        have trace one. Only explicit legacy/nojump diagnostics may return
+        sub-normalized distributions; their trace is not the core's trajectory norm.
         """
         rho_ideal = self.ideal_density_matrix()
         rho = self.simulate_density(mode)

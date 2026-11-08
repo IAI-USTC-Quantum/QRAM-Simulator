@@ -66,16 +66,17 @@ namespace qram_simulator{
 	/**
 	 * @brief 2x2 unitary matrix (four elements in row-major order).
 	 *
-	 * A custom struct is used so that CPU and CUDA agree bit for bit
-	 * (avoiding std::array differences on device); provides iterators,
-	 * subscript access, and dagger (conjugate transpose).
+	 * The wrapper supplies host/device construction and access with a shared
+	 * memory layout, iterators, indexing, and conjugate transpose.
+	 * Integer paths require bitwise agreement; floating paths use tolerances.
 	 */
 	struct u22_t
 	{
 		using data_type = std::array<std::complex<double>, 4>;
 		data_type m_data;
 
-		HOST_DEVICE u22_t() noexcept : m_data{ 0 } {}
+		/// 零初始化构造（全零矩阵）
+		HOST_DEVICE u22_t() noexcept : m_data{} {}
 
 		/// @brief Construct from four elements (row-major a,b,c,d).
 		HOST_DEVICE	u22_t(std::complex<double> a, std::complex<double> b,
@@ -90,25 +91,11 @@ namespace qram_simulator{
 		HOST_DEVICE	u22_t(std::array<std::complex<double>, 4>&& arr) noexcept
 			: m_data(arr) {}
 
-		/// Copy constructor
-		HOST_DEVICE	u22_t(const u22_t& other) noexcept
-			: m_data(other.m_data) {}
-
-		/// Move constructor
-		HOST_DEVICE	u22_t(u22_t&& other) noexcept
-			: m_data(other.m_data) {}
-
-		/// Copy assignment
-		HOST_DEVICE	u22_t& operator=(const u22_t& other) noexcept {
-			m_data = other.m_data;
-			return *this;
-		}
-
-		/// Move assignment
-		HOST_DEVICE	u22_t& operator=(u22_t&& other) noexcept {
-			m_data = other.m_data;
-			return *this;
-		}
+		/// Trivial special members are device-usable without explicit execution annotations.
+		u22_t(const u22_t&) noexcept = default;
+		u22_t(u22_t&&) noexcept = default;
+		u22_t& operator=(const u22_t&) noexcept = default;
+		u22_t& operator=(u22_t&&) noexcept = default;
 
 		/// Iterator to the beginning
 		HOST_DEVICE	data_type::iterator begin() noexcept {

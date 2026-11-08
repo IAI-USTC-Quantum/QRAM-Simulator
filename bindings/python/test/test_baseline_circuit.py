@@ -81,24 +81,49 @@ def test_depol_semi_quantitative(depol):
 
 
 @pytest.mark.parametrize("damp", [0.01, 0.05])
-def test_damping_faithful_vs_textbook(damp):
-    """The faithful mirror tracks the trajectory ensemble; the textbook channel drifts."""
+def test_damping_current_whole_tree_channel(damp):
+    """Independent gate-level Kraus channel agrees with current C++ trajectories."""
     config = {"damp": damp}
     qram = run_qram_side(2, 1, MEMORY, config, runs=300, seed=20260925)
 
     faithful = run_circuit_side(2, 1, MEMORY, config, "faithful")
     textbook = run_circuit_side(2, 1, MEMORY, config, "textbook")
 
-    # faithful trace (survival) close to the QRAM survival; textbook over-damps
+    # The complete channel is TP, not a no-jump or discarded-weight estimator.
+    assert qram["trajectory_convention"] == "joint_auxiliary_whole_tree_v1"
     assert abs(faithful["trace"] - qram["survival"]) < 0.03
-    assert textbook["trace"] > qram["survival"] or damp < 0.02
+    for trace in (qram["survival"], faithful["trace"], textbook["trace"]):
+        assert trace == pytest.approx(1.0, abs=1e-12)
+    assert faithful["fidelity"] == pytest.approx(textbook["fidelity"], abs=1e-12)
 
     overlap = qram["avg_overlap_fid"]
     assert abs(faithful["fidelity"] - overlap["mean"]) < max(3.0 * overlap["mc_error"], 0.05)
-    # sub-normalized convention: compare after per-side renormalization
+    # Keep the existing normalized-distribution metric and threshold.
     from qram_simulator.baseline.metrics import normalize
     assert classical_fidelity(normalize(qram["avg_dist"]),
                               normalize(faithful["dist"])) > 0.99
+
+
+def test_one_layer_damping_does_not_disappear_with_empty_pauli_front():
+    """Root occupation is damped even when layer_entangle_max is always zero."""
+    config = {"damp": 0.2}
+    qram = run_qram_side(1, 1, [0, 1], config, runs=2000, seed=20260925)
+    circuit = run_circuit_side(1, 1, [0, 1], config, "faithful")
+    assert circuit["trace"] == pytest.approx(1.0, abs=1e-12)
+    assert qram["survival"] == pytest.approx(1.0, abs=1e-12)
+    assert circuit["fidelity"] < 0.99
+    overlap = qram["avg_overlap_fid"]
+    assert abs(circuit["fidelity"] - overlap["mean"]) < max(3*overlap["mc_error"], 0.02)
+
+
+def test_old_non_tp_mirror_requires_explicit_legacy_mode():
+    circuit = CircuitQRAMQubit(1, 1, [0, 1], damping=0.05)
+    legacy = circuit.simulate_density("legacy")
+    current = circuit.simulate_density("faithful")
+    nojump = circuit.simulate_density("nojump")
+    assert float(np.trace(current).real) == pytest.approx(1.0, abs=1e-12)
+    assert float(np.trace(legacy).real) < 0.99
+    assert float(np.trace(nojump).real) < 0.99
 
 
 def test_metrics_basics():

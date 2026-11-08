@@ -167,7 +167,7 @@ namespace qram_simulator {
 		/// Print the state vector (also performs a normalization check when check is true)
 		inline void print_state(const std::vector<complex_t>& state, bool check = true)
 		{
-			fmt::print(get_state(state));
+			fmt::print("{}", get_state(state));
 			if (check) {
 				if (std::abs(amp_sum(state) - 1.0) > epsilon)
 					throw_bad_result();
@@ -177,13 +177,13 @@ namespace qram_simulator {
 		/// Print the content of the state vector around position pos
 		inline void print_state(const std::vector<complex_t>& state, size_t pos)
 		{
-			fmt::print(get_state(state, pos));
+			fmt::print("{}", get_state(state, pos));
 		}
 
 		/// Print the largest n_max basis vectors
 		inline void print_max_state(const std::vector<complex_t>& state, size_t n_max)
 		{
-			fmt::print(max_state2str(state, n_max));
+			fmt::print("{}", max_state2str(state, n_max));
 		}
 	} // namespace quantum_simulator
 } // namespace qram_simulator

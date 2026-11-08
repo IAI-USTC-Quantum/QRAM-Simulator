@@ -24,7 +24,7 @@ namespace qram_simulator
 			{
 				return elem.second.check_0();
 			};
-			erase_if(nz_elements, pred);
+			qram_simulator::erase_if(nz_elements, pred);
 		}
 
 		QRAMState::iterator_t QRAMState::iterof(size_t nnz_location)

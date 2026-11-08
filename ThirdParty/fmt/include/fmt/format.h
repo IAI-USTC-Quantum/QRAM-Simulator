@@ -2986,8 +2986,22 @@ constexpr auto fractional_part_rounding_thresholds(int index) -> uint32_t {
   // It is equal to ceil(2^31 + 2^32/10^(k + 1)).
   // These are stored in a string literal because we cannot have static arrays
   // in constexpr functions and non-static ones are poorly optimized.
+  //
+  // [LOCAL PATCH] nvcc on Windows (edg frontend in MSVC emulation) rejects
+  // char32_t hex escapes >= 0x80000000 in device-side parses of constexpr
+  // functions (--expt-relaxed-constexpr makes them implicitly
+  // __host__ __device__; edg parses the TU once before the host/device
+  // split, so __CUDA_ARCH__ is not yet available). Under nvcc use a plain
+  // constexpr array with identical values instead of the string literal.
+#ifdef __CUDACC__
+  const uint32_t thresholds[] = {0x9999999aU, 0x828f5c29U, 0x80418938U,
+                                 0x80068db9U, 0x8000a7c6U, 0x800010c7U,
+                                 0x800001aeU, 0x8000002bU};
+  return thresholds[index];
+#else
   return U"\x9999999a\x828f5c29\x80418938\x80068db9\x8000a7c6\x800010c7"
          U"\x800001ae\x8000002b"[index];
+#endif
 }
 
 template <typename Float>

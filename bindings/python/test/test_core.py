@@ -33,6 +33,7 @@ def test_module_surface():
     ):
         assert hasattr(qs, name), f"missing export: {name}"
     assert isinstance(qs.__version__, str)
+    assert qs.QUBIT_DAMPING_CONVENTION == "joint_auxiliary_whole_tree_v1"
 
 
 def test_seed_roundtrip_and_reproducibility():
