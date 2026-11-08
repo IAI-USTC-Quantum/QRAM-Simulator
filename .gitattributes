@@ -10,3 +10,7 @@
 /ThirdParty/eigen-3.4.0/COPYING.* text eol=lf
 /ThirdParty/argparse/LICENSE.Apache-2.0-with-LLVM-exception.txt text eol=lf
 /ThirdParty/argparse/argparse.h text eol=lf
+ThirdParty/pybind11/LICENSE text eol=lf
+ThirdParty/gcc-runtime/* text eol=lf
+# Preserve the canonical license's original final blank line verbatim.
+ThirdParty/gcc-runtime/COPYING.RUNTIME whitespace=-blank-at-eof

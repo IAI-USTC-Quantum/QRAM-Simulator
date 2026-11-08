@@ -60,6 +60,31 @@
       "path": "ThirdParty/argparse/argparse.h",
       "source": "existing tracked repository file",
       "sha256": "fea9ddb74b5abeaa32a931ea5cc141cb6e93d8380375aaf66a9c1c330dbf3c3c"
+    },
+    {
+      "path": "ThirdParty/pybind11/LICENSE",
+      "source": "https://raw.githubusercontent.com/pybind/pybind11/45fab4087eaaff234227a10cf7845e8b07f28a98/LICENSE",
+      "sha256": "83965b843b98f670d3a85bd041ed4b372c8ec50d7b4a5995a83ac697ba675dcb"
+    },
+    {
+      "path": "ThirdParty/gcc-runtime/COPYING3",
+      "source": "https://raw.githubusercontent.com/gcc-mirror/gcc/04696df09633baf97cdbbdd6e9929b9d472161d3/COPYING3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    },
+    {
+      "path": "ThirdParty/gcc-runtime/COPYING.RUNTIME",
+      "source": "https://raw.githubusercontent.com/gcc-mirror/gcc/04696df09633baf97cdbbdd6e9929b9d472161d3/COPYING.RUNTIME",
+      "sha256": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74"
+    },
+    {
+      "path": "ThirdParty/gcc-runtime/libgomp-copyright.txt",
+      "source": "https://raw.githubusercontent.com/gcc-mirror/gcc/04696df09633baf97cdbbdd6e9929b9d472161d3/libgomp/libgomp.h",
+      "sha256": "f44031efb58bd5abf04f3a7bc37874651d56046dafabca864d92fdb1d8186140",
+      "source_sha256": "ec4300e4eea038970cbf88d17ade56ce7b81161b90d975a5ce29cb0101161dd5",
+      "transform": "exact initial C comment, including copyright and runtime-exception declaration"
     }
-  ]
+  ],
+  "pybind11_version": "3.0.2",
+  "pybind11_commit": "45fab4087eaaff234227a10cf7845e8b07f28a98",
+  "gcc_canonical_notice_commit": "04696df09633baf97cdbbdd6e9929b9d472161d3"
 }

@@ -266,10 +266,19 @@ QRAM-Simulator/
 
 ## Release Process
 
-1. Merge changes into main on Gitea (the primary development repository);
-2. Sync to the GitHub upstream `IAI-USTC-Quantum/QRAM-Simulator`;
-3. Update [`CHANGELOG.md`](CHANGELOG.md) and tag (`vX.Y.Z`; note that v0.1.x already exists historically, the new series starts at v0.2.0);
-4. Push the tag or create a GitHub Release → `pypi-publish.yml` automatically builds cp310-cp313 manylinux / win_amd64 wheels and the sdist, and publishes the `qram-simulator` package via PyPI trusted publishing; `pysparq` is still released from the SparQSim repository.
+1. Merge a validated pull request into GitHub `main`, then verify its main-branch checks;
+2. Build and install candidate wheels, including their native extension, CLI,
+   packaged GUI and third-party notices. A manual `pypi-publish.yml` dispatch
+   builds and tests the complete release matrix without publishing;
+3. Update [`CHANGELOG.md`](CHANGELOG.md) and push a new immutable `vX.Y.Z`
+   tag on the validated main commit;
+4. That tag triggers cp310-cp313 manylinux / win_amd64 wheel and sdist builds.
+   Each repaired release wheel runs `tools/check_installed_product.py` in a
+   clean test environment: it checks installed notice hashes and assets, then
+   runs the native computation, CLI and HTTP GUI tests. PyPI trusted publishing
+   waits for every build and test to pass. Creating a GitHub Release afterward
+   does not trigger a second upload. `pysparq` is released separately from
+   SparQSim.
 
 ## About Us
 

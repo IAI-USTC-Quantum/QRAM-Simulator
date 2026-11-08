@@ -1,6 +1,6 @@
 name: Publish Python Package
 
-# Triggered by a tag (v*) or a GitHub Release -> cibuildwheel builds
+# Triggered by a tag (v*) -> cibuildwheel builds and tests
 # multi-platform wheels + sdist -> PyPI trusted publishing (OIDC, no
 # token; the PyPI side needs a trusted publisher preconfigured for
 # environment "pypi": owner=IAI-USTC-Quantum, repo=QRAM-Simulator,
@@ -8,8 +8,6 @@ name: Publish Python Package
 on:
   push:
     tags: ['v*']
-  release:
-    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -58,8 +56,8 @@ jobs:
           # musllinux / 32-bit / macOS unsupported for now (see
           # pyproject.toml [tool.cibuildwheel])
           CIBW_SKIP: "*-musllinux_* *-win32 *-macos*"
-          # OpenMP runtime (missing by default in manylinux containers)
-          CIBW_BEFORE_ALL_LINUX: "yum install -y libgomp"
+          # The manylinux image already provides libgomp; wheel repair bundles
+          # the linked runtime. Avoid a redundant retired CentOS yum mirror.
 
       - uses: actions/upload-artifact@v4
         with:
@@ -104,7 +102,7 @@ jobs:
     # Manual workflow_dispatch runs build only, no publishing
     if: >-
       github.repository_owner == 'IAI-USTC-Quantum' &&
-      (github.event_name == 'push' || github.event_name == 'release')
+      github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     environment:
       name: pypi
       url: https://pypi.org/project/qram-simulator/
