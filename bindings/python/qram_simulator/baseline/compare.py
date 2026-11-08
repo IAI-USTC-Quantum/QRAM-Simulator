@@ -14,8 +14,9 @@
   树回到基态的态；
 - **分布 F_cls / TVD** = 两侧 (地址,bus) 输出分布的经典保真度 (Σ√pq)² 与
   总变差距离（各自按自身总概率归一化后比较）；
-- **survival / trace** = 阻尼噪声下的存活概率（QRAM 侧轨迹范数平方之和，
-  uniqc 侧 trace(ρ)）。
+- **survival / trace** = 完整现代信道的归一化轨迹/密度矩阵迹，应为1；
+  survival字段为兼容旧结果保留，并非无跳跃存活概率。只有显式legacy/nojump
+  对照会保留未归一化权重，不可与现代完整信道混为同一物理口径。
 
 无噪 bridge：两侧无噪输出分布逐位一致（baseline 的门序列直接取自 C++
 TimeStep 调度器）。
@@ -113,6 +114,7 @@ def run_qram_side(addr_size: int, data_size: int, memory, config: Dict[str, floa
     return {
         "avg_dist": avg_dist,
         "survival": survival,
+        "trajectory_convention": qram_simulator.QUBIT_DAMPING_CONVENTION,
         "noisefree_dist": noisefree,
         "avg_overlap_fid": _mean_err(overlap),
         "avg_fid_nopost": _mean_err(nopost),
@@ -229,7 +231,7 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--addr", type=int, default=2, choices=(1, 2),
-                        help="tree depth / address width (default 2; 1 is the noise-free bridge only)")
+                        help="tree depth / address width (default 2; whole-tree damping also acts at depth 1)")
     parser.add_argument("--data", type=int, default=1, choices=(1, 2),
                         help="data width per memory cell (default 1)")
     parser.add_argument("--memory", default=None,
@@ -238,11 +240,10 @@ def main(argv=None) -> int:
                         help="number of QRAM-Simulator noise trajectories per configuration")
     parser.add_argument("--seed", type=int, default=20260925)
     parser.add_argument("--modes", nargs="+", default=["faithful"],
-                        choices=("faithful", "textbook", "nojump"),
+                        choices=("faithful", "textbook", "legacy", "nojump"),
                         help="circuit-side channel variants to evaluate in addition to "
-                             "the primary one (advanced: 'textbook' swaps in the textbook "
-                             "TP channels, which deviate systematically under damping; "
-                             "'nojump' keeps only the damping no-jump branch)")
+                             "the primary one (textbook is the equivalent standard channel; "
+                             "legacy retains the retired non-TP mirror; nojump keeps K0 only)")
     parser.add_argument("--outdir", default="qram-baseline-results",
                         help="output directory for results.json / results.csv")
     parser.add_argument("--quick", action="store_true",
@@ -266,8 +267,7 @@ def main(argv=None) -> int:
     print(f"qram-simulator {qram_simulator.__version__} | addr={args.addr} data={args.data} "
           f"memory={memory} runs={runs} seed={args.seed}")
     if args.addr == 1:
-        print("note: addr=1 has no position-sampled noise in the QRAM-Simulator model "
-              "(layer_entangle_max == 0; under Damping only the whole-tree Damp_Common acts)")
+        print("note: addr=1 has no active-front Pauli noise; whole-tree damping still acts")
 
     results = []
     bridge = run_circuit_side(args.addr, args.data, memory,

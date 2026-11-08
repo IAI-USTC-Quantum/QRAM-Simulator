@@ -95,6 +95,7 @@ breaking sampling and normalization).
 
 	m.attr("ARCH_QUBIT") = arch_qubit;
 	m.attr("ARCH_QUTRIT") = arch_qutrit;
+	m.attr("QUBIT_DAMPING_CONVENTION") = "joint_auxiliary_whole_tree_v1";
 
 	// ---- Schedule data structures (lightweight read-only views) ----
 	py::class_<Operation>(m, "Operation", "A single quantum operation: type, target qubits, and optional coefficients (noise parameters).")

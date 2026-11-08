@@ -19,7 +19,7 @@ QRAM-Simulator 是用于模拟**量子随机存取存储器（QRAM）装载电�
 - **噪声感知**：比特翻转 / 相位翻转 / 联合翻转 / 去极化 / 振幅衰减按时间片注入
 - [**分支剪枝**](../paper/qubit_qram_pruning.md)：good/bad 分支剪枝把仿真规模压缩到"坏分支全算 + 一条好分支作基准"
 - **Python 绑定**：pybind11 薄绑定（[`pip install qram-simulator`](installation.md#inst-python)）导出全部核心工作类
-- CUDA/GPU 后端保留在代码中，当前 CMake 暂时屏蔽 GPU 构建，默认 CPU-only
+- CUDA/GPU 后端通过 `QRAM_ENABLE_CUDA=ON` 显式启用，默认仍为 CPU
 
 ### 1.2 设计哲学
 
@@ -204,8 +204,9 @@ qutrit 架构要求非空噪声模型才允许走 `run(version)`（无噪场景�
 ### 4.3 CUDA 集成（保留代码）
 
 [`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)（[`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh)，thrust
-`device_vector` 内存镜像）保留在代码库中；CondRot 原语重构期间 CMake
-强制 `CUDA_FOUND FALSE`，默认 CPU-only（OpenMP 必需，TBB 可选加速）。当前活跃
+`device_vector` 内存镜像）保留在代码库中；CMake 可通过
+`QRAM_ENABLE_CUDA=ON` 构建可选 CUDA 目标，默认 CPU（OpenMP 必需，TBB 可选加速）；
+未完成的生产 CondRot 内核仍使用 CPU 回退。当前活跃
 开发的 GPU 路径——CUDA 稀疏态模拟器——位于姊妹仓库
 [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim)，已在 8×A800 服务器上
 以 CUDA 12.8 实测通过（[v1c 验证记录](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)）。

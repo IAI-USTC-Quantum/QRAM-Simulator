@@ -57,7 +57,7 @@ cmake --build build --parallel
 | [`QRAM_BUILD_TESTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L24) | ON | 构建 C++ 测试目标（`test/`） |
 | [`QRAM_BUILD_EXPERIMENTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L25) | ON | 构建论文实验程序（`Experiments/`） |
 | [`QRAM_BUILD_PYTHON_BINDINGS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L26) | OFF | 构建 pybind11 绑定（[`bindings/python/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/bindings/python)，需 pybind11） |
-| [`QRAM_ENABLE_CUDA`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L31) | OFF | 当前强制禁用（CondRot 重构期间 CPU-only） |
+| [`QRAM_ENABLE_CUDA`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L31) | OFF | 可选CUDA构建（需工具链；生产CondRot的GPU内核仍有CPU回退） |
 
 运行 CI 回归对拍：
 

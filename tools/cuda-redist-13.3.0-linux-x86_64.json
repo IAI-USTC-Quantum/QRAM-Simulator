@@ -1,0 +1,57 @@
+{
+  "schema": "qram.cuda-toolkit-bootstrap.v1",
+  "release": "13.3.0",
+  "platform": "linux-x86_64",
+  "source": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.3.0.json",
+  "source_sha256": "507eddaab1360336bc0fe17b77552e0b7dfe1e74da888671c3a2f5fad7775db1",
+  "components": {
+    "cuda_nvcc": {
+      "relative_path": "cuda_nvcc/linux-x86_64/cuda_nvcc-linux-x86_64-13.3.33-archive.tar.xz",
+      "sha256": "93b098bda4a562ebf3541523ce82adc43f106a81dcf28bcbf8f0d8e093d1c66f",
+      "md5": "5180c45363243f1bce6db068e39b7080",
+      "size": "31609400",
+      "version": "13.3.33",
+      "license_path": "cuda_nvcc/LICENSE.txt"
+    },
+    "cuda_crt": {
+      "relative_path": "cuda_crt/linux-x86_64/cuda_crt-linux-x86_64-13.3.33-archive.tar.xz",
+      "sha256": "4755d36d24c6ef7697a2d3e1dbb23c4562c9c0d97d48390d4cbd8ab32dec5b5f",
+      "md5": "40633d5ea63dc795e273ea70835a863f",
+      "size": "99372",
+      "version": "13.3.33",
+      "license_path": "cuda_crt/LICENSE.txt"
+    },
+    "cuda_cudart": {
+      "relative_path": "cuda_cudart/linux-x86_64/cuda_cudart-linux-x86_64-13.3.29-archive.tar.xz",
+      "sha256": "1e59c4888267d27ba1a9bd0f3669a6439db1334a96e754cd9013c7c73e18dc9d",
+      "md5": "a6f87957617815446daa9a4af727c92c",
+      "size": "1573744",
+      "version": "13.3.29",
+      "license_path": "cuda_cudart/LICENSE.txt"
+    },
+    "cccl": {
+      "relative_path": "cccl/linux-x86_64/cccl-linux-x86_64-13.3.3.3.1-archive.tar.xz",
+      "sha256": "67746da12f16229ac4ebde78ce7895e42b069d1d3e2ae2d2d25f90bc43679d68",
+      "md5": "d4049f09c07164a3fc0d47b31ca1e947",
+      "size": "1262040",
+      "version": "13.3.3.3.1",
+      "license_path": "cccl/LICENSE.txt"
+    },
+    "libnvvm": {
+      "relative_path": "libnvvm/linux-x86_64/libnvvm-linux-x86_64-13.3.33-archive.tar.xz",
+      "sha256": "fc9c1fd5844e44c0e5eeb051378c1b13cf0e3bb3fe4966d5103c38885424f802",
+      "md5": "422e0db4d9a8b03471e7379618f38210",
+      "size": "49180068",
+      "version": "13.3.33",
+      "license_path": "libnvvm/LICENSE.txt"
+    },
+    "libcurand": {
+      "relative_path": "libcurand/linux-x86_64/libcurand-linux-x86_64-10.4.3.29-archive.tar.xz",
+      "sha256": "0218e62ab413e435dcd0274ec8e63b62214e6aba8519201061d1597e73caadbb",
+      "md5": "954923b7638795a6bd45bfa4ed1d295c",
+      "size": "86740648",
+      "version": "10.4.3.29",
+      "license_path": "libcurand/LICENSE.txt"
+    }
+  }
+}

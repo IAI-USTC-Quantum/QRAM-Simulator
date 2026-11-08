@@ -54,7 +54,7 @@ Build toggles:
 | [`QRAM_BUILD_TESTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L24) | ON | Build the C++ test targets (`test/`) |
 | [`QRAM_BUILD_EXPERIMENTS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L25) | ON | Build the paper experiment programs (`Experiments/`) |
 | [`QRAM_BUILD_PYTHON_BINDINGS`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L26) | OFF | Build the pybind11 bindings ([`bindings/python/`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/tree/main/bindings/python), requires pybind11) |
-| [`QRAM_ENABLE_CUDA`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L31) | OFF | Currently force-disabled (CPU-only during the CondRot refactor) |
+| [`QRAM_ENABLE_CUDA`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/CMakeLists.txt#L31) | OFF | Optional CUDA build; toolkit required, with CPU fallbacks for unfinished production CondRot kernels |
 
 Run the CI regression cross-checks:
 

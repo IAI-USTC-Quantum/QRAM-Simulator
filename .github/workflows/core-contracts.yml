@@ -1,0 +1,59 @@
+name: Core contracts
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+concurrency:
+  group: core-contracts-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  baseline-mpi:
+    name: Kraus reference and real MPI
+    runs-on: ubuntu-24.04
+    if: github.repository_owner == 'IAI-USTC-Quantum'
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Install independent channel reference and local MPI runtime
+        run: |
+          python -m pip install cmake==3.26.4 ninja==1.13.2
+          python -m pip install 'unified-quantum @ git+https://github.com/IAI-USTC-Quantum/UnifiedQuantum.git@a8a936db970c93d0e568d727fdc124bf1af6f963'
+          python -m pip install '.[baseline]' pytest mpi4py==4.1.2 mpich==5.0.2
+      - name: Complete Python contracts including QuTiP and four real ranks
+        run: python -m pytest bindings/python/test -q -rs
+  cuda-compile:
+    name: CUDA 13.3 compile sm80
+    runs-on: ubuntu-24.04
+    if: github.repository_owner == 'IAI-USTC-Quantum'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Assemble pinned driver-free toolkit
+        run: |
+          python -m pip install cmake==4.4.4 ninja==1.13.2
+          python tools/bootstrap_cuda.py --output build-cuda/toolkit
+      - name: Configure explicit target architecture without a GPU
+        run: >-
+          cmake -S . -B build-cuda/native -G Ninja
+          -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          -DQRAM_ENABLE_CUDA=ON -DQRAM_BUILD_TESTS=OFF -DQRAM_BUILD_EXPERIMENTS=OFF
+          -DCMAKE_CUDA_ARCHITECTURES=80
+          -DCMAKE_CUDA_COMPILER="$PWD/build-cuda/toolkit/prefix/bin/nvcc"
+      - name: Build real CPU and CUDA libraries
+        run: >-
+          cmake --build build-cuda/native --parallel 4 --target
+          SparQ_Common SparQ_QRAMSimulator SparQ_Common_cuda SparQ_QRAMSimulator_cuda

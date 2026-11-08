@@ -44,13 +44,26 @@ git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 mkdir build && cd build
 
-# Configure (CPU build; the GPU/CUDA backend is on hold for now, CMake builds a CPU-only version)
+# Configure (CPU default; add -DQRAM_ENABLE_CUDA=ON for the optional CUDA build)
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
 make -j$(nproc)
 ```
 
-GPU builds: the CUDA/GPU backend is retained in code but disabled in CMake for the duration of the CondRot primitive refactor (the configure step reports `CUDA support disabled - building CPU-only`). The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
+GPU builds are optional: configure with `-DQRAM_ENABLE_CUDA=ON` and an installed CUDA toolkit. CPU remains the default; production CondRot kernels that are not implemented on the GPU still use CPU fallbacks. A successful build is not a GPU performance certificate. The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
+
+A driver-free development toolkit can be assembled from pinned official NVIDIA
+redistributables (Linux x86_64, Python 3.12+):
+
+```bash
+python tools/bootstrap_cuda.py --output build-cuda/toolkit
+cmake -S . -B build-cuda/native -DQRAM_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=80 -DCMAKE_CUDA_COMPILER="$PWD/build-cuda/toolkit/prefix/bin/nvcc"
+cmake --build build-cuda/native --target SparQ_Common_cuda SparQ_QRAMSimulator_cuda
+```
+
+The bootstrap verifies component sizes/SHA256 and preserves licenses. It installs
+no drivers or system packages. The explicit architecture allows a compilation check
+without a GPU; runtime correctness and throughput still require the target device.
 
 Build options (each controllable via `-D...=ON/OFF`):
 
@@ -116,7 +129,7 @@ Local development: `pip install -v .` (CMake >= 3.18 + C++17 + OpenMP); tests: `
 python -m qram_simulator.baseline.compare --addr 2 --runs 500 --outdir results
 ```
 
-See [bindings/python/qram_simulator/baseline/README.md](bindings/python/qram_simulator/baseline/README.md) for the encoding/noise conventions and [results.md](bindings/python/qram_simulator/baseline/results.md) for the packaged run (noise-free bridge at machine precision; F_cls ≥ 0.9988, TVD ≤ 0.026 and `⟨ψ|ρ|ψ⟩` = `E|⟨ψ|ψ_traj⟩|²` within Monte Carlo error over the full noise sweep).
+The default `faithful` baseline now uses the standard whole-tree Kraus channel, matching the current qubit engine (`QUBIT_DAMPING_CONVENTION=joint_auxiliary_whole_tree_v1`). Complete-channel traces are one; the old `survival` JSON key is retained as a compatibility alias, not a no-jump probability. Explicit `legacy` and `nojump` modes are historical/conditional diagnostics, not standard-channel validation. See [the channel derivation](docs/sphinx/source/en/paper/joint_damping.md) and [baseline conventions](bindings/python/qram_simulator/baseline/README.md). Historical [packaged results](bindings/python/qram_simulator/baseline/results.md) predate the corrected joint damping model and must not be used as its validation.
 
 ### MPI Ensemble Parallelism
 

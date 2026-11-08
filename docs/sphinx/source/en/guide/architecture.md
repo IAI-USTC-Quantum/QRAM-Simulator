@@ -16,7 +16,7 @@ QRAM-Simulator is a high-performance C++ core for simulating **quantum random ac
 - **Noise aware**: bit-flip / phase-flip / combined-flip / depolarizing / amplitude-damping noise injected per time slice
 - [**Branch pruning**](../paper/qubit_qram_pruning.md): good/bad branch pruning shrinks the simulation to "all bad branches computed + one good branch as the baseline"
 - **Python bindings**: a thin pybind11 layer ([`pip install qram-simulator`](installation.md#inst-python)) exports every core workhorse class
-- The CUDA/GPU backend is retained in the code base; CMake currently masks GPU builds, so the default is CPU-only
+- The optional CUDA backend is enabled with `QRAM_ENABLE_CUDA=ON`; CPU remains the default
 
 ### 1.2 Design Philosophy
 
@@ -193,7 +193,7 @@ The two implementations share the same `TimeStep` scheduler and noise-model form
 
 ### 4.3 CUDA Integration (Retained Code)
 
-[`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh) ([`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh), a thrust `device_vector` memory mirror) is retained in the code base; for the duration of the CondRot primitive refactor, CMake forces `CUDA_FOUND FALSE`, so the default is CPU-only (OpenMP required, TBB an optional accelerator). The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
+[`QRAM/include/cuda/qram_circuit_qutrit.cuh`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh) ([`CuQRAMCircuit`](https://github.com/IAI-USTC-Quantum/QRAM-Simulator/blob/main/QRAM/include/cuda/qram_circuit_qutrit.cuh), a thrust `device_vector` memory mirror) is retained in the code base; the optional CUDA targets are built with `QRAM_ENABLE_CUDA=ON`. CPU remains the default (OpenMP required, TBB optional), and unfinished production CondRot kernels still use CPU fallbacks. The actively developed GPU path — the CUDA sparse-state simulator — lives in the sister repository [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim), verified on an 8×A800 server with CUDA 12.8 ([v1c verification record](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)).
 
 ---
 
