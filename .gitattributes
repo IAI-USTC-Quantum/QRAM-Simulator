@@ -1,2 +1,12 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Notices are verified against their upstream byte digests in built wheels.
+# Keep their original LF bytes even on core.autocrlf=true Windows checkouts.
+/LICENSE text eol=lf
+/THIRD_PARTY_NOTICES.md text eol=lf
+/ThirdParty/notice-provenance.json text eol=lf
+/ThirdParty/fmt/LICENSE text eol=lf
+/ThirdParty/eigen-3.4.0/COPYING.* text eol=lf
+/ThirdParty/argparse/LICENSE.Apache-2.0-with-LLVM-exception.txt text eol=lf
+/ThirdParty/argparse/argparse.h text eol=lf

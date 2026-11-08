@@ -69,7 +69,15 @@ jobs:
       - name: Build and install wheel
         # numpy: test dependency (test_mpi_ensemble); the package itself keeps
         # numpy optional at runtime (lazy import inside qram_simulator.mpi)
-        run: python -m pip install -v . pytest numpy
+        shell: python
+        run: |
+          import glob, subprocess, sys
+          subprocess.run([sys.executable, '-m', 'pip', 'wheel', '-v', '--no-deps',
+                          '.', '--wheel-dir', 'wheelhouse'], check=True)
+          wheels = glob.glob('wheelhouse/*.whl')
+          assert len(wheels) == 1, wheels
+          subprocess.run([sys.executable, 'tools/check_wheel_contents.py', wheels[0]], check=True)
+          subprocess.run([sys.executable, '-m', 'pip', 'install', wheels[0], 'pytest', 'numpy'], check=True)
 
       - name: Run binding tests
         run: python -m pytest bindings/python/test -v
