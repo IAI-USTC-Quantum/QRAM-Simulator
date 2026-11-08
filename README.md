@@ -38,8 +38,16 @@ the noiseless reference. Noise trajectories share a fixed random memory and a
 fixed coherent address input (zero bus); the same seed reproduces samples on the same backend.
 
 JSON records the one-byte-per-record SHA256, exact parameters, software/runtime,
-query and routing registers, pre-measurement unconditional channel fidelity,
-trace error, timings, and a95% Hoeffding sampling interval. Sampled input
+query and routing registers, full-state overlap (`fidelity`) and reduced logical
+query fidelity (`logical_fidelity`) before measurement, trace error, timings,
+and separate 95% Hoeffding sampling intervals. The logical observable traces
+out routing registers while retaining coherence between input addresses; it is
+not postselected. Its canonical input has one zero-bus, ground-tree column per
+address, with normalized nonnegative weights. General coherent bus columns are
+rejected rather than silently interpreted as probabilities. These intervals
+are marginal per observable, not a joint coverage certificate. The existing
+full-state overlap retains its original definition. See the
+[derivation and independent density-matrix cross-check](docs/sphinx/source/en/paper/joint_damping.md). Sampled input
 addresses do not certify testing every memory address. Routing qubits are QRAM
 architecture resources, not a fault-tolerant physical-qubit estimate. These
 experiments are not hardware or end-to-end performance certificates. Installation

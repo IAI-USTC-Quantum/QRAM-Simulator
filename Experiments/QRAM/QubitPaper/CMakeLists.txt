@@ -14,3 +14,7 @@ add_test(NAME QubitPaperExactnessChannels COMMAND ${PROJECT_NAME}ExactTest --cha
 add_executable(${PROJECT_NAME}JointDampingTest JointDampingTest.cpp)
 target_link_libraries(${PROJECT_NAME}JointDampingTest SparQ_QRAMSimulator SparQ_Common)
 add_test(NAME QubitJointDampingChannel COMMAND ${PROJECT_NAME}JointDampingTest)
+
+add_executable(${PROJECT_NAME}LogicalFidelityTest LogicalFidelityTest.cpp)
+target_link_libraries(${PROJECT_NAME}LogicalFidelityTest SparQ_QRAMSimulator SparQ_Common)
+add_test(NAME QubitLogicalFidelity COMMAND ${PROJECT_NAME}LogicalFidelityTest)

@@ -93,3 +93,57 @@ Observed initial checks: local maximum density error $4.45\times10^{-16}$; Bell 
 The external uniqc/QuTiP exporter/driver also passes pure-damping and mixed-noise checks (2,000 shots each, six fixed-history replays). New exports declare `joint_auxiliary_whole_tree_v1`; the driver selects standard Kraus channels and normalizes layer replays.
 
 Final pruned/full validation: all 155 main cases and 120 channel cases passed. The main battery fired 178 jumps; maximum weighted component difference was 6.67e-16 and maximum fidelity difference was 1.34e-15. For an external pure-damping export, explicitly pass `--depolarizing 0` (the CLI default is nonzero).
+
+## Logical-query fidelity after tracing the routing environment
+
+`QRAMCircuitQubit.get_logical_query_fidelity()` computes a separate physical
+observable. It does not rename or replace `overlap_fid`, `fid_nopost`,
+`fid_incoh`, or the sampling APIs. The input contract is one canonical
+ground-tree, zero-bus column per selected address with normalized nonnegative
+weights. Multi-bus columns and custom input trees are rejected rather than
+silently interpreted as a coherent input state.
+
+Write the current pure trajectory as
+
+$$|\Psi\rangle=\sum_i\sqrt{p_i}|i\rangle_A
+  \sum_{b,e}c_i(b,e)|b\rangle_D|e\rangle_R,$$
+
+and the ideal address/data query as
+$|\phi\rangle=\sum_i\sqrt{p_i}|i\rangle_A|d_i\rangle_D$.
+Then the physical partial-trace fidelity is
+
+$$F_{AD}=\langle\phi|\operatorname{Tr}_R(|\Psi\rangle\langle\Psi|)|\phi\rangle
+ =\sum_e\left|\sum_i p_i c_i(d_i,e)\right|^2.$$
+
+Different environment basis states do not interfere after the trace. Equal
+environment labels retain complex cross-address coherence. Summing all tree
+amplitudes first is a different quantity. Full-circuit overlap is only the
+$e=0$ term, so it cannot exceed $F_{AD}$. A common residual tree excitation
+can give full overlap zero and logical fidelity one; which-path information
+in the tree can still destroy logical coherence. No measurement, postselection
+or random draw is performed. The method materializes implicit pruned output
+through the shared C++/Python `prepare_observables()` implementation.
+
+The standalone CLI/GUI reports both quantities and separate marginal 95%
+Hoeffding intervals. Neither interval is a joint or project-acceptance
+certificate. Input coverage, memory hash, physical router count and actual
+classical observable-evaluation time remain explicit.
+
+Validation includes exact native joint-state cases (complex relative phases,
+orthogonal environments, unequal weights, wrong buses), 60 seeded native
+pruned/full/RNG cases, an independent QuTiP partial trace, and a separately
+evolved 9-qubit UniQC/QuTiP density matrix. At two layers, one bus bit, memory
+`[0,1,1,0]`, per-slice noise probability 0.06 and 4096 trajectories per channel:
+
+| Channel | Exact logical density reference | Native trajectory mean | Full-circuit density overlap |
+| --- | ---: | ---: | ---: |
+| BitFlip | 0.5822304472 | 0.5812225342 | 0.3665730049 |
+| PhaseFlip | 0.5181157596 | 0.5144042969 | 0.5181157596 |
+| Depolarizing | 0.5073262933 | 0.5035171509 | 0.3846879825 |
+| Damping | 0.5751843138 | 0.5776750488 | 0.5195237950 |
+
+Each comparison uses a predeclared bounded-variable radius 0.0511303064 at
+failure probability 1e-9; observed mean discrepancies are below 0.00381.
+The SDK matrix bit order is observed with an actual X(0) experiment rather
+than assumed from QuTiP's tensor notation. These are small-circuit channel
+cross-checks, not a 20-layer theory/hardware certificate.

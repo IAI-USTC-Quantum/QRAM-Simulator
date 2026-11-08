@@ -216,14 +216,14 @@ Typical workflow:
 				}
 			}, py::arg("addresses"),
 				"Equal coherent address superposition with an initially zero bus; addresses must be unique.")
-			.def("prepare_observables", [](QC& self) {
-				auto damping = self.noise_parameters.find(OperationType::Damping);
-				if (damping != self.noise_parameters.end() && self.first_good_branch_group >= 0)
-					self.time_step.get_multiplier_qubit(damping->second, self.time_step.last_step(),
-						self.branch_groups, self.first_good_branch_group, self.good_branch_group_ids);
-				self.materialize_good_branches();
-			}, "Materialize implicit pruned outputs before reading distribution/overlap; "
+			.def("prepare_observables", &QC::prepare_observables,
+			   "Materialize implicit pruned outputs before reading distribution/overlap; "
 			   "does not measure the tree or consume random draws. Call after run_normal, before sampling.")
+            .def("get_logical_query_fidelity", &QC::logical_query_fidelity,
+                "Fidelity of the address/bus reduced state after tracing out the routing tree. "
+                "Requires canonical zero-bus input with one column per address. No postselection, "
+                "measurement or RNG draws; call after run, before tree/output sampling. "
+                "This differs from full-circuit overlap_fid and from the older tree-insensitive conventions.")
 			.def("set_input_zerobus", [](QC& self) {
 				/* zerobus input of the correspondence experiments: uniform
 				   superposition over all addresses with bus = 0 (a uniform bus

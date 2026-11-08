@@ -132,6 +132,7 @@ def test_noiseless_native_ensemble_and_exact_memory_digest():
     assert result["memory"]["sha256"] == hashlib.sha256(expected).hexdigest()
     assert result["resources"]["routing_qubits"] == 6
     assert result["fidelity"]["samples"] == pytest.approx([1.0]*3, abs=1e-12)
+    assert result["logical_fidelity"]["samples"] == pytest.approx([1.0]*3, abs=1e-12)
     assert result["scope"]["input_coverage"] == "all addresses"
     assert result["scope"]["acceptance_certificate"] is False
 
@@ -142,6 +143,9 @@ def test_actual_noise_channels_trace_and_reproducibility(channel):
                         channel=channel, probability=0.1)
     first, second = run(config), run(config)
     assert first["fidelity"]["samples"] == second["fidelity"]["samples"]
+    assert first["logical_fidelity"]["samples"] == second["logical_fidelity"]["samples"]
+    assert all(logical+1e-12 >= full for logical, full in zip(
+        first["logical_fidelity"]["samples"], first["fidelity"]["samples"]))
     assert first["normalization"]["max_trace_error"] < 1e-12
     assert 0 <= first["fidelity"]["mean"] < 1
     lo, hi = first["fidelity"]["confidence"]["interval"]

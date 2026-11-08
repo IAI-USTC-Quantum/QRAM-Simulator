@@ -75,25 +75,33 @@ def run(config: Experiment) -> dict:
     qram.set_noise_models(noise)
     ready = time.perf_counter()
     samples = []
+    logical_samples = []
     traces = []
     evolution = 0.0
+    observables = 0.0
     for index in range(config.trajectories):
         qs.set_seed(config.seed + index + 1)
         t0 = time.perf_counter()
         qram.run_normal()
         qram.prepare_observables()
         evolution += time.perf_counter() - t0
+        t0 = time.perf_counter()
         # Sampling the routing tree mutates branch groups; do not call
         # sample_and_get_fidelity before reading these ensemble observables.
         dist = qram.get_output_distribution()
         trace = math.fsum(dist.values())
         overlap = float(qram.get_fidelity_conventions()["overlap_fid"])
+        logical = float(qram.get_logical_query_fidelity())
         if (not math.isfinite(overlap) or not -1e-10 <= overlap <= 1+1e-10 or
+                not math.isfinite(logical) or not -1e-10 <= logical <= 1+1e-10 or
                 not math.isfinite(trace) or abs(trace-1) > 1e-9):
             raise RuntimeError("native trajectory violates normalization/fidelity bounds")
         samples.append(overlap)
+        logical_samples.append(logical)
         traces.append(trace)
+        observables += time.perf_counter()-t0
     mean = statistics.fmean(samples)
+    logical_mean = statistics.fmean(logical_samples)
     # Hoeffding, P(|mean-E[F]| > radius) <= 0.05 for independent bounded F.
     radius = math.sqrt(math.log(40)/(2*len(samples)))
     return {"schema": "qramsim.demo.v1", "software": information(),
@@ -108,13 +116,20 @@ def run(config: Experiment) -> dict:
                          "mean": mean, "samples": samples,
                          "confidence": {"method": "Hoeffding", "level": 0.95,
                                         "interval": [max(0.0, mean-radius), min(1.0, mean+radius)]}},
+            "logical_fidelity": {"definition": "<ideal_AB|Tr_tree(|trajectory><trajectory|)|ideal_AB>",
+                                 "postselected": False, "mean": logical_mean,
+                                 "samples": logical_samples,
+                                 "confidence": {"method": "Hoeffding", "level": 0.95,
+                                     "interval": [max(0.0, logical_mean-radius), min(1.0, logical_mean+radius)]}},
             "normalization": {"max_trace_error": max(abs(t-1) for t in traces)},
             "timing_s": {"prepare": ready-start, "native_evolution": evolution,
+                         "observables": observables,
                          "total": time.perf_counter()-start},
             "scope": {"input": "fixed random coherent address superposition with zero bus",
                       "input_basis_states": config.inputs,
                       "input_coverage": ("all addresses" if config.inputs == 2**config.depth
                                          else "sampled addresses"),
+                      "confidence_intervals": "95% marginal per observable; no simultaneous coverage claim",
                       "hardware_run": False, "acceptance_certificate": False}}
 
 

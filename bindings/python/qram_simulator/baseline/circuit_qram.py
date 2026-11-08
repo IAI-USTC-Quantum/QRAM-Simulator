@@ -89,8 +89,8 @@ def _require_uniqc():
 
 
 # The uniqc backend is created once per simulate() call; the basis-index bit
-# order of the QuTiP tensor product (qubit 0 = most significant bit) is probed
-# once and cached.
+# order exposed by the actual SDK is probed once and cached; do not assume
+# that a raw SDK density matrix uses QuTiP's usual qubit0-first tensor order.
 _BIT_ORDER_CACHE: Dict[str, str] = {}
 
 
@@ -184,6 +184,8 @@ class CircuitQRAMQubit:
         *,
         depolarizing: float = 0.0,
         damping: float = 0.0,
+        bit_flip: float = 0.0,
+        phase_flip: float = 0.0,
         input_mode: str = "zerobus",
     ):
         if addr_size not in (1, 2):
@@ -196,7 +198,8 @@ class CircuitQRAMQubit:
             raise ValueError(f"data_size must be 1 or 2 (got {data_size})")
         if input_mode not in ("zerobus", "uniform"):
             raise ValueError(f"input_mode must be 'zerobus' or 'uniform' (got {input_mode})")
-        for p, name in ((depolarizing, "depolarizing"), (damping, "damping")):
+        for p, name in ((depolarizing, "depolarizing"), (damping, "damping"),
+                        (bit_flip, "bit_flip"), (phase_flip, "phase_flip")):
             if not 0.0 <= p <= 1.0 or (name == "damping" and p >= 1.0):
                 raise ValueError(
                     f"{name} probability must lie in [0, 1] (Damping requires gamma < 1)"
@@ -215,6 +218,8 @@ class CircuitQRAMQubit:
         self.memory = memory
         self.depolarizing = float(depolarizing)
         self.damping = float(damping)
+        self.bit_flip = float(bit_flip)
+        self.phase_flip = float(phase_flip)
         self.input_mode = input_mode
         self.encoding = QubitQRAMEncoding(addr_size, data_size)
 
@@ -397,6 +402,14 @@ class CircuitQRAMQubit:
             for gate in gates:
                 self._apply_gate(be, gate)
             n_active = 2 * (2 ** entangle - 1)
+            for probability, pauli in ((self.bit_flip, np.array([[0, 1], [1, 0]], dtype=complex)),
+                                       (self.phase_flip, np.diag([1, -1]).astype(complex))):
+                if probability > 0:
+                    operators = [math.sqrt(1-probability)*np.eye(2, dtype=complex),
+                                 math.sqrt(probability)*pauli]
+                    for pos in range(n_active):
+                        be.kraus1q(self.encoding.noise_qubit(pos),
+                                   [matrix.reshape(-1).tolist() for matrix in operators])
             if self.depolarizing > 0.0:
                 for pos in range(n_active):
                     self._apply_depolarizing(be, self.encoding.noise_qubit(pos),
@@ -439,6 +452,40 @@ class CircuitQRAMQubit:
         if rho_ideal is None:
             rho_ideal = self.ideal_density_matrix()
         return float(np.real(np.trace(rho @ rho_ideal)))
+
+    def logical_density_matrix(self, rho: np.ndarray) -> np.ndarray:
+        """Trace out tree qubits; visible index is address + (bus << addr_size).
+
+        This retains address/bus coherences and sums only equal environment
+        indices. It is independent of the sparse engine's observable code.
+        """
+        enc = self.encoding
+        n = enc.num_qubits
+        rho = np.asarray(rho, dtype=complex)
+        if rho.shape != (2**n, 2**n):
+            raise ValueError("density matrix shape does not match the encoded circuit")
+        order = _backend_bit_order(_require_uniqc())
+        visible = [*enc.address_qubits, *enc.bus_qubits]
+        environment = [q for q in range(n) if q not in visible]
+        indices = np.empty((2**len(visible), 2**len(environment)), dtype=np.int64)
+        for index in range(2**n):
+            def bits(qubits):
+                return sum(((index >> (q if order == "lsb" else n-1-q)) & 1) << k
+                           for k, q in enumerate(qubits))
+            indices[bits(visible), bits(environment)] = index
+        reduced = np.zeros((len(indices), len(indices)), dtype=complex)
+        for column in indices.T:
+            reduced += rho[np.ix_(column, column)]
+        return reduced
+
+    def logical_fidelity_with_ideal(self, rho: np.ndarray) -> float:
+        """Overlap with the pure ideal address/bus query after a physical partial trace.
+
+        No router reset or postselection is imposed. This differs from the
+        full-circuit ``fidelity_with_ideal`` and tree-insensitive conventions.
+        """
+        ideal = self.logical_density_matrix(self.ideal_density_matrix())
+        return float(np.real(np.trace(self.logical_density_matrix(rho) @ ideal)))
 
     def run(self, mode: str = "faithful") -> Dict[str, object]:
         """Convenience wrapper: ideal + noisy density matrices and all metrics.
