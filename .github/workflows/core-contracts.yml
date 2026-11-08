@@ -32,9 +32,13 @@ jobs:
       - name: Complete Python contracts including QuTiP and four real ranks
         run: python -m pytest bindings/python/test -q -rs
   cuda-compile:
-    name: CUDA 13.3 compile sm80
+    name: CUDA ${{ matrix.cuda }} compile sm80
     runs-on: ubuntu-24.04
     if: github.repository_owner == 'IAI-USTC-Quantum'
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda: ['12.8.1', '13.3.0']
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -45,7 +49,7 @@ jobs:
       - name: Assemble pinned driver-free toolkit
         run: |
           python -m pip install cmake==4.4.4 ninja==1.13.2
-          python tools/bootstrap_cuda.py --output build-cuda/toolkit
+          python tools/bootstrap_cuda.py --release ${{ matrix.cuda }} --output build-cuda/toolkit
       - name: Configure explicit target architecture without a GPU
         run: >-
           cmake -S . -B build-cuda/native -G Ninja

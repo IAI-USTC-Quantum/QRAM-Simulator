@@ -45,10 +45,11 @@ def merge_tree(source, target):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--release", choices=("12.8.1", "13.3.0"), default="13.3.0")
     args = parser.parse_args()
     if platform.system() != "Linux" or platform.machine() != "x86_64":
         raise ValueError("this bootstrap supports Linux x86_64 only")
-    pin = json.loads(Path(__file__).with_name("cuda-redist-13.3.0-linux-x86_64.json").read_text())
+    pin = json.loads(Path(__file__).with_name(f"cuda-redist-{args.release}-linux-x86_64.json").read_text())
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=False)
     archives, extracted, prefix = root/"archives", root/"components", root/"prefix"

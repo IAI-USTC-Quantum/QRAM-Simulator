@@ -56,11 +56,12 @@ A driver-free development toolkit can be assembled from pinned official NVIDIA
 redistributables (Linux x86_64, Python 3.12+):
 
 ```bash
-python tools/bootstrap_cuda.py --output build-cuda/toolkit
+python tools/bootstrap_cuda.py --release 13.3.0 --output build-cuda/toolkit
 cmake -S . -B build-cuda/native -DQRAM_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=80 -DCMAKE_CUDA_COMPILER="$PWD/build-cuda/toolkit/prefix/bin/nvcc"
 cmake --build build-cuda/native --target SparQ_Common_cuda SparQ_QRAMSimulator_cuda
 ```
 
+The pinned choices are CUDA 12.8.1 and 13.3.0 (`--release`); both are compile-tested.
 The bootstrap verifies component sizes/SHA256 and preserves licenses. It installs
 no drivers or system packages. The explicit architecture allows a compilation check
 without a GPU; runtime correctness and throughput still require the target device.

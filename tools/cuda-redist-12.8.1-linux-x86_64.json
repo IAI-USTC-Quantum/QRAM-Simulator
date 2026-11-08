@@ -1,0 +1,41 @@
+{
+  "schema": "qram.cuda-toolkit-bootstrap.v1",
+  "release": "12.8.1",
+  "platform": "linux-x86_64",
+  "source": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_12.8.1.json",
+  "source_sha256": "249e28a83008d711d5f72880541c8be6253f6d61608461de4fcb715554a6cf17",
+  "components": {
+    "cuda_nvcc": {
+      "relative_path": "cuda_nvcc/linux-x86_64/cuda_nvcc-linux-x86_64-12.8.93-archive.tar.xz",
+      "sha256": "9961b3484b6b71314063709a4f9529654f96782ad39e72bf1e00f070db8210d3",
+      "md5": "5d7d11d3c8713fe8f19a2228b2b2b4bf",
+      "size": "79015464",
+      "version": "12.8.93",
+      "license_path": "cuda_nvcc/LICENSE.txt"
+    },
+    "cuda_cudart": {
+      "relative_path": "cuda_cudart/linux-x86_64/cuda_cudart-linux-x86_64-12.8.90-archive.tar.xz",
+      "sha256": "8d566b5fe745c46842dc16945cf36686227536decd2302c372be86da37faca68",
+      "md5": "4c374fabd7d36cac110ada9aea3c0743",
+      "size": "1354240",
+      "version": "12.8.90",
+      "license_path": "cuda_cudart/LICENSE.txt"
+    },
+    "cuda_cccl": {
+      "relative_path": "cuda_cccl/linux-x86_64/cuda_cccl-linux-x86_64-12.8.90-archive.tar.xz",
+      "sha256": "0740e9e01e4f15e17c5ab8d68bba4f8ec0eb6b84edccba4ac45112d2d2174e4b",
+      "md5": "97f6ad8c8717cc555974d03483200f43",
+      "size": "928524",
+      "version": "12.8.90",
+      "license_path": "cuda_cccl/LICENSE.txt"
+    },
+    "libcurand": {
+      "relative_path": "libcurand/linux-x86_64/libcurand-linux-x86_64-10.3.9.90-archive.tar.xz",
+      "sha256": "32a5ec30be446c1b7228d1bc502b2f029cc8b59a5e362c70d960754fa646778b",
+      "md5": "d32c8cfb7ad3afe4900df0febee45834",
+      "size": "88606668",
+      "version": "10.3.9.90",
+      "license_path": "libcurand/LICENSE.txt"
+    }
+  }
+}
