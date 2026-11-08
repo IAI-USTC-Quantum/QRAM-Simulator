@@ -35,6 +35,11 @@ minimum-version = "build-system.requires"
 cmake.version = ">=3.18"
 cmake.build-type = "Release"
 wheel.platlib = true
+wheel.license-files = [
+    "LICENSE", "THIRD_PARTY_NOTICES.md", "ThirdParty/notice-provenance.json",
+    "ThirdParty/fmt/LICENSE", "ThirdParty/eigen-3.4.0/COPYING.*",
+    "ThirdParty/argparse/LICENSE.Apache-2.0-with-LLVM-exception.txt",
+]
 # wheel.packages must be enabled together with wheel.platlib: packs both the
 # pure-Python sources of bindings/python/qram_simulator and the compiled
 # extension (_core) from the CMake install prefix into the wheel
