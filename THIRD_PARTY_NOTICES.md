@@ -19,6 +19,14 @@ distributions and binary wheels in the distribution's `licenses/` directory.
   The canonical Apache text and LLVM exception are included in
   `ThirdParty/argparse/LICENSE.Apache-2.0-with-LLVM-exception.txt`.
   LLVM is the source of that canonical license text, not a bundled dependency.
+- **pybind11 3.0.2**: the isolated Python build pins these binding headers.
+  Its full BSD-3-Clause copyright and terms accompany wheels as
+  `ThirdParty/pybind11/LICENSE`.
+- **GCC runtime**: Linux OpenMP builds link to libgomp; manylinux wheel repair
+  can bundle this runtime. Its original copyright declaration, GPLv3 text and
+  GCC Runtime Library Exception 3.1 accompany distributions under
+  `ThirdParty/gcc-runtime/`. These are runtime notices, not a change to this
+  project's license. CUDA SDK libraries are not bundled in the CPU wheel.
 
 `ThirdParty/notice-provenance.json` records the exact source commits,
 download URLs, SHA256 values and the extraction of canonical license text.

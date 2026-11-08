@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Delivery and builds
+- Add the standalone `qram-simulator info`, `run` and `gui` interfaces with
+  deterministic memory provenance, explicit selected input addresses, native
+  noisy trajectories, trace checks and sampling intervals. Reports distinguish
+  full-circuit overlap from a logical-query or acceptance certificate.
+- Add explicit observable materialization without consuming measurement RNG,
+  with pruned/full agreement covered across all four noisy channels.
+- Restore CUDA core compilation on current main and validate CUDA12.8/13.3;
+  honor actual C++20 builds. These compile checks do not certify GPU execution.
+- Include exact vendored/binding/runtime notices in binary and source packages.
+  Test each installed, repaired release wheel's notices, native computation,
+  CLI and packaged local GUI before publication. Release tags trigger one
+  upload; creating a GitHub Release does not duplicate publication.
+
 ### Fixed
 - Propagate an empty qubit reference group to all predicted groups during
   materialization, preserving input probabilities for subsequent queries.

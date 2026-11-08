@@ -78,6 +78,7 @@ jobs:
           assert len(wheels) == 1, wheels
           subprocess.run([sys.executable, 'tools/check_wheel_contents.py', wheels[0]], check=True)
           subprocess.run([sys.executable, '-m', 'pip', 'install', wheels[0], 'pytest', 'numpy'], check=True)
+          subprocess.run([sys.executable, 'tools/check_installed_product.py', '--notices-only'], check=True)
 
       - name: Run binding tests
         run: python -m pytest bindings/python/test -v
