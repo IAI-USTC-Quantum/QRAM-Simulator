@@ -17,6 +17,9 @@ authors = [{ name = "Agony", email = "chenzhaoyun@iai.ustc.edu.cn" }]
 
 dependencies = []
 
+[project.scripts]
+qram-simulator = "qram_simulator.demo:main"
+
 [project.urls]
 Homepage = "https://github.com/IAI-USTC-Quantum/QRAM-Simulator"
 Documentation = "https://iai-ustc-quantum.github.io/QRAM-Simulator/"

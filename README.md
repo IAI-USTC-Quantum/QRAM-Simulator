@@ -16,6 +16,36 @@ English | [简体中文](README_zh-cn.md)
 
 > **QRAM circuit simulation core (C++ base repository)**: two QRAM architectures (Qutrit/Qubit), noise models, QRAM paper experiments, and pybind11 Python bindings
 
+## Standalone experiment
+
+The installed package supplies its own native CPU experiment and local graphical
+interface, without depending on a separate demo-suite checkout:
+
+```bash
+qram-simulator info
+qram-simulator gui
+qram-simulator run --channel Damping --probability 0.001 --out experiment.json
+qram-simulator run --depth 20 --inputs 16 --trajectories 32 --out depth20.json
+```
+
+The GUI opens a local browser and supports all four noise channels, parameter
+editing, trajectory plots and JSON downloads. Each run uses an isolated native
+worker. Large runs use the CLI; the GUI limits depth to12, bus width to2,
+inputs to32, trajectories to64 and probability to0.1, with a60-second deadline.
+The CLI supports depth20 (1048576 random records), up to8 data bits,1024 input
+addresses and4096 trajectories. Set `--probability 0 --channel none` for
+the noiseless reference. Noise trajectories share a fixed random memory and a
+fixed coherent address input (zero bus); the same seed reproduces samples on the same backend.
+
+JSON records the one-byte-per-record SHA256, exact parameters, software/runtime,
+query and routing registers, pre-measurement unconditional channel fidelity,
+trace error, timings, and a95% Hoeffding sampling interval. Sampled input
+addresses do not certify testing every memory address. Routing qubits are QRAM
+architecture resources, not a fault-tolerant physical-qubit estimate. These
+experiments are not hardware or end-to-end performance certificates. Installation
+for developers remains `python -m pip install .`; desktop delivery bundles can
+launch the same entry point without exposing this step to end users.
+
 ## Repository Split
 
 This repository is the C++ base: QRAM circuit core + paper experiments + **pybind11 thin bindings** (the `qram-simulator` PyPI package); the SparQ framework (sparse-state simulator, algorithm library, pysparq rich bindings, and algorithm experiments) lives in the SparQSim repository:
