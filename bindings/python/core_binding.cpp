@@ -201,6 +201,29 @@ Typical workflow:
 				"Randomly sample n input branches, drawing input probabilities ~ U(0,1) then normalizing.")
 			.def("set_input_uniform", &QC::set_input_uniform, py::arg("n_inputs"),
 				"Randomly sample n input branches with equal input probability each.")
+			.def("set_input_addresses", [](QC& self, const std::vector<size_t>& addresses) {
+				if (addresses.empty()) throw std::invalid_argument("addresses must be nonempty");
+				std::set<size_t> unique(addresses.begin(), addresses.end());
+				if (unique.size() != addresses.size() || *unique.rbegin() >= pow2(self.addr_size))
+					throw std::invalid_argument("addresses must be unique and in range");
+				self.branch_groups.clear();
+				for (size_t address : addresses) {
+					self.branch_groups.emplace_back(address);
+					auto& group = self.branch_groups.back();
+					group.branches_input.emplace_back(address, self.data_size, 0);
+					group.branch_probs.push_back(1.0 / addresses.size());
+					group.state_probs.push_back(1.0 / addresses.size());
+				}
+			}, py::arg("addresses"),
+				"Equal coherent address superposition with an initially zero bus; addresses must be unique.")
+			.def("prepare_observables", [](QC& self) {
+				auto damping = self.noise_parameters.find(OperationType::Damping);
+				if (damping != self.noise_parameters.end() && self.first_good_branch_group >= 0)
+					self.time_step.get_multiplier_qubit(damping->second, self.time_step.last_step(),
+						self.branch_groups, self.first_good_branch_group, self.good_branch_group_ids);
+				self.materialize_good_branches();
+			}, "Materialize implicit pruned outputs before reading distribution/overlap; "
+			   "does not measure the tree or consume random draws. Call after run_normal, before sampling.")
 			.def("set_input_zerobus", [](QC& self) {
 				/* zerobus input of the correspondence experiments: uniform
 				   superposition over all addresses with bus = 0 (a uniform bus
