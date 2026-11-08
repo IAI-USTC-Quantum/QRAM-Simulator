@@ -82,7 +82,7 @@ fallback_version = "0.0.0"
 
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
-test-requires = ["pytest>=8,<10"]
+test-requires = ["pytest==8.4.2"]
 # Runs against the installed, repaired wheel in cibuildwheel's clean test venv.
 test-command = 'python "{project}/tools/check_installed_product.py"'
 # 32-bit systems unsupported for now (size_t != uint64_t); macOS support deferred

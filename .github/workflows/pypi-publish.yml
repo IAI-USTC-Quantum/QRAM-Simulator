@@ -26,6 +26,7 @@ jobs:
     # github.com -> run on the GitHub upstream only
     if: github.repository_owner == 'IAI-USTC-Quantum'
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
