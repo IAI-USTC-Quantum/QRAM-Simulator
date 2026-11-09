@@ -499,7 +499,8 @@ def main(argv=None) -> int:
 
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("info")
+    info = commands.add_parser("info")
+    info.add_argument("--out", type=Path)
     experiment = commands.add_parser("run")
     for name in ("depth", "data_bits", "inputs", "trajectories", "seed"):
         experiment.add_argument(

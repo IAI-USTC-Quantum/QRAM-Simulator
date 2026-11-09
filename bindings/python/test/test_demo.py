@@ -376,6 +376,27 @@ def test_real_cli_writes_artifact(tmp_path):
     assert result["fidelity"]["mean"] == pytest.approx(1, abs=1e-12)
 
 
+def test_info_command_reports_software_and_writes_artifact(tmp_path):
+    child = subprocess.run(
+        [sys.executable, "-m", "qram_simulator.demo", "info"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    result = json.loads(child.stdout)
+    assert result["software"] == "QRAM-Simulator"
+    assert result["gpu_execution"] is False
+    target = tmp_path / "info.json"
+    child = subprocess.run(
+        [sys.executable, "-m", "qram_simulator.demo", "info", "--out", str(target)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert not child.stdout
+    assert json.loads(target.read_text()) == result
+
+
 def test_gui_session_and_real_isolated_native_worker():
     with make_server() as server:
         thread = threading.Thread(target=server.serve_forever, daemon=True)
