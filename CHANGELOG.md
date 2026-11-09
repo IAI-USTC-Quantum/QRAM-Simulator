@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.5.0] - 2026-11-09
 
 ### Added
 - **Task-2.1 evidence replay as a standard product entry**
@@ -40,6 +40,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New bilingual guides "Depth-20 four-channel evidence replay (task 2.1)"
   and "Task-4 QRAM test plan"; README/README_zh sections for the `evidence`
   CLI, the `--evaluate` offline import and the new GUI panels.
+
+### Fixed
+- `qram-simulator info` crashed with AttributeError when the common output
+  block read `args.out`, an option the info parser never declared — broken
+  since the standalone CLI shipped in v0.3.0. It now accepts `--out` like
+  every other subcommand (pinned by a test).
+
+### Engineering
+- Normalize `bindings/python` and `tools` with the repository's pre-commit
+  black/isort/flake8 configuration (whole files, no semantic change) so
+  `black --check` / `flake8` pass across the Python tree; wheel and
+  installed-product checkers pin the new `evidence.py` module.
 
 ## [0.4.0] - 2026-11-09
 
