@@ -5,9 +5,7 @@
 import math
 
 import pytest
-
 import qram_simulator as qs
-
 
 MEMORY = [0, 1, 1, 0]
 
@@ -45,8 +43,12 @@ def test_schedule_operations_readable():
     assert ops, "noise-free schedule must contain logical operations"
     kinds = {op.type for op in ops}
     assert kinds <= {
-        qs.OperationType.FirstCopy, qs.OperationType.CopyIn, qs.OperationType.CopyOut,
-        qs.OperationType.SwapInternal, qs.OperationType.ControlSwap, qs.OperationType.FetchData,
+        qs.OperationType.FirstCopy,
+        qs.OperationType.CopyIn,
+        qs.OperationType.CopyOut,
+        qs.OperationType.SwapInternal,
+        qs.OperationType.ControlSwap,
+        qs.OperationType.FetchData,
     }
     assert qs.OperationType.FetchData in kinds
     assert qs.OperationType.ControlSwap in kinds

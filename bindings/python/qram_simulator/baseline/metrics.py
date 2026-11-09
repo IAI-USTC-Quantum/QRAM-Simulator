@@ -25,8 +25,7 @@ def _keys(p: Mapping[str, float], q: Mapping[str, float]):
 
 def classical_fidelity(p: Mapping[str, float], q: Mapping[str, float]) -> float:
     """Classical distribution fidelity (sum of sqrt(p*q))^2."""
-    return float(sum(math.sqrt(max(p.get(k, 0.0) * q.get(k, 0.0), 0.0))
-                     for k in _keys(p, q)) ** 2)
+    return float(sum(math.sqrt(max(p.get(k, 0.0) * q.get(k, 0.0), 0.0)) for k in _keys(p, q)) ** 2)
 
 
 def tvd(p: Mapping[str, float], q: Mapping[str, float]) -> float:

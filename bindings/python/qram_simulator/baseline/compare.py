@@ -51,9 +51,17 @@ from .metrics import classical_fidelity, dist_total, mean_of_dists, normalize, t
 DEFAULT_SWEEP: List[Dict[str, float]] = (
     [{"depol": p} for p in (0.005, 0.02, 0.05, 0.1, 0.3)]
     + [{"damp": g} for g in (0.001, 0.01, 0.05, 0.2)]
-    + [{"depol": p, "damp": g}
-       for p, g in ((0.005, 0.005), (0.02, 0.02), (0.05, 0.02),
-                    (0.02, 0.05), (0.05, 0.05), (0.1, 0.05))]
+    + [
+        {"depol": p, "damp": g}
+        for p, g in (
+            (0.005, 0.005),
+            (0.02, 0.02),
+            (0.05, 0.02),
+            (0.02, 0.05),
+            (0.05, 0.05),
+            (0.1, 0.05),
+        )
+    ]
 )
 
 
@@ -66,8 +74,9 @@ def _noise_models(config: Dict[str, float]) -> Dict[OperationType, float]:
     return noise
 
 
-def run_qram_side(addr_size: int, data_size: int, memory, config: Dict[str, float],
-                  runs: int, seed: int) -> Dict[str, object]:
+def run_qram_side(
+    addr_size: int, data_size: int, memory, config: Dict[str, float], runs: int, seed: int
+) -> Dict[str, object]:
     """R independent run_full trajectories of QRAMCircuitQubit, zerobus input.
 
     Mirrors the reference loop of QubitCorrespondenceExporter: per trajectory
@@ -108,7 +117,11 @@ def run_qram_side(addr_size: int, data_size: int, memory, config: Dict[str, floa
     def _mean_err(values: List[float]) -> Dict[str, float]:
         n = len(values)
         mean = sum(values) / n
-        err = (sum((v - mean) ** 2 for v in values) / max(n - 1, 1)) ** 0.5 / math.sqrt(n) if n > 1 else 0.0
+        err = (
+            (sum((v - mean) ** 2 for v in values) / max(n - 1, 1)) ** 0.5 / math.sqrt(n)
+            if n > 1
+            else 0.0
+        )
         return {"mean": mean, "mc_error": err}
 
     return {
@@ -125,10 +138,13 @@ def run_qram_side(addr_size: int, data_size: int, memory, config: Dict[str, floa
     }
 
 
-def run_circuit_side(addr_size: int, data_size: int, memory, config: Dict[str, float],
-                     mode: str) -> Dict[str, object]:
+def run_circuit_side(
+    addr_size: int, data_size: int, memory, config: Dict[str, float], mode: str
+) -> Dict[str, object]:
     baseline = CircuitQRAMQubit(
-        addr_size, data_size, memory,
+        addr_size,
+        data_size,
+        memory,
         depolarizing=config.get("depol", 0.0),
         damping=config.get("damp", 0.0),
     )
@@ -143,17 +159,25 @@ def run_circuit_side(addr_size: int, data_size: int, memory, config: Dict[str, f
     }
 
 
-def compare_one(config: Dict[str, float], addr_size: int, data_size: int, memory,
-                runs: int, seed: int, modes: List[str],
-                bridge: Optional[Dict[str, object]] = None) -> Dict[str, object]:
+def compare_one(
+    config: Dict[str, float],
+    addr_size: int,
+    data_size: int,
+    memory,
+    runs: int,
+    seed: int,
+    modes: List[str],
+    bridge: Optional[Dict[str, object]] = None,
+) -> Dict[str, object]:
     """One noise configuration: both sides + all convention-identical metrics."""
     qram = run_qram_side(addr_size, data_size, memory, config, runs, seed)
 
     # noise-free bridge of both sides (identical for every configuration --
     # computed once by the caller and reused)
     if bridge is None:
-        bridge = run_circuit_side(addr_size, data_size, memory,
-                                  {"depol": 0.0, "damp": 0.0}, "faithful")
+        bridge = run_circuit_side(
+            addr_size, data_size, memory, {"depol": 0.0, "damp": 0.0}, "faithful"
+        )
     bridge_max_dp = max(
         abs(bridge["ideal_dist"].get(k, 0.0) - qram["noisefree_dist"].get(k, 0.0))
         for k in set(bridge["ideal_dist"]) | set(qram["noisefree_dist"])
@@ -189,7 +213,8 @@ def compare_one(config: Dict[str, float], addr_size: int, data_size: int, memory
         "fidelity_gap": (primary["F_quantum"] - ov["mean"]) if ov["mean"] is not None else None,
         "fidelity_gap_in_mc_error": (
             abs(primary["F_quantum"] - ov["mean"]) <= 3.0 * ov["mc_error"]
-            if ov["mean"] is not None else None
+            if ov["mean"] is not None
+            else None
         ),
     }
 
@@ -229,33 +254,55 @@ def print_table(results: List[Dict[str, object]]) -> None:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--addr", type=int, default=2, choices=(1, 2),
-                        help="tree depth / address width (default 2; whole-tree damping also acts at depth 1)")
-    parser.add_argument("--data", type=int, default=1, choices=(1, 2),
-                        help="data width per memory cell (default 1)")
-    parser.add_argument("--memory", default=None,
-                        help="comma-separated memory cells (default 0,1,1,0 for addr=2)")
-    parser.add_argument("--runs", type=int, default=500,
-                        help="number of QRAM-Simulator noise trajectories per configuration")
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--addr",
+        type=int,
+        default=2,
+        choices=(1, 2),
+        help="tree depth / address width (default 2; whole-tree damping also acts at depth 1)",
+    )
+    parser.add_argument(
+        "--data", type=int, default=1, choices=(1, 2), help="data width per memory cell (default 1)"
+    )
+    parser.add_argument(
+        "--memory", default=None, help="comma-separated memory cells (default 0,1,1,0 for addr=2)"
+    )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=500,
+        help="number of QRAM-Simulator noise trajectories per configuration",
+    )
     parser.add_argument("--seed", type=int, default=20260925)
-    parser.add_argument("--modes", nargs="+", default=["faithful"],
-                        choices=("faithful", "textbook", "legacy", "nojump"),
-                        help="circuit-side channel variants to evaluate in addition to "
-                             "the primary one (textbook is the equivalent standard channel; "
-                             "legacy retains the retired non-TP mirror; nojump keeps K0 only)")
-    parser.add_argument("--outdir", default="qram-baseline-results",
-                        help="output directory for results.json / results.csv")
-    parser.add_argument("--quick", action="store_true",
-                        help="reduced sweep (one depol + one damp + mixed), 100 runs")
+    parser.add_argument(
+        "--modes",
+        nargs="+",
+        default=["faithful"],
+        choices=("faithful", "textbook", "legacy", "nojump"),
+        help="circuit-side channel variants to evaluate in addition to "
+        "the primary one (textbook is the equivalent standard channel; "
+        "legacy retains the retired non-TP mirror; nojump keeps K0 only)",
+    )
+    parser.add_argument(
+        "--outdir",
+        default="qram-baseline-results",
+        help="output directory for results.json / results.csv",
+    )
+    parser.add_argument(
+        "--quick",
+        action="store_true",
+        help="reduced sweep (one depol + one damp + mixed), 100 runs",
+    )
     args = parser.parse_args(argv)
 
     if args.memory is not None:
         memory = [int(x) for x in args.memory.split(",")]
     else:
-        memory = [0, 1, 1, 0][: 2 ** args.addr]
-        memory = (memory * (2 ** args.addr))[: 2 ** args.addr]
-    if len(memory) != 2 ** args.addr:
+        memory = [0, 1, 1, 0][: 2**args.addr]
+        memory = (memory * (2**args.addr))[: 2**args.addr]
+    if len(memory) != 2**args.addr:
         parser.error(f"memory needs 2**addr = {2**args.addr} cells")
 
     sweep = DEFAULT_SWEEP
@@ -264,23 +311,28 @@ def main(argv=None) -> int:
         sweep = [{"depol": 0.05}, {"damp": 0.05}, {"depol": 0.02, "damp": 0.02}]
         runs = min(runs, 100)
 
-    print(f"qram-simulator {qram_simulator.__version__} | addr={args.addr} data={args.data} "
-          f"memory={memory} runs={runs} seed={args.seed}")
+    print(
+        f"qram-simulator {qram_simulator.__version__} | addr={args.addr} data={args.data} "
+        f"memory={memory} runs={runs} seed={args.seed}"
+    )
     if args.addr == 1:
         print("note: addr=1 has no active-front Pauli noise; whole-tree damping still acts")
 
     results = []
-    bridge = run_circuit_side(args.addr, args.data, memory,
-                              {"depol": 0.0, "damp": 0.0}, "faithful")
+    bridge = run_circuit_side(args.addr, args.data, memory, {"depol": 0.0, "damp": 0.0}, "faithful")
     for config in sweep:
         t0 = time.time()
-        row = compare_one(config, args.addr, args.data, memory, runs, args.seed,
-                          args.modes, bridge=bridge)
+        row = compare_one(
+            config, args.addr, args.data, memory, runs, args.seed, args.modes, bridge=bridge
+        )
         results.append(row)
         name = "+".join(f"{k}={v:g}" for k, v in config.items())
-        print(f"[{time.time() - t0:6.1f}s] {name}: QRAM F={row['qram']['avg_overlap_fid']['mean']:.4f} "
-              f"vs uniqc F={row['primary']['F_quantum']:.4f}  "
-              f"F_cls={row['primary']['F_cls_norm']:.4f} TVD={row['primary']['TVD_norm']:.4f}")
+        print(
+            f"[{time.time() - t0:6.1f}s] {name}: "
+            f"QRAM F={row['qram']['avg_overlap_fid']['mean']:.4f} "
+            f"vs uniqc F={row['primary']['F_quantum']:.4f}  "
+            f"F_cls={row['primary']['F_cls_norm']:.4f} TVD={row['primary']['TVD_norm']:.4f}"
+        )
 
     print()
     print_table(results)
@@ -323,23 +375,45 @@ def main(argv=None) -> int:
 
     with (outdir / "results.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow([
-            "config", "mode", "F_cls_norm", "TVD_norm", "F_cls_unnorm",
-            "trace", "qram_survival", "F_quantum", "avg_overlap_fid",
-            "overlap_mc_error", "avg_fid_nopost", "avg_fid_incoh",
-            "avg_fidelity_post", "bridge_max_dp",
-        ])
+        writer.writerow(
+            [
+                "config",
+                "mode",
+                "F_cls_norm",
+                "TVD_norm",
+                "F_cls_unnorm",
+                "trace",
+                "qram_survival",
+                "F_quantum",
+                "avg_overlap_fid",
+                "overlap_mc_error",
+                "avg_fid_nopost",
+                "avg_fid_incoh",
+                "avg_fidelity_post",
+                "bridge_max_dp",
+            ]
+        )
         for r in results:
             for mode, ch in r["channels"].items():
                 q = r["qram"]
-                writer.writerow([
-                    "+".join(f"{k}={v:g}" for k, v in r["config"].items()),
-                    mode, ch["F_cls_norm"], ch["TVD_norm"], ch["F_cls_unnorm"],
-                    ch["trace"], q["survival"], ch["F_quantum"],
-                    q["avg_overlap_fid"]["mean"], q["avg_overlap_fid"]["mc_error"],
-                    q["avg_fid_nopost"]["mean"], q["avg_fid_incoh"]["mean"],
-                    q["avg_fidelity_post"]["mean"], r["bridge_max_dp_noisefree"],
-                ])
+                writer.writerow(
+                    [
+                        "+".join(f"{k}={v:g}" for k, v in r["config"].items()),
+                        mode,
+                        ch["F_cls_norm"],
+                        ch["TVD_norm"],
+                        ch["F_cls_unnorm"],
+                        ch["trace"],
+                        q["survival"],
+                        ch["F_quantum"],
+                        q["avg_overlap_fid"]["mean"],
+                        q["avg_overlap_fid"]["mc_error"],
+                        q["avg_fid_nopost"]["mean"],
+                        q["avg_fid_incoh"]["mean"],
+                        q["avg_fidelity_post"]["mean"],
+                        r["bridge_max_dp_noisefree"],
+                    ]
+                )
 
     print(f"\nresults written to {outdir / 'results.json'} and {outdir / 'results.csv'}")
     return 0

@@ -4,7 +4,6 @@
 # (UnifiedQuantum) + qutip stack is not installed.
 
 import pytest
-
 import qram_simulator as qs
 
 # Skip before touching qs.baseline (its __init__ eagerly imports
@@ -12,12 +11,16 @@ import qram_simulator as qs
 # CI runs on bare `pip install . pytest` environments.
 pytest.importorskip("uniqc.simulator.qutip_sim_impl")
 
-import numpy as np
+import numpy as np  # noqa: E402 -- after importorskip
 
 qs.baseline  # lazy import guard (fails here, not deep inside, if broken)
 
-from qram_simulator.baseline import CircuitQRAMQubit, classical_fidelity, tvd
-from qram_simulator.baseline.compare import run_circuit_side, run_qram_side
+from qram_simulator.baseline import (  # noqa: E402 -- after importorskip
+    CircuitQRAMQubit,
+    classical_fidelity,
+    tvd,
+)
+from qram_simulator.baseline.compare import run_circuit_side, run_qram_side  # noqa: E402
 
 MEMORY = [0, 1, 1, 0]
 
@@ -43,8 +46,8 @@ def test_physical_partial_trace_agrees_with_qutip_and_keeps_complex_coherence():
     circuit = CircuitQRAMQubit(1, 1, [0, 1])
     # Reference tensor axes: address, bus, then the two router bits.
     # Reorder visible MSB tensor indices to address + (bus << addr_size).
-    visible = qutip.Qobj([0, 1j*np.sqrt(0.7), np.sqrt(0.3), 0], dims=[[2, 2], [1, 1]])
-    tree = np.sqrt(0.4)*qutip.basis(4, 0)+1j*np.sqrt(0.6)*qutip.basis(4, 3)
+    visible = qutip.Qobj([0, 1j * np.sqrt(0.7), np.sqrt(0.3), 0], dims=[[2, 2], [1, 1]])
+    tree = np.sqrt(0.4) * qutip.basis(4, 0) + 1j * np.sqrt(0.6) * qutip.basis(4, 3)
     tree.dims = [[2, 2], [1, 1]]
     joint = qutip.tensor(visible, tree).proj()
     order = [0, 2, 1, 3]
@@ -59,21 +62,32 @@ def test_router_excitation_and_which_path_information_are_distinguished():
     import qutip
 
     circuit = CircuitQRAMQubit(1, 1, [0, 1])
-    bell = (qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0)) +
-            qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1)))/np.sqrt(2)
+    bell = (
+        qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0))
+        + qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1))
+    ) / np.sqrt(2)
     tree = qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1))
     joint = _density_in_sdk_order(qutip.tensor(bell, tree).proj())
     assert circuit.fidelity_with_ideal(joint) == pytest.approx(0, abs=1e-12)
     assert circuit.logical_fidelity_with_ideal(joint) == pytest.approx(1, abs=1e-12)
-    which_path = (qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0),
-                              qutip.basis(2, 0), qutip.basis(2, 0)) +
-                  qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1),
-                              qutip.basis(2, 1), qutip.basis(2, 1)))/np.sqrt(2)
-    assert circuit.logical_fidelity_with_ideal(_density_in_sdk_order(which_path.proj())) == pytest.approx(0.5, abs=1e-12)
+    which_path = (
+        qutip.tensor(qutip.basis(2, 0), qutip.basis(2, 0), qutip.basis(2, 0), qutip.basis(2, 0))
+        + qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1), qutip.basis(2, 1), qutip.basis(2, 1))
+    ) / np.sqrt(2)
+    assert circuit.logical_fidelity_with_ideal(
+        _density_in_sdk_order(which_path.proj())
+    ) == pytest.approx(0.5, abs=1e-12)
 
 
-@pytest.mark.parametrize("channel,parameter", [("BitFlip", "bit_flip"),
-    ("PhaseFlip", "phase_flip"), ("Depolarizing", "depolarizing"), ("Damping", "damping")])
+@pytest.mark.parametrize(
+    "channel,parameter",
+    [
+        ("BitFlip", "bit_flip"),
+        ("PhaseFlip", "phase_flip"),
+        ("Depolarizing", "depolarizing"),
+        ("Damping", "damping"),
+    ],
+)
 def test_logical_query_fidelity_matches_independent_complete_channel(channel, parameter, tmp_path):
     import json
     import math
@@ -84,35 +98,45 @@ def test_logical_query_fidelity_matches_independent_complete_channel(channel, pa
     expected = circuit.logical_fidelity_with_ideal(rho)
     full_overlap = circuit.fidelity_with_ideal(rho)
     assert np.trace(rho) == pytest.approx(1, abs=1e-11)
-    assert expected+1e-12 >= full_overlap
+    assert expected + 1e-12 >= full_overlap
     qram = qs.QRAMCircuitQubit(2, 1, MEMORY)
     qram.set_input_zerobus()
     qram.set_noise_models({getattr(qs.OperationType, channel): probability})
     values = []
     for trajectory in range(samples):
-        qs.set_seed(20261109+trajectory)
+        qs.set_seed(20261109 + trajectory)
         qram.run_normal()
         value = qram.get_logical_query_fidelity()
-        assert -1e-12 <= value <= 1+1e-12
+        assert -1e-12 <= value <= 1 + 1e-12
         values.append(value)
     mean = float(np.mean(values))
     # A declared, fixed bounded-variable concentration bound, not a fitted
     # tolerance or a retry-until-pass Monte-Carlo sample selection.
-    radius = math.sqrt(math.log(2/delta)/(2*samples))
-    report = {"channel": channel, "probability": probability, "trajectories": samples,
-              "seed_start": 20261109, "density_reference": expected,
-              "full_circuit_overlap": full_overlap, "trajectory_mean": mean,
-              "standard_error": float(np.std(values, ddof=1)/math.sqrt(samples)),
-              "confidence_radius": radius, "delta": delta}
-    (tmp_path/"logical-channel.json").write_text(json.dumps(report, indent=2)+"\n")
-    assert abs(mean-expected) <= radius
+    radius = math.sqrt(math.log(2 / delta) / (2 * samples))
+    report = {
+        "channel": channel,
+        "probability": probability,
+        "trajectories": samples,
+        "seed_start": 20261109,
+        "density_reference": expected,
+        "full_circuit_overlap": full_overlap,
+        "trajectory_mean": mean,
+        "standard_error": float(np.std(values, ddof=1) / math.sqrt(samples)),
+        "confidence_radius": radius,
+        "delta": delta,
+    }
+    (tmp_path / "logical-channel.json").write_text(json.dumps(report, indent=2) + "\n")
+    assert abs(mean - expected) <= radius
 
 
-@pytest.mark.parametrize("addr,data,memory", [
-    (1, 1, [0, 1]),
-    (2, 1, MEMORY),
-    (2, 2, [0, 1, 2, 3]),
-])
+@pytest.mark.parametrize(
+    "addr,data,memory",
+    [
+        (1, 1, [0, 1]),
+        (2, 1, MEMORY),
+        (2, 2, [0, 1, 2, 3]),
+    ],
+)
 def test_noise_free_bridge_bitwise(addr, data, memory):
     """Circuit-level ideal distribution == QRAM noise-free run, key for key."""
     circuit = CircuitQRAMQubit(addr, data, memory)
@@ -158,6 +182,7 @@ def test_depol_semi_quantitative(depol):
 
     qram = run_qram_side(2, 1, MEMORY, config, runs=300, seed=20260925)
     from qram_simulator.baseline.metrics import normalize
+
     f_cls = classical_fidelity(normalize(qram["avg_dist"]), normalize(circuit["dist"]))
     assert f_cls > 0.99
     assert tvd(normalize(qram["avg_dist"]), normalize(circuit["dist"])) < 0.05
@@ -186,8 +211,8 @@ def test_damping_current_whole_tree_channel(damp):
     assert abs(faithful["fidelity"] - overlap["mean"]) < max(3.0 * overlap["mc_error"], 0.05)
     # Keep the existing normalized-distribution metric and threshold.
     from qram_simulator.baseline.metrics import normalize
-    assert classical_fidelity(normalize(qram["avg_dist"]),
-                              normalize(faithful["dist"])) > 0.99
+
+    assert classical_fidelity(normalize(qram["avg_dist"]), normalize(faithful["dist"])) > 0.99
 
 
 def test_one_layer_damping_does_not_disappear_with_empty_pauli_front():
@@ -199,7 +224,7 @@ def test_one_layer_damping_does_not_disappear_with_empty_pauli_front():
     assert qram["survival"] == pytest.approx(1.0, abs=1e-12)
     assert circuit["fidelity"] < 0.99
     overlap = qram["avg_overlap_fid"]
-    assert abs(circuit["fidelity"] - overlap["mean"]) < max(3*overlap["mc_error"], 0.02)
+    assert abs(circuit["fidelity"] - overlap["mean"]) < max(3 * overlap["mc_error"], 0.02)
 
 
 def test_old_non_tp_mirror_requires_explicit_legacy_mode():
@@ -224,7 +249,7 @@ def test_metrics_basics():
 def test_rho_shapes_and_purity():
     circuit = CircuitQRAMQubit(2, 1, MEMORY)
     rho_ideal = circuit.ideal_density_matrix()
-    assert rho_ideal.shape == (2 ** circuit.encoding.num_qubits,) * 2
+    assert rho_ideal.shape == (2**circuit.encoding.num_qubits,) * 2
     assert np.real(np.trace(rho_ideal @ rho_ideal)) == pytest.approx(1.0, abs=1e-12)
     rho = circuit.simulate_density("faithful")
     assert rho.shape == rho_ideal.shape

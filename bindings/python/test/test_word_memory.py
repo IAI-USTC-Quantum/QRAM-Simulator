@@ -24,7 +24,6 @@ import math
 from pathlib import Path
 
 import pytest
-
 from qram_simulator.word_backend import (
     MACHINE_WORD_BITS,
     InplaceWordBackend,
@@ -42,8 +41,9 @@ MACHINE_WORD = MACHINE_WORD_BITS
 # ---------------------------------------------------------------------------
 
 
-def classical_query(memory: SparseWordMemory, address, data, control, conditions,
-                    address_bits, control_bits) -> int | None:
+def classical_query(
+    memory: SparseWordMemory, address, data, control, conditions, address_bits, control_bits
+) -> int | None:
     """Independent oracle: output data word, or None when gated off."""
     values = {pair: (address >> bit) & 1 for bit, pair in enumerate(address_bits)}
     values.update({pair: (control >> bit) & 1 for bit, pair in enumerate(control_bits)})
@@ -54,25 +54,35 @@ def classical_query(memory: SparseWordMemory, address, data, control, conditions
     return data ^ memory.cells.get(address, 0)
 
 
-def run_chain(memory, backend, address_bits, data_bits, control_bits,
-              basis_fields, amplitudes, conditions=()):
+def run_chain(
+    memory, backend, address_bits, data_bits, control_bits, basis_fields, amplitudes, conditions=()
+):
     """Execute apply_xor on a real state and derive the oracle expectation."""
     backend.register(address_bits, data_bits, control_bits)
     state = backend.make_state()
     for (address, data, control), amplitude in zip(basis_fields, amplitudes):
-        basis = encode_basis(encode_basis(encode_basis(0, address_bits, address, backend),
-                              data_bits, data, backend),
-                       control_bits, control, backend)
+        basis = encode_basis(
+            encode_basis(encode_basis(0, address_bits, address, backend), data_bits, data, backend),
+            control_bits,
+            control,
+            backend,
+        )
         state.amps[basis] = state.amps.get(basis, 0j) + amplitude
     memory.apply_xor(state, address_bits, data_bits, backend, conditions=conditions)
     expected: dict[int, complex] = {}
     for (address, data, control), amplitude in zip(basis_fields, amplitudes):
-        out = classical_query(memory, address, data, control, conditions,
-                              address_bits, control_bits)
+        out = classical_query(
+            memory, address, data, control, conditions, address_bits, control_bits
+        )
         out_data = data if out is None else out
-        basis = encode_basis(encode_basis(encode_basis(0, address_bits, address, backend),
-                              data_bits, out_data, backend),
-                       control_bits, control, backend)
+        basis = encode_basis(
+            encode_basis(
+                encode_basis(0, address_bits, address, backend), data_bits, out_data, backend
+            ),
+            control_bits,
+            control,
+            backend,
+        )
         expected[basis] = expected.get(basis, 0j) + amplitude
     return state, expected
 
@@ -89,8 +99,10 @@ def address_purity(state, address_bits, backend) -> float:
     purity = 0.0
     for a in addresses:
         for b in addresses:
-            rho_ab = sum(reduced.get((a, env), 0j) * reduced.get((b, env), 0j).conjugate()
-                         for env in environments)
+            rho_ab = sum(
+                reduced.get((a, env), 0j) * reduced.get((b, env), 0j).conjugate()
+                for env in environments
+            )
             purity += abs(rho_ab) ** 2
     return purity
 
@@ -101,17 +113,18 @@ def address_purity(state, address_bits, backend) -> float:
 
 
 def test_sparse_high_words_and_xor_involution():
-    memory = SparseWordMemory(129, 193, {1 << 128: (1 << 192)+7, 0: 1})
+    memory = SparseWordMemory(129, 193, {1 << 128: (1 << 192) + 7, 0: 1})
     assert len(memory.cells) == 2
-    data = (1 << 130)+9
+    data = (1 << 130) + 9
     output = memory.xor(1 << 128, data)
-    assert output == data ^ ((1 << 192)+7)
+    assert output == data ^ ((1 << 192) + 7)
     assert memory.xor(1 << 128, output) == data
-    assert memory.xor((1 << 128)+1, data) == data
+    assert memory.xor((1 << 128) + 1, data) == data
 
 
-@pytest.mark.parametrize("address,value",
-                   [(True, 1), (-1, 1), (1 << 129, 1), (0, True), (0, -1), (0, 1 << 193)])
+@pytest.mark.parametrize(
+    "address,value", [(True, 1), (-1, 1), (1 << 129, 1), (0, True), (0, -1), (0, 1 << 193)]
+)
 def test_invalid_values_do_not_truncate(address, value):
     with pytest.raises(ValueError):
         SparseWordMemory(129, 193, {address: value})
@@ -178,18 +191,21 @@ CHAIN_WIDTHS = [64, 65, 127, 128, 129, 256]
 def test_chain_superposition_matches_classical_oracle(address_width):
     data_width = min(address_width + 1, 257)
     addresses = [(1 << (address_width - 1)) | 0b11, 0b10, (1 << (address_width - 2)) | 1]
-    memory = SparseWordMemory(address_width, data_width, {
-        addresses[0]: (1 << (data_width - 1)) | 5,
-        addresses[2]: (1 << (data_width - 1)) | (1 << (data_width - 2)),
-    })
+    memory = SparseWordMemory(
+        address_width,
+        data_width,
+        {
+            addresses[0]: (1 << (data_width - 1)) | 5,
+            addresses[2]: (1 << (data_width - 1)) | (1 << (data_width - 2)),
+        },
+    )
     backend = ReferenceWordBackend()
     address_bits = word_layout(address_width, "a")
     data_bits = word_layout(data_width, "d")
     quarter = 0.5
     amplitudes = [quarter, quarter * 1j, -quarter]
     fields = [(address, 0, 0) for address in addresses]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, [],
-                                fields, amplitudes)
+    state, expected = run_chain(memory, backend, address_bits, data_bits, [], fields, amplitudes)
     assert state.amps == expected
 
 
@@ -200,8 +216,15 @@ def test_chain_entangles_address_and_data_and_keeps_phase():
     data_bits = word_layout(3, "d")
     phase = complex(3, 4) / 5
     fields = [(0b1011, 0, 0), (0b0100, 0, 0)]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, [],
-                                fields, [phase / math.sqrt(2), phase.conjugate() / math.sqrt(2)])
+    state, expected = run_chain(
+        memory,
+        backend,
+        address_bits,
+        data_bits,
+        [],
+        fields,
+        [phase / math.sqrt(2), phase.conjugate() / math.sqrt(2)],
+    )
     assert state.amps == expected
     # the queried branch keeps its relative phase and the branches entangle:
     # the reduced address state has purity 1/2, not the 1 of a product state
@@ -219,12 +242,14 @@ def test_chain_shared_zero_address_control():
     zero_control = ([address_bits[2]], 0)
     fields = [(0b0101, 0b0011, 0), (0b0001, 0b0011, 0), (0b0011, 0b0011, 0)]
     thirds = [1 / 3, 1 / 3, 1 / 3]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, [],
-                                fields, thirds, conditions=(zero_control,))
+    state, expected = run_chain(
+        memory, backend, address_bits, data_bits, [], fields, thirds, conditions=(zero_control,)
+    )
     assert state.amps == expected
     one_control = ([address_bits[2]], 1)  # now 0b0001 contradicts and 0b0101 agrees
-    state2, expected2 = run_chain(memory, backend, address_bits, data_bits, [],
-                                  fields, thirds, conditions=(one_control,))
+    state2, expected2 = run_chain(
+        memory, backend, address_bits, data_bits, [], fields, thirds, conditions=(one_control,)
+    )
     assert state2.amps == expected2
     assert state2.amps != state.amps, "the two gate polarities address different cells"
 
@@ -241,15 +266,26 @@ def test_chain_external_controls_zero_and_one():
     conditions = (([control_bits[1], address_bits[1]], 0b01),)
     fields = [(0b101, 0b010, 0b10), (0b101, 0b010, 0b01), (0b111, 0b010, 0b10)]
     amplitudes = [0.5, 0.5, 1 / math.sqrt(2)]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, control_bits,
-                                fields, amplitudes, conditions=conditions)
+    state, expected = run_chain(
+        memory,
+        backend,
+        address_bits,
+        data_bits,
+        control_bits,
+        fields,
+        amplitudes,
+        conditions=conditions,
+    )
     assert state.amps == expected
 
 
 @pytest.mark.parametrize("address_width", CHAIN_WIDTHS)
 def test_chain_double_application_is_identity(address_width):
-    memory = SparseWordMemory(address_width, address_width,
-                              {(1 << (address_width - 1)) | 2: (1 << (address_width - 1)) | 1})
+    memory = SparseWordMemory(
+        address_width,
+        address_width,
+        {(1 << (address_width - 1)) | 2: (1 << (address_width - 1)) | 1},
+    )
     backend = ReferenceWordBackend()
     address_bits = word_layout(address_width, "a")
     data_bits = word_layout(address_width, "d")
@@ -270,8 +306,9 @@ def test_chain_inplace_conditioned_protocol_variant():
     address_bits = word_layout(3, "a")
     data_bits = word_layout(2, "d")
     fields = [(0b110, 0b01, 0), (0b001, 0b01, 0)]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, [],
-                                fields, [1 / math.sqrt(2), 1 / math.sqrt(2)])
+    state, expected = run_chain(
+        memory, backend, address_bits, data_bits, [], fields, [1 / math.sqrt(2), 1 / math.sqrt(2)]
+    )
     assert state.amps == expected
 
 
@@ -294,14 +331,19 @@ def test_chain_input_validation():
     with pytest.raises(ValueError):
         memory.apply_xor(state, data_bits + address_bits[:1], address_bits, backend)
     with pytest.raises(ValueError):
-        memory.apply_xor(state, address_bits, data_bits, backend,
-                         conditions=(([data_bits[0]], 1),))
+        memory.apply_xor(state, address_bits, data_bits, backend, conditions=(([data_bits[0]], 1),))
     with pytest.raises(ValueError):
-        memory.apply_xor(state, address_bits, data_bits, backend,
-                         conditions=(([address_bits[0], address_bits[0]], 1),))
+        memory.apply_xor(
+            state,
+            address_bits,
+            data_bits,
+            backend,
+            conditions=(([address_bits[0], address_bits[0]], 1),),
+        )
     with pytest.raises(ValueError):
-        memory.apply_xor(state, address_bits, data_bits, backend,
-                         conditions=(([address_bits[0]], 2),))
+        memory.apply_xor(
+            state, address_bits, data_bits, backend, conditions=(([address_bits[0]], 2),)
+        )
 
 
 def test_chain_high_data_bits_span_machine_words():
@@ -310,12 +352,14 @@ def test_chain_high_data_bits_span_machine_words():
     address_bits = word_layout(70, "a")
     data_bits = word_layout(130, "d")
     fields = [((1 << 69), (1 << 65), 0), (0, 0, 0)]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, [],
-                                fields, [1 / math.sqrt(2), 1 / math.sqrt(2)])
+    state, expected = run_chain(
+        memory, backend, address_bits, data_bits, [], fields, [1 / math.sqrt(2), 1 / math.sqrt(2)]
+    )
     assert state.amps == expected
     data_positions = [backend.position(pair) for pair in data_bits]
-    assert min(data_positions[64:]) >= MACHINE_WORD, \
-        "the data register must genuinely span several machine words"
+    assert (
+        min(data_positions[64:]) >= MACHINE_WORD
+    ), "the data register must genuinely span several machine words"
 
 
 # ---------------------------------------------------------------------------
@@ -328,25 +372,32 @@ FIXTURE = Path(__file__).parent / "fixtures" / "word_query_fixture.json"
 def test_shared_fixture_matches_this_backend():
     payload = json.loads(FIXTURE.read_text())
     assert payload["schema"] == "qram.word-query-fixture.v1"
-    memory = SparseWordMemory(payload["address_width"], payload["data_width"],
-                              {int(k): int(v) for k, v in payload["cells"].items()})
+    memory = SparseWordMemory(
+        payload["address_width"],
+        payload["data_width"],
+        {int(k): int(v) for k, v in payload["cells"].items()},
+    )
     backend = ReferenceWordBackend()
     address_bits = [tuple(pair) for pair in payload["address_bits"]]
     data_bits = [tuple(pair) for pair in payload["data_bits"]]
     control_bits = [tuple(pair) for pair in payload["control_bits"]]
-    conditions = tuple(([tuple(pair) for pair in cond["bits"]], int(cond["value"]))
-                       for cond in payload["conditions"])
-    fields = [(int(row["address"]), int(row["data"]), int(row["control"]))
-              for row in payload["input"]]
-    amplitudes = [complex(row["amplitude"][0], row["amplitude"][1])
-                  for row in payload["input"]]
-    state, expected = run_chain(memory, backend, address_bits, data_bits, control_bits,
-                                fields, amplitudes, conditions)
+    conditions = tuple(
+        ([tuple(pair) for pair in cond["bits"]], int(cond["value"]))
+        for cond in payload["conditions"]
+    )
+    fields = [
+        (int(row["address"]), int(row["data"]), int(row["control"])) for row in payload["input"]
+    ]
+    amplitudes = [complex(row["amplitude"][0], row["amplitude"][1]) for row in payload["input"]]
+    state, expected = run_chain(
+        memory, backend, address_bits, data_bits, control_bits, fields, amplitudes, conditions
+    )
     recorded: dict[int, complex] = {}
     for row in payload["expected_output"]:
         basis = encode_basis(0, address_bits, int(row["address"]), backend)
         basis = encode_basis(basis, data_bits, int(row["data"]), backend)
         basis = encode_basis(basis, control_bits, int(row["control"]), backend)
-        recorded[basis] = recorded.get(basis, 0j) + complex(row["amplitude"][0],
-                                                            row["amplitude"][1])
+        recorded[basis] = recorded.get(basis, 0j) + complex(
+            row["amplitude"][0], row["amplitude"][1]
+        )
     assert state.amps == recorded == expected

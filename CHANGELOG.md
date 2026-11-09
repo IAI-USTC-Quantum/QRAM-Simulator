@@ -10,6 +10,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Task-2.1 evidence replay as a standard product entry**
+  (`qram_simulator.evidence`, `qram-simulator evidence`, GUI **任务2.1 四信道
+  证据复算** panel): the fixed depth-20 / 1,048,576-record four-channel
+  configuration with its sixteen same-depth theory anchors runs from the
+  installed package — no repository checkout, no native internals exposed.
+  The replay verifies its memory digest against the recorded v0.3.0 value,
+  writes per-run raw JSONs plus the `qramsim.depth20-four-channel.v1`
+  summary, and the GUI offers the recorded default configuration with a
+  clearly labeled 300-second deadline and JSON download;
+  `tools/depth20_four_channel.py` is now a thin wrapper over the packaged
+  module (single authoritative path).
+- **Offline import for `qramsim.addressing.v1` records**
+  (`qram-simulator addressing --evaluate RECORD`): validates a record
+  produced by this software or the declared uniqc consumer and recomputes
+  the mitigated-addressing criterion offline (`qramsim.addressing-eval.v1`)
+  — historical data stays historical, no trajectory is re-run, no hardware
+  is touched. Task-4 test plan published as a bilingual guide (seeded 2-3
+  layer / 4-8 record data, QPU-side data access via the offline standard
+  I/O, existing `>=0.75` mitigated-fidelity records and fixed operation
+  instructions).
+- **GUI addressing panel** (**寻址缓解仿真（任务2.2参考）**): the task-2.2
+  mitigation-simulation reference is now selectable, runnable and exportable
+  from the GUI exactly like the CLI (same child-process service layer, same
+  `qramsim.addressing.v1` output, GUI limits trajectories to 256 and noise
+  to 0.1).
+
+### Documentation
+- New bilingual guides "Depth-20 four-channel evidence replay (task 2.1)"
+  and "Task-4 QRAM test plan"; README/README_zh sections for the `evidence`
+  CLI, the `--evaluate` offline import and the new GUI panels.
+
+## [0.4.0] - 2026-11-09
+
+### Added
 - **Ideal sparse wide-word queries** (`qram_simulator.SparseWordMemory` and
   `qram_simulator.word_backend`): logical address/data words of arbitrary
   width (64/65/127/128/129/256 bits and beyond) carried exactly across

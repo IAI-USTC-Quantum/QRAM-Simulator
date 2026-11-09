@@ -1,6 +1,6 @@
 """Native logical-query fidelity without requiring a density-matrix backend."""
-import pytest
 
+import pytest
 import qram_simulator as qs
 
 
@@ -22,13 +22,13 @@ def test_reduced_fidelity_matches_full_without_consuming_measurement_rng(channel
             qram = qs.QRAMCircuitQubit(3, 1, memory)
             qram.set_input_addresses([0, 2, 5, 7])
             qram.set_noise_models({getattr(qs.OperationType, channel): 0.04})
-            qs.set_seed(20261109+seed)
+            qs.set_seed(20261109 + seed)
             (qram.run_normal if pruned else qram.run_full)()
             logical = qram.get_logical_query_fidelity()
-            assert -1e-12 <= logical <= 1+1e-12
+            assert -1e-12 <= logical <= 1 + 1e-12
             assert qram.get_logical_query_fidelity() == pytest.approx(logical, abs=1e-12)
             physical = qram.get_fidelity_conventions()["overlap_fid"]
-            assert logical+1e-12 >= physical
+            assert logical + 1e-12 >= physical
             reports.append((logical, physical, qram.sample_and_get_fidelity()))
         assert reports[0] == pytest.approx(reports[1], abs=1e-12)
 

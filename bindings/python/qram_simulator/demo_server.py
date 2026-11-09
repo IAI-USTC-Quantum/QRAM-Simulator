@@ -1,4 +1,5 @@
 """Loopback-only GUI; each experiment runs in an isolated, bounded child process."""
+
 from __future__ import annotations
 
 import dataclasses
@@ -12,7 +13,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 
-from .demo import Experiment, WordQuery, information
+from .demo import AddressingQuery, Experiment, WordQuery, information
 
 
 def make_server(port: int = 0) -> ThreadingHTTPServer:
@@ -38,33 +39,42 @@ def make_server(port: int = 0) -> ThreadingHTTPServer:
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("Content-Security-Policy", "default-src 'none'; connect-src 'self'; "
-                             f"script-src 'nonce-{token}'; style-src 'unsafe-inline'; "
-                             "frame-ancestors 'none'; base-uri 'none'")
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'none'; connect-src 'self'; "
+                f"script-src 'nonce-{token}'; style-src 'unsafe-inline'; "
+                "frame-ancestors 'none'; base-uri 'none'",
+            )
             self.end_headers()
             self.wfile.write(data)
 
         def local(self):
             expected = f"127.0.0.1:{self.server.server_port}"
-            return (self.headers.get("Host") == expected and
-                    self.headers.get("Origin", f"http://{expected}") == f"http://{expected}")
+            return (
+                self.headers.get("Host") == expected
+                and self.headers.get("Origin", f"http://{expected}") == f"http://{expected}"
+            )
 
         def do_GET(self):
             if not self.local():
                 return self.send(403, {"error": "local origin required"})
             if self.path == "/":
                 html = files("qram_simulator").joinpath("demo.html").read_text(encoding="utf-8")
-                return self.send(200, html.replace("__SESSION_TOKEN__", token).encode(),
-                                 "text/html; charset=utf-8")
+                return self.send(
+                    200,
+                    html.replace("__SESSION_TOKEN__", token).encode(),
+                    "text/html; charset=utf-8",
+                )
             if self.path == "/api/info":
                 return self.send(200, information())
             self.send(404, {"error": "not found"})
 
         def do_POST(self):
-            if (not self.local() or not hmac.compare_digest(
-                    self.headers.get("X-Session", ""), token)):
+            if not self.local() or not hmac.compare_digest(
+                self.headers.get("X-Session", ""), token
+            ):
                 return self.send(403, {"error": "local session required"})
-            if self.path not in ("/api/run", "/api/words"):
+            if self.path not in ("/api/run", "/api/words", "/api/addressing", "/api/evidence"):
                 return self.send(404, {"error": "not found"})
             try:
                 length = int(self.headers.get("Content-Length", "0"))
@@ -73,32 +83,69 @@ def make_server(port: int = 0) -> ThreadingHTTPServer:
                 if self.path == "/api/run":
                     config = Experiment(**json.loads(self.rfile.read(length)))
                     config.validate()
-                    if (config.depth > 12 or config.data_bits > 2 or config.inputs > 32 or
-                            config.trajectories > 64 or config.probability > 0.1):
-                        raise ValueError("GUI limit: depth12, bus2, inputs32, trajectories64, noise0.1; use CLI for larger runs")
-                else:
+                    if (
+                        config.depth > 12
+                        or config.data_bits > 2
+                        or config.inputs > 32
+                        or config.trajectories > 64
+                        or config.probability > 0.1
+                    ):
+                        raise ValueError(
+                            "GUI limit: depth12, bus2, inputs32, "
+                            "trajectories64, noise0.1; use CLI for larger runs"
+                        )
+                    command, deadline = "run", 60
+                elif self.path == "/api/words":
                     config = WordQuery(**json.loads(self.rfile.read(length)))
                     config.validate()
-                    if (config.address_width > 256 or config.data_width > 256 or
-                            config.records > 32 or config.inputs > 8):
-                        raise ValueError("GUI limit: width256, records32, inputs8; use CLI for larger words")
+                    if (
+                        config.address_width > 256
+                        or config.data_width > 256
+                        or config.records > 32
+                        or config.inputs > 8
+                    ):
+                        raise ValueError(
+                            "GUI limit: width256, records32, inputs8; use CLI for larger words"
+                        )
+                    command, deadline = "words", 60
+                elif self.path == "/api/addressing":
+                    config = AddressingQuery(**json.loads(self.rfile.read(length)))
+                    config.validate()
+                    if config.trajectories > 256 or config.probability > 0.1:
+                        raise ValueError(
+                            "GUI limit: trajectories256, noise0.1; use CLI for larger runs"
+                        )
+                    command, deadline = "addressing", 60
+                else:
+                    from .evidence import EvidenceConfig
+
+                    config = EvidenceConfig(**json.loads(self.rfile.read(length)))
+                    config.validate()
+                    # The fixed task-2.1 replay (20 layers, 1048576 records,
+                    # four channels) at its default 2048 trajectories takes
+                    # on the order of minutes on a laptop CPU; the GUI gives
+                    # it its own bounded deadline, clearly labeled in the UI.
+                    if config.trajectories > 2048 or config.stress_trajectories > 2048:
+                        raise ValueError("GUI limit: trajectories2048; use CLI for larger replays")
+                    command, deadline = "evidence", 300
             except (ValueError, TypeError, KeyError) as exc:
                 return self.send(400, {"error": str(exc)})
             if not slot.acquire(blocking=False):
                 return self.send(409, {"error": "an experiment is already running"})
             try:
-                command = [sys.executable, "-m", "qram_simulator.demo",
-                           "run" if self.path == "/api/run" else "words"]
+                command = [sys.executable, "-m", "qram_simulator.demo", command]
                 for field in dataclasses.fields(config):
-                    command.extend(["--"+field.name.replace("_", "-"), str(getattr(config, field.name))])
-                child = subprocess.run(command, capture_output=True, text=True, timeout=60)
+                    command.extend(
+                        ["--" + field.name.replace("_", "-"), str(getattr(config, field.name))]
+                    )
+                child = subprocess.run(command, capture_output=True, text=True, timeout=deadline)
                 if child.returncode:
                     return self.send(422, {"error": child.stderr.strip()[-1024:]})
                 self.send(200, json.loads(child.stdout))
             except ConnectionError:
                 pass  # Do not try to write another response to a closed socket.
             except subprocess.TimeoutExpired:
-                self.send(504, {"error": "experiment exceeded 60 seconds"})
+                self.send(504, {"error": f"experiment exceeded {deadline} seconds"})
             except (OSError, ValueError) as exc:
                 self.send(500, {"error": str(exc)})
             finally:

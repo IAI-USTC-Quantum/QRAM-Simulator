@@ -152,6 +152,8 @@ qram-simulator run --channel Damping --probability 0.001 --out experiment.json
 qram-simulator run --depth 20 --inputs 16 --trajectories 32 --out depth20.json
 qram-simulator words --address-width 129 --data-width 193 --records 8 --inputs 4
 qram-simulator addressing --layers 3 --channel Depolarizing --probability 0.001
+qram-simulator addressing --evaluate recorded-addressing.json
+qram-simulator evidence --outdir records
 ```
 
 `words` 演示**理想稀疏 XOR 查询语义**：任意位宽逻辑字（129/193/256 位及更高）
@@ -172,10 +174,23 @@ SparQSim 用相同源数据互验各自原生后端。容量概念严格区分�
 `addressing` 是任务 2.2 仿真参考：2–3 层 QRAM（4/8 条种子随机记录）在四信道下
 被全地址均匀相干叠加寻址，输出平均 `(地址:总线)` 分布、原始正确寻址概率，以及
 **缓解仿真**——按已知内存标定总线翻转率并对每地址做对称单比特混淆矩阵求逆。
-缓解后寻址 `>=0.75` 判定采用直接分项语义（JSON 记录数值与运算符）。版本化 JSON
-（`qramsim.addressing.v1`）是与 uniqc 侧的离线标准输入输出；真机业务归其所属仓
-冻结封装，本参考不运行真机。无噪声参考精确为 1；独立 QuTiP/uniqc 电路级 baseline
-在 CI 中逐键对拍同一 zerobus 寻址分布。
+GUI 提供"寻址缓解仿真（任务2.2参考）"面板。缓解后寻址 `>=0.75` 判定采用直接
+分项语义（JSON 记录数值与运算符）。版本化 JSON（`qramsim.addressing.v1`）是与
+uniqc 侧的离线标准输入输出；`--evaluate` 离线再导入一份记录（本软件或声明的
+uniqc 消费方所产），校验并重算判据——历史数据保持历史，本参考不运行真机。
+无噪声参考精确为 1；独立 QuTiP/uniqc 电路级 baseline 在 CI 中逐键对拍同一
+zerobus 寻址分布。固定的[任务4测试方案](docs/sphinx/source/zh/guide/task4_test_plan.md)
+记录了种子化 2-3 层/4-8 条数据、QPU 侧数据访问与既有缓解保真度记录。
+
+### 任务2.1 深度20四信道证据复算
+
+`qram-simulator evidence` 将固定任务2.1材料——20 层、1,048,576 条种子随机记录、
+四信道作用于同一输入——打包为标准软件入口，带十六项显式同深度理论锚点
+（无噪声恒等、相位翻转空位预测、X 型残差塌缩、一阶 Pauli 组合、阻尼 K0 占据
+尺度、归一化）。复算会对照 v0.3.0 记录值校验数据摘要，并把种子、逐轨迹样本、
+公式与来源嵌入 `qramsim.depth20-four-channel.v1` summary；GUI 的"任务2.1 四信道
+证据复算"面板提供同一入口，仓库脚本 `tools/depth20_four_channel.py` 是同一打包
+模块的薄包装。见[证据复算指南](docs/sphinx/source/zh/guide/evidence.md)。
 
 ### MPI 系综并行
 
