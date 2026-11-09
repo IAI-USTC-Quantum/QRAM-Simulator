@@ -90,8 +90,15 @@ class SparseWordMemory:
         self._check(data, self.data_width, "data")
         return data ^ self.cells.get(address, 0)
 
-    def apply_xor(self, state, address_bits: Sequence[BitCoordinate],
-                  data_bits: Sequence[BitCoordinate], backend, *, conditions=()) -> None:
+    def apply_xor(
+        self,
+        state,
+        address_bits: Sequence[BitCoordinate],
+        data_bits: Sequence[BitCoordinate],
+        backend,
+        *,
+        conditions=(),
+    ) -> None:
         """Apply the exact coherent query on native machine-word bit coordinates.
 
         ``address_bits[i]`` / ``data_bits[i]`` are the ``(word_register_name,

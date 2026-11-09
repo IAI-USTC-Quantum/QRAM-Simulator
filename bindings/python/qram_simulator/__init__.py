@@ -6,9 +6,9 @@ and global random-seed control. See the ``_core`` module docstring and
 the project documentation for details.
 """
 
-from ._core import *
-
 from importlib import metadata as _metadata
+
+from ._core import *  # noqa: F401,F403 -- the binding surface
 
 # __version__ is read from dist-info instead of a setuptools-scm generated
 # _version.py: scikit-build-core filters wheel contents by .gitignore, and
@@ -27,8 +27,8 @@ del _metadata
 # The MPI ensemble runner imports mpi4py/numpy on use only — lazy as well.
 _LAZY = ("baseline", "mpi")
 
-from .word_memory import SparseWordMemory
-from .word_backend import ReferenceWordBackend, SparseStateVector
+from .word_backend import ReferenceWordBackend, SparseStateVector  # noqa: E402,F401
+from .word_memory import SparseWordMemory  # noqa: E402,F401
 
 
 def __getattr__(name: str):

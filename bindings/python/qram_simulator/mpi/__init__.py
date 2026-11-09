@@ -30,6 +30,7 @@ triggers OpenMPI's *singleton init*, which ``setenv()``s ``OMPI_*``/``PMI*``
 variables at C level (invisible to ``os.environ``); any ``mpirun`` child
 launched later inherits them and aborts with a silent exit code 1.
 """
+
 from __future__ import annotations
 
 import time
@@ -117,10 +118,18 @@ def _norm_noise(qs, noise: Dict[object, float]) -> Dict[object, float]:
     return out
 
 
-def run_trajectories(qs, *, indices: Sequence[int], seed: int, noise: Dict[object, float],
-                     depth: int, data_size: int,
-                     memory: Optional[Sequence[int]] = None,
-                     input_mode: str = "zerobus", n_inputs: int = 0) -> dict:
+def run_trajectories(
+    qs,
+    *,
+    indices: Sequence[int],
+    seed: int,
+    noise: Dict[object, float],
+    depth: int,
+    data_size: int,
+    memory: Optional[Sequence[int]] = None,
+    input_mode: str = "zerobus",
+    n_inputs: int = 0,
+) -> dict:
     """Run the bench-faithful pruned trajectory loop over ``indices``.
 
     Mirrors the reference serial loop of the T2 benchmark
@@ -139,8 +148,8 @@ def run_trajectories(qs, *, indices: Sequence[int], seed: int, noise: Dict[objec
         # the bus register is data_size wide; larger values produce out-of-range
         # "addr:bus" keys in get_output_distribution()
         raise ValueError(
-            f"memory values must be < 2^{data_size} (bus width); "
-            f"max={max(memory)}")
+            f"memory values must be < 2^{data_size} (bus width); " f"max={max(memory)}"
+        )
 
     qram = qs.QRAMCircuitQubit(depth, data_size)
     if memory is not None:
@@ -165,7 +174,7 @@ def run_trajectories(qs, *, indices: Sequence[int], seed: int, noise: Dict[objec
 
     t_loop = time.perf_counter()
     for idx in indices:
-        qs.set_seed(int(seed) + int(idx))   # deterministic per-trajectory stream
+        qs.set_seed(int(seed) + int(idx))  # deterministic per-trajectory stream
         t0 = time.perf_counter()
         qram.run_normal()
         dt = time.perf_counter() - t0
@@ -174,8 +183,8 @@ def run_trajectories(qs, *, indices: Sequence[int], seed: int, noise: Dict[objec
         except RuntimeError:
             post.append(None)
             sample_failures += 1
-        dist = qram.get_output_distribution()      # conditional dist of this sample
-        conv = qram.get_fidelity_conventions()     # overlaps on the posterior trajectory
+        dist = qram.get_output_distribution()  # conditional dist of this sample
+        conv = qram.get_fidelity_conventions()  # overlaps on the posterior trajectory
         for k, v in dist.items():
             a, b = k.split(":")
             hist[int(a), int(b)] += v
@@ -212,10 +221,18 @@ def aggregate(partials: List[dict], runs: int) -> dict:
     if not partials:
         raise ValueError("no partials to aggregate")
 
-    rows = []   # (index, overlap, nopost, incoh, post, run_time)
+    rows = []  # (index, overlap, nopost, incoh, post, run_time)
     for p in sorted(partials, key=lambda p: p.get("rank", 0)):
-        rows.extend(zip(p["indices"], p["overlap_fid"], p["fid_nopost"],
-                        p["fid_incoh"], p["fid_post"], p["run_times_s"]))
+        rows.extend(
+            zip(
+                p["indices"],
+                p["overlap_fid"],
+                p["fid_nopost"],
+                p["fid_incoh"],
+                p["fid_post"],
+                p["run_times_s"],
+            )
+        )
     rows.sort(key=lambda r: r[0])
     order = [r[0] for r in rows]
     if order != list(range(runs)):
@@ -235,8 +252,7 @@ def aggregate(partials: List[dict], runs: int) -> dict:
         "fid_post": [r[4] for r in rows],
         "run_times_s": [r[5] for r in rows],
         "sample_failures": sum(int(p.get("sample_failures", 0)) for p in partials),
-        "wall_loop_s_per_rank": {int(p.get("rank", 0)): float(p["wall_loop_s"])
-                                 for p in partials},
+        "wall_loop_s_per_rank": {int(p.get("rank", 0)): float(p["wall_loop_s"]) for p in partials},
         "qubit_num": partials[0].get("qubit_num"),
     }
 
@@ -247,26 +263,33 @@ def mpi_metadata(comm) -> dict:
     if not isinstance(comm, SerialComm):
         try:
             from mpi4py import MPI, __version__  # noqa: PLC0415
-            impl = (f"mpi4py {__version__} / "
-                    f"{MPI.Get_library_version().splitlines()[0].strip()}")
+
+            impl = f"mpi4py {__version__} / " f"{MPI.Get_library_version().splitlines()[0].strip()}"
         except ImportError:
             impl = "mpi4py not importable"
     return {
         "nranks": int(getattr(comm, "size", 1)),
-        "gpu_per_rank": 0,   # CPU-only bindings — recorded as zero, never inferred
-        "gpu_note": "qram_simulator Python bindings are CPU-only; "
-                    "MPI ranks are CPU processes",
+        "gpu_per_rank": 0,  # CPU-only bindings — recorded as zero, never inferred
+        "gpu_note": "qram_simulator Python bindings are CPU-only; " "MPI ranks are CPU processes",
         "implementation": impl,
         "sharding": "cyclic [rank::size]",
         "seed_scheme": "per-trajectory set_seed(seed + trajectory_index)",
     }
 
 
-def run_ensemble(qs, *, depth: int, data_size: int, noise: Dict[object, float],
-                 runs: int, seed: int,
-                 memory: Optional[Sequence[int]] = None,
-                 input_mode: str = "zerobus", n_inputs: int = 0,
-                 comm=None) -> Optional[dict]:
+def run_ensemble(
+    qs,
+    *,
+    depth: int,
+    data_size: int,
+    noise: Dict[object, float],
+    runs: int,
+    seed: int,
+    memory: Optional[Sequence[int]] = None,
+    input_mode: str = "zerobus",
+    n_inputs: int = 0,
+    comm=None,
+) -> Optional[dict]:
     """Execute the whole ensemble under ``comm``; aggregate on rank 0.
 
     Returns the :func:`aggregate` result plus an ``mpi`` metadata block on
@@ -281,7 +304,7 @@ def run_ensemble(qs, *, depth: int, data_size: int, noise: Dict[object, float],
 
     if memory is None:
         if rank == 0:
-            qs.set_seed(int(seed))   # mirror the serial bench: seed before memory draw
+            qs.set_seed(int(seed))  # mirror the serial bench: seed before memory draw
             probe = qs.QRAMCircuitQubit(depth, data_size)
             probe.set_memory_random()
             memory = [int(x) for x in probe.get_memory()]
@@ -295,9 +318,16 @@ def run_ensemble(qs, *, depth: int, data_size: int, noise: Dict[object, float],
         n_inputs = int(n_inputs) or (1 << depth)
 
     partial = run_trajectories(
-        qs, indices=shard_indices(runs, size, rank), seed=seed, noise=noise,
-        depth=depth, data_size=data_size, memory=memory,
-        input_mode=input_mode, n_inputs=n_inputs)
+        qs,
+        indices=shard_indices(runs, size, rank),
+        seed=seed,
+        noise=noise,
+        depth=depth,
+        data_size=data_size,
+        memory=memory,
+        input_mode=input_mode,
+        n_inputs=n_inputs,
+    )
     partial["rank"] = rank
 
     gathered = comm.gather(partial, root=0)
@@ -306,7 +336,6 @@ def run_ensemble(qs, *, depth: int, data_size: int, noise: Dict[object, float],
 
     result = aggregate(gathered, runs)
     result["mpi"] = mpi_metadata(comm)
-    result["mpi"]["runs_per_rank"] = {int(p["rank"]): len(p["indices"])
-                                      for p in gathered}
+    result["mpi"]["runs_per_rank"] = {int(p["rank"]): len(p["indices"]) for p in gathered}
     result["memory"] = np.asarray(memory, dtype=np.uint64)
     return result

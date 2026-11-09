@@ -28,16 +28,21 @@ qram-simulator run --channel Damping --probability 0.001 --out experiment.json
 qram-simulator run --depth 20 --inputs 16 --trajectories 32 --out depth20.json
 qram-simulator words --address-width 129 --data-width 193 --records 8 --inputs 4
 qram-simulator addressing --layers 3 --channel Depolarizing --probability 0.001
+qram-simulator addressing --evaluate recorded-addressing.json
+qram-simulator evidence --outdir records
 ```
 
 The GUI opens a local browser and supports all four noise channels, parameter
 editing, trajectory plots and JSON downloads. Each run uses an isolated native
 worker. Large runs use the CLI; the GUI limits depth to12, bus width to2,
-inputs to32, trajectories to64 and probability to0.1, with a60-second deadline.
-The CLI supports depth20 (1048576 random records), up to8 data bits,1024 input
-addresses and4096 trajectories. Set `--probability 0 --channel none` for
-the noiseless reference. Noise trajectories share a fixed random memory and a
-fixed coherent address input (zero bus); the same seed reproduces samples on the same backend.
+inputs to32, trajectories to64 and probability to0.1, with a60-second deadline
+(the addressing panel allows 256 trajectories; the fixed task-2.1 evidence
+replay panel keeps the recorded 2048-trajectory configuration with its own
+labeled 300-second deadline). The CLI supports depth20 (1048576 random
+records), up to8 data bits,1024 input addresses and4096 trajectories. Set
+`--probability 0 --channel none` for the noiseless reference. Noise
+trajectories share a fixed random memory and a fixed coherent address input
+(zero bus); the same seed reproduces samples on the same backend.
 
 JSON records the one-byte-per-record SHA256, exact parameters, software/runtime,
 query and routing registers, full-state overlap (`fidelity`) and reduced logical
@@ -94,13 +99,31 @@ uniform coherent superposition over all records. It reports the mean
 `(address:bus)` output distribution, the raw correct-addressing probability,
 and a **mitigation simulation** — the bus flip rate is calibrated against the
 known memory and inverted with the symmetric single-bit confusion matrix per
-address. The `>=0.75` mitigated-addressing criterion uses the direct task-sheet
+address. The GUI exposes the same reference as the **寻址缓解仿真** panel. The `>=0.75` mitigated-addressing criterion uses the direct task-sheet
 sub-item semantics (`>=`, value and operator recorded in the JSON). The
 versioned JSON (`qramsim.addressing.v1`) is the offline standard I/O for the
-uniqc side; the real-machine business stays frozen in its owning repository
-and nothing here is a hardware run. The noiseless reference is exact (raw =
-mitigated = 1); the independent QuTiP/uniqc circuit-level baseline cross-checks
-the same zerobus addressing distribution bitwise in CI.
+uniqc side; `--evaluate` re-imports a record (from this software or the
+declared uniqc consumer), validates it and recomputes the criterion offline
+— historical data stays historical, and nothing here is a hardware run. The
+noiseless reference is exact (raw = mitigated = 1); the independent
+QuTiP/uniqc circuit-level baseline cross-checks the same zerobus addressing
+distribution bitwise in CI. The fixed [task-4 test plan](docs/sphinx/source/en/guide/task4_test_plan.md)
+documents the seeded 2-3 layer / 4-8 record data, the QPU-side data access
+and the existing mitigated-fidelity records.
+
+### Task-2.1 depth-20 four-channel evidence replay
+
+`qram-simulator evidence` packages the fixed task-2.1 material — 20 layers,
+1,048,576 seeded random records, the four channels on one identical input —
+as a standard software entry with sixteen explicit same-depth theory anchors
+(noiseless identity, phase-flip vacancy prediction, X-type residue collapse,
+first-order Pauli composition, damping K0 occupation scale, normalization).
+It verifies the replayed memory digest against the recorded v0.3.0 value,
+embeds seeds, per-trajectory samples, formulas and provenance in the
+`qramsim.depth20-four-channel.v1` summary, and is exposed identically as the
+GUI **任务2.1 四信道证据复算** panel; the repository tool
+`tools/depth20_four_channel.py` is a thin wrapper over the same packaged
+module. See the [evidence replay guide](docs/sphinx/source/en/guide/evidence.md).
 
 ## Repository Split
 

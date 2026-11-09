@@ -75,13 +75,21 @@ def _synthetic_partials(runs: int, size: int, seed: int = 7):
             po.append(None if i % 7 == 0 else b)
             rt.append(0.5)
             hist[i % 8, (i * 3) % 2] += b
-        partials.append({
-            "rank": r, "indices": idx, "hist": hist,
-            "overlap_fid": ov, "fid_nopost": npo, "fid_incoh": inh,
-            "fid_post": po, "run_times_s": rt,
-            "sample_failures": sum(1 for i in idx if i % 7 == 0),
-            "wall_loop_s": 1.0, "qubit_num": 4,
-        })
+        partials.append(
+            {
+                "rank": r,
+                "indices": idx,
+                "hist": hist,
+                "overlap_fid": ov,
+                "fid_nopost": npo,
+                "fid_incoh": inh,
+                "fid_post": po,
+                "run_times_s": rt,
+                "sample_failures": sum(1 for i in idx if i % 7 == 0),
+                "wall_loop_s": 1.0,
+                "qubit_num": 4,
+            }
+        )
     return partials
 
 
@@ -91,8 +99,7 @@ def test_aggregate_identical_across_shardings():
     for size in (2, 3, 4, 8):
         agg = aggregate(_synthetic_partials(37, size), 37)
         assert agg["traj_index"] == list(range(37))
-        for field in ("overlap_fid", "fid_nopost", "fid_incoh", "fid_post",
-                      "run_times_s"):
+        for field in ("overlap_fid", "fid_nopost", "fid_incoh", "fid_post", "run_times_s"):
             assert agg[field] == ref[field]  # bit-identical (canonical index order)
         assert agg["sample_failures"] == ref["sample_failures"]
         np.testing.assert_allclose(agg["hist"], ref["hist"], atol=1e-15)
@@ -127,14 +134,19 @@ def qs():
 def _run_sharded(qs, depth: int, runs: int, size: int, seed: int):
     from qram_simulator.mpi import run_trajectories
 
-    memory = [i % 2 for i in range(1 << depth)]   # bus width 1: values in {0,1}
+    memory = [i % 2 for i in range(1 << depth)]  # bus width 1: values in {0,1}
     partials = []
     for r in range(size):
         p = run_trajectories(
-            qs, indices=shard_indices(runs, size, r), seed=seed,
+            qs,
+            indices=shard_indices(runs, size, r),
+            seed=seed,
             noise={qs.OperationType.PhaseFlip: 0.001},
-            depth=depth, data_size=1,
-            memory=memory, input_mode="zerobus")
+            depth=depth,
+            data_size=1,
+            memory=memory,
+            input_mode="zerobus",
+        )
         p["rank"] = r
         partials.append(p)
     return aggregate(partials, runs)
@@ -158,9 +170,16 @@ def test_run_ensemble_serial_comm(qs):
 
     depth, runs, seed = 4, 9, 99
     memory = [i % 2 for i in range(1 << depth)]
-    res = run_ensemble(qs, depth=depth, data_size=1,
-                       noise={"PhaseFlip": 0.001}, runs=runs, seed=seed,
-                       memory=memory, comm=SerialComm())
+    res = run_ensemble(
+        qs,
+        depth=depth,
+        data_size=1,
+        noise={"PhaseFlip": 0.001},
+        runs=runs,
+        seed=seed,
+        memory=memory,
+        comm=SerialComm(),
+    )
     assert res is not None
     assert res["mpi"]["nranks"] == 1
     assert res["mpi"]["gpu_per_rank"] == 0
@@ -174,10 +193,15 @@ def test_run_ensemble_serial_comm(qs):
 def test_run_ensemble_memory_draw_is_seeded(qs):
     from qram_simulator.mpi import run_ensemble
 
-    kwargs = dict(depth=3, data_size=1,
-                  noise={qs.OperationType.BitFlip: 0.01}, runs=4, seed=5,
-                  comm=SerialComm())
-    res1 = run_ensemble(qs, **kwargs)          # memory=None -> rank0 draw + bcast
+    kwargs = dict(
+        depth=3,
+        data_size=1,
+        noise={qs.OperationType.BitFlip: 0.01},
+        runs=4,
+        seed=5,
+        comm=SerialComm(),
+    )
+    res1 = run_ensemble(qs, **kwargs)  # memory=None -> rank0 draw + bcast
     res2 = run_ensemble(qs, **kwargs)
     assert res1["memory"].shape == (8,)
     assert res1["memory"].tolist() == res2["memory"].tolist()  # reproducible
@@ -214,26 +238,29 @@ def test_mpi_subprocess_matches_serial(qs, tmp_path):
     as_root = hasattr(os, "geteuid") and os.geteuid() == 0
     # scrub C-level OMPI_*/PMI* setenv() side effects (OpenMPI singleton init
     # in this process breaks mpirun children with a silent exit 1)
-    child_env = {k: v for k, v in os.environ.items()
-                 if not k.startswith(("OMPI_", "PMI", "PMIX"))}
+    child_env = {k: v for k, v in os.environ.items() if not k.startswith(("OMPI_", "PMI", "PMIX"))}
     # This is a host-memory, single-node test. Hosted VMs can expose a MANA
     # verbs device whose UD queue-pair operation is unavailable to UCX.
     # Select documented TCP/self transports for this child only; honor an
     # explicit caller setting and leave library/production defaults alone.
     child_env.setdefault("UCX_TLS", "tcp,self")
     cmd = ["mpirun", *(["--allow-run-as-root"] if as_root else []), "-np", "4", *base]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300,
-                          env=child_env)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300, env=child_env)
     if proc.returncode != 0 and "unrecognized" in (proc.stdout + proc.stderr).lower():
         # MPICH-style mpirun rejects OpenMPI's root flag — retry without it
-        proc = subprocess.run(["mpirun", "-np", "4", *base],
-                              capture_output=True, text=True, timeout=300,
-                              env=child_env)
-    (tmp_path/"mpi.stdout.log").write_text(proc.stdout, encoding="utf-8")
-    (tmp_path/"mpi.stderr.log").write_text(proc.stderr, encoding="utf-8")
+        proc = subprocess.run(
+            ["mpirun", "-np", "4", *base],
+            capture_output=True,
+            text=True,
+            timeout=300,
+            env=child_env,
+        )
+    (tmp_path / "mpi.stdout.log").write_text(proc.stdout, encoding="utf-8")
+    (tmp_path / "mpi.stderr.log").write_text(proc.stderr, encoding="utf-8")
     assert proc.returncode == 0, (
         f"cmd={cmd}; UCX_TLS={child_env['UCX_TLS']}\n"
         f"--- stdout ---\n{proc.stdout[-2000:]}\n"
-        f"--- stderr start ---\n{proc.stderr[:2000]}\n--- stderr end ---\n{proc.stderr[-2000:]}")
+        f"--- stderr start ---\n{proc.stderr[:2000]}\n--- stderr end ---\n{proc.stderr[-2000:]}"
+    )
     hist = np.load(child)
     np.testing.assert_allclose(hist, ref["hist"], atol=1e-12)

@@ -26,6 +26,8 @@ memory) loading circuits:
    guide/operators
    guide/mpi
    guide/wide-words
+   guide/evidence
+   guide/task4_test_plan
    guide/naming_conventions
 
 .. toctree::

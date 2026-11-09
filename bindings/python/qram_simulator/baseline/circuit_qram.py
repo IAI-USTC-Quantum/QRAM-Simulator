@@ -115,11 +115,11 @@ class QubitQRAMEncoding:
 
     @property
     def num_qubits(self) -> int:
-        return self.addr_size + self.data_size + 2 * (2 ** self.addr_size - 1)
+        return self.addr_size + self.data_size + 2 * (2**self.addr_size - 1)
 
     @property
     def num_nodes(self) -> int:
-        return 2 ** self.addr_size - 1
+        return 2**self.addr_size - 1
 
     def addr_qubit(self, bit: int) -> int:
         return bit
@@ -151,7 +151,7 @@ class QubitQRAMEncoding:
         return [q for v in range(self.num_nodes) for q in (self.node_a(v), self.node_d(v))]
 
     def layer_nodes(self, layer: int) -> List[int]:
-        return list(range(2 ** layer - 1, 2 ** (layer + 1) - 1))
+        return list(range(2**layer - 1, 2 ** (layer + 1) - 1))
 
 
 class CircuitQRAMQubit:
@@ -198,17 +198,21 @@ class CircuitQRAMQubit:
             raise ValueError(f"data_size must be 1 or 2 (got {data_size})")
         if input_mode not in ("zerobus", "uniform"):
             raise ValueError(f"input_mode must be 'zerobus' or 'uniform' (got {input_mode})")
-        for p, name in ((depolarizing, "depolarizing"), (damping, "damping"),
-                        (bit_flip, "bit_flip"), (phase_flip, "phase_flip")):
+        for p, name in (
+            (depolarizing, "depolarizing"),
+            (damping, "damping"),
+            (bit_flip, "bit_flip"),
+            (phase_flip, "phase_flip"),
+        ):
             if not 0.0 <= p <= 1.0 or (name == "damping" and p >= 1.0):
                 raise ValueError(
                     f"{name} probability must lie in [0, 1] (Damping requires gamma < 1)"
                 )
         memory = list(memory)
-        if len(memory) != 2 ** addr_size:
+        if len(memory) != 2**addr_size:
             raise ValueError(f"memory must have 2**addr_size = {2**addr_size} cells")
         for value in memory:
-            if not 0 <= value < 2 ** data_size:
+            if not 0 <= value < 2**data_size:
                 raise ValueError(
                     f"memory value {value} does not fit into data_size = {data_size} bits"
                 )
@@ -250,34 +254,50 @@ class CircuitQRAMQubit:
         if t == OperationType.CopyIn:
             gates: List[Gate] = []
             if targets[0] == 0:
-                gates.extend(("H", (enc.bus_qubit(d),), (), math.nan)
-                             for d in range(self.data_size))
+                gates.extend(
+                    ("H", (enc.bus_qubit(d),), (), math.nan) for d in range(self.data_size)
+                )
             gates.append(("SWAP", (enc.bus_qubit(targets[0]), enc.node_d(0)), (), math.nan))
             return gates
         if t == OperationType.CopyOut:
             gates = [("SWAP", (enc.bus_qubit(targets[0]), enc.node_d(0)), (), math.nan)]
             if targets[0] == self.data_size - 1:
-                gates.extend(("H", (enc.bus_qubit(d),), (), math.nan)
-                             for d in range(self.data_size))
+                gates.extend(
+                    ("H", (enc.bus_qubit(d),), (), math.nan) for d in range(self.data_size)
+                )
             return gates
         if t == OperationType.SwapInternal:
             # SWAP(a, d) on every node of the layer (identity on ground nodes)
-            return [("SWAP", (enc.node_a(v), enc.node_d(v)), (), math.nan)
-                    for v in enc.layer_nodes(targets[0])]
+            return [
+                ("SWAP", (enc.node_a(v), enc.node_d(v)), (), math.nan)
+                for v in enc.layer_nodes(targets[0])
+            ]
         if t == OperationType.ControlSwap:
             gates = []
             for v in enc.layer_nodes(targets[0]):
-                gates.append(("SWAP", (enc.node_d(v), enc.node_d(2 * v + 1)),
-                              ((enc.node_a(v), 0),), math.nan))
-                gates.append(("SWAP", (enc.node_d(v), enc.node_d(2 * v + 2)),
-                              ((enc.node_a(v), 1),), math.nan))
+                gates.append(
+                    (
+                        "SWAP",
+                        (enc.node_d(v), enc.node_d(2 * v + 1)),
+                        ((enc.node_a(v), 0),),
+                        math.nan,
+                    )
+                )
+                gates.append(
+                    (
+                        "SWAP",
+                        (enc.node_d(v), enc.node_d(2 * v + 2)),
+                        ((enc.node_a(v), 1),),
+                        math.nan,
+                    )
+                )
             return gates
         if t == OperationType.FetchData:
             # phase kickback: -1 phase on the leaf cell selected by (a, memory)
             digit = targets[0]
             lower = 2 ** (self.addr_size - 1) - 1
             gates = []
-            for v in range(lower, 2 ** self.addr_size - 1):
+            for v in range(lower, 2**self.addr_size - 1):
                 off = v - lower
                 if (self.memory[2 * off] >> digit) & 1:
                     gates.append(("U1", (enc.node_d(v),), ((enc.node_a(v), 0),), math.pi))
@@ -329,22 +349,25 @@ class CircuitQRAMQubit:
         # faithful mixture {I, X, Z, M} of the trajectory floor rule
         c0 = math.sqrt(1.0 - p)
         c1 = math.sqrt(p / 3.0)
-        ks = [c0 * np.eye(2, dtype=complex), c1 * np.array([[0, 1], [1, 0]], dtype=complex),
-              c1 * np.array([[1, 0], [0, -1]], dtype=complex), c1 * _QUBIT_M]
+        ks = [
+            c0 * np.eye(2, dtype=complex),
+            c1 * np.array([[0, 1], [1, 0]], dtype=complex),
+            c1 * np.array([[1, 0], [0, -1]], dtype=complex),
+            c1 * _QUBIT_M,
+        ]
         be.kraus1q(q, [k.reshape(-1).tolist() for k in ks])
 
-    def _apply_damping(self, be, entangle: int, gamma: float, textbook: bool,
-                       nojump: bool) -> None:
+    def _apply_damping(self, be, entangle: int, gamma: float, textbook: bool, nojump: bool) -> None:
         enc = self.encoding
         s = math.sqrt(1.0 - gamma)
         diag = None
         total = 1.0
-        n_active_nodes = 2 ** entangle - 1
+        n_active_nodes = 2**entangle - 1
         if not textbook:
             diag = np.asarray(be.density_matrix.diag()).ravel().real
             total = float(diag.sum())
         n = enc.num_qubits
-        idx = np.arange(2 ** n)
+        idx = np.arange(2**n)
         for v in range(enc.num_nodes):
             for q in (enc.node_a(v), enc.node_d(v)):
                 if textbook:
@@ -401,22 +424,34 @@ class CircuitQRAMQubit:
         for gates, entangle in self._steps:
             for gate in gates:
                 self._apply_gate(be, gate)
-            n_active = 2 * (2 ** entangle - 1)
-            for probability, pauli in ((self.bit_flip, np.array([[0, 1], [1, 0]], dtype=complex)),
-                                       (self.phase_flip, np.diag([1, -1]).astype(complex))):
+            n_active = 2 * (2**entangle - 1)
+            for probability, pauli in (
+                (self.bit_flip, np.array([[0, 1], [1, 0]], dtype=complex)),
+                (self.phase_flip, np.diag([1, -1]).astype(complex)),
+            ):
                 if probability > 0:
-                    operators = [math.sqrt(1-probability)*np.eye(2, dtype=complex),
-                                 math.sqrt(probability)*pauli]
+                    operators = [
+                        math.sqrt(1 - probability) * np.eye(2, dtype=complex),
+                        math.sqrt(probability) * pauli,
+                    ]
                     for pos in range(n_active):
-                        be.kraus1q(self.encoding.noise_qubit(pos),
-                                   [matrix.reshape(-1).tolist() for matrix in operators])
+                        be.kraus1q(
+                            self.encoding.noise_qubit(pos),
+                            [matrix.reshape(-1).tolist() for matrix in operators],
+                        )
             if self.depolarizing > 0.0:
                 for pos in range(n_active):
-                    self._apply_depolarizing(be, self.encoding.noise_qubit(pos),
-                                             self.depolarizing, textbook)
+                    self._apply_depolarizing(
+                        be, self.encoding.noise_qubit(pos), self.depolarizing, textbook
+                    )
             if self.damping > 0.0:
-                self._apply_damping(be, entangle, self.damping, mode in ("faithful", "textbook"),
-                                    nojump=(mode == "nojump"))
+                self._apply_damping(
+                    be,
+                    entangle,
+                    self.damping,
+                    mode in ("faithful", "textbook"),
+                    nojump=(mode == "nojump"),
+                )
         return np.asarray(be.density_matrix.full())
 
     def marginal_distribution(self, rho: np.ndarray) -> Dict[str, float]:
@@ -467,11 +502,15 @@ class CircuitQRAMQubit:
         order = _backend_bit_order(_require_uniqc())
         visible = [*enc.address_qubits, *enc.bus_qubits]
         environment = [q for q in range(n) if q not in visible]
-        indices = np.empty((2**len(visible), 2**len(environment)), dtype=np.int64)
+        indices = np.empty((2 ** len(visible), 2 ** len(environment)), dtype=np.int64)
         for index in range(2**n):
+
             def bits(qubits):
-                return sum(((index >> (q if order == "lsb" else n-1-q)) & 1) << k
-                           for k, q in enumerate(qubits))
+                return sum(
+                    ((index >> (q if order == "lsb" else n - 1 - q)) & 1) << k
+                    for k, q in enumerate(qubits)
+                )
+
             indices[bits(visible), bits(environment)] = index
         reduced = np.zeros((len(indices), len(indices)), dtype=complex)
         for column in indices.T:

@@ -7,7 +7,6 @@
 #   inject near-zero noise.
 
 import pytest
-
 import qram_simulator as qs
 
 # Near-zero noise: satisfies the "must be non-empty" constraint of
@@ -85,8 +84,7 @@ def test_noise_model_validation():
     assert not qram.is_noise_free()
     assert not qram.has_damping()
 
-    qram.set_noise_models({qs.OperationType.Depolarizing: 1e-3,
-                           qs.OperationType.Damping: 1e-4})
+    qram.set_noise_models({qs.OperationType.Depolarizing: 1e-3, qs.OperationType.Damping: 1e-4})
     assert qram.has_damping()
 
 
@@ -94,10 +92,12 @@ def test_qubit_noisy_fidelity_in_range():
     qs.set_seed(11)
     qram = qs.QRAMCircuitQubit(3, 2)
     qram.set_memory_random()
-    qram.set_noise_models({
-        qs.OperationType.Depolarizing: 1e-3,
-        qs.OperationType.Damping: 1e-4,
-    })
+    qram.set_noise_models(
+        {
+            qs.OperationType.Depolarizing: 1e-3,
+            qs.OperationType.Damping: 1e-4,
+        }
+    )
     qram.set_input_uniform(20)
     qram.run_normal()
     fidelity = qram.sample_and_get_fidelity()
@@ -114,10 +114,8 @@ def test_qubit_run_versions_consistent():
         fn(qram)
         return qram.sample_and_get_fidelity()
 
-    assert run(lambda q: q.run_normal()) == pytest.approx(
-        run(lambda q: q.run_full()), abs=1e-12)
-    assert run(lambda q: q.run("normal")) == pytest.approx(
-        run(lambda q: q.run("full")), abs=1e-12)
+    assert run(lambda q: q.run_normal()) == pytest.approx(run(lambda q: q.run_full()), abs=1e-12)
+    assert run(lambda q: q.run("normal")) == pytest.approx(run(lambda q: q.run("full")), abs=1e-12)
 
 
 def test_time_step_schedule():
