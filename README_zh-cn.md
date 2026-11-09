@@ -51,17 +51,35 @@ git clone https://github.com/IAI-USTC-Quantum/QRAM-Simulator.git
 cd QRAM-Simulator
 mkdir build && cd build
 
-# 配置（CPU 版本；GPU/CUDA 后端当前暂缓，CMake 会构建 CPU-only 版本）
+# 配置（CPU 默认；可选 CUDA 构建加 -DQRAM_ENABLE_CUDA=ON）
 cmake .. -DCMAKE_BUILD_TYPE=Release
 
 make -j$(nproc)
 ```
 
-GPU 构建：本仓库的 CUDA/GPU 后端代码保留，但 CondRot 原语重构期间在 CMake 中
-强制屏蔽（配置阶段输出 `CUDA support disabled - building CPU-only`），构建恒为
-CPU-only。当前活跃开发的 GPU 路径——CUDA 稀疏态模拟器——位于姊妹仓库
+GPU 构建是可选项：以 `-DQRAM_ENABLE_CUDA=ON` 与已安装的 CUDA 工具链配置；CPU 仍是
+默认后端，未在 GPU 实现的生产 CondRot 内核继续走 CPU 回退。构建成功不是 GPU 性能
+证书。当前活跃开发的 GPU 路径——CUDA 稀疏态模拟器——位于姊妹仓库
 [SparQSim](https://github.com/IAI-USTC-Quantum/SparQSim)，已在 8×A800 服务器上
 以 CUDA 12.8 实测通过（[v1c 验证记录](https://github.com/IAI-USTC-Quantum/SparQSim/blob/main/docs/verification/v1c-gpu-cuda-a800.md)）。
+
+### 并行与 GPU 支持矩阵
+
+| 能力 | 状态 | 验证位置 | 复测入口 |
+|---|---|---|---|
+| 原生 CPU 引擎（wheel/sdist，Linux+Windows） | 已验证 | `python-bindings` CI 矩阵（py3.10/3.12）与本地运行 | `pytest bindings/python/test` |
+| C++ 核心测试（双架构） | 已验证 | `cmake-multi-platform` CI；本地 ctest 5/5 | `ctest --test-dir build-cpu` |
+| 四信道 Kraus 独立参照（QuTiP/uniqc 后端） | 已验证 | `core-contracts` CI 任务 | `pytest bindings/python/test -q -rs` |
+| CPU 系综 MPI（单机、真实 4 rank） | 已验证 | `core-contracts` CI（mpich）；本地 4 rank | 在带 `mpirun` 的环境运行 `pytest bindings/python/test/test_mpi_ensemble.py` |
+| CUDA 12.8.1 与 13.3.0 库、sm_80 | **仅编译验证**（未运行 GPU） | `core-contracts` CI cuda 矩阵 | `tools/bootstrap_cuda.py` + 本 README 的 cmake CUDA 配置/构建 |
+| CUDA 运行时正确性/吞吐 | **本仓未测——无 GPU** | 本仓无记录 | GPU 主机上：`QRAM_ENABLE_CUDA=ON` 构建，运行 C++ ctest 套件；记录设备/驱动/工具链 |
+| 多 GPU / 分布式稀疏态切分 | **不属于本仓** | GPU 稀疏态执行归 SparQSim（8×A800、CUDA 12.8 记录） | SparQSim 验证记录 |
+| 百万维 / 20 万网格应用场景 | 由 SparQSim 与应用仓在目标硬件执行 | 跨仓 | 各应用仓固定入口 |
+
+CPU 系综 MPI 是单机轨迹级并行；不是多 GPU 执行，也不是分布式稀疏态切分（见
+[MPI 指南](docs/sphinx/source/en/guide/mpi.md)）。百万维态矢量与 20 万网格场景由
+SparQSim 及应用仓库在其已验证硬件上消费；本仓提供 QRAM 查询核心，并如实保留未测
+硬件项。
 
 构建开关（均可通过 `-D...=ON/OFF` 控制）：
 
@@ -122,6 +140,42 @@ print(qram.sample_and_get_fidelity())
 
 本地开发：`pip install -v .`（CMake ≥ 3.18 + C++17 + OpenMP），
 测试：`pytest bindings/python/test`。
+
+### 独立实验、宽字查询与寻址仿真参考
+
+安装后的包自带独立 CLI/GUI，无需 demo-suite 检出：
+
+```bash
+qram-simulator info
+qram-simulator gui
+qram-simulator run --channel Damping --probability 0.001 --out experiment.json
+qram-simulator run --depth 20 --inputs 16 --trajectories 32 --out depth20.json
+qram-simulator words --address-width 129 --data-width 193 --records 8 --inputs 4
+qram-simulator addressing --layers 3 --channel Depolarizing --probability 0.001
+```
+
+`words` 演示**理想稀疏 XOR 查询语义**：任意位宽逻辑字（129/193/256 位及更高）
+跨多个 64 位机器字精确承载，绝不截断。`qram_simulator.SparseWordMemory(address_width,
+data_width, cells)` 为零默认稀疏字典（`.xor(address, data=0)` 经典读取、自逆）；
+`.apply_xor(state, address_bits, data_bits, backend, conditions=())` 在
+`(word寄存器名, 位序号)` 坐标上发射真实原生 X/控制 X——该算子协议已与 SparQSim
+负责人冻结，SparQ 的 CMake 从本仓正式 submodule 安装 `word_memory.py` 为
+`pysparq/_qram_words.py`（唯一源码，SparQ 不维护副本）。conditions 为
+`(小端位列表, 期望值)`；零控制与地址位重合时约束查询而非改址。随包
+`word_backend.ReferenceWordBackend` 是精确态矢量真实执行器；共享 fixture
+`bindings/python/test/fixtures/word_query_fixture.json` 供 QRAM-Simulator 与
+SparQSim 用相同源数据互验各自原生后端。容量概念严格区分：名义地址空间
+`2**address_width` 只是标签上界（不分配任何实体/树节点）；稀疏记录是仅存对象；
+可分配容量由调用方原生后端决定。该理想路径与上方含噪 bucket-brigade 路由相互
+独立，不构成任何噪声信道声明。GUI 提供"宽字稀疏查询"面板。
+
+`addressing` 是任务 2.2 仿真参考：2–3 层 QRAM（4/8 条种子随机记录）在四信道下
+被全地址均匀相干叠加寻址，输出平均 `(地址:总线)` 分布、原始正确寻址概率，以及
+**缓解仿真**——按已知内存标定总线翻转率并对每地址做对称单比特混淆矩阵求逆。
+缓解后寻址 `>=0.75` 判定采用直接分项语义（JSON 记录数值与运算符）。版本化 JSON
+（`qramsim.addressing.v1`）是与 uniqc 侧的离线标准输入输出；真机业务归其所属仓
+冻结封装，本参考不运行真机。无噪声参考精确为 1；独立 QuTiP/uniqc 电路级 baseline
+在 CI 中逐键对拍同一 zerobus 寻址分布。
 
 ### MPI 系综并行
 

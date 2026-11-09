@@ -41,7 +41,8 @@ def check() -> None:
     installed = Path(qram_simulator.__file__).resolve()
     if not installed.is_relative_to(Path(dist.locate_file("")).resolve()):
         raise ValueError("import resolved outside the installed distribution")
-    for name in ("demo.py", "demo_server.py", "demo.html"):
+    for name in ("demo.py", "demo_server.py", "demo.html",
+                 "word_memory.py", "word_backend.py"):
         if files("qram_simulator").joinpath(name).read_bytes() != (
                 project/"bindings/python/qram_simulator"/name).read_bytes():
             raise ValueError("installed wheel omitted/changed product asset: "+name)

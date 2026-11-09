@@ -62,3 +62,6 @@ docs/sphinx/source/api_stubs/
 # Local process artifacts (paper experiment logs / helper scripts)
 build_paper.bat
 Experiments/QRAM/QubitPaper/perf_run.log
+
+# 本地并行开发交接资料
+/.agent-task/

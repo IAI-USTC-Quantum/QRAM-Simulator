@@ -28,7 +28,8 @@ def check(wheel: Path) -> None:
             digest = hashlib.sha256((root/filename).read_bytes()).hexdigest()
             if digest not in hashes:
                 raise ValueError("wheel omitted/changed attribution: "+filename)
-        for filename in ("demo.py", "demo_server.py", "demo.html"):
+        for filename in ("demo.py", "demo_server.py", "demo.html",
+                         "word_memory.py", "word_backend.py"):
             actual = archive.read("qram_simulator/"+filename)
             expected = (root/"bindings/python/qram_simulator"/filename).read_bytes()
             if actual != expected:

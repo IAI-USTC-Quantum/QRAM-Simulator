@@ -9,6 +9,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Ideal sparse wide-word queries** (`qram_simulator.SparseWordMemory` and
+  `qram_simulator.word_backend`): logical address/data words of arbitrary
+  width (64/65/127/128/129/256 bits and beyond) carried exactly across
+  several 64-bit machine words — never truncated, never packed into a single
+  host integer. `.xor` is the exact self-inverse classical read;
+  `.apply_xor` executes the coherent query through real native X /
+  controlled-X operations on frozen `(word_register_name, bit_index)`
+  coordinates (SparQSim installs this single source as `pysparq/_qram_words.py`
+  from its submodule). Conditions are `(little_endian_bits, expected_value)`
+  pairs; zero controls coinciding with address bits restrict the query
+  instead of re-addressing. Nominal address space (`2**width` labels), sparse
+  records and allocatable capacity are kept explicitly distinct — no entity
+  is allocated for the nominal space and the ideal path makes no
+  noisy-routing claim. Ships with a real exact-statevector reference backend,
+  a shared cross-repository verification fixture
+  (`qram.word-query-fixture.v1`), and tests pinning the noisy native path's
+  explicit 64-bit boundary.
+- **Standalone `qram-simulator words` CLI and GUI wide-word panel**: seeded
+  sparse wide memories, classical + executed-chain self-checks (per-basis
+  classical match and query involution), `qramsim.words.v1` JSON with wide
+  integers as decimal strings.
+- **Noisy addressing & mitigation simulation reference**
+  (`qram-simulator addressing`, `qramsim.addressing.v1`): 2-3 layer QRAM
+  (4/8 seeded records) under all four channels with a uniform coherent
+  addressing input, mean (address:bus) distributions, raw correct-addressing
+  probability, and a calibrated symmetric bus-flip readout-mitigation
+  simulation. The `>=0.75` criterion records value and operator under the
+  direct task-sheet sub-item semantics; the JSON is the offline standard I/O
+  for the uniqc side and the real-machine business stays frozen elsewhere.
+- **Depth-20 four-channel evidence driver**
+  (`tools/depth20_four_channel.py`): reproduces the task-2.1 configuration
+  (20 layers, 1,048,576 seeded records — memory digest identical to the
+  v0.3.0 record — four channels) on one identical input and checks explicit
+  same-depth theory anchors: noiseless identity, the phase-flip vacancy
+  model calibrated at a stress probability and *predicted* at p=1e-6, the
+  X-type residue collapse separating full from logical fidelity, first-order
+  depolarizing composition and linear-in-p deficits, and the damping K0
+  occupation scale. Per-trajectory samples, seeds, formulas and provenance
+  are embedded in the artifacts; no exhaustive-input or unified-confidence
+  claim is made.
+
+### Documentation
+- New bilingual guide "Wide sparse word queries"; parallel/GPU support
+  matrix with explicit re-test entries (CUDA compile-only vs untested
+  runtime; CPU ensemble MPI is not distributed sparse-state slicing); the
+  stale zh README GPU paragraph now matches the optional `QRAM_ENABLE_CUDA`
+  build reality; README sections for `words` and `addressing`.
+
+## [0.3.0] - 2026-11-09
+
 ### Delivery and builds
 - Add the standalone `qram-simulator info`, `run` and `gui` interfaces with
   deterministic memory provenance, explicit selected input addresses, native

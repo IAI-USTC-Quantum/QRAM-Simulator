@@ -26,6 +26,8 @@ qram-simulator info
 qram-simulator gui
 qram-simulator run --channel Damping --probability 0.001 --out experiment.json
 qram-simulator run --depth 20 --inputs 16 --trajectories 32 --out depth20.json
+qram-simulator words --address-width 129 --data-width 193 --records 8 --inputs 4
+qram-simulator addressing --layers 3 --channel Depolarizing --probability 0.001
 ```
 
 The GUI opens a local browser and supports all four noise channels, parameter
@@ -53,6 +55,52 @@ architecture resources, not a fault-tolerant physical-qubit estimate. These
 experiments are not hardware or end-to-end performance certificates. Installation
 for developers remains `python -m pip install .`; desktop delivery bundles can
 launch the same entry point without exposing this step to end users.
+
+### Wide sparse word queries (`words` / `SparseWordMemory`)
+
+`qram-simulator words` demonstrates the **ideal sparse XOR query semantics**
+on logical words of arbitrary width — 129, 193, 256 bits and beyond, carried
+exactly by several 64-bit machine words with no truncation:
+
+- `qram_simulator.SparseWordMemory(address_width, data_width, cells)` holds a
+  zero-default sparse dict of exact arbitrary-precision words;
+  `.xor(address, data=0)` is the classical XOR read (self-inverse);
+  `.apply_xor(state, address_bits, data_bits, backend, conditions=())` emits
+  real native X / controlled-X operations on `(word_register_name, bit_index)`
+  coordinates — the operator protocol frozen with the SparQSim owner, whose
+  CMake installs this repository's `word_memory.py` as `pysparq/_qram_words.py`
+  (single source, no copy maintained in SparQSim);
+- conditions are `(little_endian_bits, expected_value)` pairs; a zero control
+  coinciding with an address bit restricts the query instead of re-addressing
+  the cell, and shared controls merge with the address pattern;
+- the packaged `qram_simulator.word_backend.ReferenceWordBackend` is a real
+  exact-statevector executor used by the CLI/GUI demo and the test chain; the
+  shared fixture `bindings/python/test/fixtures/word_query_fixture.json`
+  (`qram.word-query-fixture.v1`) lets QRAM-Simulator and SparQSim verify their
+  two independent native backends on identical source data.
+
+Capacity notions stay distinct: the *nominal address space* `2**address_width`
+bounds address labels only — no entity, qubit or tree node is allocated for it;
+the *sparse records* are the only stored objects; *allocatable capacity* is
+whatever the caller's native backend provides. This ideal path is separate from
+the noisy bucket-brigade routing above and involves no noise channel claim. The
+GUI exposes the same query as the **宽字稀疏查询** panel.
+
+### Noisy addressing & mitigation simulation reference (`addressing`)
+
+`qram-simulator addressing` is the task-2.2 simulation reference: a 2–3 layer
+QRAM (4 or 8 seeded records) under any of the four channels, addressed by a
+uniform coherent superposition over all records. It reports the mean
+`(address:bus)` output distribution, the raw correct-addressing probability,
+and a **mitigation simulation** — the bus flip rate is calibrated against the
+known memory and inverted with the symmetric single-bit confusion matrix per
+address. The `>=0.75` mitigated-addressing criterion uses the direct task-sheet
+sub-item semantics (`>=`, value and operator recorded in the JSON). The
+versioned JSON (`qramsim.addressing.v1`) is the offline standard I/O for the
+uniqc side; the real-machine business stays frozen in its owning repository
+and nothing here is a hardware run. The noiseless reference is exact (raw =
+mitigated = 1); the independent QuTiP/uniqc circuit-level baseline cross-checks
+the same zerobus addressing distribution bitwise in CI.
 
 ## Repository Split
 
@@ -103,6 +151,26 @@ The pinned choices are CUDA 12.8.1 and 13.3.0 (`--release`); both are compile-te
 The bootstrap verifies component sizes/SHA256 and preserves licenses. It installs
 no drivers or system packages. The explicit architecture allows a compilation check
 without a GPU; runtime correctness and throughput still require the target device.
+
+### Parallel & GPU support matrix
+
+| Capability | Status | Where verified | Re-test entry |
+|---|---|---|---|
+| Native CPU engine (wheel/sdist, Linux+Windows) | verified | `python-bindings` CI matrix (py3.10/3.12), local runs | `pytest bindings/python/test` |
+| C++ core tests (both architectures) | verified | `cmake-multi-platform` CI; local ctest 5/5 | `ctest --test-dir build-cpu` |
+| Four-channel Kraus reference (independent QuTiP/uniqc backend) | verified | `core-contracts` CI job | `pytest bindings/python/test -q -rs` |
+| CPU ensemble MPI, single node, real 4 ranks | verified | `core-contracts` CI (mpich); local 4-rank run | `pytest bindings/python/test/test_mpi_ensemble.py` under `mpirun`-equipped env |
+| CUDA 12.8.1 and 13.3.0 libraries, sm_80 | **compile-verified only** (no GPU run) | `core-contracts` CI cuda matrix | `tools/bootstrap_cuda.py` + the cmake CUDA configure/build from this README |
+| CUDA runtime correctness/throughput | **not tested here — no GPU** | none in this repository | on a GPU host: build with `QRAM_ENABLE_CUDA=ON`, run the C++ ctest suite; record device/driver/toolkit |
+| Multi-GPU / distributed sparse-state slicing | **out of scope here** | GPU sparse-state execution lives in SparQSim (8×A800, CUDA 12.8 record) | SparQSim verification records |
+| ≥10⁶-dimension / 200k-grid application scenarios | via SparQSim + applications on target hardware | cross-repo | application repositories' fixed entries |
+
+The CPU ensemble MPI entry is trajectory-level parallelism on one node; it is
+not multi-GPU execution and not a distributed sparse-state partitioning (see
+[the MPI guide](docs/sphinx/source/en/guide/mpi.md)). Million-dimensional
+state-vector and 200k-grid scenarios are consumed by SparQSim and the
+application repositories on their verified hardware; this repository supplies
+the QRAM query core and keeps the untested-hardware items explicit.
 
 Build options (each controllable via `-D...=ON/OFF`):
 
