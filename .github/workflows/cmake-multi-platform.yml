@@ -2,6 +2,7 @@ name: CMake on multiple platforms
 
 # Build CI: runs on code changes (ignores doc-only changes)
 on:
+  workflow_dispatch:
   push:
     branches: [ "main", "develop" ]
     paths-ignore:
