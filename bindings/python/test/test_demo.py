@@ -17,7 +17,7 @@ from unittest import mock
 
 import pytest
 
-from qram_simulator.demo import Experiment, run
+from qram_simulator.demo import AddressingQuery, Experiment, WordQuery, run, run_addressing, run_words
 from qram_simulator.demo_server import make_server
 
 
@@ -161,6 +161,99 @@ def test_invalid_experiments_fail_before_native_execution(kwargs):
         run(Experiment(**kwargs))
 
 
+def test_wide_word_query_run_and_chain_checks():
+    config = WordQuery(address_width=129, data_width=193, records=6, inputs=4)
+    result = run_words(config)
+    assert result["schema"] == "qramsim.words.v1"
+    assert result["chain"]["classical_match"] is True
+    assert result["chain"]["involution"] is True
+    assert result["chain"]["address_word_registers"] == 3  # 129 bits over 64-bit words
+    assert result["chain"]["data_word_registers"] == 4     # 193 bits over 64-bit words
+    assert result["memory"]["record_count"] == 6
+    assert result["memory"]["nominal_address_space"] == str(1 << 129)
+    assert int(result["memory"]["nominal_address_space"]) > 2**64
+    for row in result["results"]:
+        assert int(row["xor_output"]) == int(row["stored_word"])  # bus starts at zero
+    assert result["scope"]["hardware_run"] is False
+
+
+@pytest.mark.parametrize("kwargs", [dict(address_width=0), dict(address_width=1025),
+    dict(data_width=True), dict(data_width=-1), dict(records=0), dict(records=513),
+    dict(inputs=0), dict(seed=-1)])
+def test_invalid_word_queries_fail_before_execution(kwargs):
+    with pytest.raises(ValueError):
+        run_words(WordQuery(**kwargs))
+
+
+def test_real_words_cli_writes_artifact(tmp_path):
+    target = tmp_path/"words.json"
+    child = subprocess.run([sys.executable, "-m", "qram_simulator.demo", "words",
+        "--address-width", "129", "--data-width", "65", "--records", "4",
+        "--inputs", "3", "--out", str(target)],
+        capture_output=True, text=True, check=True)
+    assert not child.stdout
+    result = json.loads(target.read_text())
+    assert result["schema"] == "qramsim.words.v1"
+    assert result["chain"]["classical_match"] is True
+    assert result["chain"]["involution"] is True
+
+
+@pytest.mark.parametrize("layers", [2, 3])
+def test_addressing_noiseless_reference_is_exact(layers):
+    result = run_addressing(AddressingQuery(layers=layers, channel="none",
+                                            probability=0, trajectories=8))
+    assert result["schema"] == "qramsim.addressing.v1"
+    assert len(result["memory"]["records"]) == 2**layers
+    assert result["survival"] == pytest.approx(1, abs=1e-12)
+    assert result["raw_correct_addressing"] == pytest.approx(1, abs=1e-12)
+    assert result["mitigated_correct_addressing"] == pytest.approx(1, abs=1e-9)
+    assert result["criterion"]["operator"] == ">="
+    assert result["criterion"]["pass"] is True
+    assert result["scope"]["hardware_run"] is False
+
+
+@pytest.mark.parametrize("channel", ["BitFlip", "PhaseFlip", "Depolarizing", "Damping"])
+def test_addressing_mitigation_simulation_four_channels(channel):
+    result = run_addressing(AddressingQuery(layers=2, channel=channel,
+                                            probability=0.002, trajectories=48))
+    raw, mitigated = result["raw_correct_addressing"], result["mitigated_correct_addressing"]
+    assert 0 <= raw <= mitigated <= 1 or (channel == "PhaseFlip" and raw == pytest.approx(mitigated))
+    assert result["criterion"]["value"] == mitigated
+    assert result["criterion"]["pass"] == (mitigated >= 0.75)
+    assert result["mitigation"]["calibrated_flip_rate"] < 0.5
+    assert 0 <= result["survival"] <= 1 + 1e-12
+    assert 0 <= result["logical_query_fidelity_mean"] <= 1 + 1e-12
+    if channel != "Damping":
+        assert result["survival"] == pytest.approx(1, abs=1e-9)
+
+
+def test_addressing_seed_reproducibility_and_validation():
+    config = AddressingQuery(layers=3, channel="Depolarizing", probability=0.001,
+                             trajectories=16, seed=20261109)
+    first, second = run_addressing(config), run_addressing(config)
+    assert first["distribution_mean"] == second["distribution_mean"]
+    assert first["raw_correct_addressing"] == second["raw_correct_addressing"]
+    assert first["mitigated_correct_addressing"] == second["mitigated_correct_addressing"]
+    for kwargs in (dict(layers=1), dict(layers=4), dict(probability=1.0),
+                   dict(trajectories=0), dict(seed=-1), dict(channel="wrong"),
+                   dict(channel="none", probability=0.5)):
+        with pytest.raises(ValueError):
+            run_addressing(AddressingQuery(**kwargs))
+
+
+def test_real_addressing_cli_writes_artifact(tmp_path):
+    target = tmp_path/"addressing.json"
+    child = subprocess.run([sys.executable, "-m", "qram_simulator.demo", "addressing",
+        "--layers", "2", "--channel", "Depolarizing", "--probability", "0.001",
+        "--trajectories", "16", "--out", str(target)],
+        capture_output=True, text=True, check=True)
+    assert not child.stdout
+    result = json.loads(target.read_text())
+    assert result["schema"] == "qramsim.addressing.v1"
+    assert result["mitigated_correct_addressing"] >= result["raw_correct_addressing"]
+    assert result["criterion"]["pass"] is True
+
+
 def test_real_cli_writes_artifact(tmp_path):
     target = tmp_path/"experiment.json"
     child = subprocess.run([sys.executable, "-m", "qram_simulator.demo", "run",
@@ -199,6 +292,21 @@ def test_gui_session_and_real_isolated_native_worker():
                 result = json.load(response)
             assert result["fidelity"]["mean"] == pytest.approx(1, abs=1e-12)
             assert result["software"]["gpu_execution"] is False
+            words_payload = json.dumps(dict(address_width=129, data_width=129,
+                                            records=4, inputs=3, seed=20261109)).encode()
+            def post_words(headers, payload=words_payload):
+                req = urllib.request.Request(base+"/api/words", data=payload,
+                    headers={"Content-Type": "application/json", **headers})
+                return urllib.request.urlopen(req)
+            with post_words({"X-Session": token}) as response:
+                words = json.load(response)
+            assert words["schema"] == "qramsim.words.v1"
+            assert words["chain"]["classical_match"] is True
+            over_limit = json.dumps(dict(address_width=300, data_width=8,
+                                         records=4, inputs=3, seed=1)).encode()
+            with pytest.raises(urllib.error.HTTPError) as limited:
+                post_words({"X-Session": token}, over_limit)
+            assert limited.value.code == 400
             with urllib.request.urlopen(base+"/api/info") as response:
                 assert json.load(response)["software"] == "QRAM-Simulator"
         finally:

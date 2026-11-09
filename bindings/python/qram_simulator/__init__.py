@@ -27,6 +27,9 @@ del _metadata
 # The MPI ensemble runner imports mpi4py/numpy on use only — lazy as well.
 _LAZY = ("baseline", "mpi")
 
+from .word_memory import SparseWordMemory
+from .word_backend import ReferenceWordBackend, SparseStateVector
+
 
 def __getattr__(name: str):
     if name in _LAZY:

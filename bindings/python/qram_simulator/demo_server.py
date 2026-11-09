@@ -12,7 +12,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 
-from .demo import Experiment, information
+from .demo import Experiment, WordQuery, information
 
 
 def make_server(port: int = 0) -> ThreadingHTTPServer:
@@ -64,23 +64,31 @@ def make_server(port: int = 0) -> ThreadingHTTPServer:
             if (not self.local() or not hmac.compare_digest(
                     self.headers.get("X-Session", ""), token)):
                 return self.send(403, {"error": "local session required"})
-            if self.path != "/api/run":
+            if self.path not in ("/api/run", "/api/words"):
                 return self.send(404, {"error": "not found"})
             try:
                 length = int(self.headers.get("Content-Length", "0"))
                 if not 0 < length <= 2048 or self.headers.get("Content-Type") != "application/json":
                     raise ValueError("a bounded JSON request is required")
-                config = Experiment(**json.loads(self.rfile.read(length)))
-                config.validate()
-                if (config.depth > 12 or config.data_bits > 2 or config.inputs > 32 or
-                        config.trajectories > 64 or config.probability > 0.1):
-                    raise ValueError("GUI limit: depth12, bus2, inputs32, trajectories64, noise0.1; use CLI for larger runs")
+                if self.path == "/api/run":
+                    config = Experiment(**json.loads(self.rfile.read(length)))
+                    config.validate()
+                    if (config.depth > 12 or config.data_bits > 2 or config.inputs > 32 or
+                            config.trajectories > 64 or config.probability > 0.1):
+                        raise ValueError("GUI limit: depth12, bus2, inputs32, trajectories64, noise0.1; use CLI for larger runs")
+                else:
+                    config = WordQuery(**json.loads(self.rfile.read(length)))
+                    config.validate()
+                    if (config.address_width > 256 or config.data_width > 256 or
+                            config.records > 32 or config.inputs > 8):
+                        raise ValueError("GUI limit: width256, records32, inputs8; use CLI for larger words")
             except (ValueError, TypeError, KeyError) as exc:
                 return self.send(400, {"error": str(exc)})
             if not slot.acquire(blocking=False):
                 return self.send(409, {"error": "an experiment is already running"})
             try:
-                command = [sys.executable, "-m", "qram_simulator.demo", "run"]
+                command = [sys.executable, "-m", "qram_simulator.demo",
+                           "run" if self.path == "/api/run" else "words"]
                 for field in dataclasses.fields(config):
                     command.extend(["--"+field.name.replace("_", "-"), str(getattr(config, field.name))])
                 child = subprocess.run(command, capture_output=True, text=True, timeout=60)

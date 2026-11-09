@@ -90,6 +90,8 @@ jobs:
           tar -tzf dist/qram_simulator-*.tar.gz | grep -q "ThirdParty/eigen-3.4.0/Eigen/Eigen"
           tar -tzf dist/qram_simulator-*.tar.gz | grep -q "ThirdParty/fmt/src/format.cc"
           tar -tzf dist/qram_simulator-*.tar.gz | grep -q "bindings/python/core_binding.cpp"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "bindings/python/qram_simulator/word_memory.py"
+          tar -tzf dist/qram_simulator-*.tar.gz | grep -q "bindings/python/test/fixtures/word_query_fixture.json"
 
       - uses: actions/upload-artifact@v4
         with:
