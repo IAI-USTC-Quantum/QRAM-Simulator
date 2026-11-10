@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.2
+
+- Describe addressing targets and the depth-20 benchmark as reusable, inclusive numerical checks without external workflow references.
+- Keep all benchmark defaults, output schema keys, numerical comparisons and simulation kernels unchanged.
+
 ## 0.5.1
 
 - Use generic addressing and depth-20 four-channel labels throughout the CLI help, local GUI and bilingual documentation. Test configurations, thresholds, formulas and numerical kernels are unchanged.
