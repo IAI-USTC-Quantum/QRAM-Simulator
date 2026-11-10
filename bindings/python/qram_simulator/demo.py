@@ -212,11 +212,9 @@ def run_addressing(config: AddressingQuery) -> dict:
     mitigation: the bus flip rate is calibrated per bit against the known
     memory and inverted with the symmetric single-bit confusion matrix
     (routing-induced flips are mitigated to the extent they follow that
-    model). The >=0.75 mitigated addressing threshold uses the direct
-    task-sheet sub-item semantics (``>=``, not ``>``); this is a simulation
-    reference with standard JSON I/O for the uniqc side — the real-machine
-    business stays frozen in its owning repository and nothing here is a
-    hardware run.
+    model). The default mitigated addressing threshold uses an inclusive
+    comparison (``>=0.75``). This simulation reference has standard JSON I/O
+    for external consumers and never initiates a hardware run.
     """
     config.validate()
     import qram_simulator as qs
@@ -297,7 +295,7 @@ def run_addressing(config: AddressingQuery) -> dict:
             "threshold": 0.75,
             "operator": ">=",
             "value": mitigated,
-            "semantics": "direct task-sheet sub-item >=75% (not the " "cross-page >75% variant)",
+            "semantics": "inclusive comparison against the configured minimum fidelity",
             "pass": mitigated >= 0.75,
         },
         "timing_s": {"total": time.perf_counter() - start},

@@ -1,6 +1,6 @@
 """Packaged depth-20 four-channel evidence replay (depth-20 four-channel standard entry).
 
-Reproduces the fixed task-sheet 2.1 configuration — 20 tree layers, 1,048,576
+Reproduces a full-depth benchmark configuration — 20 tree layers, 1,048,576
 seeded random data records, the four channels (BitFlip / PhaseFlip /
 Depolarizing / Damping) — on one identical input (same memory digest and
 address superposition for every channel and probability), then checks the

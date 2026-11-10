@@ -99,8 +99,8 @@ uniform coherent superposition over all records. It reports the mean
 `(address:bus)` output distribution, the raw correct-addressing probability,
 and a **mitigation simulation** — the bus flip rate is calibrated against the
 known memory and inverted with the symmetric single-bit confusion matrix per
-address. The GUI exposes the same reference as the **寻址缓解仿真** panel. The `>=0.75` mitigated-addressing criterion uses the direct task-sheet
-sub-item semantics (`>=`, value and operator recorded in the JSON). The
+address. The GUI exposes the same reference as the **寻址缓解仿真** panel. The default mitigated-addressing criterion is `>=0.75`;
+the comparison operator and target value are recorded in the JSON. The
 versioned JSON (`qramsim.addressing.v1`) is the offline standard I/O for the
 uniqc side; `--evaluate` re-imports a record (from this software or the
 declared uniqc consumer), validates it and recomputes the criterion offline
