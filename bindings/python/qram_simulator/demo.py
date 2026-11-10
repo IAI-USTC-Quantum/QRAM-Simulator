@@ -313,7 +313,7 @@ def run_addressing(config: AddressingQuery) -> dict:
 def evaluate_addressing(record: dict) -> dict:
     """Offline import of a recorded ``qramsim.addressing.v1`` JSON report.
 
-    Task-4 engineering wrapper: reads a record produced by this software or
+    Addressing engineering wrapper: reads a record produced by this software or
     by the declared uniqc consumer, validates its schema and required
     numeric fields, and recomputes the mitigated-addressing criterion from
     the recorded values (no simulation, no hardware run). Historical data

@@ -1,6 +1,6 @@
-# Depth-20 Four-Channel Evidence Replay (Task 2.1)
+# Depth-20 Four-Channel Evidence Replay (Depth-20 four-channel)
 
-The fixed task-2.1 material — **20 tree layers, 1,048,576 seeded random data
+The fixed depth-20 four-channel material — **20 tree layers, 1,048,576 seeded random data
 records, the four noise channels** (BitFlip / PhaseFlip / Depolarizing /
 Damping) on one identical input — ships as a standard product entry, not a
 repository-internal script. Every channel and probability point consumes the
@@ -13,7 +13,7 @@ qram-simulator evidence --out summary.json
 python tools/depth20_four_channel.py --outdir build-evidence   # repo wrapper
 ```
 
-The GUI exposes the same replay as the **任务2.1 四信道证据复算** panel
+The GUI exposes the same replay as the **深度20四信道证据复算** panel
 (default configuration, about one to three minutes on a laptop CPU, a
 300-second deadline, and a JSON download). The panel and the CLI call the
 same packaged module `qram_simulator.evidence`; ordinary users never touch

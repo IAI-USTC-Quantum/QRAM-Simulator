@@ -27,7 +27,7 @@
 <section class="card"><h2>宽字查询结果</h2><p id="words-status" role="status" aria-live="polite">设置参数后执行查询。</p><div class="metrics"><div><span class="muted">名义地址空间（标签数，不分配）</span><strong class="value" id="nominal-space">—</strong></div><div><span class="muted">实际稀疏记录数</span><strong class="value" id="word-records">—</strong></div><div><span class="muted">地址/数据机器字寄存器</span><strong class="value" id="word-registers">—</strong></div><div><span class="muted">查询链自检</span><strong class="value" id="chain-check">—</strong></div></div>
 <details style="margin-top:14px"><summary>逐地址查询明细（十进制字符串）</summary><pre id="words-detail">尚无结果</pre></details>
 <p class="muted">经典 XOR 与执行后的量子链逐基矢一致，且二次查询恢复初态（自逆）。名义地址空间 2<sup>位宽</sup> 只是取值上界：本软件不为其分配实体或树节点。</p><button type="button" id="words-download" disabled>下载宽字查询 JSON</button></section></div>
-<div class="grid" style="margin-top:24px"><form class="card" id="addressing-config"><h2>寻址缓解仿真（任务2.2参考）</h2><fieldset id="addressing-fields">
+<div class="grid" style="margin-top:24px"><form class="card" id="addressing-config"><h2>寻址缓解仿真</h2><fieldset id="addressing-fields">
 <label for="layers">QRAM 层数</label><select id="layers"><option value="2">2 层（4 条记录）</option><option value="3" selected>3 层（8 条记录）</option></select>
 <label for="addressing-channel">噪声信道</label><select id="addressing-channel"><option value="Depolarizing" selected>退极化</option><option value="BitFlip">比特翻转</option><option value="PhaseFlip">相位翻转</option><option value="Damping">振幅阻尼</option><option value="none">无噪声</option></select>
 <label for="addressing-probability">每次信道作用的概率</label><input id="addressing-probability" name="probability" type="number" min="0" max="0.1" step="any" value="0.001" required>
@@ -36,8 +36,8 @@
 </fieldset><button id="addressing-run" type="submit">运行寻址与缓解仿真</button><p class="muted">本面板是<strong>仿真参考</strong>：对全部记录的均匀相干叠加寻址，报告平均（地址:总线）分布、原始正确寻址概率与校准总线翻转率的读出缓解仿真。它不是三层QRAM实验、不是QPU实测、也不替代宽字理想查询；真机业务冻结在所属仓库。</p></form>
 <section class="card"><h2>寻址缓解结果</h2><p id="addressing-status" role="status" aria-live="polite">设置参数后运行寻址仿真。</p><div class="metrics"><div><span class="muted">原始正确寻址概率</span><strong class="value" id="raw-correct">—</strong></div><div><span class="muted">缓解后正确寻址概率</span><strong class="value" id="mitigated-correct">—</strong></div><div><span class="muted">校准总线翻转率</span><strong class="value" id="flip-rate">—</strong></div><div><span class="muted">判据 缓解后 ≥ 0.75</span><strong class="value" id="criterion">—</strong></div></div>
 <details style="margin-top:14px"><summary>记录数据、分布与语义边界</summary><pre id="addressing-detail">尚无结果</pre></details>
-<p class="muted">缓解模型：按已知数据校准的对称单比特混淆矩阵逐地址求逆（结果截断到 [0,1]）。判据采用任务书直接子项语义（≥，含等号）；本结果不是硬件运行或验收证书。</p><button type="button" id="addressing-download" disabled>下载寻址仿真 JSON</button></section></div>
-<div class="grid" style="margin-top:24px"><form class="card" id="evidence-config"><h2>任务2.1 四信道证据复算</h2><fieldset id="evidence-fields">
+<p class="muted">缓解模型：按已知数据校准的对称单比特混淆矩阵逐地址求逆（结果截断到 [0,1]）。阈值比较采用 ≥（含等号）；本结果不是硬件运行或验收证书。</p><button type="button" id="addressing-download" disabled>下载寻址仿真 JSON</button></section></div>
+<div class="grid" style="margin-top:24px"><form class="card" id="evidence-config"><h2>深度20四信道证据复算</h2><fieldset id="evidence-fields">
 <label for="trajectories_evidence">主轨迹数（记录值 2048）</label><input id="trajectories_evidence" name="trajectories" type="number" min="16" max="2048" value="2048" required>
 <label for="stress-trajectories">压力点轨迹数（记录值 256）</label><input id="stress-trajectories" name="stress_trajectories" type="number" min="16" max="2048" value="256" required>
 <label for="stress-probability">压力点概率</label><input id="stress-probability" name="stress_probability" type="number" min="0" step="any" value="0.0001" required>

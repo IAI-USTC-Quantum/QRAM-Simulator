@@ -86,7 +86,7 @@ its wide-word panel; stale results are invalidated on parameter change.
 The 64-bit boundary of the noisy native path is pinned by tests
 (`test_word_memory.py::test_narrow_native_boundary_is_explicit_not_silent`):
 `addr_size + data_size > 64` raises at input sampling, and oversized Python
-integers raise in the binding instead of truncating. The task-2.2 noisy
+integers raise in the binding instead of truncating. The addressing mitigation noisy
 addressing/mitigation simulation reference is the
 [`addressing` CLI](https://iai-ustc-quantum.github.io/QRAM-Simulator/en/guide/quickstart.html)
 (`qramsim.addressing.v1`).

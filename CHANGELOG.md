@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 0.5.1
+
+- Use generic addressing and depth-20 four-channel labels throughout the CLI help, local GUI and bilingual documentation. Test configurations, thresholds, formulas and numerical kernels are unchanged.
+- Name the reusable addressing test plan by its interface and retain all seeded replay parameters and provenance.
+
 ## [0.5.0] - 2026-11-09
 
 ### Added
-- **Task-2.1 evidence replay as a standard product entry**
-  (`qram_simulator.evidence`, `qram-simulator evidence`, GUI **任务2.1 四信道
+- **Depth-20 four-channel evidence replay as a standard product entry**
+  (`qram_simulator.evidence`, `qram-simulator evidence`, GUI **深度20 四信道
   证据复算** panel): the fixed depth-20 / 1,048,576-record four-channel
   configuration with its sixteen same-depth theory anchors runs from the
   installed package — no repository checkout, no native internals exposed.
@@ -26,19 +31,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   produced by this software or the declared uniqc consumer and recomputes
   the mitigated-addressing criterion offline (`qramsim.addressing-eval.v1`)
   — historical data stays historical, no trajectory is re-run, no hardware
-  is touched. Task-4 test plan published as a bilingual guide (seeded 2-3
+  is touched. Addressing test plan published as a bilingual guide (seeded 2-3
   layer / 4-8 record data, QPU-side data access via the offline standard
   I/O, existing `>=0.75` mitigated-fidelity records and fixed operation
   instructions).
-- **GUI addressing panel** (**寻址缓解仿真（任务2.2参考）**): the task-2.2
+- **GUI addressing panel** (**寻址缓解仿真**): the addressing mitigation
   mitigation-simulation reference is now selectable, runnable and exportable
   from the GUI exactly like the CLI (same child-process service layer, same
   `qramsim.addressing.v1` output, GUI limits trajectories to 256 and noise
   to 0.1).
 
 ### Documentation
-- New bilingual guides "Depth-20 four-channel evidence replay (task 2.1)"
-  and "Task-4 QRAM test plan"; README/README_zh sections for the `evidence`
+- New bilingual guides "Depth-20 four-channel evidence replay (Depth-20 four-channel)"
+  and "Addressing QRAM test plan"; README/README_zh sections for the `evidence`
   CLI, the `--evaluate` offline import and the new GUI panels.
 
 ### Fixed
@@ -83,10 +88,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   addressing input, mean (address:bus) distributions, raw correct-addressing
   probability, and a calibrated symmetric bus-flip readout-mitigation
   simulation. The `>=0.75` criterion records value and operator under the
-  direct task-sheet sub-item semantics; the JSON is the offline standard I/O
+  declared example threshold; the JSON is the offline standard I/O
   for the uniqc side and the real-machine business stays frozen elsewhere.
 - **Depth-20 four-channel evidence driver**
-  (`tools/depth20_four_channel.py`): reproduces the task-2.1 configuration
+  (`tools/depth20_four_channel.py`): reproduces the depth-20 four-channel configuration
   (20 layers, 1,048,576 seeded records — memory digest identical to the
   v0.3.0 record — four channels) on one identical input and checks explicit
   same-depth theory anchors: noiseless identity, the phase-flip vacancy
