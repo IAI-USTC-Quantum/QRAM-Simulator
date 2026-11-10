@@ -25,7 +25,7 @@ QRAM-Simulator 是面向 QRAM（量子随机存储器）装载电路的高性能
    guide/mpi
    guide/wide-words
    guide/evidence
-   guide/task4_test_plan
+   guide/addressing_test_plan
    guide/naming_conventions
 
 .. toctree::

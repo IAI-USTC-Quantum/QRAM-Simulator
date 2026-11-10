@@ -1,10 +1,6 @@
-# 任务4 QRAM 测试方案：记录、QPU 数据访问与缓解判据
+# QRAM 寻址测试方案：记录、数据交换与缓解阈值
 
-本页是 **本仓** 所承担的 QRAM 任务4子项的固定测试方案。QRAM-Simulator
-只做工程封装与历史数据离线导入：**本仓不运行真机、不消耗 shots、仿真数据
-绝不冒充真机数据。** 真机业务（提交、映射、随机化、恢复、位序、误差处理、
-缓解执行）冻结在所属仓库（uniqc / UnifiedQuantum）；任务 3/5/6 的测试方案
-归其负责人，不在本页代写。
+本页提供可复现的QRAM寻址与数据交换测试。QRAM-Simulator提供本地仿真和离线记录校验；云平台接入由UniQC维护。仿真记录与硬件记录通过来源标记区分，本页步骤不提交设备任务。
 
 ## 被测对象与三个不可互换的功能
 
@@ -49,7 +45,7 @@ qram-simulator addressing --evaluate addressing-L3-Depolarizing.json
 
 ## 错误缓解后保真度 ≥ 75%——既有记录
 
-判据采用任务书直接子项语义——`mitigated_correct_addressing >= 0.75`，值与
+示例阈值定义为`mitigated_correct_addressing >= 0.75`，值与
 算符记录在 JSON 中（`criterion.threshold`、`criterion.operator`、
 `criterion.value`、`criterion.pass`）。既有的 2 层/3 层记录（种子
 20261109、p=0.001、256 轨迹）全部通过，例如：
@@ -66,7 +62,7 @@ qram-simulator addressing --evaluate addressing-L3-Depolarizing.json
 
 ## 固定操作说明（GUI）
 
-1. `qram-simulator gui` → **寻址缓解仿真（任务2.2参考）** 面板；
+1. `qram-simulator gui` → **寻址缓解仿真** 面板；
 2. 设置层数（2/3）、信道、概率（≤ 0.1）、轨迹数（≤ 256）、种子并运行；
    显示判据结论、翻转率、分布与数据表；
 3. 下载 `qram-addressing.json`（即 `qramsim.addressing.v1` 记录）；

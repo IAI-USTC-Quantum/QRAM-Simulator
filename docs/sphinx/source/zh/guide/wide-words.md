@@ -74,5 +74,5 @@ qram-simulator words --address-width 129 --data-width 193 --records 8 --inputs 4
 含噪原生路径的 64 位边界由测试钉住
 （`test_word_memory.py::test_narrow_native_boundary_is_explicit_not_silent`）：
 `addr_size + data_size > 64` 在输入采样处抛错，超范围 Python 整数在绑定层
-抛错而非截断。任务 2.2 的含噪寻址/缓解仿真参考是 `addressing` CLI
+抛错而非截断。寻址含噪寻址/缓解仿真参考是 `addressing` CLI
 （`qramsim.addressing.v1`）。

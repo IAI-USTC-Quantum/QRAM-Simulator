@@ -1,4 +1,4 @@
-"""Packaged depth-20 four-channel evidence replay (task-2.1 standard entry).
+"""Packaged depth-20 four-channel evidence replay (depth-20 four-channel standard entry).
 
 Reproduces the fixed task-sheet 2.1 configuration — 20 tree layers, 1,048,576
 seeded random data records, the four channels (BitFlip / PhaseFlip /
@@ -57,7 +57,7 @@ class EvidenceConfig:
     """Trajectory/probability knobs of the replay; the core stays fixed.
 
     depth=20, data_bits=1, inputs=16, the four channels at p=1e-6 and the
-    stress/linearity structure are part of the recorded task-2.1 material
+    stress/linearity structure are part of the recorded depth-20 four-channel material
     and are not configurable through this product surface.
     """
 
@@ -105,7 +105,7 @@ def _strikes_per_trajectory(depth: int, probability: float) -> float:
 
 
 def run_evidence(config: EvidenceConfig, outdir: Path | None = None) -> dict:
-    """Run the fixed task-2.1 replay and evaluate the 16 theory anchors.
+    """Run the fixed depth-20 four-channel replay and evaluate the 16 theory anchors.
 
     Returns the ``qramsim.depth20-four-channel.v1`` summary. With ``outdir``
     the per-run raw JSON files are written next to it; the summary itself is
@@ -154,7 +154,7 @@ def run_evidence(config: EvidenceConfig, outdir: Path | None = None) -> dict:
     assert len(set(digests.values())) == 1, "inputs differ across runs"
     if config.seed == 20261109 and digests["BitFlip"] != RECORDED_MEMORY_DIGEST:
         raise RuntimeError(
-            "replay memory digest differs from the recorded task-2.1 input "
+            "replay memory digest differs from the recorded depth-20 four-channel input "
             f"({digests['BitFlip']} != {RECORDED_MEMORY_DIGEST})"
         )
     noiseless, bit = runs["noiseless"], runs["BitFlip"]

@@ -121,7 +121,7 @@ def make_server(port: int = 0) -> ThreadingHTTPServer:
 
                     config = EvidenceConfig(**json.loads(self.rfile.read(length)))
                     config.validate()
-                    # The fixed task-2.1 replay (20 layers, 1048576 records,
+                    # The fixed depth-20 four-channel replay (20 layers, 1048576 records,
                     # four channels) at its default 2048 trajectories takes
                     # on the order of minutes on a laptop CPU; the GUI gives
                     # it its own bounded deadline, clearly labeled in the UI.

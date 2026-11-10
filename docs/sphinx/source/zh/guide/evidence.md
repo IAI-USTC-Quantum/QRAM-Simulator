@@ -1,6 +1,6 @@
-# 深度20四信道证据复算（任务2.1）
+# 深度20四信道证据复算
 
-固定的任务2.1材料——**20 层树、1,048,576 条种子随机数据记录、四个噪声信道**
+固定的深度20四信道材料——**20 层树、1,048,576 条种子随机数据记录、四个噪声信道**
 （BitFlip / PhaseFlip / Depolarizing / Damping）作用于同一输入——以标准产品入口
 发布，而非仓库内部脚本。每个信道与概率点消费同一份数据摘要与同一个 16 地址
 相干叠加输入。
@@ -12,7 +12,7 @@ qram-simulator evidence --out summary.json
 python tools/depth20_four_channel.py --outdir build-evidence   # 仓库侧包装
 ```
 
-GUI 以**任务2.1 四信道证据复算**面板提供同一复算（默认配置在笔记本 CPU 上
+GUI 以**深度20四信道证据复算**面板提供同一复算（默认配置在笔记本 CPU 上
 约一到三分钟，300 秒时限，可下载 JSON）。面板与 CLI 调用同一打包模块
 `qram_simulator.evidence`；普通用户不接触原生内部依赖。
 

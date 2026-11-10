@@ -36,7 +36,7 @@ The GUI opens a local browser and supports all four noise channels, parameter
 editing, trajectory plots and JSON downloads. Each run uses an isolated native
 worker. Large runs use the CLI; the GUI limits depth to12, bus width to2,
 inputs to32, trajectories to64 and probability to0.1, with a60-second deadline
-(the addressing panel allows 256 trajectories; the fixed task-2.1 evidence
+(the addressing panel allows 256 trajectories; the fixed depth-20 four-channel evidence
 replay panel keeps the recorded 2048-trajectory configuration with its own
 labeled 300-second deadline). The CLI supports depth20 (1048576 random
 records), up to8 data bits,1024 input addresses and4096 trajectories. Set
@@ -93,7 +93,7 @@ GUI exposes the same query as the **宽字稀疏查询** panel.
 
 ### Noisy addressing & mitigation simulation reference (`addressing`)
 
-`qram-simulator addressing` is the task-2.2 simulation reference: a 2–3 layer
+`qram-simulator addressing` is the addressing mitigation simulation reference: a 2–3 layer
 QRAM (4 or 8 seeded records) under any of the four channels, addressed by a
 uniform coherent superposition over all records. It reports the mean
 `(address:bus)` output distribution, the raw correct-addressing probability,
@@ -107,13 +107,13 @@ declared uniqc consumer), validates it and recomputes the criterion offline
 — historical data stays historical, and nothing here is a hardware run. The
 noiseless reference is exact (raw = mitigated = 1); the independent
 QuTiP/uniqc circuit-level baseline cross-checks the same zerobus addressing
-distribution bitwise in CI. The fixed [task-4 test plan](docs/sphinx/source/en/guide/task4_test_plan.md)
+distribution bitwise in CI. The fixed [Addressing test plan](docs/sphinx/source/en/guide/addressing_test_plan.md)
 documents the seeded 2-3 layer / 4-8 record data, the QPU-side data access
 and the existing mitigated-fidelity records.
 
-### Task-2.1 depth-20 four-channel evidence replay
+### Depth-20 four-channel depth-20 four-channel evidence replay
 
-`qram-simulator evidence` packages the fixed task-2.1 material — 20 layers,
+`qram-simulator evidence` packages the fixed depth-20 four-channel material — 20 layers,
 1,048,576 seeded random records, the four channels on one identical input —
 as a standard software entry with sixteen explicit same-depth theory anchors
 (noiseless identity, phase-flip vacancy prediction, X-type residue collapse,
@@ -121,7 +121,7 @@ first-order Pauli composition, damping K0 occupation scale, normalization).
 It verifies the replayed memory digest against the recorded v0.3.0 value,
 embeds seeds, per-trajectory samples, formulas and provenance in the
 `qramsim.depth20-four-channel.v1` summary, and is exposed identically as the
-GUI **任务2.1 四信道证据复算** panel; the repository tool
+GUI **深度20四信道证据复算** panel; the repository tool
 `tools/depth20_four_channel.py` is a thin wrapper over the same packaged
 module. See the [evidence replay guide](docs/sphinx/source/en/guide/evidence.md).
 

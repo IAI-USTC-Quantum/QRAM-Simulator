@@ -1,13 +1,6 @@
-# Task-4 QRAM Test Plan: Records, QPU Data Access and the Mitigation Criterion
+# QRAM Addressing Test Plan: Records, Data Exchange and Mitigation Threshold
 
-This page is the fixed test plan for the QRAM task-4 sub-items as far as
-**this repository** owns them. QRAM-Simulator provides engineering wrapping
-and offline data import only: **no real machine is run from here, no shots
-are consumed, and simulation data is never presented as hardware data.**
-The real-machine business (submission, mapping, randomization, recovery,
-bit order, error handling, mitigation execution) stays frozen in its owning
-repository (uniqc / UnifiedQuantum); test plans for tasks 3/5/6 belong to
-their owners and are not written here.
+This page describes reproducible QRAM addressing and data-exchange tests. QRAM-Simulator provides local simulation and offline record validation; UniQC maintains cloud-platform access. Source flags distinguish simulated records from hardware records. These steps do not submit device jobs.
 
 ## Tested object and its three non-interchangeable functions
 
@@ -58,7 +51,7 @@ touches hardware; evaluation of a simulated record is not a hardware test.
 
 ## Error-mitigated fidelity ≥ 75% — existing records
 
-The criterion uses the direct task-sheet sub-item semantics —
+The criterion uses the declared example threshold —
 `mitigated_correct_addressing >= 0.75`, with value and operator recorded in
 the JSON (`c.threshold`, `criterion.operator`, `criterion.value`,
 `criterion.pass`). The existing layer-2/layer-3 records (seed 20261109,
@@ -80,7 +73,7 @@ model and flip rate.
 
 ## Fixed operation instructions (GUI)
 
-1. `qram-simulator gui` → **寻址缓解仿真（任务2.2参考）** panel;
+1. `qram-simulator gui` → **寻址缓解仿真** panel;
 2. set layers (2/3), channel, probability (≤ 0.1), trajectories (≤ 256),
    seed; run; the criterion verdict, flip rate, distribution and records
    are shown;
