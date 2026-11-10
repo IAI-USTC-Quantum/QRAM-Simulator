@@ -111,7 +111,7 @@ distribution bitwise in CI. The fixed [Addressing test plan](docs/sphinx/source/
 documents the seeded 2-3 layer / 4-8 record data, the QPU-side data access
 and the existing mitigated-fidelity records.
 
-### Depth-20 four-channel depth-20 four-channel evidence replay
+### Depth-20 four-channel evidence replay
 
 `qram-simulator evidence` packages the fixed depth-20 four-channel material — 20 layers,
 1,048,576 seeded random records, the four channels on one identical input —
