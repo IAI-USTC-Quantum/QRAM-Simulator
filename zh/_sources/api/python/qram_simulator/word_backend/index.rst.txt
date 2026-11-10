@@ -1,0 +1,129 @@
+qram_simulator.word_backend
+===========================
+
+.. py:module:: qram_simulator.word_backend
+
+.. autoapi-nested-parse::
+
+   Reference native backend for the ideal sparse wide-word query chain.
+
+   Executes the frozen ``SparseWordMemory.apply_xor`` operator protocol (see
+   :mod:`qram_simulator.word_memory`) on an exact dict-backed statevector
+   whose basis indices are arbitrary-precision Python ints. Registers are
+   named machine words of ``MACHINE_WORD_BITS`` bits, so logical registers
+   wider than 64 bits genuinely span several words — the same layout
+   discipline SparQSim's production native backend follows.
+
+   This module is QRAM-Simulator's own verification and product-demo
+   executor. Production-scale native execution is provided by the caller's
+   backend (SparQSim); both are validated against the shared fixture
+   ``bindings/python/test/fixtures/word_query_fixture.json``.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   qram_simulator.word_backend.MACHINE_WORD_BITS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.word_backend.InplaceWordBackend
+   qram_simulator.word_backend.ReferenceWordBackend
+   qram_simulator.word_backend.SparseStateVector
+   qram_simulator.word_backend.WordXOperator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   qram_simulator.word_backend.encode_basis
+   qram_simulator.word_backend.word_layout
+
+
+Module Contents
+---------------
+
+.. py:class:: InplaceWordBackend(machine_word_bits: int = 64)
+
+   Bases: :py:obj:`ReferenceWordBackend`
+
+
+   Protocol variant whose ``conditioned_by_bit`` returns None (pure mutation).
+
+
+   .. py:method:: X_Bool(name, bit_index)
+
+
+.. py:class:: ReferenceWordBackend(machine_word_bits: int = 64)
+
+   Named machine-word register file with exact X / controlled-X execution.
+
+       Every operation is an exact unitary permutation of the amplitudes —
+       a genuine statevector execution, not a call recorder. Bit indices are
+       confined to one machine word; wider logical registers span several
+       word registers (see :func:`word_layout`).
+
+
+
+   .. py:method:: X_Bool(name: str, bit_index: int) -> WordXOperator
+
+
+   .. py:method:: make_state() -> SparseStateVector
+
+
+   .. py:method:: position(pair: tuple[str, int]) -> int
+
+
+   .. py:method:: register(*views) -> None
+
+      Touch every coordinate so later state creation sees the layout.
+
+
+
+   .. py:method:: word_slot(name: str) -> int
+
+
+.. py:class:: SparseStateVector
+
+   Exact amplitudes over arbitrary-width basis indices (dict-backed).
+
+
+   .. py:method:: amplitude(basis: int) -> complex
+
+
+.. py:class:: WordXOperator(backend: ReferenceWordBackend, position: int)
+
+   A native X on one machine-word bit, optionally controlled on |1>.
+
+       Follows the frozen protocol: ``conditioned_by_bit`` accepts the bit
+       coordinate list, mutates the operator and returns ``self``.
+
+
+
+   .. py:method:: conditioned_by_bit(pairs)
+
+
+.. py:function:: encode_basis(basis: int, pairs, value: int, backend: ReferenceWordBackend) -> int
+
+   OR the little-endian ``value`` into ``basis`` at the given coordinates.
+
+
+.. py:function:: word_layout(width: int, prefix: str, machine_word_bits: int = 64) -> list[tuple[str, int]]
+
+   Little-endian coordinates of one logical register over machine words.
+
+
+.. py:data:: MACHINE_WORD_BITS
+   :type:  int
+   :value: 64
+
+

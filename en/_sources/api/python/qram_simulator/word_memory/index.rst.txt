@@ -1,0 +1,128 @@
+qram_simulator.word_memory
+==========================
+
+.. py:module:: qram_simulator.word_memory
+
+.. autoapi-nested-parse::
+
+   Sparse logical QRAM words independent of host integer/register widths.
+
+   This module is the single authoritative source of the ideal sparse XOR
+   query semantics shared with SparQSim (installed there as
+   ``pysparq/_qram_words.py`` from this repository's submodule) and OracQ.
+
+   The ideal XOR interface emits actual controlled native X operations on
+   caller-supplied bit coordinates. It is separate from the noisy
+   bucket-brigade circuit (``QRAMCircuitQubit``/``QRAMCircuitQutrit``, which
+   route through a physical tree and keep their ``size_t`` address packing)
+   and never claims to allocate or simulate a dense tree with
+   ``2**address_width`` nodes.
+
+   Capacity notions kept apart by design:
+
+   - *wide logical words*: ``address_width``/``data_width`` may be any
+     positive integer (65, 129, 256, ...); logical registers are carried by
+     one or more native machine words and are never truncated to 64 bits;
+   - *sparse records*: only the non-zero ``cells`` exist as Python objects;
+   - *nominal address space*: ``2**address_width`` labels, a pure bound on
+     address values — no entity, qubit or tree node is allocated for it;
+   - *allocatable entity capacity*: whatever the native backend actually
+     allocates (machine words / qubits); querying this memory allocates
+     nothing beyond the caller's own registers.
+
+   Native backend protocol (frozen with the SparQSim owner):
+
+   - bit coordinates are ``(word_register_name, bit_index)`` pairs — a
+     logical register wider than one machine word simply spans several word
+     registers;
+   - ``backend.X_Bool(word_register_name, bit_index)`` returns an operator
+     object that can be applied to the state by calling it:
+     ``operator(state)``;
+   - ``operator.conditioned_by_bit(bit_coordinate_list)`` turns the operator
+     into an X controlled on every listed bit reading 1. Implementations may
+     mutate the operator in place, return ``self`` or return a new
+     conditioned operator; all three are supported here;
+   - conditions passed to :meth:`SparseWordMemory.apply_xor` are
+     ``(little_endian_bits, expected_value)`` pairs: the query for a stored
+     cell fires only on basis states where the listed bits hold
+     ``expected_value`` (little-endian).
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   qram_simulator.word_memory.BitCoordinate
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   qram_simulator.word_memory.SparseWordMemory
+
+
+Module Contents
+---------------
+
+.. py:class:: SparseWordMemory(address_width: int, data_width: int, cells: collections.abc.Mapping[int, int])
+
+   A zero-default sparse memory with arbitrary-width unsigned words.
+
+       ``address_width`` and ``data_width`` are logical widths in bits; every
+       stored value keeps its exact high bits in arbitrary-precision Python
+       integers, so words are never packed into a single 64-bit machine word.
+       Cells mapped to zero are dropped: the memory is zero by default.
+
+
+
+   .. py:method:: apply_xor(state, address_bits: Sequence[BitCoordinate], data_bits: Sequence[BitCoordinate], backend, *, conditions=tuple()) -> None
+
+      Apply the exact coherent query on native machine-word bit coordinates.
+
+              ``address_bits[i]`` / ``data_bits[i]`` are the ``(word_register_name,
+              bit_index)`` coordinates of logical bit ``i`` (little-endian) of the
+              address / data registers; a logical register wider than one machine
+              word spans several word registers. ``backend`` must be the caller's
+              real native backend (see the module docstring protocol), not a mock.
+              Conditions are ``(little_endian_bits, expected_value)`` pairs; a
+              stored cell is queried only on basis states satisfying all of them.
+              Shared bits between conditions and the address register are merged —
+              a zero control coinciding with an address bit restricts the query to
+              cells whose address agrees with it, and never re-addresses a cell.
+
+              For each stored cell the emission is: toggle the zero-valued
+              address/control bits to 1, apply one controlled native X per set
+              data bit conditioned on all required bits, then restore the
+              toggles. This is exact: basis states not matching the merged
+              pattern are untouched by the transient toggles.
+
+
+
+
+   .. py:method:: xor(address: int, data: int = 0) -> int
+
+      Return ``data`` XOR the stored word at ``address`` (0 if absent).
+
+
+
+   .. py:property:: nominal_address_space
+      :type: int
+
+
+      Number of addressable labels ``2**address_width`` (no allocation).
+
+
+   .. py:property:: record_count
+      :type: int
+
+
+      Number of non-zero stored records (the only existing entities).
+
+
+.. py:data:: BitCoordinate
+   :type:  types.GenericAlias
+
